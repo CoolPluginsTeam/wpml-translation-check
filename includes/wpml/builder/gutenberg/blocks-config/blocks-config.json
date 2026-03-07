@@ -1,0 +1,1256 @@
+{
+    "cp-timeline/content-timeline-child": {
+        "attributes": {
+            "t_date": true,
+            "time_desc": true,
+            "time_heading": true
+        }
+    },
+    "cp-timeline/content-timeline-block-child": {
+        "attributes": {
+            "t_date": true,
+            "time_desc": true,
+            "time_heading": true
+        }
+    },
+    "uagb/advanced-heading": {
+        "attributes": {
+            "headingTitle": true,
+            "headingDesc": true
+        }
+    },
+    "uagb/buttons-child": {
+        "attributes": {
+            "label": true
+        }
+    },
+    "uagb/countdown": {
+        "attributes": {
+            "labelDays": true,
+            "labelHours": true,
+            "labelMinutes": true,
+            "labelSeconds": true
+        }
+    },
+    "uagb/info-box": {
+        "attributes": {
+            "infoBoxTitle": true,
+            "headingDesc": true,
+            "tempHeadingDesc": true,
+            "ctaText": true,
+            "prefixTitle": true,
+            "iconImage": {
+                "alt": true
+            }
+        }
+    },
+    "uagb/call-to-action": {
+        "attributes": {
+            "ctaTitle": true,
+            "description": true,
+            "tempDesc": true,
+            "ctaText": true
+        }
+    },
+    "uagb/blockquote": {
+        "attributes": {
+            "author": true,
+            "descriptionText": true,
+            "authorImage": {
+                "alt": true
+            }
+        }
+    },
+    "uagb/content-timeline": {
+        "attributes": {
+            "label": true
+        }
+    },
+    "uagb/content-timeline-child": {
+        "attributes": {
+            "time_desc": true,
+            "time_heading": true
+        }
+    },
+    "uagb/counter": {
+        "attributes": {
+            "numberPrefix": true,
+            "heading": true,
+            "iconImage": {
+                "alt": true
+            }
+        }
+    },
+    "uagb/faq-child": {
+        "attributes": {
+            "question": true,
+            "answer": true
+        }
+    },
+    "uagb/forms": {
+        "attributes": {
+            "afterSubmitEmailSubject": true,
+            "captchaMessage": true,
+            "confirmationMessage": true,
+            "failedMessage": true,
+            "formLabel": true
+        }
+    },
+    "uagb/forms-name": {
+        "attributes": {
+            "placeholder": true,
+            "name": true
+        }
+    },
+    "uagb/forms-email": {
+        "attributes": {
+            "placeholder": true,
+            "name": true
+        }
+    },
+    "uagb/forms-textarea": {
+        "attributes": {
+            "placeholder": true,
+            "textareaName": true
+        }
+    },
+    "uagb/icon-list-child": {
+        "attributes": {
+            "label": true
+        }
+    },
+    "uagb/inline-notice": {
+        "attributes": {
+            "noticeTitle": true
+        }
+    },
+    "uagb/marketing-button": {
+        "attributes": {
+            "heading": true,
+            "prefix": true
+        }
+    },
+    "uagb/restaurant-menu-child": {
+        "attributes": {
+            "description": true,
+            "title": true
+        }
+    },
+    "uagb/container": {
+        "attributes": {
+            "description": true
+        }
+    },
+    "uagb/star-rating": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "uagb/table-of-contents": {
+        "attributes": {
+            "emptyHeadingTeaxt": true,
+            "headingTitle": true
+        }
+    },
+    "uagb/tabs-child": {
+        "attributes": {
+            "header": true
+        }
+    },
+    "uagb/team": {
+        "attributes": {
+            "description_text": true,
+            "prefix": true,
+            "title": true
+        }
+    },
+    "uagb/testimonial": {
+        "attributes": {
+            "test_block": [
+                {
+                    "company": true,
+                    "description": true,
+                    "name": true
+                }
+            ]
+        }
+    },
+    "uagb/review": {
+        "attributes": {
+            "summaryDescription": true,
+            "summaryTitle": true,
+            "parts": [
+                {
+                    "label": true
+                }
+            ],
+            "rAuthor": true,
+            "rContent": true,
+            "rTitle": true,
+            "schema": true
+        }
+    },
+    "uagb/how-to-step": {
+        "attributes": {
+            "description": true,
+            "name": true
+        }
+    },
+    "uagb/how-to": {
+        "attributes": {
+            "currencyType": true,
+            "headingDesc": true,
+            "headingTitle": true,
+            "timeNeeded": true,
+            "estCost": true,
+            "materials": [
+                {
+                    "add_required_materials": true
+                }
+            ],
+            "tools": [
+                {
+                    "add_required_tools": true
+                }
+            ],
+            "stepsTitle": true,
+            "materialTitle": true,
+            "toolsTitle": true,
+            "timeIn": true
+        }
+    },
+    "essential-blocks/accordion-item": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "essential-blocks/button": {
+        "attributes": {
+            "buttonText": true
+        }
+    },
+    "essential-blocks/call-to-action": {
+        "attributes": {
+            "buttonText": true,
+            "description": true,
+            "title": true
+        }
+    },
+    "essential-blocks/countdown": {
+        "attributes": {
+            "daysLabel": true,
+            "hoursLabel": true,
+            "minutesLabel": true,
+            "secondsLabel": true
+        }
+    },
+    "essential-blocks/number-counter": {
+        "attributes": {
+            "counterTitle": true,
+            "hoursLabel": true
+        }
+    },
+    "essential-blocks/dual-button": {
+        "attributes": {
+            "buttonTextOne": true,
+            "buttonTextTwo": true
+        }
+    },
+    "essential-blocks/flipbox": {
+        "attributes": {
+            "backContent": true,
+            "backTitle": true,
+            "buttonText": true,
+            "frontContent": true,
+            "frontTitle": true
+        }
+    },
+    "essential-blocks/advanced-heading": {
+        "attributes": {
+            "subtitleText": true,
+            "titleText": true
+        }
+    },
+    "essential-blocks/advanced-tabs": {
+        "attributes": {
+            "tabTitles": [
+                {
+                    "text": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/infobox": {
+        "attributes": {
+            "description": true,
+            "subTitle": true,
+            "title": true,
+            "buttonText": true
+        }
+    },
+    "essential-blocks/interactive-promo": {
+        "attributes": {
+            "header": true,
+            "imageAltTag": true
+        }
+    },
+    "essential-blocks/notice": {
+        "attributes": {
+            "text": true,
+            "title": true
+        }
+    },
+    "essential-blocks/pricing-table": {
+        "attributes": {
+            "buttonText": true,
+            "mainPrice": true,
+            "pricePeriod": true,
+            "subtitle": true,
+            "title": true,
+            "features": [
+                {
+                    "text": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/progress-bar": {
+        "attributes": {
+            "title": true,
+            "suffix": true,
+            "prefix": true
+        }
+    },
+    "essential-blocks/slider": {
+        "attributes": {
+            "images": [
+                {
+                    "alt": true,
+                    "buttonText": true,
+                    "subtitle": true,
+                    "title": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/social": {
+        "attributes": {
+            "socialDetails": [
+                {
+                    "title": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/social-share": {
+        "attributes": {
+            "profilesOnly": [
+                {
+                    "iconText": true
+                }
+            ],
+            "socialDetails": [
+                {
+                    "iconText": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/team-member": {
+        "attributes": {
+            "description": true,
+            "jobTitle": true,
+            "name": true,
+            "profilesOnly": [
+                {
+                    "title": true
+                }
+            ],
+            "socialDetails": [
+                {
+                    "title": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/testimonial": {
+        "attributes": {
+            "companyName": true,
+            "description": true,
+            "userName": true
+        }
+    },
+    "essential-blocks/toggle-content": {
+        "attributes": {
+            "primaryLabelText": true,
+            "secondaryLabelText": true
+        }
+    },
+    "essential-blocks/typing-text": {
+        "attributes": {
+            "prefix": true,
+            "suffix": true,
+            "typedText": [
+                {
+                    "text": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/table-of-contents": {
+        "attributes": {
+            "title": true,
+            "deleteHeaderList": [
+                {
+                    "label": true
+                }
+            ],
+            "headers": [
+                {
+                    "text": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/feature-list": {
+        "attributes": {
+            "features": [
+                {
+                    "title": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/advanced-image": {
+        "attributes": {
+            "image": {
+                "alt": true
+            }
+        }
+    },
+    "essential-blocks/advanced-video": {
+        "attributes": {
+            "image": [
+                {
+                    "alt": true
+                }
+            ]
+        }
+    },
+    "essential-blocks/popup": {
+        "attributes": {
+            "btnText": true
+        }
+    },
+    "essential-blocks/form": {
+        "attributes": {
+            "buttonText": true,
+            "formTitle": true
+        }
+    },
+    "essential-blocks/form-text-field": {
+        "attributes": {
+            "labelText": true,
+            "placeholderText": true
+        }
+    },
+    "essential-blocks/form-email-field": {
+        "attributes": {
+            "labelText": true,
+            "placeholderText": true
+        }
+    },
+    "essential-blocks/form-textarea-field": {
+        "attributes": {
+            "labelText": true,
+            "placeholderText": true
+        }
+    },
+    "essential-blocks/form-number-field": {
+        "attributes": {
+            "labelText": true,
+            "placeholderText": true
+        }
+    },
+    "essential-blocks/form-select-field": {
+        "attributes": {
+            "options": [
+                {
+                    "name": true
+                }
+            ],
+            "labelText": true
+        }
+    },
+    "essential-blocks/form-checkbox-field": {
+        "attributes": {
+            "options": [
+                {
+                    "name": true
+                }
+            ],
+            "labelText": true
+        }
+    },
+    "kadence/pane": {
+        "attributes": {
+            "title": [
+                true
+            ]
+        }
+    },
+    "kadence/advancedgallery": {
+        "attributes": {
+            "imagesData": [
+                {
+                    "alt": true
+                }
+            ],
+            "imagesDynamic": [
+                {
+                    "alt": true
+                }
+            ]
+        }
+    },
+    "kadence/singlebtn": {
+        "attributes": {
+            "iconTitle": true,
+            "text": true,
+            "label": true
+        }
+    },
+    "kadence/advancedheading": {
+        "attributes": {
+            "iconTitle": true,
+            "iconTooltip": true
+        }
+    },
+    "kadence/countdown": {
+        "attributes": {
+            "secondsLabel": true,
+            "minutesLabel": true,
+            "hoursLabel": true,
+            "daysLabel": true,
+            "postLabel": true,
+            "preLabel": true
+        }
+    },
+    "themeisle-blocks/accordion-item": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "themeisle-blocks/form-input": {
+        "attributes": {
+            "helpText": true,
+            "placeholder": true,
+            "label": true
+        }
+    },
+    "themeisle-blocks/form-textarea": {
+        "attributes": {
+            "helpText": true,
+            "placeholder": true,
+            "label": true
+        }
+    },
+    "themeisle-blocks/circle-counter": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "themeisle-blocks/flip": {
+        "attributes": {
+            "description": true,
+            "title": true
+        }
+    },
+    "themeisle-blocks/review": {
+        "attributes": {
+            "links": [
+                {
+                    "label": true
+                }
+            ],
+            "cons": [
+                true
+            ],
+            "pros": [
+                true
+            ],
+            "features": [
+                {
+                    "description": true,
+                    "title": true
+                }
+            ],
+            "description": true,
+            "title": true
+        }
+    },
+    "themeisle-blocks/slider": {
+        "attributes": {
+            "images": [
+                {
+                    "caption": true
+                }
+            ]
+        }
+    },
+    "themeisle-blocks/progress-bar": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "themeisle-blocks/button": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "themeisle-blocks/icon-list-item":{
+        "attributes": {
+            "content": true
+        }
+    },
+    "themeisle-blocks/tabs-item": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "kadence/listitem": {
+        "attributes": {
+            "iconTitle": true,
+            "text": true
+        }
+    },
+    "kadence/testimonial": {
+        "attributes": {
+            "occupation": true,
+            "name": true,
+            "title": true
+        }
+    },
+    "kadence/countup": {
+        "attributes": {
+            "suffix": true,
+            "prefix": true,
+            "title": true
+        }
+    },
+    "kadence/form": {
+        "attributes": {
+            "submitLabel": true,
+            "messages": [
+                {
+                    "preError": true,
+                    "error": true,
+                    "success": true
+                }
+            ],
+            "fields": [
+                {
+                    "ariaLabel": true,
+                    "description": true,
+                    "requiredMessage": true,
+                    "options": [
+                        {
+                            "label": true,
+                            "value": true
+                        }
+                    ],
+                    "placeholder": true,
+                    "label": true,
+                    "errorMessage": true
+                }
+            ]
+        }
+    },
+    "kadence/infobox": {
+        "attributes": {
+            "learnMore": true,
+            "contentText": true,
+            "title": true,
+            "mediaIcon": [
+                {
+                    "title": true
+                }
+            ]
+        }
+    },
+    "kadence/image": {
+        "attributes": {
+            "title": true,
+            "alt": true
+        }
+    },
+    "kadence/lottie": {
+        "attributes": {
+            "label": true
+        }
+    },
+    "kadence/progress-bar": {
+        "attributes": {
+            "numberSuffix": true,
+            "numberPrefix": true,
+            "label": true
+        }
+    },
+    "kadence/tableofcontents": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "kadence/tabs": {
+        "attributes": {
+            "titles": [
+                {
+                    "text": true
+                }
+            ]
+        }
+    },
+    "stackable/heading": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "stackable/text": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "stackable/button": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "stackable/subtitle": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "stackable/image": {
+        "attributes": {
+            "imageAlt": true
+        }
+    },
+    "stackable/icon-list-item": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "stackable/tab-labels": {
+        "attributes": {
+            "tabLabels": [
+                {
+                    "label": true
+                }
+            ],
+            "tabText": true
+        }
+    },
+    "stackable/count-up": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "stackable/countdown": {
+        "attributes": {
+            "secondText": true,
+            "minuteText": true,
+            "hourText": true,
+            "dayText": true
+        }
+    },
+    "stackable/number-box": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "stackable/posts": {
+        "attributes": {
+            "readmoreText": true
+        }
+    },
+    "stackable/progress-bar": {
+        "attributes": {
+            "text": true
+        },
+        "xpath": ["//*[contains(@class,'stk-progress-bar__text')]",{"value": "//*[contains(@class,'stk-progress-bar')]/@aria-label", "label": "Aria Label"},{"value": "//*[contains(@class,'stk-progress-bar')]/@aria-valuetext", "label": "Aria Value Text"}]
+    },
+    "stackable/table-of-contents": {
+        "attributes": {
+            "titleText": true,
+            "text": true,
+            "headings": [
+                {
+                    "content": true,
+                    "customContent": true
+                }
+            ]
+        }
+    },
+    "stackable/timeline": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "gutenverse/accordion": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "gutenverse/icon-list-item": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "gutenverse/advanced-heading": {
+        "attributes": {
+            "text": true,
+            "subText": true,
+            "focusText": true
+        }
+    },
+    "gutenverse/animated-text": {
+        "attributes": {
+            "beforeTextAnimated": true,
+            "text": true,
+            "afterTextAnimated": true
+        }
+    },
+    "gutenverse/button": {
+        "attributes": {
+            "content": true
+        }
+    },
+    "gutenverse/chart": {
+        "attributes": {
+            "description": true,
+            "title": true
+        }
+    },
+    "gutenverse/countdown": {
+        "attributes": {
+            "labelDays": true,
+            "labelHours": true,
+            "labelMinutes": true,
+            "labelPosition": true,
+            "labelSeconds": true
+        }
+    },
+    "gutenverse/icon-box": {
+        "attributes": {
+            "description": true,
+            "title": true
+        }
+    },
+    "gutenverse/image-box": {
+        "attributes": {
+            "description": true,
+            "title": true
+        }
+    },
+    "gutenverse/feature-list": {
+        "attributes": {
+            "featureList": [
+                {
+                    "content": true,
+                    "title": true
+                }
+            ]
+        }
+    },
+    "gutenverse/fun-fact": {
+        "attributes": {
+            "suffix": true,
+            "title": true
+        }
+    },
+    "gutenverse/gallery": {
+        "xpath": ["//*[contains(@class,'item-title')]",{"value": "//*[contains(@class,'image-list')]/@data-filter", "label": "Data Filter"},{"value": "//*[contains(@class,'image-list')]/@data-title", "label": "Data Title"},{"value": "//*[contains(@class,'gallery-item-wrap')]/@data-control", "label": "Data Control"},{"value": "//*[contains(@class,'main-image')]/@alt", "label": "Alt"}],
+        "attributes": {
+            "images": [
+                {
+                    "title": true
+                }
+            ]
+        }
+    },
+    "gutenverse/portfolio-gallery": {
+        "attributes": {
+            "linkText": true,
+            "images": [
+                {
+                    "subtitle": true,
+                    "title": true
+                }
+            ]
+        }
+    },
+    "gutenverse/progress-bar": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "gutenverse/star-rating": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "gutenverse/tabs": {
+        "attributes": {
+            "tabs": [
+                {
+                    "text": true
+                }
+            ]
+        }
+    },
+    "gutenverse/team": {
+        "attributes": {
+            "job": true,
+            "name": true
+        }
+    },
+    "gutenverse/testimonials": {
+        "attributes": {
+            "testimonialData": [
+                {
+                    "description": true,
+                    "name": true,
+                    "comment": true
+                }
+            ]
+        }
+    },
+    "ub/content-toggle-panel-block": {
+        "attributes": {
+            "panelTitle": true
+        }
+    },
+    "ub/button": {
+        "attributes": {
+            "buttons": [
+                {
+                    "buttonText": true
+                }
+            ]
+        }
+    },
+    "ub/expand-portion": {
+        "attributes": {
+            "clickText": true
+        }
+    },
+    "ub/testimonial": {
+        "attributes": {
+            "ub_testimonial_author_role": true,
+            "ub_testimonial_author": true,
+            "ub_testimonial_text": true
+        }
+    },
+    "ub/call-to-action-block": {
+        "attributes": {
+            "ub_cta_button_text": true,
+            "ub_cta_content_text": true,
+            "ub_call_to_action_headline_text": true
+        }
+    },
+    "ub/click-to-tweet": {
+        "attributes": {
+            "ubTweet": true
+        }
+    },
+    "ub/tabbed-content-block": {
+        "attributes": {
+            "tabsTitle": [
+                true
+            ]
+        }
+    },
+    "ub/star-rating-block": {
+        "attributes": {
+            "reviewText": true
+        }
+    },
+    "ub/table-of-contents-block": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "ub/progress-bar": {
+        "attributes": {
+            "detail": true
+        }
+    },
+    "ub/review": {
+        "attributes": {
+            "parts": [
+                {
+                    "label": true
+                }
+            ],
+            "summaryDescription": true,
+            "summaryTitle": true,
+            "itemName": true,
+            "authorName": true
+        }
+    },
+    "ub/content-filter-block": {
+        "attributes": {
+            "filterArray": [
+                {
+                    "category": true
+                }
+            ]
+        }
+    },
+    "ub/how-to": {
+        "attributes": {
+            "resultIntro": true,
+            "howToYield": true,
+            "section": [
+                {
+                    "steps": [
+                        {
+                            "title": true,
+                            "tip": true,
+                            "direction": true
+                        }
+                    ]
+                }
+            ],
+            "introduction": true,
+            "title": true
+        }
+    },
+    "ub/counter": {
+        "attributes": {
+            "label": true
+        }
+    },
+    "qi-blocks/button": {
+        "attributes": {
+            "buttonText": true
+        }
+    },
+    "qi-blocks/accordion": {
+        "attributes": {
+            "accordionItemsRepeater": [
+                {
+                    "itemTitle": true,
+                    "itemText": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/advanced-text": {
+        "attributes": {
+            "text": true
+        }
+    },
+    "qi-blocks/author-info": {
+        "attributes": {
+            "text": true,
+            "title": true
+        }
+    },
+    "qi-blocks/banner": {
+        "attributes": {
+            "text": true,
+            "subtitle": true,
+            "title": true
+        }
+    },
+    "qi-blocks/call-to-action": {
+        "attributes": {
+            "text": true,
+            "title": true
+        }
+    },
+    "qi-blocks/clients-list": {
+        "attributes": {
+            "clientItemsRepeater": [
+                {
+                    "clientText": true,
+                    "clientTitle": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/counter": {
+        "attributes": {
+            "text": true,
+            "title": true
+        }
+    },
+    "qi-blocks/faq": {
+        "attributes": {
+            "faqItemsRepeater": [
+                {
+                    "itemText": true,
+                    "itemTitle": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/how-to": {
+        "attributes": {
+            "text": true,
+            "subtitle": true,
+            "title": true,
+            "howToItemsRepeater": [
+                {
+                    "stepText": true,
+                    "stepTitle": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/icon-with-text": {
+        "attributes": {
+            "text": true,
+            "title": true
+        }
+    },
+    "qi-blocks/info-box": {
+        "attributes": {
+            "text": true,
+            "title": true,
+            "subtitle": true
+        }
+    },
+    "qi-blocks/message-box": {
+        "attributes": {
+            "text": true,
+            "title": true
+        }
+    },
+    "qi-blocks/pricing-table": {
+        "attributes": {
+            "pricingTableItemsRepeater": [
+                {
+                    "itemText": true
+                }
+            ],
+            "label": true,
+            "period": true,
+            "currency": true,
+            "price": true,
+            "title": true
+        }
+    },
+    "qi-blocks/process": {
+        "attributes": {
+            "processItemsRepeater": [
+                {
+                    "itemText": true,
+                    "itemTitle": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/progress-bar-circle": {
+        "attributes": {
+            "text": true,
+            "title": true
+        }
+    },
+    "qi-blocks/progress-bar-horizontal": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "qi-blocks/progress-bar-vertical": {
+        "attributes": {
+            "title": true
+        }
+    },
+    "qi-blocks/search": {
+        "attributes": {
+            "buttonText": true
+        }
+    },
+    "qi-blocks/section-title": {
+        "attributes": {
+            "subtitleIcon": {
+                "html": true
+            },
+            "text": true,
+            "subtitle": true,
+            "title": true
+        }
+    },
+    "qi-blocks/table-of-contents": {
+        "attributes": {
+            "text": true,
+            "subtitle": true,
+            "title": true
+        }
+    },
+    "qi-blocks/tabs-horizontal": {
+        "attributes": {
+            "tabsHorizontalItemsRepeater": [
+                {
+                    "itemTitle": true,
+                    "itemText": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/tabs-vertical": {
+        "attributes": {
+            "tabsVerticalItemsRepeater": [
+                {
+                    "itemTitle": true,
+                    "itemText": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/team-member": {
+        "attributes": {
+            "role": true,
+            "name": true
+        }
+    },
+    "qi-blocks/testimonials-list": {
+        "attributes": {
+            "testimonialsListItemsRepeater": [
+                {
+                    "itemAuthorOccupation": true,
+                    "itemAuthor": true,
+                    "itemText": true,
+                    "itemTitle": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/text-marquee": {
+        "attributes": {
+            "items": [
+                {
+                    "itemText": true
+                }
+            ]
+        }
+    },
+    "qi-blocks/timeline": {
+        "attributes": {
+            "timelineRepeater": [
+                {
+                    "itemText": true,
+                    "itemDate": true,
+                    "itemTitle": true
+                }
+            ]
+        }
+    },
+    "rank-math/toc-block": {
+        "attributes": {
+            "title": true
+        }
+    }
+}

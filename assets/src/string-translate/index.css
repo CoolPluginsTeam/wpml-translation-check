@@ -1,0 +1,1359 @@
+.automl-wpml-bulk-translate-btn_re_translation {
+  margin-left: 10px !important;
+}
+
+.automl-wpml-bulk-translate-notice {
+  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+          box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  border: 1px solid #c3c4c7;
+  border-left-width: 4px;
+  padding: 4.8px;
+  margin-top: 8px;
+}
+
+.automl-wpml-bulk-translate-notice p {
+  padding: 0;
+  margin: 0;
+  font-size: 14px;
+}
+
+.automl-wpml-bulk-translate-notice-warning {
+  border-left-color: #f0ad4e;
+}
+
+.automl-wpml-bulk-translate-notice-error {
+  border-left-color: #d9534f;
+}
+
+.automl-wpml-bulk-translate-notice-success {
+  border-left-color: #5cb85c;
+}
+
+#automl-wpml-bulk-translate-wrapper {
+  display: none;
+}
+
+#automl-wpml-bulk-translate-wrapper.automl-wpml-bulk-translate-active {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: #000000d4;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container {
+  background: white;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 100vw;
+  /* Setting Modal CSS Start */
+  /* Setting Modal CSS Start */
+  /* Setting Modal CSS End */
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active {
+  width: clamp(200px, 800px, 90%);
+  height: auto;
+  max-height: 70vh;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active.automl-wpml-bulk-translate-empty-posts {
+  height: auto;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active.automl-wpml-bulk-translate-empty-posts h2 {
+  padding-bottom: 1.5rem !important;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active.automl-wpml-bulk-translate-empty-posts p {
+  font-size: 1.2rem;
+  color: red;
+  font-weight: 600;
+  text-align: center;
+  margin: 0;
+  padding: 12px;
+  margin-top: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active .automl-wpml-bulk-translate-progress-skeleton {
+  background: -webkit-gradient(linear, left top, right top, color-stop(25%, #e0e0e0), color-stop(50%, #f5f5f5), color-stop(75%, #e0e0e0));
+  background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  height: 19px;
+  padding: 9px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  width: 100%;
+  border-radius: 3px;
+  -webkit-animation: shimmer 1.2s infinite linear;
+          animation: shimmer 1.2s infinite linear;
+  margin-bottom: .5rem;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-setting-modal-active {
+  height: auto;
+  max-height: 90vh;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-language-container {
+  max-width: 560px;
+  min-width: 500px;
+}
+.automl-wpml-bulk-translate-header{
+  padding: 12px 24px 0px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    background: #ffffff;
+}
+.automl-wpml-bulk-translate-modal-close{
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 24px;
+  padding: 0;
+  margin: 0;
+  width: 24px;
+  height: 24px;
+
+}
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container {
+  height: 100%;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content {
+  border-radius: 0px;
+  padding: 0px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  height: 100%;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-header h2 {
+  height: unset;
+  padding: 8px 36px 8px 25px;
+  border: none;
+  background: 0 0;
+  border-bottom: 1px solid #dcdcde;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 2;
+  margin: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-header .automl-wpml-bulk-translate-setting-modal-close {
+  right: 15px;
+  top: 13px;
+  border-radius: 0 !important;
+  height: 30px !important;
+  width: 20px !important;
+  position: absolute;
+  font-size: 32px;
+  font-weight: bold;
+  color: #646970;
+  cursor: pointer;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-body {
+  max-width: 100vw;
+  overflow-x: auto;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-footer {
+  display: flex;
+  justify-content: space-between;
+  background: 0 0;
+  border: none;
+  border-top: 1px solid #dcdcde;
+  margin-top: 0;
+  padding: 16px 22.4px 16px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-footer .automl-wpml-bulk-translate-setting-close {
+ background-color: #ffffff;
+ border: none;
+ color: #000000;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-footer .automl-wpml-bulk-translate-setting-close:hover {
+  background-color: #fff;
+  border-color: #fff;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  max-width: 900px;
+  padding: 5px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  border-radius: 8px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-modal-close {
+  position: absolute;
+  right: 1rem;
+  top: .8rem;
+  cursor: pointer;
+  font-size: 2rem;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container h2 {
+  font-size: 22px;
+  padding: 0px;
+  margin: 0px;
+  text-align: center;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container h2.running span {
+  width: 18px;
+  aspect-ratio: 3;
+  background: radial-gradient(circle closest-side, #1d2327 50%, #0000 80%) 0/calc(100%/3) 100% space;
+  -webkit-clip-path: inset(0 100% 0 0);
+          clip-path: inset(0 100% 0 0);
+  -webkit-animation: blink 1s steps(4) infinite;
+          animation: blink 1s steps(4) infinite;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  line-height: 1;
+  padding: 0px;
+  margin: 0px;
+  margin-bottom: -1px;
+  margin-left: 1px;
+}
+
+@-webkit-keyframes blink {
+  to {
+    -webkit-clip-path: inset(0 -34% 0 0);
+            clip-path: inset(0 -34% 0 0);
+  }
+}
+
+@keyframes blink {
+  to {
+    -webkit-clip-path: inset(0 -34% 0 0);
+            clip-path: inset(0 -34% 0 0);
+  }
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-overall-progress .automl-wpml-bulk-translate-progress-bar {
+  width: 100%;
+  background: #ddd;
+  height: 19px;
+  border-radius: 5px;
+  overflow: hidden;
+  text-align: center;
+  color: white;
+  background-size: 30px 30px;
+  margin-bottom: 10px;
+  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+  -webkit-animation: animate-stripes 0.6s linear infinite;
+          animation: animate-stripes 0.6s linear infinite;
+  -webkit-animation-duration: 1.25s;
+          animation-duration: 1.25s;
+  animation-direction: reverse;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-overall-progress .automl-wpml-bulk-translate-progress-bar .automl-wpml-bulk-translate-progress {
+  height: 100%;
+  background: #3db63d;
+  width: 0%;
+  -webkit-transition: width 0.3s ease;
+  transition: width 0.3s ease;
+  max-width: 100%;
+  border-radius: 5px;
+}
+
+@-webkit-keyframes animate-stripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 60px 0;
+  }
+}
+
+@keyframes animate-stripes {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 60px 0;
+  }
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-translator-strings-count {
+  color: #4caf50;
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-header+div {
+  margin-top: 16px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container {
+  background: #00000008;
+  border: 1px solid #00000012;
+  border-radius: 13px;
+  display: grid;
+  font-size: 1rem;
+  gap: .8rem .3rem;
+  grid-template-columns: auto auto auto;
+  justify-content: space-between;
+  margin-inline: 24px;
+  margin-bottom: 15px;
+  padding: .7rem 1rem;
+}
+
+.automl-wpml-bulk-translate-count-container .automl-wpml-bulk-translate-count-stat-cell .automl-wpml-bulk-translate-count-stat-value{
+  font-weight: 700;
+}
+.automl-wpml-bulk-translate-count-container .automl-wpml-bulk-translate-count-stat-cell .automl-wpml-bulk-translate-count-stat-label{
+  font-size: 10px;
+  font-weight: 500;
+  color: #8c8585;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container ~ .automl-wpml-bulk-translate-status-table-container {
+  border-radius: 0 0 8px 8px;
+  margin-top: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container {
+  height: 100%;
+  overflow: hidden;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+/* Shared layout for td-completed and td-error - same structure and styling */
+/* Grid with fixed left column so flag+language and badge+count align across all cards */
+.automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status-table-inner .automl-wpml-bulk-translate-td-completed,
+.automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status-table-inner .automl-wpml-bulk-translate-td-error {
+  background: #00000008;
+  border: 1px solid #00000012;
+  border-radius: 13px;
+  display: grid;
+  font-size: 1rem;
+  gap: .8rem .3rem;
+  grid-template-columns: auto auto auto;
+  justify-content: space-between;
+  margin-inline: 24px;
+  margin-bottom: 15px;
+  padding: .7rem 1rem;
+}
+
+ .automl-wpml-bulk-translate-td-pending {
+  background: #00000008;
+  border: 1px solid #00000012;
+  border-radius: 13px;
+  display: grid;
+  font-size: 1rem;
+  gap: .8rem .3rem;
+  grid-template-columns: auto auto auto;
+  justify-content: space-between;
+  margin-inline: 24px;
+  margin-bottom: 15px;
+  padding: .7rem 1rem;
+}
+
+/* Skeleton only: status-content grid layout */
+.automl-wpml-bulk-translate-overall-progress .automl-wpml-bulk-translate-td-pending .automl-wpml-bulk-translate-status-content {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Right section: badge + count - fixed column widths so they align across cards */
+.automl-wpml-bulk-translate-td-completed .automl-wpml-bulk-translate-status-content,
+.automl-wpml-bulk-translate-td-error .automl-wpml-bulk-translate-status-content {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Badge stays in first column; count text in second - both align across rows */
+.automl-wpml-bulk-translate-td-completed .automl-wpml-bulk-translate-status-content .automl-wpml-bulk-translate-status-content-inner,
+.automl-wpml-bulk-translate-td-error .automl-wpml-bulk-translate-status-content .automl-wpml-bulk-translate-status-content-inner {
+  min-width: 0;
+}
+
+.automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status-table-inner .automl-wpml-bulk-translate-status-flag .automl-wpml-bulk-translate-status-flag-inner .automl-wpml-bulk-translate-status-flag-inner-left {
+  margin-right: 7px;
+  margin-top: 3px;
+}
+
+.automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status-table-inner .automl-wpml-bulk-translate-status-flag .automl-wpml-bulk-translate-status-flag-inner .automl-wpml-bulk-translate-status-flag-inner-right {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container > div {
+  height: 100%;
+  overflow-y: auto;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-progress-bar-circular {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: inline-block;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-progress-bar-circular .automl-wpml-bulk-translate-circle {
+  width: 100%;
+  height: 100%;
+  -webkit-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-progress-bar-circular .automl-wpml-bulk-translate-bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 3;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-progress-bar-circular .automl-wpml-bulk-translate-progress {
+  fill: none;
+  stroke: #4caf50;
+  stroke-width: 3;
+  stroke-linecap: round;
+  -webkit-transition: stroke-dasharray 0.6s ease;
+  transition: stroke-dasharray 0.6s ease;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-progress-bar-circular .automl-wpml-bulk-translate-percentage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+  font-size: 11px;
+  font-weight: bold;
+  color: #333;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-group-title {
+  border-block: 1px solid #ebebeb;
+}
+
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status-error-button {
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  -webkit-transition: all .4s ease-in-out;
+  transition: all .4s ease-in-out;
+  border-color: #ff2f44;
+  color: white;
+  background: #ff3e51;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status-error-button:hover {
+  background: #ff2037;
+  border-color: #ff152d;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-retranslate {
+  padding: 3px 5px;
+  border-radius: 28px;
+  font-size: 12px;
+  color: #fff;
+  border: 1px solid transparent;
+  background: #5cb85c;
+  margin-left: 7px;
+  line-height: 1;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status {
+  padding: 4px 8px;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 600;
+  border: 1px solid transparent;
+  margin-right: 10px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status.error {
+  background: #ee4237;
+  border-color: #dd362b;
+  color: #fff;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status.warning {
+  background: #fff297;
+  color: #000000;
+  border-color: #f7e241;
+}
+
+.automl-wpml-bulk-translate-status-flag .automl-wpml-bulk-translate-status-flag-inner{
+  display: flex;
+}
+
+.automl-wpml-bulk-translate-status.success.completed{
+  background-color: #3db63d26;
+  color: #3db63d;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-status.primary {
+  background: #2271b1;
+  border-color: #2271b1;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-progress-skeleton {
+  background: -webkit-gradient(linear, left top, right top, color-stop(25%, #e0e0e0), color-stop(50%, #f5f5f5), color-stop(75%, #e0e0e0));
+  background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
+  background-size: 200% 100%;
+  height: 10px;
+  border-radius: 3px;
+  -webkit-animation: shimmer 1.2s infinite linear;
+          animation: shimmer 1.2s infinite linear;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-progress-skeleton.short {
+  padding: 0;
+  width: 30px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-td-in-progress .automl-wpml-bulk-translate-in-progress-text {
+  background-color: #3db63d;
+  border-color: #33a133;
+  color: #fff;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: end;
+  font-weight: 600;
+  width: auto;
+  padding: .1rem .5rem;
+  border-radius: 27px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table .automl-wpml-bulk-translate-td-in-progress .automl-wpml-bulk-translate-in-progress-text span {
+  width: 15px;
+  aspect-ratio: 3;
+  background: radial-gradient(circle closest-side, #fff 40%, #0000 90%) 0/calc(100%/3) 100% space;
+  -webkit-clip-path: inset(0 100% 0 0);
+          clip-path: inset(0 100% 0 0);
+  -webkit-animation: blink 1s steps(4) infinite;
+          animation: blink 1s steps(4) infinite;
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  line-height: 1;
+  padding: 0px;
+  margin: 0px;
+  margin-bottom: 3px;
+  margin-left: 1px;
+}
+
+@keyframes blink {
+  to {
+    -webkit-clip-path: inset(0 -34% 0 0);
+            clip-path: inset(0 -34% 0 0);
+  }
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-progress-footer {
+  text-align: center;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-progress-footer a {
+  padding: 2px 11px;
+  margin-top: 1.2rem;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message {
+  color: red;
+  padding: 1rem;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span ol {
+  margin-block: 16px;
+  list-style-type: decimal;
+  margin-left: 32px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span ol li {
+  margin-bottom: 12px;
+  list-style: decimal;
+  line-height: 1.2;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span p {
+  margin: 0;
+  padding: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span p * {
+  color: red !important;
+  font-size: 16px;
+  -webkit-box-shadow: unset;
+          box-shadow: unset;
+  outline: unset;
+  border: unset;
+  line-height: 1.5;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span p a {
+  color: #2271b1 !important;
+  text-decoration: underline;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-notice {
+  margin-top: 1rem;
+  margin-inline: 25px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-loading {
+  color: #000;
+  padding: 1rem;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  padding: 7px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-enabled-list {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 1rem 25px;
+}
+
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-disabled-lists {
+  background: #0000000a;
+  border-radius: 8px;
+  padding: 1rem 25px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-disabled-lists>div {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-disabled-lists>p {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 15px;
+  padding: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language.automl-wpml-bulk-translate-language-item--selected {
+  border-color: #2271b1;
+  background-color: #f0f6ff;
+  box-shadow: 0 0 0 1px #2271b1;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language-item input[type="checkbox"].automl-wpml-bulk-translate-language-checkbox-input {
+  position: absolute;
+  left: 7px;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+}
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language .automl-wpml-bulk-translate-language-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 22px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language .automl-wpml-bulk-translate-language-item .automl-wpml-bulk-translate-check-visual {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  background: #fff;
+  box-sizing: border-box;
+  position: relative;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language .automl-wpml-bulk-translate-language-item input:checked + .automl-wpml-bulk-translate-check-visual {
+  border-color: #2271b1;
+  background-color: #2271b1;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language .automl-wpml-bulk-translate-language-item input:checked + .automl-wpml-bulk-translate-check-visual::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 6px;
+  height: 12px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  box-sizing: border-box;
+}
+.automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language  .automl-wpml-bulk-translate-language-item .automl-wpml-bulk-translate-language-label{
+  margin-left: 7px;
+}
+
+.automl-wpml-bulk-translate-modal-header-inner .automl-wpml-bulk-translate-modal-desc {
+  color: #888;
+  font-size: 12px !important;
+  font-weight: 500;
+  margin: 0 0 4px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language input[name="languages"]:disabled ~ img {
+  opacity: 0.5;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language input[name="languages"]:disabled ~ span {
+  opacity: 0.5;
+}
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language input[name="languages"]:disabled ~ label {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer {
+  border: none;
+  border-top: 2px solid #00000012;
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0;
+  padding: 16px 22.4px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-of-type(1) {
+  background: #ffffff;
+  border: none;
+  color: #000000;
+  margin-right: 10px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-of-type(2) {
+  background: #2271b1;
+  border: 1px solid #2271b1;
+  color: #fff;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-of-type(2):disabled {
+  background: #5493c5 !important;
+  border: 1px solid #3f8dcf !important;
+  color: white !important;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-child(1):hover {
+  background-color: #ffffff;
+  border-color: #000000;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:not(:disabled):nth-child(2):hover {
+  background-color: #135e96;
+  border-color: #135e96;
+}
+
+.automl-wpml-bulk-translate-modal-header-inner .automl-wpml-bulk-translate-step-label{
+  font-size: 10px;
+    font-weight: 600;
+    color: #3737e7;
+}
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-header h2{
+  background: 0 0;
+  font-size: 18px;
+  font-weight: 600;
+  height: unset;
+  line-height: 2;
+  margin: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-header {
+  align-items: flex-start;
+  border-bottom: 2px solid #00000012;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 10px 24px 8px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.75);
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  z-index: 99999;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-reload-btn {
+  background: #0073aa;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 20px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element {
+  position: relative;
+  overflow: visible;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element .automl-wpml-bulk-translate-tooltip {
+  display: block;
+  font-size: 12.8px;
+  position: absolute;
+  background: #5cb85c;
+  color: #fff !important;
+  padding: 3.2px 8px;
+  border-radius: 4px;
+  top: 0;
+  left: 20px;
+  right: 20px;
+  margin: auto;
+  opacity: 0;
+  width: 121px;
+  white-space: nowrap;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element .automl-wpml-bulk-translate-tooltip:after {
+  content: "";
+  position: absolute;
+  top: 98%;
+  left: 50%;
+  margin-left: -8px;
+  width: 0;
+  height: 0;
+  border-top: 8px solid #5cb85c;
+  border-right: 8px solid transparent;
+  border-left: 8px solid transparent;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element .automl-wpml-bulk-translate-tooltip.automl-wpml-bulk-translate-tooltip-active {
+  -webkit-animation: slide-up 0.15s cubic-bezier(0.51, 0.92, 0.265, 1.55) both;
+  animation: slide-up 0.15s cubic-bezier(0.51, 0.92, 0.265, 1.55) both;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box {
+  background-color: #fefefe;
+  width: clamp(200px, 500px, 80%);
+  height: auto;
+  -webkit-box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  border-radius: 8px;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-header {
+  position: relative;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-header h3 {
+  height: unset;
+  padding: 8px 36px 8px 25px;
+  border: none;
+  background: 0 0;
+  border-bottom: 1px solid #dcdcde;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 2;
+  margin: 0;
+  color: black;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-header .automl-wpml-bulk-translate-error-modal-box-close {
+  right: 15px;
+  border-radius: 0 !important;
+  height: 30px !important;
+  width: 20px !important;
+  position: absolute;
+  font-size: 32px;
+  font-weight: bold;
+  color: #646970;
+  cursor: pointer;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body {
+  min-height: 0px;
+  max-height: 65vh;
+  height: auto;
+  padding: 22px;
+  overflow: auto;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body h4 {
+  margin: 0;
+  margin-top: 0;
+  margin-bottom: 24px;
+  display: block;
+  font-weight: 600;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body ol {
+  margin-top: 16px;
+  margin-bottom: 0px;
+  list-style-type: decimal;
+  margin-left: 32px;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  padding: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body ol li {
+  margin-bottom: 6px;
+  list-style: decimal;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body p {
+  margin: 0;
+  padding: 0;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body p * {
+  color: red !important;
+  font-size: 16px;
+  -webkit-box-shadow: unset;
+          box-shadow: unset;
+  outline: unset;
+  border: unset;
+  line-height: 1.5;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body p a {
+  color: #2271b1 !important;
+  text-decoration: underline;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body button.automl-wpml-bulk-translate-error-reload-btn {
+  background: #0073aa;
+  color: #fff !important;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 9px;
+  cursor: pointer;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body button.automl-wpml-bulk-translate-error-reload-btn:hover {
+  background: #005682;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-footer {
+  background: 0 0;
+  border: none;
+  border-top: 1px solid #dcdcde;
+  margin-top: 0;
+  padding: 16px 22.4px 16px;
+  text-align: end;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-footer .automl-wpml-bulk-translate-error-modal-box-close {
+  background: #f6f7f7;
+  border: 1px solid #c3c4c7;
+  color: #50575e;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-footer .automl-wpml-bulk-translate-error-modal-box-close:hover {
+  background-color: #e1e1e1;
+  border-color: #c9c9c9;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-pending-request {
+  text-align: center;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-pending-request .automl-wpml-bulk-translate-ai-pending-request-heading {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: .4rem !important;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-pending-request p {
+  margin-block: .4rem !important;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 1rem;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  margin-top: 1rem;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons button[data-status="translateAgain"] {
+  background: #30b230 !important;
+  color: #fff !important;
+  border-color: #239d23 !important;
+  -webkit-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out;
+}
+
+/* Provider cards grid - Step 2 style */
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-setting-modal-body .automl-wpml-bulk-translate-provider-cards {
+  display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 560px;
+    min-width: 500px;
+    padding: 16px 24px;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card {
+  align-items: flex-start;
+  background: #fff;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  padding: 12px;
+  position: relative;
+  text-align: left;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card--disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card-icon {
+  align-items: center;
+  display: flex;
+  height: 25px;
+  justify-content: center;
+  width: 25px;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card-icon img {
+  height: 24px;
+  -o-object-fit: contain;
+  object-fit: contain;
+  width: 24px;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card-name {
+  color: #0f172a;
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card-desc {
+  font-size: 0.8125rem;
+  color: #64748b;
+  line-height: 1.45;
+  display: block;
+  flex: 1;
+}
+.automl-wpml-bulk-translate-provider-card--disabled .automl-wpml-bulk-translate-provider-card-error .automl-wpml-bulk-translate-provider-error{
+  color: #64748b;
+  display: inline-flex;
+  cursor: pointer;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-body {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 7px;
+  width: 100%;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card-docs {
+  color: #64748b;
+  display: inline-flex;
+  margin-right: auto;
+}
+
+#automl-wpml-bulk-translate-wrapper .automl-wpml-bulk-translate-provider-card-docs:hover {
+  color: var(--wp-admin-theme-color, #2271b1);
+}
+
+.automl-wpml-bulk-translate-provider-card--selected {
+  border-color: var(--wp-admin-theme-color, #2271b1) !important;
+  box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #2271b1);
+  background: #eff6ff;
+}
+
+.automl-wpml-bulk-translate-provider-card {
+  cursor: pointer;
+}
+
+.automl-wpml-bulk-translate-provider-card--disabled {
+  cursor: not-allowed;
+}
+
+.automl-wpml-bulk-translate-provider-card-check {
+  position: absolute;
+  top: 7px;
+  right: 16px;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #cbd5e1;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+
+.automl-wpml-bulk-translate-provider-card--selected .automl-wpml-bulk-translate-provider-card-check {
+  border-color: var(--wp-admin-theme-color, #2271b1);
+  background: var(--wp-admin-theme-color, #2271b1);
+}
+
+.automl-wpml-bulk-translate-provider-card--selected .automl-wpml-bulk-translate-provider-card-check::after {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 1px;
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.automl-wpml-bulk-translate-setting-start-translation:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.automl-wpml-bulk-translate-provider-card-error {
+  font-size: 0.8125rem;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons button[data-status="translateAgain"]:hover {
+  background: #2da52d !important;
+  border-color: #209120 !important;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons button[data-status="continue"] {
+  background: #0073aa !important;
+  color: #fff !important;
+  border-color: #2271b1 !important;
+  -webkit-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons button[data-status="continue"]:hover {
+  background: #005682 !important;
+  border-color: #004466 !important;
+}
+
+@-webkit-keyframes shimmer {
+  0% {
+    background-position: 100%;
+  }
+  100% {
+    background-position: -100%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 100%;
+  }
+  100% {
+    background-position: -100%;
+  }
+}
+
+@-webkit-keyframes slide-up {
+  0% {
+    -webkit-transform: translateY(0) scale(0.8);
+            transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(-35px) scale(1);
+            transform: translateY(-35px) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  0% {
+    -webkit-transform: translateY(0) scale(0.8);
+            transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateY(-35px) scale(1);
+            transform: translateY(-35px) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 992px) {
+  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container {
+    display: -ms-grid;
+    display: grid;
+    -ms-grid-columns: 1fr 1fr;
+        grid-template-columns: 1fr 1fr;
+    -ms-grid-rows: auto auto;
+        grid-template-rows: auto auto;
+  }
+  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container > div:nth-child(1) {
+    -ms-grid-column: 1;
+    -ms-grid-column-span: 2;
+    grid-column: 1/3;
+  }
+  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container > div:nth-child(2) {
+    -ms-grid-column: 1;
+    grid-column: 1;
+    -ms-grid-row: 2;
+    grid-row: 2;
+  }
+  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container > div:nth-child(3) {
+    -ms-grid-column: 2;
+    grid-column: 2;
+    -ms-grid-row: 2;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 576px) {
+  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active {
+    width: clamp(200px, 800px, 80%);
+  }
+}
+
+/* Google Translate CSS Start */
+body > div.skiptranslate iframe.skiptranslate[frameborder][src][style="visibility:visible"] {
+  display: none !important;
+}
+
+#automl-wpml-bulk-translate-google-table-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  gap: 10px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  color: #fff;
+  max-height: 100%;
+  overflow: auto;
+  z-index: -999;
+  opacity: 0 !important;
+  white-space: pre-wrap;
+}
+
+#automl-wpml-bulk-translate-google-table-container #automl-wpml-bulk-translate-google-translate-btn {
+  display: none;
+}
+
+body.automl-wpml-bulk-translate-google-translate {
+  top: 0px !important;
+}
+
+/* Google Translate CSS End */
+/*# sourceMappingURL=index.css.map */
