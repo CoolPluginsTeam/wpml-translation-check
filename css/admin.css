@@ -1,0 +1,99 @@
+.clear {
+	clear: both;
+}
+
+.frm-check {
+	margin: 20px 0;
+	height: 40px;
+}
+
+.frm-check .submit {
+	float: left;
+	margin-right: 10px;
+}
+
+.frm-check .progress {
+	float: left;
+	margin-top: -7px;
+	color: #2EA2CC;
+}
+
+td span.missing {
+	padding: 2px 6px;
+	color: white;
+	background-color: #cfcfcf;
+}
+
+div.updated.warning {
+	border-left: 4px solid #DDE23E;
+}
+
+
+td.detection-warning {
+	background-color: #FFE2BB;
+}
+
+td.detection-success {
+	background-color: #DBFFBF;
+}
+
+td.detection-error {
+	background-color: #EFDCDD;
+}
+
+span.detection {
+	display: block;
+	float: right;
+	margin: 0 6px;
+	border-radius: 50%;
+	color: white;
+	font-weight: bold;
+	width: 28px;
+	height: 22px;
+	text-align: center;
+}
+
+
+span.detection-unknown {
+	background-color: #222;
+}
+
+span.detection-correct {
+	background-color: #4CA454;
+}
+
+span.detection-incorrect {
+	background-color: #BE4C39;
+}
+
+span.detection-unreliable {
+	background-color: #E18728;
+}
+
+#dtc-content {
+	border-collapse: collapse;
+}
+
+#dtc-content td, #dtc-content th {
+	border: 1px solid #ccc;
+}
+
+#dtc-content th {
+	font-weight: bold;
+	background-color: #e4e4e4;
+}
+
+.dtc-error {
+	clear: both;
+	margin: 20px 0;
+}
+
+#dtc-legend {
+	float:right;
+	text-align: right;
+	margin: 20px 0 20px 20px;
+}
+
+.dtc-legend td.bg {
+	width: 40px;
+}
