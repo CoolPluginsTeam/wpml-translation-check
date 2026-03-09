@@ -75,10 +75,10 @@ class AUTOML_AI_Strings_Ajax
 		if (empty($target_lang) || empty($translated_strings)) {
 			wp_send_json_error(array('msg' => esc_html__('Missing target language or translated strings.', 'wpml-translation-check')));
 		}
-		// $wizard_lang = WPML_AT_Helper::get_wizard_allowed_language_code();
-		// if ( $wizard_lang !== null && strtolower( (string) $target_lang ) !== strtolower( $wizard_lang ) ) {
-		// 	wp_send_json_error(array('msg' => esc_html__('This target language is not allowed. Only the language selected in the setup wizard can be used.', 'wpml-translation-check')));
-		// }
+		$wizard_lang = WPML_AT_Helper::get_wizard_allowed_language_code();
+		if ( $wizard_lang !== null && strtolower( (string) $target_lang ) !== strtolower( $wizard_lang ) ) {
+			wp_send_json_error(array('msg' => esc_html__('This target language is not allowed. Only the language selected in the setup wizard can be used.', 'wpml-translation-check')));
+		}
 
 		$status = defined('ICL_TM_COMPLETE') ? ICL_TM_COMPLETE : 10;
 		$translator_id = get_current_user_id();

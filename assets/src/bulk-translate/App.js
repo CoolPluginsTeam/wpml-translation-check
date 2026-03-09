@@ -159,8 +159,8 @@ const App = ({ onDestory, prefix, postIds }) => {
                                 <SelectLanguageNotice />
                                 {wizardSelectedCode ?
                                     <div className={`${prefix}-languages`}>
-                                       <div className={`${prefix}-languages-enabled-list`}>
-                                        {/* <RenderLanguage
+                                        <div className={`${prefix}-languages-enabled-list`}>
+                                        <RenderLanguage
                                             language={wizardSelectedCode}
                                             selectedLanguages={selectedLanguages}
                                             setSelectedLanguages={setSelectedLanguagesHandler}
@@ -174,9 +174,9 @@ const App = ({ onDestory, prefix, postIds }) => {
                                         &nbsp;
                                         <a href='#' title={__('Buy Pro Version to Unlock All Languages', 'wpml-translation-check')} className={`${prefix}-buy-pro-version-link`}>{__('Upgrade now', 'wpml-translation-check')}</a>
                                         </p>
-                                        <div> */}
+                                        <div>
                                             {Object.keys(targetLanguages).map((language) => (
-                                                // language === wizardSelectedCode ? <></> : 
+                                                language === wizardSelectedCode ? <></> : 
                                                 <RenderLanguage
                                                     key={language}
                                                     language={language}
@@ -189,7 +189,7 @@ const App = ({ onDestory, prefix, postIds }) => {
                                                 ))
                                             }
                                         </div>
-                                        {/* </div> */}
+                                        </div>
                                     </div>: (
                                     <div className={`${prefix}-wizard-language-notice`} style={{ padding: '12px 24px', marginTop: 8, background: '#00000008', borderRadius: 4 }}>
                                         <p style={{ margin: '0 0 8px', fontSize: 14 }}>{__('Please select a translation language first.', 'wpml-translation-check')}</p>

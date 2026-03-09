@@ -39,7 +39,7 @@ const App = ({ onDestory, prefix, postIds }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [errorModal, setErrorModal] = useState(false);
   const [localAiModalError, setLocalAiModalError] = useState(false);
-  const targetLanguages = JSON.parse(JSON.stringify(languageObject));
+  const targetLanguages=JSON.parse(JSON.stringify(languageObject));
   delete targetLanguages[automl_wpml_bulk_translate_object.default_language_slug];
 
   const destroyApp = (e) => {
@@ -183,7 +183,7 @@ const App = ({ onDestory, prefix, postIds }) => {
         ))}
       {!statusModalVisibility && !settingModalVisibility && (
         <div className={`${prefix}-language-container`}>
-          <div className={`${prefix}-header`}>
+        <div className={`${prefix}-header`}>
             <div className={`${prefix}-modal-header-inner`}>
               <span className={`${prefix}-step-label`}>
                 {__("STEP 1 OF 3", "automl-ai-translation-for-wpml")}
@@ -213,109 +213,206 @@ const App = ({ onDestory, prefix, postIds }) => {
             )
           ) : (
             <>
-              <div className={`${prefix}-body`}>
-                <SelectLanguageNotice />
-                {wizardSelectedCode ? (
-                  <div className={`${prefix}-languages`}>
-                    <div className={`${prefix}-languages-enabled-list`}>
-                    {(() => {
-                          const defaultSlug = automl_wpml_bulk_translate_object.default_language_slug;
-                          const allCodes = Object.keys(languageObject).filter(
-                            (lang) => !defaultSlug || defaultSlug !== lang
-                          );
-                          const selectedFirst =
-                            wizardSelectedCode && allCodes.includes(wizardSelectedCode)
-                              ? [wizardSelectedCode, ...allCodes.filter((l) => l !== wizardSelectedCode)]
-                              : allCodes;
+            <div className={`${prefix}-body`}>
+  <SelectLanguageNotice />
+  {wizardSelectedCode ? (
+    <div className={`${prefix}-languages`}>
+      <div className={`${prefix}-languages-enabled-list`}>
+        {(() => {
+          const defaultSlug = automl_wpml_bulk_translate_object.default_language_slug;
+          const allCodes = Object.keys(languageObject).filter(
+            (lang) => !defaultSlug || defaultSlug !== lang
+          );
+          const selectedFirst =
+            wizardSelectedCode && allCodes.includes(wizardSelectedCode)
+              ? [wizardSelectedCode, ...allCodes.filter((l) => l !== wizardSelectedCode)]
+              : allCodes;
 
-                          return selectedFirst.map((language) => {
-                            if (!languageObject[language]) return null;
-                            const isDisabled =false;
+          return selectedFirst.map((language) => {
+            if (!languageObject[language]) return null;
+            const isDisabled =
+              (!postIds.length && !isStringTranslationPage) ||
+              (wizardSelectedCode && language !== wizardSelectedCode);
 
-                            const isSelected = selectedLanguages.includes(language);
-                            return (
-                              <React.Fragment key={language}>
-                                <div
-                                  className={`${prefix}-language ${isDisabled ? `${prefix}-language-item--disabled` : ''
-                                    } ${isSelected ? `${prefix}-language-item--selected` : ''}`}
-                                  title={
-                                    !postIds.length && !isStringTranslationPage
-                                      ? emptyPostIdsErrorMessage
-                                      : languageObject[language].name
-                                  }
-                                  onClick={(e) => {
-                                    if (e.target.closest('input') || e.target.closest('label')) return;
-                                    if (isDisabled) return;
-                                    if (isSelected) {
-                                      setSelectedLanguages(selectedLanguages.filter((l) => l !== language));
-                                    } else {
-                                      setSelectedLanguages([...selectedLanguages, language]);
-                                    }
-                                  }}
-                                  role="button"
-                                  tabIndex={isDisabled ? -1 : 0}
-                                  onKeyDown={(e) => {
-                                    if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
-                                      e.preventDefault();
-                                      if (isSelected) {
-                                        setSelectedLanguages(selectedLanguages.filter((l) => l !== language));
-                                      } else {
-                                        setSelectedLanguages([...selectedLanguages, language]);
-                                      }
-                                    }
-                                  }}
-                                >
-                                  <div className={`${prefix}-language-item`}>
-                                    <input
-                                      type="checkbox"
-                                      name="languages"
-                                      id={language}
-                                      value={language}
-                                      onChange={handleLanguageChange}
-                                      disabled={isDisabled}
-                                      checked={isSelected}
-                                      className={`${prefix}-language-checkbox-input`}
-                                    />
-                                    <span className={`${prefix}-check-visual`} aria-hidden="true" />
-                                    <label
-                                      htmlFor={language}
-                                      className={`${prefix}-language-label`}
-                                      title={languageObject[language].name}
-                                    >
-                                      <img
-                                        src={languageObject[language].flag}
-                                        alt={languageObject[language].name}
-                                      />
-                                      &nbsp; {languageObject[language].name}
-                                    </label>
-                                  </div>
-                                </div>
-                              </React.Fragment>
-                            );
-                          });
-                        })()}
-                    </div>
+            // Only show enabled items in this column
+            if (isDisabled) return null;
+
+            const isSelected = selectedLanguages.includes(language);
+            return (
+              <React.Fragment key={language}>
+                <div
+                  className={`${prefix}-language ${
+                    isDisabled ? `${prefix}-language-item--disabled` : ''
+                  } ${isSelected ? `${prefix}-language-item--selected` : ''}`}
+                  title={
+                    !postIds.length && !isStringTranslationPage
+                      ? emptyPostIdsErrorMessage
+                      : languageObject[language].name
+                  }
+                  onClick={(e) => {
+                    if (e.target.closest('input') || e.target.closest('label')) return;
+                    if (isDisabled) return;
+                    if (isSelected) {
+                      setSelectedLanguages(selectedLanguages.filter((l) => l !== language));
+                    } else {
+                      setSelectedLanguages([...selectedLanguages, language]);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={isDisabled ? -1 : 0}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
+                      e.preventDefault();
+                      if (isSelected) {
+                        setSelectedLanguages(selectedLanguages.filter((l) => l !== language));
+                      } else {
+                        setSelectedLanguages([...selectedLanguages, language]);
+                      }
+                    }
+                  }}
+                >
+                  <div className={`${prefix}-language-item`}>
+                    <input
+                      type="checkbox"
+                      name="languages"
+                      id={language}
+                      value={language}
+                      onChange={handleLanguageChange}
+                      disabled={isDisabled}
+                      checked={isSelected}
+                      className={`${prefix}-language-checkbox-input`}
+                    />
+                    <span className={`${prefix}-check-visual`} aria-hidden="true" />
+                    <label
+                      htmlFor={language}
+                      className={`${prefix}-language-label`}
+                      title={languageObject[language].name}
+                    >
+                      <img
+                        src={languageObject[language].flag}
+                        alt={languageObject[language].name}
+                      />
+                      &nbsp; {languageObject[language].name}
+                    </label>
                   </div>
-                ) : (
-                  <div
-                    className={`${prefix}-wizard-language-notice`}
-                    style={{
-                      padding: '12px 16px',
-                      marginTop: 8,
-                      background: '#f0f6fc',
-                      border: '1px solid #c3c4c7',
-                      borderRadius: 4,
-                    }}
-                  >
-                    <p style={{ margin: '0 0 8px', fontSize: 14 }}>
-                      {__('Please select a translation language first.', 'wpml-translation-check')}
-                    </p>
-                    <a href={wizardLanguagesUrl} style={{ fontSize: 14 }}>
-                      {__('Select language in Setup Wizard (Languages step)', 'wpml-translation-check')}
-                    </a>
+                </div>
+              </React.Fragment>
+            );
+          });
+        })()}
+      </div>
+
+      <div className={`${prefix}-languages-disabled-lists`}>
+      <p>{__('Multiple language translation available in Pro.', 'automl-ai-translation-for-wpml')}
+       &nbsp;
+      <a href='#' title={__('Buy Pro Version to Unlock All Languages', 'automl-ai-translation-for-wpml')} className={`${prefix}-buy-pro-version-link`}>{__('Upgrade now', 'automl-ai-translation-for-wpml')}</a>
+      </p>
+      <div>
+        {(() => {
+          const defaultSlug = automl_wpml_bulk_translate_object.default_language_slug;
+          const allCodes = Object.keys(languageObject).filter(
+            (lang) => !defaultSlug || defaultSlug !== lang
+          );
+          const selectedFirst =
+            wizardSelectedCode && allCodes.includes(wizardSelectedCode)
+              ? [wizardSelectedCode, ...allCodes.filter((l) => l !== wizardSelectedCode)]
+              : allCodes;
+
+          return selectedFirst.map((language) => {
+            if (!languageObject[language]) return null;
+            const isDisabled =
+              (!postIds.length && !isStringTranslationPage) ||
+              (wizardSelectedCode && language !== wizardSelectedCode);
+
+            // Only show disabled items in this column
+            if (!isDisabled) return null;
+
+            const isSelected = selectedLanguages.includes(language);
+            return (
+              <React.Fragment key={language}>
+                <div
+                  className={`${prefix}-language ${
+                    isDisabled ? `${prefix}-language-item--disabled` : ''
+                  } ${isSelected ? `${prefix}-language-item--selected` : ''}`}
+                  title={
+                    !postIds.length && !isStringTranslationPage
+                      ? emptyPostIdsErrorMessage
+                      : languageObject[language].name
+                  }
+                  onClick={(e) => {
+                    if (e.target.closest('input') || e.target.closest('label')) return;
+                    if (isDisabled) return;
+                    if (isSelected) {
+                      setSelectedLanguages(selectedLanguages.filter((l) => l !== language));
+                    } else {
+                      setSelectedLanguages([...selectedLanguages, language]);
+                    }
+                  }}
+                  role="button"
+                  tabIndex={isDisabled ? -1 : 0}
+                  onKeyDown={(e) => {
+                    if ((e.key === 'Enter' || e.key === ' ') && !isDisabled) {
+                      e.preventDefault();
+                      if (isSelected) {
+                        setSelectedLanguages(selectedLanguages.filter((l) => l !== language));
+                      } else {
+                        setSelectedLanguages([...selectedLanguages, language]);
+                      }
+                    }
+                  }}
+                >
+                  <div className={`${prefix}-language-item`}>
+                    <input
+                      type="checkbox"
+                      name="languages"
+                      id={language}
+                      value={language}
+                      onChange={handleLanguageChange}
+                      disabled={isDisabled}
+                      checked={isSelected}
+                      className={`${prefix}-language-checkbox-input`}
+                    />
+                    <span className={`${prefix}-check-visual`} aria-hidden="true" />
+                    <label
+                      htmlFor={language}
+                      className={`${prefix}-language-label`}
+                      title={languageObject[language].name}
+                    >
+                      <img
+                        src={languageObject[language].flag}
+                        alt={languageObject[language].name}
+                      />
+                      &nbsp; {languageObject[language].name}
+                    </label>
                   </div>
-                )}
-              </div>
+                </div>
+              </React.Fragment>
+            );
+          });
+        })()}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div
+      className={`${prefix}-wizard-language-notice`}
+      style={{
+        padding: '12px 16px',
+        marginTop: 8,
+        background: '#f0f6fc',
+        border: '1px solid #c3c4c7',
+        borderRadius: 4,
+      }}
+    >
+      <p style={{ margin: '0 0 8px', fontSize: 14 }}>
+        {__('Please select a translation language first.', 'automl-ai-translation-for-wpml')}
+      </p>
+      <a href={wizardLanguagesUrl} style={{ fontSize: 14 }}>
+        {__('Select language in Setup Wizard (Languages step)', 'automl-ai-translation-for-wpml')}
+      </a>
+    </div>
+  )}
+</div>
               <div className={`${prefix}-footer`}>
                 <button
                   className={`${prefix}-footer-button button button-primary`}
@@ -339,14 +436,14 @@ const App = ({ onDestory, prefix, postIds }) => {
                     !postIds.length && !isStringTranslationPage
                       ? emptyPostIdsErrorMessage
                       : !selectedLanguages.length
-                        ? __(
+                      ? __(
                           "Please select at least one language",
                           "automl-ai-translation-for-wpml",
                         )
-                        : ""
+                      : ""
                   }
                 >
-                  {__("Next", "automl-ai-translation-for-wpml")} <span className={`${prefix}-next-arrow`}>&#8594;</span>
+                                    {__("Next", "automl-ai-translation-for-wpml")} <span className={`${prefix}-next-arrow`}>&#8594;</span>
                 </button>
               </div>
             </>
