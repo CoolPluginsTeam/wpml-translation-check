@@ -43,7 +43,7 @@ const initBulkTranslate = async (postKeys = [], nonce, storeDispatch, prefix, up
                 for (const lang of languages) {
                     storeDispatch(unsetPendingPost(postId + '_' + lang));
                     storeDispatch(updateProgressStatus(100 / pendingPosts.length));
-                    storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'error', messageClass: 'error', errorMessage: __('This post editor type is not supported for translation', 'automl-ai-translation-for-wpml') } }));
+                    storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'error', messageClass: 'error', errorMessage: __('This post editor type is not supported for translation', 'wpml-translation-check') } }));
                 }
             }else{
                 const source = { title: title, content: JSON.parse(JSON.stringify(content)), post_name: post_name, excerpt: excerpt };
@@ -146,7 +146,7 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
 
             updateTranslateData({ provider: service, sourceLang, targetLang: lang, currentPostId: data.data.post_id, parentPostId: postId, editorType, updateTranslateDataNonce: data?.data?.update_translate_data_nonce, extraData });
 
-            data.data.post_title = '' === data.data.post_title ? __('N/A', 'automl-ai-translation-for-wpml') : data.data.post_title;
+            data.data.post_title = '' === data.data.post_title ? __('N/A', 'wpml-translation-check') : data.data.post_title;
             updateData = { targetPostId: data.data.post_id, targetPostTitle: data.data.post_title, targetLanguage: lang, postLink: data.data.post_link, postEditLink: data.data.post_edit_link, status: 'completed', messageClass: 'success' };
             storeDispatch(updateCountInfo({ postsTranslated: store.getState().countInfo.postsTranslated + 1 }));
         } else {
@@ -161,15 +161,15 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
                     errorHtml += '<br>Error Message:' + JSON.stringify(data.data.error);
                 }
 
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'automl-ai-translation-for-wpml'), errorHtml: '<div class="automl-wpml-error-html">' + errorHtml + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + errorHtml + '</div>' };
             } else if (data.code && data.message) {
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'automl-ai-translation-for-wpml'), errorHtml: '<div class="automl-wpml-error-html">' + data.message + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + data.message + '</div>' };
             } else if (!data.success || data.data) {
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'automl-ai-translation-for-wpml'), errorHtml: '<div class="automl-wpml-error-html">' + data.data + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + data.data + '</div>' };
             } else if (!data.data.post_id) {
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'automl-ai-translation-for-wpml'), errorHtml: '<div class="automl-wpml-error-html">' + data.data + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + data.data + '</div>' };
             } else if (typeof data === 'string') {
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'automl-ai-translation-for-wpml'), errorHtml: '<div class="automl-wpml-error-html">' + data + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + data + '</div>' };
             }
         }
 
@@ -199,7 +199,7 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
             }
         }
 
-        storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'automl-ai-translation-for-wpml'), errorHtml: '<div class="automl-wpml-error-html">' + errorHtml + '</div>' } }));
+        storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + errorHtml + '</div>' } }));
     })
 }
 
@@ -251,7 +251,7 @@ const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
     }
 
     if (!untranslatedPostsData) {
-        return { success: false, message: __('No posts to translate data undefined', 'automl-ai-translation-for-wpml') };
+        return { success: false, message: __('No posts to translate data undefined', 'wpml-translation-check') };
     }
 
     if (!untranslatedPostsData.success) {
@@ -259,15 +259,15 @@ const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
     }
 
     if (!untranslatedPostsData.data) {
-        return { success: false, message: __('No posts to translate untranslated data not found', 'automl-ai-translation-for-wpml') };
+        return { success: false, message: __('No posts to translate untranslated data not found', 'wpml-translation-check') };
     }
 
     if (!untranslatedPostsData.data.posts || Object.keys(untranslatedPostsData.data.posts).length === 0) {
-        return { success: false, message: sprintf(__('Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.', 'automl-ai-translation-for-wpml'), automl_wpml_bulk_translate_object.post_label, automl_wpml_bulk_translate_object.post_label) };
+        return { success: false, message: sprintf(__('Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label, automl_wpml_bulk_translate_object.post_label) };
     }
 
     if (!untranslatedPostsData.data.CreateTranslatePostNonce) {
-        return { success: false, message: __('No create translate post nonce', 'automl-ai-translation-for-wpml') };
+        return { success: false, message: __('No create translate post nonce', 'wpml-translation-check') };
     }
 
     const posts = untranslatedPostsData.data.posts;
@@ -333,7 +333,7 @@ const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
                     editorType: editor_type,
                     sourceLanguage,
                     errorMessage: sprintf(
-                        __('Set source language for this %s %s before translating.', 'automl-ai-translation-for-wpml'),
+                        __('Set source language for this %s %s before translating.', 'wpml-translation-check'),
                         titleLink ? '<a href="' + titleLink + '" target="_blank" rel="noopener noreferrer">' + postTitle + '</a>' : postTitle,
                         window?.automl_wpml_bulk_translate_object?.taxonomy_page || window?.automl_wpml_bulk_translate_object?.post_label
                     )

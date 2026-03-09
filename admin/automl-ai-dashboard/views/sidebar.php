@@ -16,27 +16,27 @@ if ( ! function_exists( 'automl_ai_format_time_taken' ) ) :
 	 */
 	function automl_ai_format_time_taken( $time_taken ) {
 		if ( 0 === intval( $time_taken ) ) {
-			return esc_html__( '0', 'automl-ai-translation-for-wpml' );
+			return esc_html__( '0', 'wpml-translation-check' );
 		}
 
 		$time_taken = intval( $time_taken );
 
 		if ( $time_taken < 60 ) {
 			// translators: %d: seconds.
-			return sprintf( esc_html__( '%d sec', 'automl-ai-translation-for-wpml' ), $time_taken );
+			return sprintf( esc_html__( '%d sec', 'wpml-translation-check' ), $time_taken );
 		}
 
 		if ( $time_taken < 3600 ) {
 			$min = floor( $time_taken / 60 );
 			$sec = $time_taken % 60;
 			// translators: 1: minutes, 2: seconds.
-			return sprintf( esc_html__( '%1$d min %2$d sec', 'automl-ai-translation-for-wpml' ), $min, $sec );
+			return sprintf( esc_html__( '%1$d min %2$d sec', 'wpml-translation-check' ), $min, $sec );
 		}
 
 		$hours = floor( $time_taken / 3600 );
 		$min   = floor( ( $time_taken % 3600 ) / 60 );
 		// translators: 1: hours, 2: minutes.
-		return sprintf( esc_html__( '%1$d hours %2$d min', 'automl-ai-translation-for-wpml' ), $hours, $min );
+		return sprintf( esc_html__( '%1$d hours %2$d min', 'wpml-translation-check' ), $hours, $min );
 	}
 endif;
 
@@ -77,8 +77,8 @@ if ( ! function_exists( 'automl_ai_get_plugin_display_name' ) ) :
 			'automatic-translator-addon-for-loco-translate' => array(
 				'free'      => 'automatic-translator-addon-for-loco-translate/automatic-translator-addon-for-loco-translate.php',
 				'pro'       => 'loco-automatic-translate-addon-pro/loco-automatic-translate-addon-pro.php',
-				'free_name' => esc_html__( 'LocoAI – Auto Translate For Loco Translate', 'automl-ai-translation-for-wpml' ),
-				'pro_name'  => esc_html__( 'LocoAI – Auto Translate for Loco Translate (Pro)', 'automl-ai-translation-for-wpml' ),
+				'free_name' => esc_html__( 'LocoAI – Auto Translate For Loco Translate', 'wpml-translation-check' ),
+				'pro_name'  => esc_html__( 'LocoAI – Auto Translate for Loco Translate (Pro)', 'wpml-translation-check' ),
 			),
 		);
 
@@ -110,11 +110,11 @@ if ( ! function_exists( 'automl_ai_format_number' ) ) :
 		$number = intval( $number );
 
 		if ( $number >= 1000000000 ) {
-			return round( $number / 1000000000, 1 ) . esc_html__( 'B', 'automl-ai-translation-for-wpml' );
+			return round( $number / 1000000000, 1 ) . esc_html__( 'B', 'wpml-translation-check' );
 		} elseif ( $number >= 1000000 ) {
-			return round( $number / 1000000, 1 ) . esc_html__( 'M', 'automl-ai-translation-for-wpml' );
+			return round( $number / 1000000, 1 ) . esc_html__( 'M', 'wpml-translation-check' );
 		} elseif ( $number >= 1000 ) {
-			return round( $number / 1000, 1 ) . esc_html__( 'K', 'automl-ai-translation-for-wpml' );
+			return round( $number / 1000, 1 ) . esc_html__( 'K', 'wpml-translation-check' );
 		}
 
 		return (string) $number;
@@ -125,7 +125,7 @@ endif;
 <!-- Right Sidebar -->
 <div class="automl_ai_dashboard-sidebar">
 	<div class="automl_ai_dashboard-status">
-		<h3><?php esc_html_e( 'Auto Translation Status', 'automl-ai-translation-for-wpml' ); ?></h3>
+		<h3><?php esc_html_e( 'Auto Translation Status', 'wpml-translation-check' ); ?></h3>
 		<div class="automl_ai_dashboard-sts-top">
 			<?php
 			// You can later store stats in an option similar to this.
@@ -164,14 +164,14 @@ endif;
 			$automl_wpml_time_taken_str = automl_ai_format_time_taken( $totals['time_taken'] );
 			?>
 			<span><?php echo esc_html( automl_ai_format_number( $totals['character_count'] ) ); ?></span>
-			<span><?php esc_html_e( 'Total Characters Translated!', 'automl-ai-translation-for-wpml' ); ?></span>
+			<span><?php esc_html_e( 'Total Characters Translated!', 'wpml-translation-check' ); ?></span>
 		</div>
 		<ul class="automl_ai_dashboard-sts-btm">
 			<li>
-				<span><?php esc_html_e( 'Total Strings', 'automl-ai-translation-for-wpml' ); ?></span>
+				<span><?php esc_html_e( 'Total Strings', 'wpml-translation-check' ); ?></span>
 				<span><?php echo esc_html( automl_ai_format_number( $totals['string_count'] ) ); ?></span>
 			</li>
-			<?php foreach($automl_valid_providers as $provider_key => $provider_name): ?>
+			<?php foreach($automl_valid_providers as $provider_key => $provider_name): // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
 				<?php if(isset($totals[$provider_key])): ?>
 				<li>
 						<span><?php echo esc_html( ucfirst( $provider_name ) ); ?></span>
@@ -180,11 +180,11 @@ endif;
 				<?php endif; ?>
 			<?php endforeach; ?>
 			<li>
-				<span><?php esc_html_e( 'Total Translation Jobs', 'automl-ai-translation-for-wpml' ); ?></span>
+				<span><?php esc_html_e( 'Total Translation Jobs', 'wpml-translation-check' ); ?></span>
 				<span><?php echo esc_html( $totals['translation_count'] ); ?></span>
 			</li>
 			<li>
-				<span><?php esc_html_e( 'Time Taken', 'automl-ai-translation-for-wpml' ); ?></span>
+				<span><?php esc_html_e( 'Time Taken', 'wpml-translation-check' ); ?></span>
 				<span><?php echo esc_html( $automl_wpml_time_taken_str ); ?></span>
 			</li>
 		</ul>

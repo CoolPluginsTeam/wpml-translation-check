@@ -4,7 +4,7 @@
  * Description: AutoML – AI translation addon for WPML that helps translate WordPress pages and posts content faster and more accurately.
  * Version: 1.0.0
  * Author: Cool Plugins
- * Text Domain: automl-ai-translation-for-wpml
+ * Text Domain: wpml-translation-check
  * Domain Path: /languages
  * Requires at least: 5.0
  * Requires PHP: 7.2
@@ -129,7 +129,7 @@ final class AUTOML_Ai_Translate_Addon {
 		$settings_link = sprintf(
 			'<a href="%s">%s</a>',
 			esc_url( $url ),
-			esc_html__( 'Settings', 'automl-ai-translation-for-wpml' )
+			esc_html__( 'Settings', 'wpml-translation-check' )
 		);
 
 		array_unshift( $links, $settings_link ); // Put Settings first (before Deactivate).
@@ -158,8 +158,8 @@ final class AUTOML_Ai_Translate_Addon {
 	
 		add_submenu_page(
 			$parent_slug, // parent (WPML) menu slug
-			__( 'AUTOML AI Translate', 'automl-ai-translation-for-wpml' ), // page title
-			__( 'AutoML AI', 'automl-ai-translation-for-wpml' ),      // menu title
+			__( 'AUTOML AI Translate', 'wpml-translation-check' ), // page title
+			__( 'AutoML AI', 'wpml-translation-check' ),      // menu title
 			'manage_options',       	                                  // capability
 			'automl_ai_dashboard',                                    // menu slug
 			array( \AUTOML_Ai_Dashboard::get_instance(), 'automl_ai_render_dashboard_page' ) // callback
@@ -267,8 +267,8 @@ final class AUTOML_Ai_Translate_Addon {
 		?>
 		<div class="notice notice-error">
 			<p>
-				<strong><?php esc_html_e( 'AUTOML AI Translate Addon:', 'automl-ai-translation-for-wpml' ); ?></strong>
-				<?php esc_html_e( 'This plugin requires WPML to be installed and activated.', 'automl-ai-translation-for-wpml' ); ?>
+				<strong><?php esc_html_e( 'AUTOML AI Translate Addon:', 'wpml-translation-check' ); ?></strong>
+				<?php esc_html_e( 'This plugin requires WPML to be installed and activated.', 'wpml-translation-check' ); ?>
 			</p>
 		</div>
 		<?php

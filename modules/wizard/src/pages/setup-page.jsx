@@ -39,12 +39,12 @@ const SetupPage = () => {
 	if ( showReady ) {
 		return (
 				<div className="automl-ai-wizard-card" style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
-					<h2 style={{ marginTop: 0 }}>{ __( "You're ready to translate with AI", 'automl-ai-translation-for-wpml' ) }</h2>
+					<h2 style={{ marginTop: 0 }}>{ __( "You're ready to translate with AI", 'wpml-translation-check' ) }</h2>
 					<p style={{ color: '#6b7280', marginBottom: 24 }}>
-						{ __( "Use the AUTOML AI Translate dashboard to translate your posts and strings with AI.", 'automl-ai-translation-for-wpml' ) }
+						{ __( "Use the AUTOML AI Translate dashboard to translate your posts and strings with AI.", 'wpml-translation-check' ) }
 					</p>
 					<a href={ dashboardUrl } className="button button-primary button-hero">
-						{ __( 'Open AUTOML AI Translate', 'automl-ai-translation-for-wpml' ) }
+						{ __( 'Open AUTOML AI Translate', 'wpml-translation-check' ) }
 					</a>
 				</div>
 		);
@@ -53,7 +53,7 @@ const SetupPage = () => {
 	return (
 		<>
 			<h1 style={{ textAlign: 'center', paddingTop: 30, marginBottom: 16 }}>
-				{ __( 'AutoML – AI Translation for WPML', 'automl-ai-translation-for-wpml' ) }
+				{ __( 'AutoML – AI Translation for WPML', 'wpml-translation-check' ) }
 			</h1>
 			<SetupProgress
 				currentStep={ currentStep }

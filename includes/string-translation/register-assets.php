@@ -67,14 +67,14 @@ class Register_Assets {
 					'languages' => $selected_language,
 					'admin_url' => esc_url(admin_url()),
 					'i18n'      => array(
-						'errorPageId'      => esc_html__('Could not detect page ID for this row.', 'automl-ai-translation-for-wpml'),
-						'errorNoSelection' => esc_html__('Please select at least one post to translate.', 'automl-ai-translation-for-wpml'),
-						'errorNoLanguage'  => esc_html__('Please select a target language.', 'automl-ai-translation-for-wpml'),
-						'errorInvalidData' => esc_html__('Invalid post ID or language.', 'automl-ai-translation-for-wpml'),
-						'errorNoStrings'   => esc_html__('No translation strings found.', 'automl-ai-translation-for-wpml'),
-						'errorAjax'        => esc_html__('AJAX error while loading content.', 'automl-ai-translation-for-wpml'),
-						'errorAjaxSave'    => esc_html__('AJAX error while saving.', 'automl-ai-translation-for-wpml'),
-						'errorUnknown'     => esc_html__('Unknown error occurred.', 'automl-ai-translation-for-wpml'),
+						'errorPageId'      => esc_html__('Could not detect page ID for this row.', 'wpml-translation-check'),
+						'errorNoSelection' => esc_html__('Please select at least one post to translate.', 'wpml-translation-check'),
+						'errorNoLanguage'  => esc_html__('Please select a target language.', 'wpml-translation-check'),
+						'errorInvalidData' => esc_html__('Invalid post ID or language.', 'wpml-translation-check'),
+						'errorNoStrings'   => esc_html__('No translation strings found.', 'wpml-translation-check'),
+						'errorAjax'        => esc_html__('AJAX error while loading content.', 'wpml-translation-check'),
+						'errorAjaxSave'    => esc_html__('AJAX error while saving.', 'wpml-translation-check'),
+						'errorUnknown'     => esc_html__('Unknown error occurred.', 'wpml-translation-check'),
 					),
 				)
 			);

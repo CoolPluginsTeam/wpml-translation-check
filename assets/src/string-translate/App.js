@@ -308,10 +308,10 @@ const App = ({ onDestory, prefix, postIds }) => {
                     }}
                   >
                     <p style={{ margin: '0 0 8px', fontSize: 14 }}>
-                      {__('Please select a translation language first.', 'automl-ai-translation-for-wpml')}
+                      {__('Please select a translation language first.', 'wpml-translation-check')}
                     </p>
                     <a href={wizardLanguagesUrl} style={{ fontSize: 14 }}>
-                      {__('Select language in Setup Wizard (Languages step)', 'automl-ai-translation-for-wpml')}
+                      {__('Select language in Setup Wizard (Languages step)', 'wpml-translation-check')}
                     </a>
                   </div>
                 )}

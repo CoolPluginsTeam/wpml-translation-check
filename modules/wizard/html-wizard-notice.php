@@ -25,20 +25,20 @@ $automl_wpml_skip_url = wp_nonce_url(
 			<?php
 			printf(
 				/* translators: %s: plugin name */
-				esc_html__( 'Welcome to %s', 'automl-ai-translation-for-wpml' ),
-				esc_html__( 'AutoML – AI Translation for WPML', 'automl-ai-translation-for-wpml' )
+				esc_html__( 'Welcome to %s', 'wpml-translation-check' ),
+				esc_html__( 'AutoML – AI Translation for WPML', 'wpml-translation-check' )
 			);
 			?>
 		</strong>
 		<?php echo ' &#8211; '; ?>
-		<?php esc_html_e( 'You\'re almost ready to translate your content with AI.', 'automl-ai-translation-for-wpml' ); ?>
+		<?php esc_html_e( 'You\'re almost ready to translate your content with AI.', 'wpml-translation-check' ); ?>
 	</p>
 	<p class="buttons">
 		<a href="<?php echo esc_url( $automl_wpml_wizard_url ); ?>" class="button button-primary">
-			<?php esc_html_e( 'Run the Setup Wizard', 'automl-ai-translation-for-wpml' ); ?>
+			<?php esc_html_e( 'Run the Setup Wizard', 'wpml-translation-check' ); ?>
 		</a>
 		<a href="<?php echo esc_url( $automl_wpml_skip_url ); ?>" class="button button-secondary">
-			<?php esc_html_e( 'Skip setup', 'automl-ai-translation-for-wpml' ); ?>
+			<?php esc_html_e( 'Skip setup', 'wpml-translation-check' ); ?>
 		</a>
 	</p>
 </div>

@@ -46,8 +46,8 @@ class AUTOML_Ai_Wizard {
 		}
 		add_submenu_page(
 			$parent_slug,
-			esc_html__( 'AutoML Setup Wizard', 'automl-ai-translation-for-wpml' ),
-			esc_html__( 'AutoML Setup', 'automl-ai-translation-for-wpml' ),
+			esc_html__( 'AutoML Setup Wizard', 'wpml-translation-check' ),
+			esc_html__( 'AutoML Setup', 'wpml-translation-check' ),
 			'manage_options',
 			'automl_ai_wizard',
 			array( $this, 'display_wizard_page' )
@@ -158,7 +158,7 @@ class AUTOML_Ai_Wizard {
 	 */
 	public function display_wizard_page() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'automl-ai-translation-for-wpml' ) );
+			wp_die( esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'wpml-translation-check' ) );
 		}
         if ( get_option( 'automl_ai_setup_complete' ) && $this->is_wizard_language_set() ) {
 			wp_safe_redirect( add_query_arg( array( 'page' => 'automl_ai_dashboard' ), admin_url( 'admin.php' ) ) );

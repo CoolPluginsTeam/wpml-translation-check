@@ -64,7 +64,7 @@ class String_Translation {
 	{
     ?>
 		<button class="button button-primary automl-wpml-bulk-translate-btn" style="display: none;">
-			<?php esc_html_e('AI Translate', 'automl-ai-translation-for-wpml'); ?>
+			<?php esc_html_e('AI Translate', 'wpml-translation-check'); ?>
 		</button>
 	<?php
 	}

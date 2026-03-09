@@ -98,7 +98,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 			} );
 
 			// Success: show a single general success message
-			setGeneralMessage( __( 'API keys saved.', 'automl-ai-translation-for-wpml' ) );
+			setGeneralMessage( __( 'API keys saved.', 'wpml-translation-check' ) );
 			setIsError( false );
 			return true;
 		} catch ( err ) {
@@ -182,7 +182,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 			window.location.reload();
 		} catch (err) {
 			// Show error message
-			const errorMsg = __('Failed to delete API key. Please try again.', 'automl-ai-translation-for-wpml');
+			const errorMsg = __('Failed to delete API key. Please try again.', 'wpml-translation-check');
 			if (provider === 'openai') {
 				setOpenaiMessage(errorMsg);
 			} else if (provider === 'google') {
@@ -198,12 +198,12 @@ const AiTranslation = ({ onBack, onContinue }) => {
 			>
 				<div className="automl-ai-wizard-language-container" style={{ flex: 1 }}>
 					<h2 style={{ marginTop: 0 }}>
-						{ __( 'Connect AI Provider', 'automl-ai-translation-for-wpml' ) }
+						{ __( 'Connect AI Provider', 'wpml-translation-check' ) }
 					</h2>
 					<p style={{ marginBottom: 12, color: '#6b7280' }}>
 						{ __(
 							'To start using AI translation, connect at least one AI provider below. Add your AI provider API key to start translating your website with AutoML.',
-							'automl-ai-translation-for-wpml'
+							'wpml-translation-check'
 						) }
 					</p>
 
@@ -224,7 +224,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 							htmlFor="automl-ai-wizard-openai-key"
 							style={{ display: 'block', marginBottom: 6, fontWeight: 500 }}
 						>
-							{ __( 'OpenAI API key', 'automl-ai-translation-for-wpml' ) }
+							{ __( 'OpenAI API key', 'wpml-translation-check' ) }
 						</label>
 						<div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
 							<input
@@ -235,7 +235,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 								onClick={ () => handleInputClick('openai') }
 								onBlur={ () => handleInputBlur('openai') }
 								disabled={ !openaiEditMode }
-								placeholder={ openaiEditMode ? __( 'Enter OpenAI API key', 'automl-ai-translation-for-wpml' ) : '' }
+								placeholder={ openaiEditMode ? __( 'Enter OpenAI API key', 'wpml-translation-check' ) : '' }
 								style={{ 
 									flex: 1, 
 									padding: '8px 12px', 
@@ -251,7 +251,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 										onClick={ () => handleReset('openai') }
 										className="button button-primary automl-reset-key-btn"
 									>
-										{ __( 'Reset', 'automl-ai-translation-for-wpml' ) }
+										{ __( 'Reset', 'wpml-translation-check' ) }
 									</button>
 								</>
 							) }
@@ -268,8 +268,8 @@ const AiTranslation = ({ onBack, onContinue }) => {
 								{ openaiMessage }
 							</p>
 						) }
-						<a href="https://docs.coolplugins.net/doc/generate-openai-api-key/" target="_blank">{ __( 'Click here', 'automl-ai-translation-for-wpml' ) }</a> { ' ' }
-						{ __( ' to see how to configure OpenAI in the AI SDK.', 'automl-ai-translation-for-wpml' ) }
+						<a href="https://docs.coolplugins.net/doc/generate-openai-api-key/" target="_blank">{ __( 'Click here', 'wpml-translation-check' ) }</a> { ' ' }
+						{ __( ' to see how to configure OpenAI in the AI SDK.', 'wpml-translation-check' ) }
 					</div>
 
 					<div className="automl-ai-wizard-api-key-container" style={{ marginBottom: 16, color: '#6b7280' }}>
@@ -277,7 +277,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 							htmlFor="automl-ai-wizard-google-key"
 							style={{ display: 'block', marginBottom: 6, fontWeight: 500 }}
 						>
-							{ __( 'Google / Gemini API key', 'automl-ai-translation-for-wpml' ) }
+							{ __( 'Google / Gemini API key', 'wpml-translation-check' ) }
 						</label>
 						<div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
 							<input
@@ -288,7 +288,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 								onClick={ () => handleInputClick('google') }
 								onBlur={ () => handleInputBlur('google') }
 								disabled={ !googleEditMode }
-								placeholder={ googleEditMode ? __( 'Enter Google API key', 'automl-ai-translation-for-wpml' ) : '' }
+								placeholder={ googleEditMode ? __( 'Enter Google API key', 'wpml-translation-check' ) : '' }
 								style={{ 
 									flex: 1, 
 									padding: '8px 12px', 
@@ -304,7 +304,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 										onClick={ () => handleReset('google') }
 										className="button button-primary automl-reset-key-btn"
 									>
-										{ __( 'Reset', 'automl-ai-translation-for-wpml' ) }
+										{ __( 'Reset', 'wpml-translation-check' ) }
 									</button>
 								</>
 							) }
@@ -321,8 +321,8 @@ const AiTranslation = ({ onBack, onContinue }) => {
 								{ googleMessage }
 							</p>
 						) }
-						<a href="https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/" target="_blank">{ __( 'Click here', 'automl-ai-translation-for-wpml' ) }</a> { ' ' }
-						{ __( ' to see how to configure Google Gemini in the AI SDK.', 'automl-ai-translation-for-wpml' ) }
+						<a href="https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/" target="_blank">{ __( 'Click here', 'wpml-translation-check' ) }</a> { ' ' }
+						{ __( ' to see how to configure Google Gemini in the AI SDK.', 'wpml-translation-check' ) }
 					</div>
 
 					<div className="automl-ai-wizard-card-language-footer">
@@ -344,12 +344,12 @@ const AiTranslation = ({ onBack, onContinue }) => {
 						<div className="automl-ai-wizard-card-language-footer-content">
 							<p>
 								<strong>
-									{ __( 'Chrome Built-in AI', 'automl-ai-translation-for-wpml' ) }
+									{ __( 'Chrome Built-in AI', 'wpml-translation-check' ) }
 								</strong>
 								{ ' — ' }
 								{ __(
 									'Translate on your device using local AI, no API key required, unlimited translations, save 100% on API usage costs.',
-									'automl-ai-translation-for-wpml'
+									'wpml-translation-check'
 								) }
 							</p>
 							<a
@@ -358,7 +358,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 								rel="noopener noreferrer"
 								className="automl-ai-wizard-card-language-footer-link"
 							>
-								{ __( 'Upgrade to Pro →', 'automl-ai-translation-for-wpml' ) }
+								{ __( 'Upgrade to Pro →', 'wpml-translation-check' ) }
 							</a>
 						</div>
 					</div>
@@ -366,7 +366,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 					<p className="automl-ai-wizard-api-note">
 						{ __(
 							'API keys are saved securely and can be updated anytime in WPML → AutoML AI → Settings.',
-							'automl-ai-translation-for-wpml'
+							'wpml-translation-check'
 						) }
 					</p>
 				</div>
@@ -391,16 +391,16 @@ const AiTranslation = ({ onBack, onContinue }) => {
 							}
 							window.location.href = dashboardUrl;
 						} }
-						label={ __( 'Finish setup', 'automl-ai-translation-for-wpml' ) }
+						label={ __( 'Finish setup', 'wpml-translation-check' ) }
 						disabled={ saving || !hasValidApiKey() }
 					/>
 				</div>
 			</div>
 
 			<div className="automl-ai-wizard-card-footer">
-				{ __( 'Need help? Visit our', 'automl-ai-translation-for-wpml' ) }{ ' ' }
+				{ __( 'Need help? Visit our', 'wpml-translation-check' ) }{ ' ' }
 				<a href={ data.doc_url || '#' } target="_blank" rel="noopener noreferrer">
-					{ __( 'Documentation', 'automl-ai-translation-for-wpml' ) }
+					{ __( 'Documentation', 'wpml-translation-check' ) }
 				</a>
 			</div>
 		</>

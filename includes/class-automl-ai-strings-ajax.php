@@ -48,7 +48,7 @@ class AUTOML_AI_Strings_Ajax
 			// Extract nonce from JSON for verification
 			$nonce = isset($json_data['nonce']) ? sanitize_text_field($json_data['nonce']) : '';
 			if (! wp_verify_nonce($nonce, 'automl_wpml_auto_translate_nonce')) {
-				wp_send_json_error(array('msg' => esc_html__('Security check failed. Please refresh the page and try again.', 'automl-ai-translation-for-wpml')));
+				wp_send_json_error(array('msg' => esc_html__('Security check failed. Please refresh the page and try again.', 'wpml-translation-check')));
 				return;
 			}
 			$target_lang = isset($json_data['target_lang']) ? sanitize_text_field($json_data['target_lang']) : '';
@@ -56,7 +56,7 @@ class AUTOML_AI_Strings_Ajax
 		} else {
 			// Fallback to POST (backward compatibility)
 			if (! check_ajax_referer('automl_wpml_auto_translate_nonce', 'nonce', false)) {
-				wp_send_json_error(array('msg' => esc_html__('Security check failed. Please refresh the page and try again.', 'automl-ai-translation-for-wpml')));
+				wp_send_json_error(array('msg' => esc_html__('Security check failed. Please refresh the page and try again.', 'wpml-translation-check')));
 				return;
 			}
 			$target_lang = isset($_POST['target_lang']) ? sanitize_text_field(wp_unslash($_POST['target_lang'])) : '';
@@ -65,19 +65,19 @@ class AUTOML_AI_Strings_Ajax
 		}
 
 		if (! current_user_can('manage_options')) {
-			wp_send_json_error(array('msg' => esc_html__('Insufficient permissions.', 'automl-ai-translation-for-wpml')));
+			wp_send_json_error(array('msg' => esc_html__('Insufficient permissions.', 'wpml-translation-check')));
 		}
 
 		if (! function_exists('icl_add_string_translation')) {
-			wp_send_json_error(array('msg' => esc_html__('WPML String Translation is not active.', 'automl-ai-translation-for-wpml')));
+			wp_send_json_error(array('msg' => esc_html__('WPML String Translation is not active.', 'wpml-translation-check')));
 		}
 
 		if (empty($target_lang) || empty($translated_strings)) {
-			wp_send_json_error(array('msg' => esc_html__('Missing target language or translated strings.', 'automl-ai-translation-for-wpml')));
+			wp_send_json_error(array('msg' => esc_html__('Missing target language or translated strings.', 'wpml-translation-check')));
 		}
 		// $wizard_lang = WPML_AT_Helper::get_wizard_allowed_language_code();
 		// if ( $wizard_lang !== null && strtolower( (string) $target_lang ) !== strtolower( $wizard_lang ) ) {
-		// 	wp_send_json_error(array('msg' => esc_html__('This target language is not allowed. Only the language selected in the setup wizard can be used.', 'automl-ai-translation-for-wpml')));
+		// 	wp_send_json_error(array('msg' => esc_html__('This target language is not allowed. Only the language selected in the setup wizard can be used.', 'wpml-translation-check')));
 		// }
 
 		$status = defined('ICL_TM_COMPLETE') ? ICL_TM_COMPLETE : 10;
@@ -114,7 +114,7 @@ class AUTOML_AI_Strings_Ajax
 		}
 
 		if (empty($rows_data)) {
-			wp_send_json_error(array('msg' => esc_html__('No valid strings to save.', 'automl-ai-translation-for-wpml')));
+			wp_send_json_error(array('msg' => esc_html__('No valid strings to save.', 'wpml-translation-check')));
 			return;
 		}
 
@@ -153,7 +153,7 @@ $result = $wpdb->query($query); // phpcs:ignore
 		wp_send_json_success(array(
 			'msg'   => sprintf(
 				/* translators: %d: number of strings */
-				esc_html__('%d string(s) translated and saved.', 'automl-ai-translation-for-wpml'),
+				esc_html__('%d string(s) translated and saved.', 'wpml-translation-check'),
 				$saved
 			),
 			'saved' => $saved,

@@ -203,13 +203,13 @@ class Create_Translated_Post {
 
 		// WPML language linking
 		do_action(
-			'wpml_set_element_language_details',
+			'wpml_set_element_language_details', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 			array(
 				'element_id'           => $translated_post_id,
 				'element_type'         => 'post_' . $post_type,
-				'trid'                 => apply_filters( 'wpml_element_trid', null, $this->post_id, 'post_' . $post_type ),
+				'trid'                 => apply_filters( 'wpml_element_trid', null, $this->post_id, 'post_' . $post_type ), // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				'language_code'        => $this->target_language,
-				'source_language_code' => apply_filters( 'wpml_post_language_details', null, $this->post_id )['language_code'],
+				'source_language_code' => apply_filters( 'wpml_post_language_details', null, $this->post_id )['language_code'], // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound	
 			)
 		);
 

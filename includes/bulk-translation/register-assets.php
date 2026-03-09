@@ -36,7 +36,7 @@ class Register_Assets {
 			return;
 		}
 
-		$automl_current_language=apply_filters( 'wpml_current_language', null );
+		$automl_current_language=apply_filters( 'wpml_current_language', null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$wizard_lang = WPML_AT_Helper::get_wizard_allowed_language_code();
 
 		wp_enqueue_script( 'automl-admin', AUTOML_AI_PLUGIN_URL . 'assets/js/automl-admin.min.js', array(), AUTOML_AI_VERSION, true );
@@ -56,7 +56,7 @@ class Register_Assets {
 			}
 		}
 
-		$post_label    = __( 'Pages', 'automl-ai-translation-for-wpml' );
+		$post_label    = __( 'Pages', 'wpml-translation-check' );
 		$taxonomy_page = false;
 
 		if ( isset( $current_screen->post_type ) ) {

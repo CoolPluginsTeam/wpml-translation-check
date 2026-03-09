@@ -54,7 +54,7 @@ const ErrorModalBox = ({ message, onClose, Title, prefix, children }) => {
             <div className={`${prefix}-error-modal-box`}>
                 <div className={`${prefix}-error-modal-box-header`}>
                     {Title && <h3>{Title}</h3>}
-                    <button type="button" aria-label={__('Close', 'automl-ai-translation-for-wpml')} className={`${prefix}-error-modal-box-close`} onClick={onClose}>&times;</button>
+                    <button type="button" aria-label={__('Close', 'wpml-translation-check')} className={`${prefix}-error-modal-box-close`} onClick={onClose}>&times;</button>
                 </div>
                 <div className={`${prefix}-error-modal-box-body`}>
                     <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(stringifiedMessage) }} />

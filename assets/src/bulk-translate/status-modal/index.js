@@ -24,7 +24,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     const [progressBarVisibility, setProgressBarVisibility] = useState(true);
     const [bulkStatus, setBulkStatus] = useState('status');
     const countInfo = useSelector(selectCountInfo);
-    let [emptyPostMessage, setEmptyPostMessage] = useState(sprintf(__('Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.', 'automl-ai-translation-for-wpml'), automl_wpml_bulk_translate_object.post_label, automl_wpml_bulk_translate_object.post_label));
+    let [emptyPostMessage, setEmptyPostMessage] = useState(sprintf(__('Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label, automl_wpml_bulk_translate_object.post_label));
     let progressStatus = useSelector(selectProgressStatus);
     progressStatus = progressStatus.toFixed(1);
     progressStatus = Math.min(progressStatus, 100);
@@ -194,15 +194,15 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     const getBulkStatus = () => {
         switch (bulkStatus) {
             case 'in-queue':
-                return __('In Queue', 'automl-ai-translation-for-wpml');
+                return __('In Queue', 'wpml-translation-check');
             case 'running':
-                return __('In Progress', 'automl-ai-translation-for-wpml');
+                return __('In Progress', 'wpml-translation-check');
             case 'pending':
-                return __('Pending', 'automl-ai-translation-for-wpml');
+                return __('Pending', 'wpml-translation-check');
             case 'completed':
-                return __('Completed', 'automl-ai-translation-for-wpml');
+                return __('Completed', 'wpml-translation-check');
             default:
-                return __('Status', 'automl-ai-translation-for-wpml');
+                return __('Status', 'wpml-translation-check');
         }
     }
 
@@ -289,21 +289,21 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     const getPostStatus = (type) => {
         switch (type) {
             case 'pending':
-                return __('Pending', 'automl-ai-translation-for-wpml');
+                return __('Pending', 'wpml-translation-check');
             case 'completed':
-                return __('Completed', 'automl-ai-translation-for-wpml');
+                return __('Completed', 'wpml-translation-check');
             case 'in-queue':
-                return __('In Queue', 'automl-ai-translation-for-wpml');
+                return __('In Queue', 'wpml-translation-check');
             default:
                 return '';
         }
     };
 
     return (
-        errorModal ? <ErrorModalBox message={errorModalData.errorHtml} onClose={closeErrorModal} Title={__('Bulk Translation Error', 'automl-ai-translation-for-wpml')} prefix={prefix} >
+        errorModal ? <ErrorModalBox message={errorModalData.errorHtml} onClose={closeErrorModal} Title={__('Bulk Translation Error', 'wpml-translation-check')} prefix={prefix} >
             {errorModalData.aiError && <div className={`${prefix}-ai-error-buttons`}>
-                <button className={`${prefix}-ai-error-button button`} data-status="translateAgain" onClick={AIErrorBtnHandler}>{__('Translate', 'automl-ai-translation-for-wpml')}</button>
-                <button className={`${prefix}-ai-error-button button`} data-status="continue" onClick={AIErrorBtnHandler}>{__('Continue', 'automl-ai-translation-for-wpml')}</button>
+                <button className={`${prefix}-ai-error-button button`} data-status="translateAgain" onClick={AIErrorBtnHandler}>{__('Translate', 'wpml-translation-check')}</button>
+                <button className={`${prefix}-ai-error-button button`} data-status="continue" onClick={AIErrorBtnHandler}>{__('Continue', 'wpml-translation-check')}</button>
             </div>}
         </ErrorModalBox> :
             <div id={`${prefix}-status-modal-container`}>
@@ -325,10 +325,10 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                             countInfo.errorPosts < 1 &&
                             !(translatePostInfo && Object.values(translatePostInfo).some((info) => info?.status === "error")) &&
                             countInfo.stringsTranslated > 0 && (
-                                <p className={`${prefix}-modal-desc`}>{__("Your content has been translated successfully.", 'automl-ai-translation-for-wpml')}</p>
+                                <p className={`${prefix}-modal-desc`}>{__("Your content has been translated successfully.", 'wpml-translation-check')}</p>
                             )}
                     </div>
-                    <button type="button" aria-label={__('Close', 'automl-ai-translation-for-wpml')} className={`${prefix}-modal-close`} onClick={(e) => onModalClose(e)}>&times;</button>
+                    <button type="button" aria-label={__('Close', 'wpml-translation-check')} className={`${prefix}-modal-close`} onClick={(e) => onModalClose(e)}>&times;</button>
                 </div>
                 {(countInfo.totalPosts < 1 && countInfo.errorPosts < 1) && !isLoading ?
                     <p>{emptyPostMessage}</p> :
@@ -342,16 +342,16 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                 </div> : (countInfo.postsTranslated > 0 &&
                                 <div className={`${prefix}-count-container`}>
                                     <div className={`${prefix}-post-count`}>
-                                        <span className={`${prefix}-count-text-heading`}>{__('Posts', 'automl-ai-translation-for-wpml')} </span><br />
+                                        <span className={`${prefix}-count-text-heading`}>{__('Posts', 'wpml-translation-check')} </span><br />
                                         <span className={`${prefix}-post-translated-post`}>{countInfo.postsTranslated}/{countInfo.totalPosts}</span>
                                     </div>
                                     <div className={`${prefix}-string-count`}>
-                                        <span className={`${prefix}-count-text-heading`}>{__('Characters', 'automl-ai-translation-for-wpml')} </span><br />
+                                        <span className={`${prefix}-count-text-heading`}>{__('Characters', 'wpml-translation-check')} </span><br />
                                         <span className={`${prefix}-string-number`}>{countInfo.charactersTranslated}</span>
                                     </div>
                                     <div className={`${prefix}-char-count`}>
-                                        <span className={`${prefix}-count-text-heading`}>{__('Time Taken', 'automl-ai-translation-for-wpml')} </span><br />
-                                        <span className={`${prefix}-char-number`}>{Math.round((countInfo.endTime - countInfo.startTime) / 1000)} {__('seconds', 'automl-ai-translation-for-wpml')}</span>
+                                        <span className={`${prefix}-count-text-heading`}>{__('Time Taken', 'wpml-translation-check')} </span><br />
+                                        <span className={`${prefix}-char-number`}>{Math.round((countInfo.endTime - countInfo.startTime) / 1000)} {__('seconds', 'wpml-translation-check')}</span>
                                     </div>
                                 </div>
                             )
@@ -402,16 +402,16 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                     !isLoading && Object.keys(translatePostInfo).length > 0 &&
                                     <div className={`${prefix}-status-header-container`}>
                                         <div className={`${prefix}-status-flag-th`}>
-                                            <span className={`${prefix}-status-header-label`}>{__('Language', 'automl-ai-translation-for-wpml')}</span>
+                                            <span className={`${prefix}-status-header-label`}>{__('Language', 'wpml-translation-check')}</span>
                                         </div>
                                         <div className={`${prefix}-status-status-th`}>
-                                            <span className={`${prefix}-status-header-label`}>{__('Status', 'automl-ai-translation-for-wpml')}</span>
+                                            <span className={`${prefix}-status-header-label`}>{__('Status', 'wpml-translation-check')}</span>
                                         </div>
                                         <div className={`${prefix}-status-title-th`}>
-                                            <span className={`${prefix}-status-header-label`}>{__('Preview', 'automl-ai-translation-for-wpml')}</span>
+                                            <span className={`${prefix}-status-header-label`}>{__('Preview', 'wpml-translation-check')}</span>
                                         </div>
                                         <div className={`${prefix}-status-actions-th`}>
-                                            <span className={`${prefix}-status-header-label`}>{__('Actions', 'automl-ai-translation-for-wpml')}</span>
+                                            <span className={`${prefix}-status-header-label`}>{__('Actions', 'wpml-translation-check')}</span>
                                         </div>
                                     </div>
                                 }
@@ -420,7 +420,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                         return (
                                             <div className={`${prefix}-status-inner-item`} key={key}>
                                                 <div key={`group-title-${key}`} className={`${prefix}-group-title`}>
-                                                    {errorPostsInfo[key]?.title || __('Untitled', 'automl-ai-translation-for-wpml')}
+                                                    {errorPostsInfo[key]?.title || __('Untitled', 'wpml-translation-check')}
                                                 </div>
                                                 <div className={`${prefix}-status-inner-item ${prefix}-error-message`}>
                                                     <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(errorPostsInfo[key].errorMessage) }}></div>
@@ -435,7 +435,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                     const workingStatus = info.status === 'running' || info.status === 'in-progress' ? true : false;
                                     return (
                                         <div className={`${prefix}-status-inner-item`} key={`group-title-${info.parentPostId || key}`}>
-                                            <div className={`${prefix}-status-parent-post-title`}>{info.parentPostTitle || __('Untitled', 'automl-ai-translation-for-wpml')}</div>
+                                            <div className={`${prefix}-status-parent-post-title`}>{info.parentPostTitle || __('Untitled', 'wpml-translation-check')}</div>
                                             <div className={`${prefix}-status-target-post`}>
                                                 <div className={`${prefix}-status-target-post-flag`}>
                                                     {info.flagUrl && <img src={info.flagUrl} width="20" alt={info.targetLanguage} />}
@@ -448,7 +448,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                                 <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(info.errorMessage) }}></div>
                                                             </div> :
                                                             <div className={`${prefix}-status-target-post-error-button`} style={{ gridColumn: 'span 4' }}>
-                                                                {info.errorHtml && <div className={`${prefix}-status-target-post-error-button`} onClick={() => { handleErrorModal(info) }}><button className={`${prefix}-status-error-button`}>{__('Error Details', 'automl-ai-translation-for-wpml')}</button></div>}
+                                                                {info.errorHtml && <div className={`${prefix}-status-target-post-error-button`} onClick={() => { handleErrorModal(info) }}><button className={`${prefix}-status-error-button`}>{__('Error Details', 'wpml-translation-check')}</button></div>}
                                                             </div>
                                                         }
                                                     </> :
@@ -474,7 +474,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                                 {info.status === 'completed' ?
                                                                     <a href={info.postLink} target="_blank" rel="noopener noreferrer">{info.targetPostTitle}</a> :
                                                                     (info.status === 'in-progress' ?
-                                                                        <div className={`${prefix}-${info.messageClass}-text`}>{__('In Progress', 'automl-ai-translation-for-wpml')}<span></span></div> :
+                                                                        <div className={`${prefix}-${info.messageClass}-text`}>{__('In Progress', 'wpml-translation-check')}<span></span></div> :
                                                                         <div className={`${prefix}-progress-skeleton short`} style={{ marginInline: 'auto' }}></div>)
                                                                 }
                                                             </>
@@ -488,23 +488,23 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
                                                                             className="button button-primary"
-                                                                            title={sprintf(__('Open the translated %s for review', 'automl-ai-translation-for-wpml'), automl_wpml_bulk_translate_object.post_label)}
+                                                                            title={sprintf(__('Open the translated %s for review', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label)}
                                                                         >
-                                                                            {__('Review', 'automl-ai-translation-for-wpml')}
+                                                                            {__('Review', 'wpml-translation-check')}
                                                                         </a>
                                                                     ) : (
                                                                         <button
                                                                             className="button disabled"
                                                                             disabled
-                                                                            title={sprintf(__('Please wait until all translations for this %s are complete before reviewing.', 'automl-ai-translation-for-wpml'), automl_wpml_bulk_translate_object.post_label)}
+                                                                            title={sprintf(__('Please wait until all translations for this %s are complete before reviewing.', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label)}
                                                                         >
-                                                                            {__('Review', 'automl-ai-translation-for-wpml')}
+                                                                            {__('Review', 'wpml-translation-check')}
                                                                         </button>
                                                                     )}
                                                                 </span>
                                                                 :
                                                                 (info.status === 'in-progress' ?
-                                                                    <div className={`${prefix}-${info.messageClass}-text`}>{__('In Progress', 'automl-ai-translation-for-wpml')}<span></span></div> :
+                                                                    <div className={`${prefix}-${info.messageClass}-text`}>{__('In Progress', 'wpml-translation-check')}<span></span></div> :
                                                                     <div className={`${prefix}-progress-skeleton short`}></div>)
                                                             }
                                                         </div>
@@ -518,8 +518,8 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                         <div className={`${prefix}-status-footer`}>
                             {isLoading ?
                              <div className={`${prefix}-progress-skeleton`}></div> :
-                             (!(countInfo.postsTranslated > 0 && !pendingPosts.length)) ? <div className={`${prefix}-progress-button button button-primary`} disabled>{sprintf(__('Check Translated %s', 'automl-ai-translation-for-wpml'), automl_wpml_bulk_translate_object.post_label)}</div> :
-                             <a className={`${prefix}-progress-button button button-primary`} href={getTranslatedPostLink()}>{sprintf(__('Check Translated %s', 'automl-ai-translation-for-wpml'), automl_wpml_bulk_translate_object.post_label)}</a>
+                             (!(countInfo.postsTranslated > 0 && !pendingPosts.length)) ? <div className={`${prefix}-progress-button button button-primary`} disabled>{sprintf(__('Check Translated %s', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label)}</div> :
+                             <a className={`${prefix}-progress-button button button-primary`} href={getTranslatedPostLink()}>{sprintf(__('Check Translated %s', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label)}</a>
                             }
                         </div>
                     </>

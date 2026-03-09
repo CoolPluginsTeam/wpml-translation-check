@@ -103,9 +103,9 @@ if ( ! class_exists( 'AUTOML_Ai_Dashboard' ) ) {
 			$file_prefix = 'admin/automl-ai-dashboard/views/';
 
 			$valid_tabs = array(
-				'dashboard'       => __( 'Dashboard', 'automl-ai-translation-for-wpml' ),
-				'ai-translations' => __( 'AI Translations', 'automl-ai-translation-for-wpml' ),
-				'settings'        => __( 'Settings', 'automl-ai-translation-for-wpml' ),
+				'dashboard'       => __( 'Dashboard', 'wpml-translation-check' ),
+				'ai-translations' => __( 'AI Translations', 'wpml-translation-check' ),
+				'settings'        => __( 'Settings', 'wpml-translation-check' ),
 			);
 
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -116,7 +116,7 @@ if ( ! class_exists( 'AUTOML_Ai_Dashboard' ) ) {
 				<div class="automl_ai_dashboard-header">
 					<div class="automl_ai_dashboard-header-left">
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=automl_ai_dashboard&tab=dashboard' ) ); ?>" class="automl_ai_dashboard-logo-link">
-							<img src="<?php echo esc_url( AUTOML_AI_PLUGIN_URL . 'admin/automl-ai-dashboard/images/automl-ai-logo.png' ); ?>" alt="<?php esc_attr_e( 'WPML Auto Logo', 'automl-ai-translation-for-wpml' ); ?>">
+							<img src="<?php echo esc_url( AUTOML_AI_PLUGIN_URL . 'admin/automl-ai-dashboard/images/automl-ai-logo.png' ); ?>" alt="<?php esc_attr_e( 'WPML Auto Logo', 'wpml-translation-check' ); ?>">
 						</a>
 						<div>
 							<span class="automl_ai_dashboard-logo-text">AutoML</span>
@@ -127,7 +127,7 @@ if ( ! class_exists( 'AUTOML_Ai_Dashboard' ) ) {
 					</div>
 				</div>
 
-				<nav class="nav-tab-wrapper" aria-label="<?php esc_attr_e( 'Dashboard navigation', 'automl-ai-translation-for-wpml' ); ?>">
+				<nav class="nav-tab-wrapper" aria-label="<?php esc_attr_e( 'Dashboard navigation', 'wpml-translation-check' ); ?>">
 					<?php foreach ( $valid_tabs as $tab_key => $tab_title ) : ?>
 						<a href="<?php echo esc_url( admin_url( 'admin.php?page=automl_ai_dashboard&tab=' . $tab_key ) ); ?>"
 							class="nav-tab <?php echo esc_attr( $tab === $tab_key ? 'nav-tab-active' : '' ); ?>">
@@ -143,7 +143,7 @@ if ( ! class_exists( 'AUTOML_Ai_Dashboard' ) ) {
 					if ( file_exists( $view_file ) ) {
 						require $view_file;
 					} else {
-						echo '<p>' . esc_html__( 'View file not found.', 'automl-ai-translation-for-wpml' ) . '</p>';
+						echo '<p>' . esc_html__( 'View file not found.', 'wpml-translation-check' ) . '</p>';
 					}
 
 					$sidebar_file = AUTOML_AI_PLUGIN_DIR . $file_prefix . 'sidebar.php';

@@ -183,7 +183,7 @@ class AIService {
 
             await this.processCompleteHandler(timeStart);
             if (error.name === 'AbortError') {
-                const errorMessage = this.errorMessage && this.errorMessage.includes('You exceeded your current quota') ? __('You have exceeded you current plan limit. that\'s why the request is aborted.', 'automl-ai-translation-for-wpml') : error;
+                const errorMessage = this.errorMessage && this.errorMessage.includes('You exceeded your current quota') ? __('You have exceeded you current plan limit. that\'s why the request is aborted.', 'wpml-translation-check') : error;
                 console.warn(errorMessage);
             } else {
                 console.error('An error occurred during the AJAX processing:', error);
@@ -414,29 +414,29 @@ class AIService {
         const limitExceeded = this.errorMessage && this.errorMessage.includes('You exceeded your current quota');
 
         if (limitExceeded) {
-            errorMessage = `<p class="${this.prefix}-ai-pending-request-heading">` + __('You’ve exceeded your current plan limit.', 'automl-ai-translation-for-wpml') + '</p> ' + __('To continue, please check your plan details and update your API key.', 'automl-ai-translation-for-wpml');
-            translateBtnMessage = __('Click "Translate" after updating your API key to re-translate the remaining strings.', 'automl-ai-translation-for-wpml');
+            errorMessage = `<p class="${this.prefix}-ai-pending-request-heading">` + __('You’ve exceeded your current plan limit.', 'wpml-translation-check') + '</p> ' + __('To continue, please check your plan details and update your API key.', 'wpml-translation-check');
+            translateBtnMessage = __('Click "Translate" after updating your API key to re-translate the remaining strings.', 'wpml-translation-check');
         } else {
-            errorMessage = `<p class="${this.prefix}-ai-pending-request-heading">` + __('Oops! Something went wrong during translation', 'automl-ai-translation-for-wpml') + '</p>';
-            translateBtnMessage = __('Click "Translate" to re-translate the remaining strings.', 'automl-ai-translation-for-wpml');
+            errorMessage = `<p class="${this.prefix}-ai-pending-request-heading">` + __('Oops! Something went wrong during translation', 'wpml-translation-check') + '</p>';
+            translateBtnMessage = __('Click "Translate" to re-translate the remaining strings.', 'wpml-translation-check');
         }
 
         const message = `<div class="${this.prefix}-ai-pending-request">
                     <div>${errorMessage}</div>
-                    <p>${__('To see more details, open your browser’s developer console.', 'automl-ai-translation-for-wpml')}</p>
+                    <p>${__('To see more details, open your browser’s developer console.', 'wpml-translation-check')}</p>
 
-                <p>✅ ${sprintf(__('You’ve translated %s of the strings.', 'automl-ai-translation-for-wpml'), completedPercent + '%')}</p>
-                <p>❌ ${sprintf(__('%s of the strings are still not translated.', 'automl-ai-translation-for-wpml'), notCompletedPercent + '%')}</p>
+                <p>✅ ${sprintf(__('You’ve translated %s of the strings.', 'wpml-translation-check'), completedPercent + '%')}</p>
+                <p>❌ ${sprintf(__('%s of the strings are still not translated.', 'wpml-translation-check'), notCompletedPercent + '%')}</p>
 
-                <p><strong>${__('Next Steps:', 'automl-ai-translation-for-wpml')}</strong></p>
+                <p><strong>${__('Next Steps:', 'wpml-translation-check')}</strong></p>
 
                 <p>${translateBtnMessage}</p>
-                <p><strong>${__('OR', 'automl-ai-translation-for-wpml')}</strong></p>
-                <p>${__('Click "Continue" to proceed without translating the rest of the strings.', 'automl-ai-translation-for-wpml')}</p>
+                <p><strong>${__('OR', 'wpml-translation-check')}</strong></p>
+                <p>${__('Click "Continue" to proceed without translating the rest of the strings.', 'wpml-translation-check')}</p>
                 </div>`;
 
 
-        this.storeDispatch(updateTranslatePostInfo({ [this.activePostId + '_' + this.activeTargetLangs]: { status: 'error', messageClass: 'error', errorMessage: __('Translation failed.', 'automl-ai-translation-for-wpml'), errorHtml: message, aiError: true, nonce: this.createTranslatePostNonce, completedStrings, totalPosts: this.pendingPosts} }));
+        this.storeDispatch(updateTranslatePostInfo({ [this.activePostId + '_' + this.activeTargetLangs]: { status: 'error', messageClass: 'error', errorMessage: __('Translation failed.', 'wpml-translation-check'), errorHtml: message, aiError: true, nonce: this.createTranslatePostNonce, completedStrings, totalPosts: this.pendingPosts} }));
     }
 
     static translateComplete = async({postId, targetLang, storeDispatch, prefix, updateDestoryHandler, nonce, closeErrorModal, totalPosts, completedStrings}) => {

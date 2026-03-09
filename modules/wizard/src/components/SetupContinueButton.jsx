@@ -9,7 +9,7 @@ export default function SetupContinueButton({ onClick, label, disabled }) {
 			disabled={ disabled }
 			style={{ minWidth: 100 }}
 		>
-			{ label || __( 'Continue', 'automl-ai-translation-for-wpml' ) }
+			{ label || __( 'Continue', 'wpml-translation-check' ) }
 		</button>
 	);
 }
@@ -21,7 +21,7 @@ export function SetupBackButton({ onClick }) {
 			className="button button-primary automl-ai-wizard-back-button"
 			onClick={ onClick }
 		>
-			{ __( 'Back', 'automl-ai-translation-for-wpml' ) }
+			{ __( 'Back', 'wpml-translation-check' ) }
 		</button>
 	);
 }

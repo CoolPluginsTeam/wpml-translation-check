@@ -35,7 +35,7 @@ const Languages = ( { onBack, onContinue } ) => {
 	const selectedLabel =
 		selectedLang?.name ||
 		selectedLang?.code ||
-		__( 'Select an option', 'automl-ai-translation-for-wpml' );
+		__( 'Select an option', 'wpml-translation-check' );
 
 	const handleContinue = async () => {
 		if ( selectedCode ) {
@@ -89,7 +89,7 @@ const Languages = ( { onBack, onContinue } ) => {
 					<h2 style={ { marginTop: 0 } }>
 						{ __(
 							'Select Language for AI Translation',
-							'automl-ai-translation-for-wpml'
+							'wpml-translation-check'
 						) }
 					</h2>
 
@@ -99,7 +99,7 @@ const Languages = ( { onBack, onContinue } ) => {
 					>
 						{ __(
 							'Choose your website language you want to translate using AI. The free version of AutoML allows AI translation for one language only.',
-							'automl-ai-translation-for-wpml'
+							'wpml-translation-check'
 						) }
 					</p>
 
@@ -115,7 +115,7 @@ const Languages = ( { onBack, onContinue } ) => {
 					>
 						{ __(
 							'Choose a language',
-							'automl-ai-translation-for-wpml'
+							'wpml-translation-check'
 						) }
 					</label>
 
@@ -126,7 +126,7 @@ const Languages = ( { onBack, onContinue } ) => {
 	className="automl-ai-wizard-select"
 >
 	<option value="">
-		{ __( 'Select an option', 'automl-ai-translation-for-wpml' ) }
+		{ __( 'Select an option', 'wpml-translation-check' ) }
 	</option>
 
 	{ languageOptions.map( ( opt ) => (
@@ -146,7 +146,7 @@ const Languages = ( { onBack, onContinue } ) => {
 						>
 							{ __(
 								'No languages found. Add languages in WPML → Languages first.',
-								'automl-ai-translation-for-wpml'
+								'wpml-translation-check'
 							) }
 						</p>
 					) }
@@ -171,7 +171,7 @@ const Languages = ( { onBack, onContinue } ) => {
 							<p>
 								{ __(
 									'Translate all languages using AI - Have a website in multiple languages and want to translate them all using AI?',
-									'automl-ai-translation-for-wpml'
+									'wpml-translation-check'
 								) }
 							</p>
 							<a
@@ -182,7 +182,7 @@ const Languages = ( { onBack, onContinue } ) => {
 							>
 								{ __(
 									'Upgrade to Pro →',
-									'automl-ai-translation-for-wpml'
+									'wpml-translation-check'
 								) }
 							</a>
 						</div>
@@ -195,7 +195,7 @@ const Languages = ( { onBack, onContinue } ) => {
 						onClick={ handleContinue }
 						label={ __(
 							'Continue',
-							'automl-ai-translation-for-wpml'
+							'wpml-translation-check'
 						) }
 						disabled={ ! selectedCode }
 					/>
@@ -203,13 +203,13 @@ const Languages = ( { onBack, onContinue } ) => {
 			</div>
 
 			<div className="automl-ai-wizard-card-footer">
-				{ __( 'Need help? Visit our', 'automl-ai-translation-for-wpml' ) }{ ' ' }
+				{ __( 'Need help? Visit our', 'wpml-translation-check' ) }{ ' ' }
 				<a
 					href={ data.doc_url || 'https://docs.coolplugins.net/' }
 					target="_blank"
 					rel="noopener noreferrer"
 				>
-					{ __( 'Documentation', 'automl-ai-translation-for-wpml' ) }
+					{ __( 'Documentation', 'wpml-translation-check' ) }
 				</a>
 			</div>
 		</>

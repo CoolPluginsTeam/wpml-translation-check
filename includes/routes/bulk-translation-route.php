@@ -253,32 +253,32 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 			$nonce = $request->get_header( 'X-WP-Nonce' );
 
 			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', __( 'Invalid nonce.', 'automl-ai-translation-for-wpml' ), array( 'status' => 403 ) );
+				return new WP_Error( 'rest_forbidden', __( 'Invalid nonce.', 'wpml-translation-check' ), array( 'status' => 403 ) );
 			}
 
 			if ( ! is_user_logged_in() ) {
-				return new \WP_Error( 'rest_forbidden', __( 'You are not authorized to perform this action.', 'automl-ai-translation-for-wpml' ), array( 'status' => 401 ) );
+				return new \WP_Error( 'rest_forbidden', __( 'You are not authorized to perform this action.', 'wpml-translation-check' ), array( 'status' => 401 ) );
 			}
 			if ( ! current_user_can( 'edit_posts' ) ) {
-				return new \WP_Error( 'rest_forbidden', __( 'You are not authorized to perform this action.', 'automl-ai-translation-for-wpml' ), array( 'status' => 403 ) );
+				return new \WP_Error( 'rest_forbidden', __( 'You are not authorized to perform this action.', 'wpml-translation-check' ), array( 'status' => 403 ) );
 			}
 			return true;
 		}
 
 		public function validate_automl_wpml_ai_translate_nonce( $value, $request, $param ) {
-			return wp_verify_nonce( $value, 'automl_wpml_ai_translate_nonce' ) ? true : new \WP_Error( 'rest_invalid_param', __( 'Invalid security token sent.', 'automl-ai-translation-for-wpml' ), array( 'status' => 403 ) );
+			return wp_verify_nonce( $value, 'automl_wpml_ai_translate_nonce' ) ? true : new \WP_Error( 'rest_invalid_param', __( 'Invalid security token sent.', 'wpml-translation-check' ), array( 'status' => 403 ) );
 		}
 
 		public function validate_automl_wpml_bulk_nonce( $value, $request, $param ) {
-			return wp_verify_nonce( $value, 'automl_wpml_bulk_translate_entries_nonce' ) ? true : new \WP_Error( 'rest_invalid_param', __( 'You are not authorized to perform this action.', 'automl-ai-translation-for-wpml' ), array( 'status' => 403 ) );
+			return wp_verify_nonce( $value, 'automl_wpml_bulk_translate_entries_nonce' ) ? true : new \WP_Error( 'rest_invalid_param', __( 'You are not authorized to perform this action.', 'wpml-translation-check' ), array( 'status' => 403 ) );
 		}
 
 		public function validate_automl_wpml_create_post_nonce( $value, $request, $param ) {
-			return wp_verify_nonce( $value, 'automl_wpml_create_translate_post_nonce' ) ? true : new \WP_Error( 'rest_invalid_param', __( 'You are not authorized to perform this action.', 'automl-ai-translation-for-wpml' ), array( 'status' => 403 ) );
+			return wp_verify_nonce( $value, 'automl_wpml_create_translate_post_nonce' ) ? true : new \WP_Error( 'rest_invalid_param', __( 'You are not authorized to perform this action.', 'wpml-translation-check' ), array( 'status' => 403 ) );
 		}
 
 		public function validate_pending_posts_ids_request( $value, $request, $param ) {
-			return wp_verify_nonce( $value, 'automl_wpml_pending_posts_ids_nonce' ) ? true : new \WP_Error( 'rest_invalid_param', __( 'Invalid security token sent.', 'automl-ai-translation-for-wpml' ), array( 'status' => 403 ) );
+			return wp_verify_nonce( $value, 'automl_wpml_pending_posts_ids_nonce' ) ? true : new \WP_Error( 'rest_invalid_param', __( 'Invalid security token sent.', 'wpml-translation-check' ), array( 'status' => 403 ) );
 		}
 
 		/**
@@ -315,7 +315,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             }
 			// $wizard_lang = WPML_AT_Helper::get_wizard_allowed_language_code();
             // if ( $wizard_lang !== null && strtolower( $target_language ) !== strtolower( $wizard_lang ) ) {
-            //     wp_send_json_error( __( 'This target language is not allowed. Only the language selected in the setup wizard can be used.', 'automl-ai-translation-for-wpml' ) );
+            //     wp_send_json_error( __( 'This target language is not allowed. Only the language selected in the setup wizard can be used.', 'wpml-translation-check' ) );
             // }
         
             // Decode numeric-key => text map, e.g. {"0":"text","1":"text"}
@@ -422,7 +422,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		if ( ! $has_openai && ! $has_google && ! $is_reset && ! $is_wizard ) {
 			return new \WP_Error(
 				'automl_no_api_key',
-				__( 'Please enter at least one API key (OpenAI or Google).', 'automl-ai-translation-for-wpml' ),
+				__( 'Please enter at least one API key (OpenAI or Google).', 'wpml-translation-check' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -472,7 +472,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		if ( $is_wizard_request && ! $is_reset_request && ! $has_final_openai && ! $has_final_google ) {
 			return new \WP_Error(
 				'automl_no_api_key',
-				__( 'Please enter at least one API key (OpenAI or Google).', 'automl-ai-translation-for-wpml' ),
+				__( 'Please enter at least one API key (OpenAI or Google).', 'wpml-translation-check' ),
 				array( 'status' => 400 )
 			);
 		}
@@ -542,7 +542,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	
 			return new \WP_Error(
 				'automl_invalid_api_key',
-				__( 'One of the API keys is invalid.', 'automl-ai-translation-for-wpml' ),
+				__( 'One of the API keys is invalid.', 'wpml-translation-check' ),
 				array(
 					'status' => 400,
 					'errors' => $errors, // ['openai' => '...', 'google' => '...']
@@ -566,16 +566,16 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
  */
 private function validate_provider_api_key( $provider_id, $api_key ) {
 	if ( ! $provider_id || ! $api_key ) {
-		return array( 'message' => __( 'Provider and API key are required.', 'automl-ai-translation-for-wpml' ) );
+		return array( 'message' => __( 'Provider and API key are required.', 'wpml-translation-check' ) );
 	}
 
 	if ( ! class_exists( 'WordPress\AI_Client\AI_Client' ) || ! class_exists( 'WordPress\AiClient\AiClient' ) ) {
-		return array( 'message' => __( 'AI client is not available.', 'automl-ai-translation-for-wpml' ) );
+		return array( 'message' => __( 'AI client is not available.', 'wpml-translation-check' ) );
 	}
 
 	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
 	if ( ! $registry->hasProvider( $provider_id ) ) {
-		return array( 'message' => __( 'Invalid AI provider.', 'automl-ai-translation-for-wpml' ) );
+		return array( 'message' => __( 'Invalid AI provider.', 'wpml-translation-check' ) );
 	}
 
 	// Simple cooldown per provider + key (so changing the key allows a fresh validation; same key is still rate-limited).
@@ -586,8 +586,8 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 	if ( get_transient( $lock_key ) ) {
 		return array(
 			'message' => $is_gemini
-				? __( 'Gemini rate limit reached. Please wait a minute and try again.', 'automl-ai-translation-for-wpml' )
-				: __( 'Please wait a few seconds before testing again.', 'automl-ai-translation-for-wpml' ),
+				? __( 'Gemini rate limit reached. Please wait a minute and try again.', 'wpml-translation-check' )
+				: __( 'Please wait a few seconds before testing again.', 'wpml-translation-check' ),
 		);
 	}
 
@@ -636,7 +636,7 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 		}
 	}
 	if ( ! $model_instance ) {
-		return array( 'message' => __( 'Invalid API key.', 'automl-ai-translation-for-wpml' ) );
+		return array( 'message' => __( 'Invalid API key.', 'wpml-translation-check' ) );
 	}
 
 	// Set cooldown only when we are about to call the API, so invalid-key attempts don't block retries.
@@ -655,8 +655,8 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 		$error_message = $result->get_error_message();
 		if ( str_contains( strtolower( $error_message ), '429' ) ) {
 			$error_message = $is_gemini
-				? __( 'Gemini free tier rate limit exceeded. Please wait and try again.', 'automl-ai-translation-for-wpml' )
-				: __( 'Rate limit exceeded. Please try again later.', 'automl-ai-translation-for-wpml' );
+				? __( 'Gemini free tier rate limit exceeded. Please wait and try again.', 'wpml-translation-check' )
+				: __( 'Rate limit exceeded. Please try again later.', 'wpml-translation-check' );
 		}
 		return array( 'message' => $error_message );
 	}
@@ -711,7 +711,7 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 			$target_language = json_decode( $params['lang'] );
 			$target_language = array_map( 'sanitize_text_field', $target_language );
 
-			$active_languages = apply_filters( 'wpml_active_languages', null, null );
+			$active_languages = apply_filters( 'wpml_active_languages', null, null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 			$active_languages_slugs = array_column( $active_languages, 'code' );
 			$valid_target_languages = array_intersect( $target_language, $active_languages_slugs );
@@ -724,10 +724,10 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 			$pending_posts_ids = array();
 
 			foreach ( $post_ids as $post_id ) {
-				$automl_wpml_post_element_type = apply_filters( 'wpml_element_type', get_post_type( $post_id ) );
-				$automl_wpml_trid = apply_filters( 'wpml_element_trid', null, $post_id);
+				$automl_wpml_post_element_type = apply_filters( 'wpml_element_type', get_post_type( $post_id ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+				$automl_wpml_trid = apply_filters( 'wpml_element_trid', null, $post_id); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
-				$automl_wpml_translations = apply_filters( 'wpml_get_element_translations', null, $automl_wpml_trid, $automl_wpml_post_element_type );
+				$automl_wpml_translations = apply_filters( 'wpml_get_element_translations', null, $automl_wpml_trid, $automl_wpml_post_element_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				
 				$parent_post_set=false;
 
@@ -772,7 +772,7 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 				wp_send_json_error( 'Empty post IDs Select at least one post to translate' );
 			}
 
-			$active_languages = apply_filters( 'wpml_active_languages', null, null );
+			$active_languages = apply_filters( 'wpml_active_languages', null, null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 			$active_languages_slugs = array_column( $active_languages, 'code' );
 
@@ -800,13 +800,13 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 					continue;
 				}
 
-				$automl_wpml_post_element_type = apply_filters( 'wpml_element_type', get_post_type( $post_id ) );
+				$automl_wpml_post_element_type = apply_filters( 'wpml_element_type', get_post_type( $post_id ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 				// Get the translation group ID (trid) of the post
-				$automl_wpml_trid = apply_filters( 'wpml_element_trid', null, $post_id );
+				$automl_wpml_trid = apply_filters( 'wpml_element_trid', null, $post_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 				// Get all translations of the element using the trid and element type
-				$automl_wpml_translations = apply_filters( 'wpml_get_element_translations', null, $automl_wpml_trid, $automl_wpml_post_element_type );
+				$automl_wpml_translations = apply_filters( 'wpml_get_element_translations', null, $automl_wpml_trid, $automl_wpml_post_element_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 				$automl_wpml_post_translated_languages = array_column( $automl_wpml_translations, 'language_code' );
 
@@ -886,7 +886,7 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 			$target_language = sanitize_text_field( $params['target_language'] );
 			// $wizard_lang     = WPML_AT_Helper::get_wizard_allowed_language_code();
 			// if ( $wizard_lang !== null && strtolower( $target_language ) !== strtolower( $wizard_lang ) ) {
-			// 	wp_send_json_error( __( 'This target language is not allowed. Only the language selected in the setup wizard can be used.', 'automl-ai-translation-for-wpml' ) );
+			// 	wp_send_json_error( __( 'This target language is not allowed. Only the language selected in the setup wizard can be used.', 'wpml-translation-check' ) );
 			// }
 			$editor_type     = sanitize_text_field( $params['editor_type'] );
 			$source_language = sanitize_text_field( $params['source_language'] );

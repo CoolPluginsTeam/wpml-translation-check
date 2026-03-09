@@ -4,7 +4,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! current_user_can( 'manage_options' ) ) {
-	wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'automl-ai-translation-for-wpml' ) );
+	wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'wpml-translation-check' ) );
 }
 
 $automl_wpml_wizard_lang         = get_option( 'automl_ai_wizard_selected_language', array() );
@@ -13,14 +13,14 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 <div class="automl_ai_dashboard-settings">
 	<div class="automl_ai_dashboard-settings-container">
 		<div class="header">
-			<h1><?php echo esc_html__( 'AutoML AI Translate Settings', 'automl-ai-translation-for-wpml' ); ?></h1>
+			<h1><?php echo esc_html__( 'AutoML AI Translate Settings', 'wpml-translation-check' ); ?></h1>
 		</div>
 
 		<p class="description">
 			<?php
 			echo esc_html__(
 				'Configure your AI providers and translation models here. Keys are stored via the WP AI Client option and models via the WPML addon model option.',
-				'automl-ai-translation-for-wpml'
+				'wpml-translation-check'
 			);
 			?>
 		</p>
@@ -34,13 +34,13 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 			<div class="notice notice-warning" style="margin: 1rem 0;">
 				<p>
 					<strong>
-						<?php esc_html_e( 'Please select a translation language first.', 'automl-ai-translation-for-wpml' ); ?>
+						<?php esc_html_e( 'Please select a translation language first.', 'wpml-translation-check' ); ?>
 					</strong>
-					<?php esc_html_e( 'Complete the Setup Wizard and choose a language in the Languages step. Until then, API key settings are disabled.', 'automl-ai-translation-for-wpml' ); ?>
+					<?php esc_html_e( 'Complete the Setup Wizard and choose a language in the Languages step. Until then, API key settings are disabled.', 'wpml-translation-check' ); ?>
 				</p>
 				<p>
 					<a href="<?php echo esc_url( add_query_arg( array( 'page' => 'automl_ai_wizard&step=languages' ), admin_url( 'admin.php' ) ) ); ?>" class="button button-primary">
-						<?php esc_html_e( 'Open Setup Wizard', 'automl-ai-translation-for-wpml' ); ?>
+						<?php esc_html_e( 'Open Setup Wizard', 'wpml-translation-check' ); ?>
 					</a>
 				</p>
 			</div>
@@ -241,7 +241,7 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 								<?php
 								printf(
 									// translators: %s: API name.
-									esc_html__( 'Add %s API key', 'automl-ai-translation-for-wpml' ),
+									esc_html__( 'Add %s API key', 'wpml-translation-check' ),
 									esc_html( $automl_wpml_settings['name'] )
 								);
 								?>
@@ -271,10 +271,10 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 											type="button" 
 											class="button button-primary automl-reset-key-btn" 
 											data-provider="<?php echo esc_attr( $automl_wpml_api_key ); ?>"
-											title="<?php esc_attr_e( 'Reset API key', 'automl-ai-translation-for-wpml' ); ?>"
+											title="<?php esc_attr_e( 'Reset API key', 'wpml-translation-check' ); ?>"
 											<?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
 										>
-											<?php esc_html_e( 'Reset', 'automl-ai-translation-for-wpml' ); ?>
+											<?php esc_html_e( 'Reset', 'wpml-translation-check' ); ?>
 										</button>
 									<?php endif; ?>
 								</div>
@@ -289,7 +289,7 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 								?>
 								<div class="automl_ai_dashboard-api-settings-openai-model">
 									<label for="automl_ai_selected_openai_model" class="api-settings-label">
-										<?php esc_html_e( 'Select OpenAI Model', 'automl-ai-translation-for-wpml' ); ?>
+										<?php esc_html_e( 'Select OpenAI Model', 'wpml-translation-check' ); ?>
 									</label>
 									<select
 										id="automl_ai_selected_openai_model"
@@ -297,7 +297,7 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 										class="automl-openai-model-select"
 										<?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
 									>
-										<option value=""><?php esc_html_e( 'Select model...', 'automl-ai-translation-for-wpml' ); ?></option>
+										<option value=""><?php esc_html_e( 'Select model...', 'wpml-translation-check' ); ?></option>
 										<?php foreach ( $automl_wpml_openai_models as $automl_wpml_model_id ) : ?>
 											<option value="<?php echo esc_attr( $automl_wpml_model_id ); ?>" <?php selected( $automl_wpml_current_openai_model, $automl_wpml_model_id ); ?>>
 												<?php echo esc_html( $automl_wpml_model_id ); ?>
@@ -313,7 +313,7 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 								?>
 								<div class="automl_ai_dashboard-api-settings-google-model">
 									<label for="automl_ai_selected_google_model" class="api-settings-label">
-										<?php esc_html_e( 'Select Gemini Model', 'automl-ai-translation-for-wpml' ); ?>
+										<?php esc_html_e( 'Select Gemini Model', 'wpml-translation-check' ); ?>
 									</label>
 									<select
 										id="automl_ai_selected_google_model"
@@ -321,7 +321,7 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 										class="automl-google-model-select"
 										<?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
 									>
-										<option value=""><?php esc_html_e( 'Select model...', 'automl-ai-translation-for-wpml' ); ?></option>
+										<option value=""><?php esc_html_e( 'Select model...', 'wpml-translation-check' ); ?></option>
 										<?php foreach ( $automl_wpml_google_models as $automl_wpml_model_id ) : ?>
 											<option value="<?php echo esc_attr( $automl_wpml_model_id ); ?>" <?php selected( $automl_wpml_current_google_model, $automl_wpml_model_id ); ?>>
 												<?php echo esc_html( $automl_wpml_model_id ); ?>
@@ -334,8 +334,8 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 
 							printf(
 								// translators: 1: Click here link, 2: API name.
-								esc_html__( '%1$s to see how to configure %2$s in the AI SDK.', 'automl-ai-translation-for-wpml' ),
-								'<a href="' . esc_url( $automl_wpml_settings['doc_url'] ) . '" target="_blank">' . esc_html__( 'Click here', 'automl-ai-translation-for-wpml' ) . '</a>',
+								esc_html__( '%1$s to see how to configure %2$s in the AI SDK.', 'wpml-translation-check' ),
+								'<a href="' . esc_url( $automl_wpml_settings['doc_url'] ) . '" target="_blank">' . esc_html__( 'Click here', 'wpml-translation-check' ) . '</a>',
 								esc_html( $automl_wpml_settings['name'] )
 							);
 							echo '<br/><br/>';
@@ -344,7 +344,7 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 
 						<hr>
 						<div class="automl_ai_dashboard-save-btn-container">
-							<?php submit_button( __( 'Save', 'automl-ai-translation-for-wpml' ), 'primary', 'submit', true, $automl_wpml_wizard_language_set ? array() : array( 'disabled' => 'disabled' ) ); ?>
+							<?php submit_button( __( 'Save', 'wpml-translation-check' ), 'primary', 'submit', true, $automl_wpml_wizard_language_set ? array() : array( 'disabled' => 'disabled' ) ); ?>
 						</div>
 				</form>
 			</div>
@@ -388,7 +388,7 @@ if ( $automl_wpml_wizard_language_set ) :
 				input.value = '';
 				input.type = 'password';
 				input.removeAttribute('disabled');
-				input.placeholder = '<?php echo esc_js( __( 'Enter new key to update', 'automl-ai-translation-for-wpml' ) ); ?>';
+				input.placeholder = '<?php echo esc_js( __( 'Enter new key to update', 'wpml-translation-check' ) ); ?>';
 				input.focus();
 			}
 		}
@@ -418,7 +418,7 @@ if ( $automl_wpml_wizard_language_set ) :
 			
 			// Disable the button during request
 			e.target.disabled = true;
-			e.target.textContent = '<?php echo esc_js( __( 'Deleting...', 'automl-ai-translation-for-wpml' ) ); ?>';
+			e.target.textContent = '<?php echo esc_js( __( 'Deleting...', 'wpml-translation-check' ) ); ?>';
 			
 			// Prepare delete request - send empty string to remove the key
 			var deleteData = {};
@@ -442,7 +442,7 @@ if ( $automl_wpml_wizard_language_set ) :
 				} else {
 					// Error - show error message
 					var err = result.data || {};
-					var errorMsg = (err.message) ? err.message : '<?php echo esc_js( __( 'Failed to delete API key. Please try again.', 'automl-ai-translation-for-wpml' ) ); ?>';
+					var errorMsg = (err.message) ? err.message : '<?php echo esc_js( __( 'Failed to delete API key. Please try again.', 'wpml-translation-check' ) ); ?>';
 					var msgElement = document.getElementById('automl-ai-settings-message-' + provider);
 					if (msgElement) {
 						msgElement.textContent = errorMsg;
@@ -451,20 +451,20 @@ if ( $automl_wpml_wizard_language_set ) :
 					}
 					// Re-enable button
 					e.target.disabled = false;
-					e.target.textContent = '<?php echo esc_js( __( 'Reset', 'automl-ai-translation-for-wpml' ) ); ?>';
+					e.target.textContent = '<?php echo esc_js( __( 'Reset', 'wpml-translation-check' ) ); ?>';
 				}
 			})
 			.catch(function() {
 				// Network error
 				var msgElement = document.getElementById('automl-ai-settings-message-' + provider);
 				if (msgElement) {
-					msgElement.textContent = '<?php echo esc_js( __( 'Network error. Please try again.', 'automl-ai-translation-for-wpml' ) ); ?>';
+					msgElement.textContent = '<?php echo esc_js( __( 'Network error. Please try again.', 'wpml-translation-check' ) ); ?>';
 					msgElement.style.display = 'block';
 					msgElement.style.color = '#d63638';
 				}
 				// Re-enable button
 				e.target.disabled = false;
-				e.target.textContent = '<?php echo esc_js( __( 'Reset', 'automl-ai-translation-for-wpml' ) ); ?>';
+				e.target.textContent = '<?php echo esc_js( __( 'Reset', 'wpml-translation-check' ) ); ?>';
 			});
 		}
 	});
@@ -554,7 +554,7 @@ if ( $automl_wpml_wizard_language_set ) :
 			}
 		})
 		.catch(function() {
-			var fallback = '<?php echo esc_js( __( 'Request failed. Please try again.', 'automl-ai-translation-for-wpml' ) ); ?>';
+			var fallback = '<?php echo esc_js( __( 'Request failed. Please try again.', 'wpml-translation-check' ) ); ?>';
 			if ( validationNotice ) {
 				var noticeP = validationNotice.querySelector( 'p' );
 				if ( noticeP ) {

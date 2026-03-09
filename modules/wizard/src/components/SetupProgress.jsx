@@ -5,9 +5,9 @@ import Languages from './Languages';
 import AiTranslation from './AiTranslation';
 
 const STEPS = [
-	{ key: 'video_intro', label: __( 'Intro', 'automl-ai-translation-for-wpml' ) },
-	{ key: 'languages', label: __( 'Languages', 'automl-ai-translation-for-wpml' ) },
-	{ key: 'ai_translation', label: __( 'AI Translation', 'automl-ai-translation-for-wpml' ) },
+	{ key: 'video_intro', label: __( 'Intro', 'wpml-translation-check' ) },
+	{ key: 'languages', label: __( 'Languages', 'wpml-translation-check' ) },
+	{ key: 'ai_translation', label: __( 'AI Translation', 'wpml-translation-check' ) },
 ];
 
 const SetupProgress = ({ currentStep, setCurrentStep, onGetStarted, onFinish }) => {

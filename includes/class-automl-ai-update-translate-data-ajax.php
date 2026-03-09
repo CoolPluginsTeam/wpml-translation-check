@@ -31,7 +31,7 @@ class AUTOML_AI_Update_Translate_Data_Ajax {
 	 */
 	public static function handle_update_translate_data() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'msg' => __( 'Unauthorized', 'automl-ai-translation-for-wpml' ) ), 403 );
+			wp_send_json_error( array( 'msg' => __( 'Unauthorized', 'wpml-translation-check' ) ), 403 );
 		}
 
 		$nonce = isset( $_POST['automl_wpml_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['automl_wpml_nonce'] ) ) : '';
@@ -39,7 +39,7 @@ if ( empty( $nonce ) && isset( $_POST['translate_data_nonce'] ) ) {
 	$nonce = sanitize_text_field( wp_unslash( $_POST['translate_data_nonce'] ) );
 }
 if ( ! wp_verify_nonce( $nonce, 'automl_wpml_update_translate_data' ) ) {
-	wp_send_json_error( array( 'msg' => __( 'Invalid nonce', 'automl-ai-translation-for-wpml' ) ), 400 );
+	wp_send_json_error( array( 'msg' => __( 'Invalid nonce', 'wpml-translation-check' ) ), 400 );
 }
     
 		$post_id        = isset( $_POST['post_id'] ) ? sanitize_text_field( wp_unslash( $_POST['post_id'] ) ) : '';
@@ -59,7 +59,7 @@ if ( ! wp_verify_nonce( $nonce, 'automl_wpml_update_translate_data' ) ) {
 		$bulk_translate = isset( $_POST['bulk_translate'] ) ? sanitize_text_field( wp_unslash( $_POST['bulk_translate'] ) ) : '';
 
 		if ( empty( $post_id ) || empty( $provider ) || empty( $source_lang ) || empty( $target_lang ) ) {
-			wp_send_json_error( array( 'msg' => __( 'Missing required fields', 'automl-ai-translation-for-wpml' ) ), 400 );
+			wp_send_json_error( array( 'msg' => __( 'Missing required fields', 'wpml-translation-check' ) ), 400 );
 		}
     
 		if ( class_exists( 'AUTOML_Ai_Cpt_Dashboard' ) ) {
