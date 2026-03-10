@@ -18,7 +18,7 @@ const VideoIntro = ({ onGetStarted }) => {
 					{ __( 'automatically using AI.', 'wpml-translation-check' ) }
 				</p>
 			</div>
-			<div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%', marginBottom: 24 }}>
+			<div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
 				<iframe
 					title={ __( 'AutoML Setup Guide', 'wpml-translation-check' ) }
 					style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', borderRadius: 8 }}
@@ -28,7 +28,7 @@ const VideoIntro = ({ onGetStarted }) => {
 					allowFullScreen
 				/>
 			</div>
-			<div style={{ display: 'flex', justifyContent: 'center', padding: '1.5em' }}>
+			<div style={{ display: 'flex', justifyContent: 'center', padding: '2.5em' }}>
 				<button type="button" className="button button-primary button-hero" onClick={ onGetStarted }>
 					{ __( 'Get Started', 'wpml-translation-check' ) }
 				</button>
