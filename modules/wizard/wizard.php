@@ -6,6 +6,7 @@
  */
 
 namespace AUTOML_WPML\Modules\Wizard;
+use WordPress\AiClient\AiClient;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -200,7 +201,22 @@ class AUTOML_Ai_Wizard {
 			$wpml_languages = \WPML_AT_Helper::get_wpml_languages();
             $default_language = \WPML_AT_Helper::get_default_language();
 		}
-        $saved_credentials = get_option( 'wp_ai_client_provider_credentials', array() );
+		if ( class_exists( \WordPress\AI_Client\AI_Client::class ) ) {
+			$saved_credentials        = get_option( 'wp_ai_client_provider_credentials', array() );
+			$is_using_connectors_ai   = false;
+			$is_openai_provider_installed = false;
+			$is_google_provider_installed = false;
+		} else {
+			$is_using_connectors_ai       = true;
+			$is_openai_provider_installed = class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' );
+			$is_google_provider_installed = class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' );
+			$openai_key    = get_option( 'connectors_ai_openai_api_key', '' );
+			$google_key    = get_option( 'connectors_ai_google_api_key', '' );
+			$saved_credentials = array(
+				'openai' => $openai_key,
+				'google' => $google_key,
+			);
+		}
 		$home_url_with_lang = get_home_url();      // e.g. http://wpml-plugin.local/en/
 		$lang_code          = defined( 'ICL_LANGUAGE_CODE' ) ? ICL_LANGUAGE_CODE : '';
 		$base_home_url      = $home_url_with_lang;
@@ -213,7 +229,6 @@ class AUTOML_Ai_Wizard {
 				untrailingslashit( $home_url_with_lang )
 			);
 		}
-        $saved_models = get_option( 'automl_ai_translation_models', array() );
 		wp_localize_script(
             'wpml_at_setup',
             'wpml_at_setup',
@@ -230,10 +245,10 @@ class AUTOML_Ai_Wizard {
                     'openai_key' => isset( $saved_credentials['openai'] ) ? $saved_credentials['openai'] : '',
                     'google_key' => isset( $saved_credentials['google'] ) ? $saved_credentials['google'] : '',
                 ),
-                'saved_models' => array(
-                    'openai_model' => isset( $saved_models['openai'] ) ? $saved_models['openai'] : '',
-                    'google_model' => isset( $saved_models['google'] ) ? $saved_models['google'] : '',
-                ),
+				'is_connectors_ai'            => $is_using_connectors_ai,
+				'is_openai_provider_installed' => $is_openai_provider_installed,
+				'is_google_provider_installed' => $is_google_provider_installed,
+				'connectors_url'              => admin_url( 'options-connectors.php' ),
             )
         );
 		wp_enqueue_style(

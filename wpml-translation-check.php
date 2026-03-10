@@ -32,12 +32,9 @@ if ( ! defined( 'AUTOML_AI_PLUGIN_URL' ) ) {
 if ( ! defined( 'AUTOML_AI_PLUGIN_BASENAME' ) ) {
 	define( 'AUTOML_AI_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 }
-$automl_ai_autoload = AUTOML_AI_PLUGIN_DIR . 'vendor/autoload.php';
-if ( file_exists( $automl_ai_autoload ) ) {
-	require_once $automl_ai_autoload;
-}
 
 use WordPress\AI_Client\AI_Client;
+use WordPress\AiClient\AiClient;
 
 use AUTOML_WPML\Includes\Routes\Bulk_Translation_Route;
 use AUTOML_WPML\Helper\Helper;
@@ -72,7 +69,7 @@ final class AUTOML_Ai_Translate_Addon {
 	public function __construct() {
 		$this->load_dependencies();
 		$this->init();
-		add_action( 'init', array( AI_Client::class, 'init' ) );
+		add_action( 'init', array($this, 'register_ai_client') );
 		add_filter(
 			'plugin_action_links_' . AUTOML_AI_PLUGIN_BASENAME,
 			array( $this, 'add_settings_action_link' )
@@ -104,6 +101,26 @@ final class AUTOML_Ai_Translate_Addon {
 				},
 			)
 		);
+	}
+
+	public function register_ai_client() {
+		// Register the AI Client in the container for use in other parts of the plugin.
+
+		if(class_exists( AiClient::class ) ) {
+			return; // Already registered, likely by another plugin. Do not re-register.
+		}
+
+		$automl_ai_autoload = AUTOML_AI_PLUGIN_DIR . 'vendor/autoload.php';
+
+		if ( file_exists( $automl_ai_autoload ) ) {	
+			require_once $automl_ai_autoload;
+		}
+
+		if(!class_exists( AI_Client::class ) ) {
+			return; // Successfully loaded from this plugin's vendor directory.
+		}
+
+		AI_Client::init();
 	}
 
 		/**
