@@ -49,18 +49,17 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 				<form id="automl-ai-settings-credentials-form" method="post" action="#">
 					<?php
 
-					$automl_openai_key=get_option('connectors_ai_openai_api_key', '' );
-					$automl_google_key=get_option('connectors_ai_google_api_key', '');
+					$get_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
+
 					$automl_wpml_ai_credentials = array();
 
-					if(isset($automl_openai_key) && !empty($automl_openai_key)){
-						$automl_wpml_ai_credentials['openai']=$automl_openai_key;
+					if(isset($get_providers_key['openai']) && !empty($get_providers_key['openai'])){
+						$automl_wpml_ai_credentials['openai']=$get_providers_key['openai'];
 					}
 
-					if(isset($automl_google_key) && !empty($automl_google_key)){
-						$automl_wpml_ai_credentials['google']=$automl_google_key;
+					if(isset($get_providers_key['google']) && !empty($get_providers_key['google'])){
+						$automl_wpml_ai_credentials['google']=$get_providers_key['google'];
 					}
-
 
 					// Current selected models (saved by the addon).
 					$automl_wpml_current_models       = get_option( 'automl_ai_translation_models', array() );

@@ -200,17 +200,17 @@ class AUTOML_Ai_Wizard {
 			$wpml_languages = \WPML_AT_Helper::get_wpml_languages();
             $default_language = \WPML_AT_Helper::get_default_language();
 		}
-		$automl_openai_key=get_option('connectors_ai_openai_api_key', '' );
-		$automl_google_key=get_option('connectors_ai_google_api_key', '');
+		$get_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'));
 		$saved_credentials = array();
 
-		if(isset($automl_openai_key) && !empty($automl_openai_key)){
-			$saved_credentials['openai']=$automl_openai_key;
+		if(isset($get_providers_key['openai']) && !empty($get_providers_key['openai'])){
+			$saved_credentials['openai']=$get_providers_key['openai'];
 		}
 
-		if(isset($automl_google_key) && !empty($automl_google_key)){
-			$saved_credentials['google']=$automl_google_key;
+		if(isset($get_providers_key['google']) && !empty($get_providers_key['google'])){
+			$saved_credentials['google']=$get_providers_key['google'];
 		}
+
 		$home_url_with_lang = get_home_url();      // e.g. http://wpml-plugin.local/en/
 		$lang_code          = defined( 'ICL_LANGUAGE_CODE' ) ? ICL_LANGUAGE_CODE : '';
 		$base_home_url      = $home_url_with_lang;

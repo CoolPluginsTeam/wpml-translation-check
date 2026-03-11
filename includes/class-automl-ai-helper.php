@@ -196,5 +196,46 @@ class WPML_AT_Helper {
 		}
 		return sanitize_text_field( $option['code'] );
 	}
+
+	public static function get_providers_key($providers=array(), $removed_mask_filter=false) {
+		$api_key = array();
+
+		if(empty($providers) || ! class_exists( '\WordPress\AiClient\AiClient'  )) {
+			$providers = array();
+		}
+
+		$allowed_providers = array('openai', 'google');
+
+		$providers = array_intersect($providers, $allowed_providers);
+
+		if(function_exists('_wp_register_default_connector_settings')){
+			foreach ($providers as $provider) {
+				$ai_client_option_name='connectors_ai_'.$provider.'_api_key';
+
+				if(true === $removed_mask_filter){
+					remove_filter( "option_{$ai_client_option_name}", '_wp_connectors_mask_api_key' );
+				}
+				$client_api_key=get_option($ai_client_option_name, '');
+
+				if(true === $removed_mask_filter){
+					add_filter( "option_{$ai_client_option_name}", '_wp_connectors_mask_api_key' );
+				}
+
+				if(!empty($client_api_key) && is_string($client_api_key)) {
+					$api_key[$provider] = $client_api_key;
+				}
+			}
+		}else{
+			$wp_ai_providers_options=get_option('wp_ai_client_provider_credentials', array());
+
+			foreach ($wp_ai_providers_options as $provider => $value) {
+				if(!empty($value) && is_string($value)) {
+					$api_key[$provider] = $value;
+				}
+			}
+		}
+
+		return $api_key;
+	}
 }
 

@@ -447,6 +447,8 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	
 		// Keep previous values so we can restore if validation fails.
 		$previous_models = get_option( 'automl_ai_translation_models', array() );
+		$previous_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'));
+
 		if ( ! is_array( $previous_models ) ) {
 			$previous_models = array();
 		}
@@ -511,17 +513,22 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		}
 
 		$errors=array();
+		$updated_providers_key=$previous_providers_key;
 		foreach ($automl_update_data as $provider => $data) {
 			if ( isset( $data['key'] ) ) {
-				if(empty($data['key'])){
-					delete_option( 'connectors_ai_' . $provider . '_api_key' );
-				} else {
+				if(!empty($data['key'])) {
 					$automl_validation_result=$this->validate_provider_api_key( $provider, $data['key'] );
 					if ( is_array( $automl_validation_result ) && ! empty( $automl_validation_result['message'] ) ) {
 						$errors[$provider] = $automl_validation_result['message'];
 						continue; // Skip updating the key for this provider since it's invalid.
 					}		
-					update_option( 'connectors_ai_' . $provider . '_api_key', $data['key'] );
+					$updated_providers_key[$provider]=$data['key'];
+				}else{
+					if(function_exists('_wp_register_default_connector_settings')){
+						delete_option('connectors_ai_'.$provider.'_api_key');
+					}else{
+						unset($updated_providers_key[$provider]);
+					}
 				}
 			}
 		}
@@ -541,6 +548,14 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 					'errors' => $errors, // ['openai' => '...', 'google' => '...']
 				)
 			);
+		}
+
+		if(function_exists('_wp_register_default_connector_settings')){
+			foreach ($updated_providers_key as $provider => $key) {
+				update_option('connectors_ai_'.$provider.'_api_key', $key);
+			}
+		}else{
+			update_option('wp_ai_client_provider_credentials', $updated_providers_key);
 		}
 	
 		// Clear model list cache so Settings page refetches and shows model selectors after reload.
@@ -628,6 +643,7 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 			$model_instance = $registry->getProviderModel( $provider_id, $test_model_id );
 		}
 	}
+	
 	if ( ! $model_instance ) {
 		return array( 'message' => __( 'Invalid API key.', 'wpml-translation-check' ) );
 	}
