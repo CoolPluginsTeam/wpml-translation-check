@@ -276,11 +276,11 @@
 }
 
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-overall-progress .automl-wpml-bulk-translate-progress-bar {
-  width: 100%;
   background: #ddd;
   height: 19px;
   border-radius: 5px;
   overflow: hidden;
+  margin-inline: 24px;
   text-align: center;
   color: white;
   background-size: 30px 30px;
@@ -295,7 +295,7 @@
 
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-overall-progress .automl-wpml-bulk-translate-progress-bar .automl-wpml-bulk-translate-progress {
   height: 100%;
-  background: #3db63d;
+  background: #2271b1;
   width: 0%;
   -webkit-transition: width 0.3s ease;
   transition: width 0.3s ease;

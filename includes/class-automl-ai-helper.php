@@ -126,6 +126,30 @@ class WPML_AT_Helper {
 	}
 
 	/**
+ * Mask an API key for display.
+ * Already-masked values (containing * or •) are returned as-is to avoid double-masking.
+ *
+ * @param string $api_key The API key to mask.
+ * @return string Masked API key.
+ */
+public static function mask_api_key( $api_key ) {
+    if ( empty( $api_key ) ) {
+        return $api_key;
+    }
+    if ( strpos( $api_key, '*' ) !== false || strpos( $api_key, '•' ) !== false ) {
+        return $api_key;
+    }
+    if ( strlen( $api_key ) < 12 ) {
+        return $api_key;
+    }
+    $start         = substr( $api_key, 0, 6 );
+    $end           = substr( $api_key, -6 );
+    $middle_length = strlen( $api_key ) - 12;
+    $masked_middle = str_repeat( '*', min( max( $middle_length, 0 ), 24 ) );
+    return $start . $masked_middle . $end;
+}
+
+	/**
 	 * Get existing translation ID for a specific language.
 	 *
 	 * @param int    $post_id     Post ID.

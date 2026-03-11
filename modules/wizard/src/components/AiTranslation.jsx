@@ -13,7 +13,10 @@ const AiTranslation = ({ onBack, onContinue }) => {
   const connectorsUrl = data.connectors_url || "#";
   // Helper function to mask API keys
   const maskApiKey = (apiKey) => {
-    if (!apiKey || apiKey.length < 12) {
+    if (!apiKey || apiKey.includes('*')) {
+      return apiKey;
+    }
+    if (apiKey.length < 12) {
       return apiKey;
     }
     const start = apiKey.substring(0, 6);
@@ -139,9 +142,24 @@ const AiTranslation = ({ onBack, onContinue }) => {
       });
 
       // Success: show a single general success message
-      setGeneralMessage(__("API keys saved.", "wpml-translation-check"));
-      setIsError(false);
-      return true;
+      if (window.wpml_at_setup) {
+        window.wpml_at_setup.saved_credentials = window.wpml_at_setup.saved_credentials || {};
+        if (requestData.openai_key !== undefined && requestData.openai_key !== "") {
+          window.wpml_at_setup.saved_credentials.openai_key = maskApiKey(requestData.openai_key);
+        } else if (requestData.openai_key === "") {
+          delete window.wpml_at_setup.saved_credentials.openai_key;
+        }
+        if (requestData.google_key !== undefined && requestData.google_key !== "") {
+          window.wpml_at_setup.saved_credentials.google_key = maskApiKey(requestData.google_key);
+        } else if (requestData.google_key === "") {
+          delete window.wpml_at_setup.saved_credentials.google_key;
+        }
+      }
+    
+          // Success: show a single general success message
+          setGeneralMessage(__("API keys saved.", "wpml-translation-check"));
+          setIsError(false);
+          return true;
     } catch (err) {
       const fieldErrors = err?.data?.errors || {};
 
@@ -343,25 +361,23 @@ const AiTranslation = ({ onBack, onContinue }) => {
                       ✓
                     </span>
                   )}
-                  <button
-                    type="button"
-                    onClick={
-                      isUsingConnectorsAi
-                        ? () => {
-                            window.open(connectorsUrl, '_blank', 'noopener,noreferrer');
-                          }
-                        : () => handleReset("openai")
-                    }
-                    className="button button-primary automl-reset-key-btn"
-                  >
-                    {isUsingConnectorsAi
-                      ? !isOpenaiProviderInstalled
-                        ? __("Install", "wpml-translation-check")
-                        : !hasExistingOpenaiKey
-                        ? __("Connect", "wpml-translation-check")
-                        : __("Edit", "wpml-translation-check")
-                      : __("Reset", "wpml-translation-check")}
-                  </button>
+                  {!isOpenaiProviderInstalled ? (
+                    <button
+                      type="button"
+                      onClick={() => window.open(connectorsUrl, '_blank', 'noopener,noreferrer')}
+                      className="button button-primary automl-reset-key-btn"
+                    >
+                      {__("Install", "wpml-translation-check")}
+                    </button>
+                  ) : hasExistingOpenaiKey ? (
+                    <button
+                      type="button"
+                      onClick={() => handleReset("openai")}
+                      className="button button-primary automl-reset-key-btn"
+                    >
+                      {__("Reset", "wpml-translation-check")}
+                    </button>
+                  ) : null}
                 </>
               )}
             </div>
@@ -428,7 +444,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                 }}
               />
               {(isUsingConnectorsAi ||
-                (hasExistingOpenaiKey && !openaiEditMode)) && (
+                (!hasExistingGoogleKey && !googleEditMode)) && (
                 <>
                   {!isUsingConnectorsAi && (
                     <span
@@ -441,25 +457,23 @@ const AiTranslation = ({ onBack, onContinue }) => {
                       ✓
                     </span>
                   )}
-                  <button
-                    type="button"
-                    onClick={
-                      isUsingConnectorsAi
-                        ? () => {
-                          window.open(connectorsUrl, '_blank', 'noopener,noreferrer');
-                          }
-                        : () => handleReset("google")
-                    }
-                    className="button button-primary automl-reset-key-btn"
-                  >
-                    {isUsingConnectorsAi
-                      ? !isGoogleProviderInstalled
-                        ? __("Install", "wpml-translation-check")
-                        : !hasExistingGoogleKey
-                        ? __("Connect", "wpml-translation-check")
-                        : __("Edit", "wpml-translation-check")
-                      : __("Reset", "wpml-translation-check")}
-                  </button>
+                  {!isGoogleProviderInstalled ? (
+                    <button
+                      type="button"
+                      onClick={() => window.open(connectorsUrl, '_blank', 'noopener,noreferrer')}
+                      className="button button-primary automl-reset-key-btn"
+                    >
+                      {__("Install", "wpml-translation-check")}
+                    </button>
+                  ) : hasExistingGoogleKey ? (
+                    <button
+                      type="button"
+                      onClick={() => handleReset("google")}
+                      className="button button-primary automl-reset-key-btn"
+                    >
+                      {__("Reset", "wpml-translation-check")}
+                    </button>
+                  ) : null}
                 </>
               )}
             </div>

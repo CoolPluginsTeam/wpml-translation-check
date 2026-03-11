@@ -200,7 +200,7 @@ class AUTOML_Ai_Wizard {
 			$wpml_languages = \WPML_AT_Helper::get_wpml_languages();
             $default_language = \WPML_AT_Helper::get_default_language();
 		}
-		$get_providers_key=\WPML_AT_Helper::get_providers_key(array('openai', 'google'));
+		$get_providers_key=\WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
 		$saved_credentials = array();
 
 		if(isset($get_providers_key['openai']) && !empty($get_providers_key['openai'])){
@@ -241,8 +241,8 @@ class AUTOML_Ai_Wizard {
                 'default_language' => $default_language,
                 'saved_language' => get_option( 'automl_ai_wizard_selected_language', array() ),
                 'saved_credentials' => array(
-                    'openai_key' => isset( $saved_credentials['openai'] ) ? $saved_credentials['openai'] : '',
-                    'google_key' => isset( $saved_credentials['google'] ) ? $saved_credentials['google'] : '',
+					'openai_key' => isset( $saved_credentials['openai'] ) ? \WPML_AT_Helper::mask_api_key( $saved_credentials['openai'] ) : '',
+                    'google_key' => isset( $saved_credentials['google'] ) ? \WPML_AT_Helper::mask_api_key( $saved_credentials['google'] ) : '',
                 ),
 				'is_connectors_ai'            => $is_using_connectors_ai,
 				'is_openai_provider_installed' => $is_openai_provider_installed,

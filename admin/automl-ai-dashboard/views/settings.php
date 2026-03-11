@@ -75,19 +75,7 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 					// Helper function to mask API keys for display
 					if ( ! function_exists( 'automl_mask_api_key' ) ) {
 						function automl_mask_api_key( $api_key ) {
-							// Check already masked (e.g. user saved without change, so value is masked), in which case return as-is to avoid double-masking.
-							if ( strpos( $api_key, '*' ) !== false || strpos($api_key,'•') !== false ) {
-								return $api_key;
-							}
-
-							if ( empty( $api_key ) || strlen( $api_key ) < 12 ) {
-								return $api_key;
-							}
-							$start = substr( $api_key, 0, 6 );
-							$end = substr( $api_key, -6 );
-							$middle_length = strlen( $api_key ) - 12;
-							$masked_middle = str_repeat( '*', min( max( $middle_length, 0 ), 24 ) ); // Ensure non-negative and limit stars to 24 for readability
-							return $start . $masked_middle . $end;
+							return WPML_AT_Helper::mask_api_key( $api_key );
 						}
 					}
 
@@ -343,12 +331,33 @@ if ( $is_ConnectorsAi ) :
 										class="automl-openai-model-select"
 										<?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
 									>
-										<option value=""><?php esc_html_e( 'Select model...', 'wpml-translation-check' ); ?></option>
-										<?php foreach ( $automl_wpml_openai_models as $automl_wpml_model_id ) : ?>
-											<option value="<?php echo esc_attr( $automl_wpml_model_id ); ?>" <?php selected( $automl_wpml_current_openai_model, $automl_wpml_model_id ); ?>>
-												<?php echo esc_html( $automl_wpml_model_id ); ?>
-											</option>
-										<?php endforeach; ?>
+									<option value=""><?php esc_html_e( 'Select model...', 'wpml-translation-check' ); ?></option>
+									<?php
+									$automl_preferred_models = array(
+										'gpt-5.4'             => __( 'gpt-5.4 (Best Quality)', 'wpml-translation-check' ),
+										'gpt-5.4-pro'         => __( 'gpt-5.4-pro (Highest Accuracy)', 'wpml-translation-check' ),
+										'gpt-5.3-chat-latest' => __( 'gpt-5.3-chat-latest (Recommended)', 'wpml-translation-check' ),
+										'gpt-5.2'             => __( 'gpt-5.2 (Balanced)', 'wpml-translation-check' ),
+										'gpt-5-mini'          => __( 'gpt-5-mini (Fast)', 'wpml-translation-check' ),
+										'gpt-5-nano'          => __( 'gpt-5-nano (Cheapest)', 'wpml-translation-check' ),
+										'gpt-4o-mini'         => __( 'gpt-4o-mini (Fast & Cheap)', 'wpml-translation-check' ),
+									);
+
+									$automl_filtered_models = array_intersect_key(
+										$automl_preferred_models,
+										array_flip( $automl_wpml_openai_models )
+									);
+
+									$automl_display_models = ! empty( $automl_filtered_models )
+										? $automl_filtered_models
+										: array_combine( $automl_wpml_openai_models, $automl_wpml_openai_models );
+
+									foreach ( $automl_display_models as $automl_model_id => $automl_model_label ) :
+									?>
+										<option value="<?php echo esc_attr( $automl_model_id ); ?>" <?php selected( $automl_wpml_current_openai_model, $automl_model_id ); ?>>
+											<?php echo esc_html( $automl_model_label ); ?>
+										</option>
+									<?php endforeach; ?>
 									</select>
 								</div>
 								<?php
@@ -367,12 +376,33 @@ if ( $is_ConnectorsAi ) :
 										class="automl-google-model-select"
 										<?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
 									>
-										<option value=""><?php esc_html_e( 'Select model...', 'wpml-translation-check' ); ?></option>
-										<?php foreach ( $automl_wpml_google_models as $automl_wpml_model_id ) : ?>
-											<option value="<?php echo esc_attr( $automl_wpml_model_id ); ?>" <?php selected( $automl_wpml_current_google_model, $automl_wpml_model_id ); ?>>
-												<?php echo esc_html( $automl_wpml_model_id ); ?>
-											</option>
-										<?php endforeach; ?>
+									<option value=""><?php esc_html_e( 'Select model...', 'wpml-translation-check' ); ?></option>
+									<?php
+									$automl_preferred_google_models = array(
+										'gemini-3.1-pro-preview'        => __( 'gemini-3.1-pro-preview (Best Quality)', 'wpml-translation-check' ),
+										'gemini-3.1-flash-lite-preview' => __( 'gemini-3.1-flash-lite-preview (Fast & Cheap)', 'wpml-translation-check' ),
+										'gemma-3n-e4b-it'               => __( 'gemma-3n-e4b-it (Cheapest)', 'wpml-translation-check' ),
+										'gemini-2.5-pro'                => __( 'gemini-2.5-pro (Best Overall)', 'wpml-translation-check' ),
+										'gemini-2.5-flash'              => __( 'gemini-2.5-flash (Balanced)', 'wpml-translation-check' ),
+										'gemini-3-flash-preview'        => __( 'gemini-3-flash-preview (Recommended)', 'wpml-translation-check' ),
+										'gemini-2.5-pro-preview-tts'    => __( 'gemini-2.5-pro-preview-tts (High Accuracy)', 'wpml-translation-check' ),
+									);
+
+									$automl_filtered_google_models = array_intersect_key(
+										$automl_preferred_google_models,
+										array_flip( $automl_wpml_google_models )
+									);
+
+									$automl_display_google_models = ! empty( $automl_filtered_google_models )
+										? $automl_filtered_google_models
+										: array_combine( $automl_wpml_google_models, $automl_wpml_google_models );
+
+									foreach ( $automl_display_google_models as $automl_model_id => $automl_model_label ) :
+									?>
+										<option value="<?php echo esc_attr( $automl_model_id ); ?>" <?php selected( $automl_wpml_current_google_model, $automl_model_id ); ?>>
+											<?php echo esc_html( $automl_model_label ); ?>
+										</option>
+									<?php endforeach; ?>
 									</select>
 								</div>
 								<?php
