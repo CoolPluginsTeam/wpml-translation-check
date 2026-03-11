@@ -37,11 +37,11 @@ class Register_Assets {
 				$credentials = array();
 
 				if(isset($get_providers_key['openai']) && !empty($get_providers_key['openai'])){
-					$credentials['openai']=$automl_openai_key;
+					$credentials['openai']=$get_providers_key['openai'];
 				}
 
 				if(isset($get_providers_key['google']) && !empty($get_providers_key['google'])){
-					$credentials['google']=$automl_google_key;
+					$credentials['google']=$get_providers_key['google'];
 				}
 
 				if ( is_array( $credentials ) ) {

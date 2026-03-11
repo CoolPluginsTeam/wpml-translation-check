@@ -200,7 +200,7 @@ class AUTOML_Ai_Wizard {
 			$wpml_languages = \WPML_AT_Helper::get_wpml_languages();
             $default_language = \WPML_AT_Helper::get_default_language();
 		}
-		$get_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'));
+		$get_providers_key=\WPML_AT_Helper::get_providers_key(array('openai', 'google'));
 		$saved_credentials = array();
 
 		if(isset($get_providers_key['openai']) && !empty($get_providers_key['openai'])){
