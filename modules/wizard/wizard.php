@@ -223,6 +223,11 @@ class AUTOML_Ai_Wizard {
 				untrailingslashit( $home_url_with_lang )
 			);
 		}
+
+		$is_using_connectors_ai             = function_exists('_wp_register_default_connector_settings');
+		$is_openai_provider_installed = $is_using_connectors_ai && class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' ) ? true : false;
+		$is_google_provider_installed = $is_using_connectors_ai && class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' ) ? true : false;
+
 		wp_localize_script(
             'wpml_at_setup',
             'wpml_at_setup',
