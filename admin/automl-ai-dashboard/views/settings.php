@@ -278,26 +278,29 @@ $automl_provider_installed = ( 'openai' === $automl_wpml_api_key )
     : $is_google_provider_installed;
 $automl_connectors_url = admin_url( 'options-connectors.php' );
 if ( $is_ConnectorsAi ) :
-    if ( ! $automl_provider_installed ) :
-        $automl_connector_btn_label = __( 'Install', 'wpml-translation-check' );
-    elseif ( ! $automl_wpml_has_existing_key ) :
-        $automl_connector_btn_label = __( 'Connect', 'wpml-translation-check' );
-    else :
-        $automl_connector_btn_label = __( 'Edit', 'wpml-translation-check' );
-    endif;
-    ?>
-    <?php if ( $automl_wpml_has_existing_key ) : ?>
+    if ( ! $automl_provider_installed ) : ?>
+        <a
+            href="<?php echo esc_url( $automl_connectors_url ); ?>"
+            class="button button-primary"
+            target="_blank"
+            rel="noopener noreferrer"
+        >
+            <?php esc_html_e( 'Install', 'wpml-translation-check' ); ?>
+        </a>
+		<?php elseif ( $automl_wpml_has_existing_key ) : ?>
         <span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
+        <button
+            type="button"
+            class="button button-primary automl-reset-key-btn"
+            data-provider="<?php echo esc_attr( $automl_wpml_api_key ); ?>"
+            title="<?php esc_attr_e( 'Reset API key', 'wpml-translation-check' ); ?>"
+            <?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
+        >
+            <?php esc_html_e( 'Reset', 'wpml-translation-check' ); ?>
+        </button>
     <?php endif; ?>
-	<a
-    href="<?php echo esc_url( $automl_connectors_url ); ?>"
-    class="button button-primary"
-    target="_blank"
-    rel="noopener noreferrer"
->
-    <?php echo esc_html( $automl_connector_btn_label ); ?>
-</a>
-<?php else : ?>
+<?php
+else : ?>
     <?php if ( $automl_wpml_has_existing_key ) : ?>
         <span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
         <button
@@ -331,7 +334,6 @@ if ( $is_ConnectorsAi ) :
 										class="automl-openai-model-select"
 										<?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
 									>
-									<option value=""><?php esc_html_e( 'Select model...', 'wpml-translation-check' ); ?></option>
 									<?php
 									$automl_preferred_models = array(
 										'gpt-5.4'             => __( 'gpt-5.4 (Best Quality)', 'wpml-translation-check' ),
@@ -376,7 +378,6 @@ if ( $is_ConnectorsAi ) :
 										class="automl-google-model-select"
 										<?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
 									>
-									<option value=""><?php esc_html_e( 'Select model...', 'wpml-translation-check' ); ?></option>
 									<?php
 									$automl_preferred_google_models = array(
 										'gemini-3.1-pro-preview'        => __( 'gemini-3.1-pro-preview (Best Quality)', 'wpml-translation-check' ),
