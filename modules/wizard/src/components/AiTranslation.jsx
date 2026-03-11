@@ -363,7 +363,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                     {isUsingConnectorsAi
                       ? !isOpenaiProviderInstalled
                         ? __("Install", "wpml-translation-check")
-                        : !hasExistingOpenaiKey && !hasExistingGoogleKey
+                        : !hasExistingOpenaiKey
                         ? __("Connect", "wpml-translation-check")
                         : __("Edit", "wpml-translation-check")
                       : __("Reset", "wpml-translation-check")}
@@ -461,7 +461,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                     {isUsingConnectorsAi
                       ? !isGoogleProviderInstalled
                         ? __("Install", "wpml-translation-check")
-                        : !hasExistingOpenaiKey && !hasExistingGoogleKey
+                        : !hasExistingGoogleKey
                         ? __("Connect", "wpml-translation-check")
                         : __("Edit", "wpml-translation-check")
                       : __("Reset", "wpml-translation-check")}
