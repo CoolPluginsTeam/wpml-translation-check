@@ -447,7 +447,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	
 		// Keep previous values so we can restore if validation fails.
 		$previous_models = get_option( 'automl_ai_translation_models', array() );
-		$previous_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'));
+		$previous_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
 
 		if ( ! is_array( $previous_models ) ) {
 			$previous_models = array();
@@ -515,7 +515,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		$errors=array();
 		$updated_providers_key=$previous_providers_key;
 		foreach ($automl_update_data as $provider => $data) {
-			if ( isset( $data['key'] ) ) {
+			if ( isset( $data['key'] ) || empty($data['key']) ) {
 				if(!empty($data['key'])) {
 					$automl_validation_result=$this->validate_provider_api_key( $provider, $data['key'] );
 					if ( is_array( $automl_validation_result ) && ! empty( $automl_validation_result['message'] ) ) {
@@ -526,6 +526,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 				}else{
 					if(function_exists('_wp_register_default_connector_settings')){
 						delete_option('connectors_ai_'.$provider.'_api_key');
+						unset($updated_providers_key[$provider]);
 					}else{
 						unset($updated_providers_key[$provider]);
 					}
