@@ -338,7 +338,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 						   wp_send_json_error( 'No AI model selected for this provider.' );
 					   }
         
-            if ( ! class_exists( '\WordPress\AiClient\AiClient' ) || ! class_exists( '\WordPress\AI_Client\AI_Client' ) ) {
+            if ( ! class_exists( '\WordPress\AiClient\AiClient' ) ) {
                 wp_send_json_error( 'AI SDK is not available.' );
             }
         
@@ -373,6 +373,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             );
         
            // $content is your long instruction + JSON string
+		   if(class_exists( '\WordPress\AI_Client\AI_Client' )) {
             try {
                 $builder = \WordPress\AI_Client\AI_Client::prompt();
                 $raw     = $builder
@@ -383,6 +384,18 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             } catch ( \Throwable $e ) {
                 wp_send_json_error( 'Error during text generation: ' . $e->getMessage() );
             }
+		}else{
+			try {
+				$builder = \WordPress\AiClient\AiClient::prompt();
+				$raw     = $builder
+					->usingModel( $model )
+					->usingProvider( $service_slug )
+					->withText( $content )
+					->generateText();
+			} catch ( \Throwable $e ) {
+				wp_send_json_error( 'Error during text generation: ' . $e->getMessage() );
+			}
+		}
            	// Clean the text
 						$cleanText = preg_replace( '/(^```json\n|```$)/', '', $raw );
 

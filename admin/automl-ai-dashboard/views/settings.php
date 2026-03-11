@@ -50,22 +50,11 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 					<?php
 
 					// Current AI SDK credentials.
-					if(class_exists( ( \WordPress\AI_Client\AI_Client::class ) ) ){
-						$automl_wpml_ai_credentials = get_option( 'wp_ai_client_provider_credentials', array() );
-						$is_ConnectorsAi = false;
-						$is_openai_provider_installed = false;
-						$is_google_provider_installed = false;
-					}else{
-						$is_ConnectorsAi = true;
-						$is_openai_provider_installed = class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' );
-						$is_google_provider_installed = class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' );
-						$openai_key = get_option( 'connectors_ai_openai_api_key', '' );
-						$google_key = get_option( 'connectors_ai_google_api_key', '' );
-						$automl_wpml_ai_credentials = array(
-							'openai' => $openai_key,
-							'google' => $google_key,
-						);
-					}
+					$ai_context                  = WPML_AT_Helper::get_ai_credentials();
+					$automl_wpml_ai_credentials  = $ai_context['credentials'];
+					$is_ConnectorsAi             = $ai_context['is_ConnectorsAi'];
+					$is_openai_provider_installed = $ai_context['is_openai_provider_installed'];
+					$is_google_provider_installed = $ai_context['is_google_provider_installed'];
 
 					// Current selected models (saved by the addon).
 					$automl_wpml_current_models       = get_option( 'automl_ai_translation_models', array() );
@@ -299,12 +288,14 @@ if ( $is_ConnectorsAi ) :
     <?php if ( $automl_wpml_has_existing_key ) : ?>
         <span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
     <?php endif; ?>
-    <a
-        href="<?php echo esc_url( $automl_connectors_url ); ?>"
-        class="button button-primary"
-    >
-        <?php echo esc_html( $automl_connector_btn_label ); ?>
-    </a>
+	<a
+    href="<?php echo esc_url( $automl_connectors_url ); ?>"
+    class="button button-primary"
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    <?php echo esc_html( $automl_connector_btn_label ); ?>
+</a>
 <?php else : ?>
     <?php if ( $automl_wpml_has_existing_key ) : ?>
         <span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>

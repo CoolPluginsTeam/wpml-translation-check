@@ -115,7 +115,8 @@ class Register_Assets {
 		$available_ai_services = array();
 
 			// Build from saved credentials so button shows "Add API Key" when key is missing/empty.
-			$credentials = get_option( 'wp_ai_client_provider_credentials', array() );
+	   $ai_context = WPML_AT_Helper::get_ai_credentials();
+	   $credentials = $ai_context['credentials'];
 		if ( is_array( $credentials ) ) {
 			foreach ( array( 'openai', 'google' ) as $provider_id ) {
 				if ( ! empty( $credentials[ $provider_id ] ) && is_string( $credentials[ $provider_id ] ) ) {

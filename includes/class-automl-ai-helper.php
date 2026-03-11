@@ -89,6 +89,35 @@ class WPML_AT_Helper {
 	}
 
 	/**
+ * Get AI provider credentials.
+ *
+ * Returns credentials from the unified AI client if available,
+ * otherwise falls back to individual provider options.
+ *
+ * @return array Credentials array keyed by provider.
+ */
+public static function get_ai_credentials(): array {
+    if ( class_exists( \WordPress\AI_Client\AI_Client::class ) ) {
+        return array(
+            'credentials'                  => get_option( 'wp_ai_client_provider_credentials', array() ),
+            'is_ConnectorsAi'              => false,
+            'is_openai_provider_installed' => false,
+            'is_google_provider_installed' => false,
+        );
+    }
+
+    return array(
+        'credentials'                  => array(
+            'openai' => get_option( 'connectors_ai_openai_api_key', '' ),
+            'google' => get_option( 'connectors_ai_google_api_key', '' ),
+        ),
+        'is_ConnectorsAi'              => true,
+        'is_openai_provider_installed' => class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' ),
+        'is_google_provider_installed' => class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' ),
+    );
+}
+
+	/**
 	 * Get translations for a post.
 	 *
 	 * @param int    $post_id   Post ID.

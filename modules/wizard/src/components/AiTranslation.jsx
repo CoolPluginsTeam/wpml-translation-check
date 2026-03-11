@@ -6,12 +6,6 @@ import { getNonce } from "../utils";
 
 const AiTranslation = ({ onBack, onContinue }) => {
   const data = window.wpml_at_setup || {};
-  const dashboardUrl =
-    data.dashboard_url ||
-    (data.admin_url || "").replace(
-      "admin.php",
-      "admin.php?automl_ai_dashboard&tab=settings",
-    );
   const savedCreds = data.saved_credentials || {};
   const isUsingConnectorsAi = data.is_connectors_ai || false;
   const isOpenaiProviderInstalled = data.is_openai_provider_installed || false;
@@ -354,7 +348,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                     onClick={
                       isUsingConnectorsAi
                         ? () => {
-                            window.location.href = connectorsUrl;
+                            window.open(connectorsUrl, '_blank', 'noopener,noreferrer');
                           }
                         : () => handleReset("openai")
                     }
@@ -452,7 +446,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                     onClick={
                       isUsingConnectorsAi
                         ? () => {
-                            window.location.href = connectorsUrl;
+                          window.open(connectorsUrl, '_blank', 'noopener,noreferrer');
                           }
                         : () => handleReset("google")
                     }
