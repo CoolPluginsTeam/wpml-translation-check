@@ -479,7 +479,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		$is_reset_request = $is_reset === true || $is_reset === 'true';
 		
 		// Require at least one provider for wizard, but allow deletion in settings and reset operations
-		if ( $is_wizard_request && ! $is_reset_request && !isset($automl_update_data['openai']) && !isset($automl_update_data['google']) ) {
+		if ( $is_wizard_request && ! $is_reset_request && !isset($automl_update_data['openai']) && !isset($automl_update_data['google']) && !isset($previous_providers_key['openai']) && !isset($previous_providers_key['google']) ) {
 			return new \WP_Error(
 				'automl_no_api_key',
 				__( 'Please enter at least one API key (OpenAI or Google).', 'wpml-translation-check' ),
