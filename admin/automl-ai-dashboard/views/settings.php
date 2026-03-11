@@ -61,10 +61,9 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 						$automl_wpml_ai_credentials['google']=$get_providers_key['google'];
 					}
 					// Current AI SDK credentials.
-					$ai_context                  = WPML_AT_Helper::get_ai_credentials();
-					$is_ConnectorsAi             = $ai_context['is_ConnectorsAi'];
-					$is_openai_provider_installed = $ai_context['is_openai_provider_installed'];
-					$is_google_provider_installed = $ai_context['is_google_provider_installed'];
+					$is_ConnectorsAi             = function_exists('_wp_register_default_connector_settings');
+					$is_openai_provider_installed = $is_ConnectorsAi && class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' ) ? true : false;
+					$is_google_provider_installed = $is_ConnectorsAi && class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' ) ? true : false;
 
 					// Current selected models (saved by the addon).
 					$automl_wpml_current_models       = get_option( 'automl_ai_translation_models', array() );
