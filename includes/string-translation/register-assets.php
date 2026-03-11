@@ -33,7 +33,18 @@ class Register_Assets {
 		// Enqueue translation dashboard/post list scripts.
 			if ( $needs_ai_services ) {
 				// Build from saved credentials so button shows "Add API Key" when key is missing/empty.
-				$credentials = get_option( 'wp_ai_client_provider_credentials', array() );
+				$automl_openai_key=get_option('connectors_ai_openai_api_key', '' );
+				$automl_google_key=get_option('connectors_ai_google_api_key', '');
+				$credentials = array();
+
+				if(isset($automl_openai_key) && !empty($automl_openai_key)){
+					$credentials['openai']=$automl_openai_key;
+				}
+
+				if(isset($automl_google_key) && !empty($automl_google_key)){
+					$credentials['google']=$automl_google_key;
+				}
+
 				if ( is_array( $credentials ) ) {
 					foreach ( array( 'openai', 'google' ) as $provider_id ) {
 						if ( ! empty( $credentials[ $provider_id ] ) && is_string( $credentials[ $provider_id ] ) ) {

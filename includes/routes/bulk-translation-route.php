@@ -338,7 +338,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 						   wp_send_json_error( 'No AI model selected for this provider.' );
 					   }
         
-            if ( ! class_exists( '\WordPress\AiClient\AiClient' ) || ! class_exists( '\WordPress\AI_Client\AI_Client' ) ) {
+            if ( ! class_exists( '\WordPress\AiClient\AiClient'  ) ) {
                 wp_send_json_error( 'AI SDK is not available.' );
             }
         
@@ -374,7 +374,22 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
         
            // $content is your long instruction + JSON string
             try {
-                $builder = \WordPress\AI_Client\AI_Client::prompt();
+                $builder = null;
+
+				add_filter('wp_ai_client_default_request_timeout', function($timeout){
+					return 120;
+				});
+
+				if(function_exists('wp_ai_client_prompt')){
+					$builder = wp_ai_client_prompt();
+				}else{
+					$builder = \WordPress\AI_Client\AI_Client::prompt();
+				}
+				
+				if(is_null($builder)){
+					wp_send_json_error( 'AI client is not available.' );
+				}
+
                 $raw     = $builder
                     ->using_model( $model )
 					->using_provider( $service_slug )
@@ -383,13 +398,14 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             } catch ( \Throwable $e ) {
                 wp_send_json_error( 'Error during text generation: ' . $e->getMessage() );
             }
+
            	// Clean the text
-						$cleanText = preg_replace( '/(^```json\n|```$)/', '', $raw );
+			$cleanText = preg_replace( '/(^```json\n|```$)/', '', $raw );
 
-						// Replace the double backslashes with a single backslash
-						$final_text = preg_replace( '/\\\\{2,}([\'"n])/', '\\\$1', $cleanText );
+			// Replace the double backslashes with a single backslash
+			$final_text = preg_replace( '/\\\\{2,}([\'"n])/', '\\\$1', $cleanText );
 
-						$translated_text = json_decode( $final_text, true );
+			$translated_text = json_decode( $final_text, true );
             if ( ! is_array( $translated_text ) ) {
                 wp_send_json_error( 'AI response is not valid JSON.' );
             }
@@ -426,38 +442,34 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 				array( 'status' => 400 )
 			);
 		}
+
+		$automl_update_data=array();
 	
 		// Keep previous values so we can restore if validation fails.
-		$previous_credentials = get_option( 'wp_ai_client_provider_credentials', array() );
-		if ( ! is_array( $previous_credentials ) ) {
-			$previous_credentials = array();
-		}
 		$previous_models = get_option( 'automl_ai_translation_models', array() );
 		if ( ! is_array( $previous_models ) ) {
 			$previous_models = array();
 		}
 	
-		$credentials = $previous_credentials;
 		$models      = $previous_models;
 
-		// Build the final credentials array to check if at least one provider will be available
-		$final_credentials = $previous_credentials;
-		
 		// OpenAI: if user typed something -> set; if they cleared field -> unset.
 		if ( $openai_key !== null ) {
+			$automl_update_data['openai']=array('status'=>'updated');
 			if ( $has_openai ) {
-				$final_credentials['openai'] = $openai_key;
+				$automl_update_data['openai']['key'] = sanitize_text_field( $openai_key );
 			} else {
-				unset( $final_credentials['openai'] );
+				$automl_update_data['openai']['key'] = '';
 			}
 		}
 		
 		// Google: same logic.
 		if ( $google_key !== null ) {
+			$automl_update_data['google']=array('status'=>'updated');
 			if ( $has_google ) {
-				$final_credentials['google'] = $google_key;
+				$automl_update_data['google']['key'] = sanitize_text_field( $google_key );
 			} else {
-				unset( $final_credentials['google'] );
+				$automl_update_data['google']['key'] = '';
 			}
 		}
 		
@@ -466,23 +478,13 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		$is_reset_request = $is_reset === true || $is_reset === 'true';
 		
 		// Require at least one provider for wizard, but allow deletion in settings and reset operations
-		$has_final_openai = ! empty( $final_credentials['openai'] );
-		$has_final_google = ! empty( $final_credentials['google'] );
-		
-		if ( $is_wizard_request && ! $is_reset_request && ! $has_final_openai && ! $has_final_google ) {
+		if ( $is_wizard_request && ! $is_reset_request && !isset($automl_update_data['openai']) && !isset($automl_update_data['google']) ) {
 			return new \WP_Error(
 				'automl_no_api_key',
 				__( 'Please enter at least one API key (OpenAI or Google).', 'wpml-translation-check' ),
 				array( 'status' => 400 )
 			);
 		}
-		
-		// Update with the final credentials
-		$credentials = $final_credentials;
-
-		// === Update credentials ===
-	
-		update_option( 'wp_ai_client_provider_credentials', $credentials );
 	
 		// === Update models (optional) ===
 	
@@ -507,33 +509,24 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		} else {
 			delete_option( 'automl_ai_translation_models' );
 		}
-	
-		// === Validate ONLY providers the user is enabling now, via test calls ===
-	
-		$errors = array();
-	
-		if ( $has_openai && ! empty( $credentials['openai'] ) ) {
-			$result = $this->validate_provider_api_key( 'openai', $credentials['openai'] );
-			if ( is_array( $result ) && ! empty( $result['message'] ) ) {
-				$errors['openai'] = $result['message'];
-			}
-		}
-	
-		if ( $has_google && ! empty( $credentials['google'] ) ) {
-			$result = $this->validate_provider_api_key( 'google', $credentials['google'] );
-			if ( is_array( $result ) && ! empty( $result['message'] ) ) {
-				$errors['google'] = $result['message'];
+
+		$errors=array();
+		foreach ($automl_update_data as $provider => $data) {
+			if ( isset( $data['key'] ) ) {
+				if(empty($data['key'])){
+					delete_option( 'connectors_ai_' . $provider . '_api_key' );
+				} else {
+					$automl_validation_result=$this->validate_provider_api_key( $provider, $data['key'] );
+					if ( is_array( $automl_validation_result ) && ! empty( $automl_validation_result['message'] ) ) {
+						$errors[$provider] = $automl_validation_result['message'];
+						continue; // Skip updating the key for this provider since it's invalid.
+					}		
+					update_option( 'connectors_ai_' . $provider . '_api_key', $data['key'] );
+				}
 			}
 		}
 	
 		if ( ! empty( $errors ) ) {
-			// Restore previous values so invalid keys/models are not persisted.
-			if ( ! empty( $previous_credentials ) ) {
-				update_option( 'wp_ai_client_provider_credentials', $previous_credentials );
-			} else {
-				delete_option( 'wp_ai_client_provider_credentials' );
-			}
-	
 			if ( ! empty( $previous_models ) ) {
 				update_option( 'automl_ai_translation_models', $previous_models );
 			} else {
@@ -569,7 +562,7 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 		return array( 'message' => __( 'Provider and API key are required.', 'wpml-translation-check' ) );
 	}
 
-	if ( ! class_exists( 'WordPress\AI_Client\AI_Client' ) || ! class_exists( 'WordPress\AiClient\AiClient' ) ) {
+	if ( ! class_exists( 'WordPress\AiClient\AiClient' ) ) {
 		return array( 'message' => __( 'AI client is not available.', 'wpml-translation-check' ) );
 	}
 
@@ -643,8 +636,22 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 	set_transient( $lock_key, 1, $cooldown );
 
 	try {
-		$result = \WordPress\AI_Client\AI_Client::prompt_with_wp_error( 'OK' )
+
+		$builder = null;
+
+		if(function_exists('wp_ai_client_prompt')){
+			$builder = wp_ai_client_prompt();
+		}else{
+			$builder = \WordPress\AI_Client\AI_Client::prompt();
+		}
+		
+		if(is_null($builder)){
+			return array( 'message' => __( 'AI client is not available.', 'wpml-translation-check' ) );
+		}
+
+		$result = $builder
 			->using_model( $model_instance )
+			->with_text( 'ok' )
 			->generate_text();
 
 	} catch ( \Exception $e ) {
@@ -908,7 +915,7 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 			$post_link      = html_entity_decode( get_the_permalink( $translated_post_id ) );
 			$post_title     = html_entity_decode( get_the_title( $translated_post_id ) );
 			$post_edit_link = html_entity_decode( get_edit_post_link( $translated_post_id ) );
-
+				
 			wp_send_json_success(
 				array(
 					'post_id'                     => $translated_post_id,
