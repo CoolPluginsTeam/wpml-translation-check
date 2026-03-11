@@ -62,7 +62,7 @@ import LocalAITranslate from './components/translate-provider/local-ai/local-ai-
                 localAiCheckInProgres = true;
                 const targetLang = Object.keys(languagesObj)[0];
 
-                if(supportedLanguages.includes(targetLang)){
+                if(supportedLanguages.includes(targetLang) || supportedLanguages.includes(targetLang.split('-')[0])){
                     try {
                         const status = await LocalAITranslate.languagePairAvality('en', targetLang);
     

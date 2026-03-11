@@ -1171,12 +1171,6 @@
   margin-right: 10px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-of-type(2) {
-  background: #2271b1;
-  border: 1px solid #2271b1;
-  color: #fff;
-}
-
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-of-type(2):disabled {
   cursor: not-allowed;
   opacity: .6;
@@ -1185,11 +1179,6 @@
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-child(1):hover {
   background-color: #ffffff;
   border-color: #000000;
-}
-
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:not(:disabled):nth-child(2):hover {
-  background-color: #135e96;
-  border-color: #135e96;
 }
 
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container {
@@ -1212,19 +1201,16 @@
   z-index: 99999;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-reload-btn {
-  background: #0073aa;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 8px 20px;
-}
-
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element {
   position: relative;
   overflow: visible;
   cursor: pointer;
   white-space: nowrap;
+  color: #2271b1;
+}
+
+#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element svg {
+  color: #3c434a;
 }
 
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element .automl-wpml-bulk-translate-tooltip {
@@ -1316,7 +1302,7 @@
   min-height: 0px;
   max-height: 65vh;
   height: auto;
-  padding: 15px 24px 24px;
+  padding: 15px 24px;
   overflow: auto;
 }
 
@@ -1363,19 +1349,6 @@
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body p a {
   color: #2271b1 !important;
   text-decoration: underline;
-}
-
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body button.automl-wpml-bulk-translate-error-reload-btn {
-  background: #0073aa;
-  color: #fff !important;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 9px;
-  cursor: pointer;
-}
-
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body button.automl-wpml-bulk-translate-error-reload-btn:hover {
-  background: #005682;
 }
 
 #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-footer {

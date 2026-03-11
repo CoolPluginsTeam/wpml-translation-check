@@ -72,7 +72,7 @@ const translateContent = async ({ sourceLang, targetLangs, totalPosts, storeDisp
 
     if (providerDetails && providerDetails.Provider) {
 
-        const updateContentCallback = async (lang) => { await updateContent({ source, postId, sourceLang, lang, editorType, createTranslatePostNonce, storeDispatch }) };
+        const updateContentCallback = async (lang) => { await updateContent({ source, postId, sourceLang, lang, createTranslatePostNonce, storeDispatch, editorType }) };
 
         const data = { sourceLang, targetLangs, totalPosts, storeDispatch, postId, createTranslatePostNonce, updateContent: updateContentCallback, prefix, updateDestoryHandler };
 
@@ -89,8 +89,8 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
     
     const deepCloneSource = JSON.parse(JSON.stringify(source));
     
-    const updateContent = await updateFilterContent({ source: deepCloneSource, postId, lang, editorType, service });
-    
+    const updateContent = await updateFilterContent({ source: deepCloneSource, postId, lang, service });
+
     const bulkTranslateRouteUrl = automl_wpml_bulk_translate_object.bulkTranslateRouteUrl;
     const nonce = automl_wpml_bulk_translate_object.nonce;
     

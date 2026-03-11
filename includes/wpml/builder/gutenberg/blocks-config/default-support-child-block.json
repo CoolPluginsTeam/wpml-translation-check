@@ -27,5 +27,8 @@
     "uagb/countdown": true,
     "uagb/how-to-step": true,
     "uagb/how-to": true,
-    "uagb/review": true
+    "uagb/review": true,
+    "uagb/forms-name": true,
+    "uagb/forms-email": true,
+    "uagb/forms-textarea": true
 }

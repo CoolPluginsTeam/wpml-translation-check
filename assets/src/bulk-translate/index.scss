@@ -1027,10 +1027,6 @@ $prefix: automl-wpml-bulk-translate;
             }
 
             .#{$prefix}-footer-button:nth-of-type(2) {
-                background: #2271b1;
-                border: 1px solid #2271b1;
-                color: #fff;
-
                 &:disabled {
                     cursor: not-allowed;
                     opacity: .6;
@@ -1040,11 +1036,6 @@ $prefix: automl-wpml-bulk-translate;
             .#{$prefix}-footer-button:nth-child(1):hover {
                 background-color: #ffffff;
                 border-color: #000000;
-            }
-
-            .#{$prefix}-footer-button:not(:disabled):nth-child(2):hover {
-                background-color: #135e96;
-                border-color: #135e96;
             }
         }
 
@@ -1062,19 +1053,16 @@ $prefix: automl-wpml-bulk-translate;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
             z-index: 99999;
 
-            .#{$prefix}-error-reload-btn {
-                background: #0073aa;
-                color: #fff;
-                border: none;
-                border-radius: 4px;
-                padding: 8px 20px;
-            }
-
             .#{$prefix}-tooltip-element {
                 position: relative;
                 overflow: visible;
                 cursor: pointer;
                 white-space: nowrap;
+                color: #2271b1;
+
+                svg{
+                    color: #3c434a;
+                }
 
                 .#{$prefix}-tooltip {
                     display: block;
@@ -1159,7 +1147,7 @@ $prefix: automl-wpml-bulk-translate;
                 min-height: 0px;
                 max-height: 65vh;
                 height: auto;
-                padding: 15px 24px 24px;
+                padding: 15px 24px;
                 overflow: auto;
 
                 h4 {
@@ -1201,19 +1189,6 @@ $prefix: automl-wpml-bulk-translate;
                     a {
                         color: #2271b1 !important;
                         text-decoration: underline;
-                    }
-                }
-
-                button.#{$prefix}-error-reload-btn {
-                    background: #0073aa;
-                    color: #fff !important;
-                    border: none;
-                    border-radius: 4px;
-                    padding: 4px 9px;
-                    cursor: pointer;
-
-                    &:hover {
-                        background: #005682;
                     }
                 }
             }

@@ -85,6 +85,9 @@ class ChromeAiTranslator {
                         Click on the URL to copy it, then open a new window and paste this URL to access the settings.
                     </li>
                 </ol>
+                <div style="text-align: right;">
+                    <button onclick="location.reload()" class="automl-wpml-bulk-translate-error-reload-btn button button-primary">Reload Page</button>
+                </div>
             </span>`);
             return { html: message, message: 'Browser not supported', type: 'browser-not-supported' };
         }
@@ -102,12 +105,15 @@ class ChromeAiTranslator {
                 <p>For more information, please refer to the <a href="https://developer.chrome.com/docs/ai/translator-api" target="_blank">documentation</a>.</p>   
                 <p>If the issue persists, please ensure that your browser is up to date and restart your browser.</p>
                 <p>If you continue to experience issues after following the above steps, please <a href="https://my.coolplugins.net/account/support-tickets/" target="_blank" rel="noopener">open a support ticket</a> with our team. We are here to help you resolve any problems and ensure a smooth translation experience.</p>
+                <div style="text-align: right;">
+                    <button onclick="location.reload()" class="automl-wpml-bulk-translate-error-reload-btn button button-primary">Reload Page</button>
+                </div>
             </span>`);
             return { html: message, message: 'Translation API not available', type: 'translation-api-not-available' };
         }
 
         // Check if the target language is supported
-        if (!supportedLanguages.includes(targetLanguage.toLowerCase())) {
+        if (!supportedLanguages.includes(targetLanguage.toLowerCase()) && !supportedLanguages.includes(targetLanguage.split('-')[0])) {
             const message = jQuery(`<span style="display: inline-block;">
                 <strong>Language Support Information:</strong>
                 <ol>
@@ -120,7 +126,7 @@ class ChromeAiTranslator {
         }
 
         // Check if the source language is supported
-        if (!supportedLanguages.includes(sourceLanguage.toLowerCase())) {
+        if (!supportedLanguages.includes(sourceLanguage.toLowerCase()) && !supportedLanguages.includes(sourceLanguage.split('-')[0])) {
             const message = jQuery(`<span style="display: inline-block;">
                 <strong>Language Support Information:</strong>
                 <ol>
@@ -163,6 +169,9 @@ class ChromeAiTranslator {
                     </li>
                     <li>For more help, refer to the <a href="https://developer.chrome.com/docs/ai/translator-api#supported-languages" target="_blank">documentation to check supported languages</a>.</li>
                 </ol>
+                <div style="text-align: right;">
+                    <button onclick="location.reload()" class="automl-wpml-bulk-translate-error-reload-btn button button-primary">Reload Page</button>
+                </div>
             </span>`);
             return { html: message, message: `Language pack not installed: ${targetLanguageLabel} (${targetLanguage}) or ${sourceLanguageLabel} (${sourceLanguage})`, type: 'language-pack-not-installed' };
         }
@@ -199,7 +208,7 @@ class ChromeAiTranslator {
                     </li>
                 </ol>
                 <div style="text-align: right;">
-                    <button onclick="location.reload()" class="automl-wpml-error-reload-btn">Reload Page</button>
+                    <button onclick="location.reload()" class="automl-wpml-bulk-translate-error-reload-btn button button-primary">Reload Page</button>
                 </div>
             </span>`);
             return { html: message, message: `Language pack downloading please wait or try again...`, type: 'language-pack-downloading' };
