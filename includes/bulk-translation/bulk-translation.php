@@ -32,6 +32,7 @@ class Bulk_Translation {
 	public function __construct() {
 		add_action( 'current_screen', array( $this, 'bulk_translate_btn' ) );
 		add_filter('wpml_tm_show_page_builders_translation_editor_warning', array( $this, 'hide_page_builders_translation_editor_warning' ), 10, 2);
+		add_filter('wpml_tm_editor_exclude_posts', array( $this, 'editor_exclude_posts' ), 10, 2);
 	}
 
 	public function bulk_translate_btn( $screen ) {
@@ -64,11 +65,35 @@ class Bulk_Translation {
 	public function hide_page_builders_translation_editor_warning( $show, $post_id ) {
 		$status = get_post_meta( $post_id, '_automl_translation_editor_native', true );
 		
-		if($post_id === $status) {
+		if($post_id == $status) {
 			return false;
 		}
 
 		return $show;
+	}
+
+	public function editor_exclude_posts( $exclude_post_ids, $post_ids ) {
+		
+		if(is_array($post_ids) && !empty($post_ids)) {
+			$current_post_id=$post_ids[0];
+			
+			if(isset($current_post_id)){
+				global $post;
+
+				if(!isset($post) || !isset($post->ID) || empty($post->ID)) {
+					return $exclude_post_ids;
+				}
+
+				$post_id=$post->ID;
+				
+				$status = get_post_meta( $post_id, '_automl_translation_editor_native', true );
+				if($post_id == $status) {
+					$exclude_post_ids[$current_post_id] = __( 'This post was translated using AutoML AI Translation and cannot be translated by WPML. There is no need to open the WPML Advanced Translation Editor.', 'wpml-translation-check' );
+				}
+			};
+		}
+
+		return $exclude_post_ids;
 	}
 }
 
