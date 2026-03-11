@@ -123,26 +123,6 @@ final class AUTOML_Ai_Translate_Addon {
 		);
 	}
 
-	public function register_ai_client() {
-		// Register the AI Client in the container for use in other parts of the plugin.
-
-		if(class_exists( AiClient::class ) ) {
-			return; // Already registered, likely by another plugin. Do not re-register.
-		}
-
-		$automl_ai_autoload = AUTOML_AI_PLUGIN_DIR . 'vendor/autoload.php';
-
-		if ( file_exists( $automl_ai_autoload ) ) {	
-			require_once $automl_ai_autoload;
-		}
-
-		if(!class_exists( AI_Client::class ) ) {
-			return; // Successfully loaded from this plugin's vendor directory.
-		}
-
-		AI_Client::init();
-	}
-
 		/**
 	 * Add Settings link on Plugins screen.
 	 *
