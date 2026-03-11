@@ -60,6 +60,11 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 					if(isset($get_providers_key['google']) && !empty($get_providers_key['google'])){
 						$automl_wpml_ai_credentials['google']=$get_providers_key['google'];
 					}
+					// Current AI SDK credentials.
+					$ai_context                  = WPML_AT_Helper::get_ai_credentials();
+					$is_ConnectorsAi             = $ai_context['is_ConnectorsAi'];
+					$is_openai_provider_installed = $ai_context['is_openai_provider_installed'];
+					$is_google_provider_installed = $ai_context['is_google_provider_installed'];
 
 					// Current selected models (saved by the addon).
 					$automl_wpml_current_models       = get_option( 'automl_ai_translation_models', array() );
@@ -280,18 +285,45 @@ $automl_wpml_wizard_language_set = is_array( $automl_wpml_wizard_lang ) && ! emp
 										style="flex: 1;"
 										<?php echo $automl_wpml_has_existing_key ? 'disabled="disabled"' : ''; ?>
 									/>
-									<?php if ( $automl_wpml_has_existing_key ) : ?>
-										<span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
-										<button 
-											type="button" 
-											class="button button-primary automl-reset-key-btn" 
-											data-provider="<?php echo esc_attr( $automl_wpml_api_key ); ?>"
-											title="<?php esc_attr_e( 'Reset API key', 'wpml-translation-check' ); ?>"
-											<?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
-										>
-											<?php esc_html_e( 'Reset', 'wpml-translation-check' ); ?>
-										</button>
-									<?php endif; ?>
+									<?php
+$automl_provider_installed = ( 'openai' === $automl_wpml_api_key )
+    ? $is_openai_provider_installed
+    : $is_google_provider_installed;
+$automl_connectors_url = admin_url( 'options-connectors.php' );
+if ( $is_ConnectorsAi ) :
+    if ( ! $automl_provider_installed ) :
+        $automl_connector_btn_label = __( 'Install', 'wpml-translation-check' );
+    elseif ( ! $automl_wpml_has_existing_key ) :
+        $automl_connector_btn_label = __( 'Connect', 'wpml-translation-check' );
+    else :
+        $automl_connector_btn_label = __( 'Edit', 'wpml-translation-check' );
+    endif;
+    ?>
+    <?php if ( $automl_wpml_has_existing_key ) : ?>
+        <span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
+    <?php endif; ?>
+	<a
+    href="<?php echo esc_url( $automl_connectors_url ); ?>"
+    class="button button-primary"
+    target="_blank"
+    rel="noopener noreferrer"
+>
+    <?php echo esc_html( $automl_connector_btn_label ); ?>
+</a>
+<?php else : ?>
+    <?php if ( $automl_wpml_has_existing_key ) : ?>
+        <span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
+        <button
+            type="button"
+            class="button button-primary automl-reset-key-btn"
+            data-provider="<?php echo esc_attr( $automl_wpml_api_key ); ?>"
+            title="<?php esc_attr_e( 'Reset API key', 'wpml-translation-check' ); ?>"
+            <?php echo $automl_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
+        >
+            <?php esc_html_e( 'Reset', 'wpml-translation-check' ); ?>
+        </button>
+    <?php endif; ?>
+<?php endif; ?>
 								</div>
 							</div>
 							<div id="automl-ai-settings-message-<?php echo esc_attr( $automl_wpml_api_key ); ?>" class="automl_ai_dashboard-settings-message" style="margin-top: 4px; margin-bottom: 12px; display: none; color: #b32d2e; font-size: 13px;" role="alert"></div>

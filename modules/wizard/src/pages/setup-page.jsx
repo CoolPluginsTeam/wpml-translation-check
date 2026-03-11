@@ -2,7 +2,7 @@ import React from 'react';
 import { __ } from '@wordpress/i18n';
 import SetupProgress from '../components/SetupProgress';
 
-const STEP_KEYS = [ 'video_intro', 'languages', 'ai_translation' ];
+const STEP_KEYS = [ 'video_intro', 'ai_translation', 'languages' ];
 
 function getStepFromUrl() {
 	if ( typeof window === 'undefined' ) return 'video_intro';
@@ -29,7 +29,7 @@ const SetupPage = () => {
 	const dashboardUrl = data.dashboard_url || ( data.admin_url || '' ).replace( 'admin.php', 'admin.php?page=automl_ai_dashboard' );
 
 	const handleGetStarted = () => {
-		setCurrentStep( 'languages' );
+		setCurrentStep( 'ai_translation' );
 	};
 
 	const handleFinish = () => {

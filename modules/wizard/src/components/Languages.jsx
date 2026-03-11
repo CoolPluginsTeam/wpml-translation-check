@@ -7,6 +7,7 @@ import SetupContinueButton, { SetupBackButton } from "./SetupContinueButton";
 
 const Languages = ({ onBack, onContinue }) => {
   const data = window.wpml_at_setup || {};
+  const dashboardUrl = data.dashboard_url || ( data.admin_url || '' ).replace( 'admin.php', 'admin.php?automl_ai_dashboard&tab=settings' );
   const defaultCode = (data.default_language || "").toLowerCase();
   const allLanguages = Array.isArray(data.wpml_languages)
     ? data.wpml_languages
@@ -79,7 +80,8 @@ const Languages = ({ onBack, onContinue }) => {
 		  }
 		}
 	
-		onContinue();
+		window.location.href = dashboardUrl;
+		return true;
 	  };
 
   return (
@@ -189,8 +191,21 @@ const Languages = ({ onBack, onContinue }) => {
         <div className="automl-ai-wizard-footer" style={{ marginTop: 24 }}>
           <SetupBackButton onClick={onBack} />
           <SetupContinueButton
-            onClick={handleContinue}
-            label={__("Continue", "wpml-translation-check")}
+            onClick={async () => {
+              const saved = await handleContinue();
+              if (!saved) return;
+              try {
+                await apiFetch({
+                  path: "automl-bulk-translate/wizard-complete",
+                  method: "POST",
+                  headers: { "X-WP-Nonce": getNonce() },
+                });
+              } catch (e) {
+                // ignore, we'll still redirect
+              }
+              window.location.href = dashboardUrl;
+            }}
+            label={__("Finish setup", "wpml-translation-check")}
             disabled={!selectedCode}
           />
         </div>

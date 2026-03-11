@@ -223,7 +223,6 @@ class AUTOML_Ai_Wizard {
 				untrailingslashit( $home_url_with_lang )
 			);
 		}
-        $saved_models = get_option( 'automl_ai_translation_models', array() );
 		wp_localize_script(
             'wpml_at_setup',
             'wpml_at_setup',
@@ -240,10 +239,10 @@ class AUTOML_Ai_Wizard {
                     'openai_key' => isset( $saved_credentials['openai'] ) ? $saved_credentials['openai'] : '',
                     'google_key' => isset( $saved_credentials['google'] ) ? $saved_credentials['google'] : '',
                 ),
-                'saved_models' => array(
-                    'openai_model' => isset( $saved_models['openai'] ) ? $saved_models['openai'] : '',
-                    'google_model' => isset( $saved_models['google'] ) ? $saved_models['google'] : '',
-                ),
+				'is_connectors_ai'            => $is_using_connectors_ai,
+				'is_openai_provider_installed' => $is_openai_provider_installed,
+				'is_google_provider_installed' => $is_google_provider_installed,
+				'connectors_url'              => admin_url( 'options-connectors.php' ),
             )
         );
 		wp_enqueue_style(
