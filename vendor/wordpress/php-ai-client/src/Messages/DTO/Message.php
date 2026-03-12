@@ -107,13 +107,15 @@ class Message extends AbstractDataTransferObject
     private function validateParts(): void
     {
         foreach ($this->parts as $part) {
-            if ($this->role->isUser() && $part->getType()->isFunctionCall()) {
+            $type = $part->getType();
+
+            if ($this->role->isUser() && $type->isFunctionCall()) {
                 throw new InvalidArgumentException(
                     'User messages cannot contain function calls.'
                 );
             }
 
-            if ($this->role->isModel() && $part->getType()->isFunctionResponse()) {
+            if ($this->role->isModel() && $type->isFunctionResponse()) {
                 throw new InvalidArgumentException(
                     'Model messages cannot contain function responses.'
                 );
@@ -190,5 +192,22 @@ class Message extends AbstractDataTransferObject
             // Only USER and MODEL roles are supported
             throw new InvalidArgumentException('Invalid message role: ' . $role->value);
         }
+    }
+
+    /**
+     * Performs a deep clone of the message.
+     *
+     * This method ensures that message part objects are cloned to prevent
+     * modifications to the cloned message from affecting the original.
+     *
+     * @since 0.4.2
+     */
+    public function __clone()
+    {
+        $clonedParts = [];
+        foreach ($this->parts as $part) {
+            $clonedParts[] = clone $part;
+        }
+        $this->parts = $clonedParts;
     }
 }

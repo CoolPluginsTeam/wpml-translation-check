@@ -81,24 +81,47 @@ final class AUTOML_Ai_Translate_Addon {
 	}
 
 	public function register_ai_client() {
-		// Register the AI Client in the container for use in other parts of the plugin.
-
-		if(function_exists( '_wp_register_default_connector_settings' ) && class_exists( AiClient::class ) ) {
-			return; // Already registered, likely by another plugin. Do not re-register.
+		
+		$is_wp70 = function_exists( 'wp_has_ai_client' ) && wp_has_ai_client();
+	
+		if ( ! $is_wp70 ) {
+			$sdk_autoload = AUTOML_AI_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
+			if ( file_exists( $sdk_autoload ) ) {
+				require_once $sdk_autoload;
+			}
+			if ( ! class_exists( \WordPress\AI_Client\AI_Client::class ) ) {
+				return;
+			}
 		}
-
-		$automl_ai_autoload = AUTOML_AI_PLUGIN_DIR . 'vendor/autoload.php';
-
-		if ( file_exists( $automl_ai_autoload ) ) {	
-			require_once $automl_ai_autoload;
+	
+		$providers_autoload = AUTOML_AI_PLUGIN_DIR . 'ai-providers/vendor/autoload.php';
+		if ( file_exists( $providers_autoload ) ) {
+			require_once $providers_autoload;
 		}
-
-		if(!class_exists( AI_Client::class ) ) {
-			return; // Successfully loaded from this plugin's vendor directory.
+	
+		$registry = \WordPress\AiClient\AiClient::defaultRegistry();
+		if ( class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' )
+			&& ! $registry->hasProvider( 'openai' )
+		) {
+			$registry->registerProvider( \WordPress\OpenAiAiProvider\Provider\OpenAiProvider::class );
 		}
-
-		AI_Client::init();
+		if ( class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' )
+			&& ! $registry->hasProvider( 'google' )
+		) {
+			$registry->registerProvider( \WordPress\GoogleAiProvider\Provider\GoogleProvider::class );
+		}
+	
+		if ( ! $is_wp70 ) {
+			\WordPress\AI_Client\AI_Client::init();
+	
+			try {
+				$http_transporter = \WordPress\AiClient\Providers\Http\HttpTransporterFactory::createTransporter();
+				$registry->setHttpTransporter( $http_transporter );
+			} catch ( \Exception $e ) {
+			}
+		}
 	}
+
 
 	public function register_ai_model_setting() {
 		register_setting(

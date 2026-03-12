@@ -32,6 +32,15 @@ use WordPress\AiClient\Results\Enums\FinishReasonEnum;
  *
  * @since 0.1.0
  *
+ * @phpstan-type ImageGenerationParams array{
+ *     model: string,
+ *     prompt: string,
+ *     n?: int,
+ *     response_format?: string,
+ *     output_format?: string|null,
+ *     size?: string,
+ *     ...
+ * }
  * @phpstan-type ChoiceData array{
  *     url?: string,
  *     b64_json?: string
@@ -51,7 +60,9 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
     ImageGenerationModelInterface
 {
     /**
-     * @inheritDoc
+     * {@inheritDoc}
+     *
+     * @since 0.1.0
      */
     public function generateImageResult(array $prompt): GenerativeAiResult
     {
@@ -88,7 +99,7 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
      * @param list<Message> $prompt The prompt to generate an image for. Either a single message or a list of messages
      *                              from a chat. However as of today, OpenAI compatible image generation endpoints only
      *                              support a single user message.
-     * @return array<string, mixed> The parameters for the API request.
+     * @return ImageGenerationParams The parameters for the API request.
      */
     protected function prepareGenerateImageParams(array $prompt): array
     {
@@ -140,6 +151,7 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
             $params[$key] = $value;
         }
 
+        /** @var ImageGenerationParams $params */
         return $params;
     }
 
@@ -156,13 +168,13 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
     {
         if (count($messages) !== 1) {
             throw new InvalidArgumentException(
-                'The API only supports a single user message as prompt.'
+                'The API requires a single user message as prompt.'
             );
         }
         $message = $messages[0];
         if (!$message->getRole()->isUser()) {
             throw new InvalidArgumentException(
-                'The API only supports a user message as prompt.'
+                'The API requires a user message as prompt.'
             );
         }
 
@@ -176,7 +188,7 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
 
         if ($text === null) {
             throw new InvalidArgumentException(
-                'The API only supports a single text message part as prompt.'
+                'The API requires a single text message part as prompt.'
             );
         }
 
@@ -194,26 +206,6 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
      */
     protected function prepareSizeParam(?MediaOrientationEnum $orientation, ?string $aspectRatio): string
     {
-        // If both values are set, validate that they are compatible.
-        if ($orientation !== null && $aspectRatio !== null) {
-            if ($orientation->isSquare() && $aspectRatio !== '1:1') {
-                throw new InvalidArgumentException(
-                    'The aspect ratio "' . $aspectRatio . '" is not compatible with the square orientation.'
-                );
-            }
-            $aspectRatioParts = explode(':', $aspectRatio);
-            if ($orientation->isLandscape() && $aspectRatioParts[0] <= $aspectRatioParts[1]) {
-                throw new InvalidArgumentException(
-                    'The aspect ratio "' . $aspectRatio . '" is not compatible with the landscape orientation.'
-                );
-            }
-            if ($orientation->isPortrait() && $aspectRatioParts[0] >= $aspectRatioParts[1]) {
-                throw new InvalidArgumentException(
-                    'The aspect ratio "' . $aspectRatio . '" is not compatible with the portrait orientation.'
-                );
-            }
-        }
-
         // Use aspect ratio if set, as it is more specific.
         if ($aspectRatio !== null) {
             switch ($aspectRatio) {
@@ -323,7 +315,7 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
             $candidates[] = $this->parseResponseChoiceToCandidate($choiceData, $index, $expectedMimeType);
         }
 
-        $id = isset($responseData['id']) && is_string($responseData['id']) ? $responseData['id'] : '';
+        $id = $this->getResultId($responseData);
 
         if (isset($responseData['usage']) && is_array($responseData['usage'])) {
             $usage = $responseData['usage'];
@@ -337,7 +329,7 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
             $tokenUsage = new TokenUsage(0, 0, 0);
         }
 
-        // Use any other data from the response as provider metadata.
+        // Use any other data from the response as provider-specific response metadata.
         $providerMetadata = $responseData;
         unset($providerMetadata['id'], $providerMetadata['data'], $providerMetadata['usage']);
 
@@ -384,5 +376,20 @@ abstract class AbstractOpenAiCompatibleImageGenerationModel extends AbstractApiB
         $message = new Message(MessageRoleEnum::model(), $parts);
 
         return new Candidate($message, FinishReasonEnum::stop());
+    }
+
+    /**
+     * Extracts the result ID from the API response data.
+     *
+     * @since 0.4.0
+     *
+     * @param array<string, mixed> $responseData The response data from the API.
+     * @return string The result ID.
+     */
+    protected function getResultId(array $responseData): string
+    {
+        return isset($responseData['id']) && is_string($responseData['id'])
+            ? $responseData['id']
+            : '';
     }
 }

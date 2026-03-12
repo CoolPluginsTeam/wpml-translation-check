@@ -4,10 +4,11 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInite96838d1ca1936b052d417515e33674c
+class ComposerStaticInitd627e3cc273a901d3abf2ba88488aff2
 {
     public static $files = array (
         'b952b7bb71a5e8271abe3f2cc08a14a8' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/polyfills.php',
+        '7e392ecbba534ac5fdcf583ac558478d' => __DIR__ . '/..' . '/wordpress/wp-ai-client/functions.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -18,8 +19,10 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         ),
         'P' =>
         array (
+            'Psr\\SimpleCache\\' => 16,
             'Psr\\Http\\Message\\' => 17,
             'Psr\\Http\\Client\\' => 16,
+            'Psr\\EventDispatcher\\' => 20,
         ),
         'N' =>
         array (
@@ -28,7 +31,6 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'H' =>
         array (
             'Http\\Promise\\' => 13,
-            'Http\\Message\\' => 13,
             'Http\\Discovery\\' => 15,
             'Http\\Client\\' => 12,
         ),
@@ -43,6 +45,10 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         array (
             0 => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes',
         ),
+        'Psr\\SimpleCache\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/simple-cache/src',
+        ),
         'Psr\\Http\\Message\\' =>
         array (
             0 => __DIR__ . '/..' . '/psr/http-factory/src',
@@ -52,6 +58,10 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         array (
             0 => __DIR__ . '/..' . '/psr/http-client/src',
         ),
+        'Psr\\EventDispatcher\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/psr/event-dispatcher/src',
+        ),
         'Nyholm\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/nyholm/psr7/src',
@@ -59,10 +69,6 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'Http\\Promise\\' =>
         array (
             0 => __DIR__ . '/..' . '/php-http/promise/src',
-        ),
-        'Http\\Message\\' =>
-        array (
-            0 => __DIR__ . '/..' . '/php-http/message-factory/src',
         ),
         'Http\\Discovery\\' =>
         array (
@@ -109,11 +115,6 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'Http\\Discovery\\Strategy\\PuliBetaStrategy' => __DIR__ . '/..' . '/php-http/discovery/src/Strategy/PuliBetaStrategy.php',
         'Http\\Discovery\\StreamFactoryDiscovery' => __DIR__ . '/..' . '/php-http/discovery/src/StreamFactoryDiscovery.php',
         'Http\\Discovery\\UriFactoryDiscovery' => __DIR__ . '/..' . '/php-http/discovery/src/UriFactoryDiscovery.php',
-        'Http\\Message\\MessageFactory' => __DIR__ . '/..' . '/php-http/message-factory/src/MessageFactory.php',
-        'Http\\Message\\RequestFactory' => __DIR__ . '/..' . '/php-http/message-factory/src/RequestFactory.php',
-        'Http\\Message\\ResponseFactory' => __DIR__ . '/..' . '/php-http/message-factory/src/ResponseFactory.php',
-        'Http\\Message\\StreamFactory' => __DIR__ . '/..' . '/php-http/message-factory/src/StreamFactory.php',
-        'Http\\Message\\UriFactory' => __DIR__ . '/..' . '/php-http/message-factory/src/UriFactory.php',
         'Http\\Promise\\FulfilledPromise' => __DIR__ . '/..' . '/php-http/promise/src/FulfilledPromise.php',
         'Http\\Promise\\Promise' => __DIR__ . '/..' . '/php-http/promise/src/Promise.php',
         'Http\\Promise\\RejectedPromise' => __DIR__ . '/..' . '/php-http/promise/src/RejectedPromise.php',
@@ -128,6 +129,9 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'Nyholm\\Psr7\\StreamTrait' => __DIR__ . '/..' . '/nyholm/psr7/src/StreamTrait.php',
         'Nyholm\\Psr7\\UploadedFile' => __DIR__ . '/..' . '/nyholm/psr7/src/UploadedFile.php',
         'Nyholm\\Psr7\\Uri' => __DIR__ . '/..' . '/nyholm/psr7/src/Uri.php',
+        'Psr\\EventDispatcher\\EventDispatcherInterface' => __DIR__ . '/..' . '/psr/event-dispatcher/src/EventDispatcherInterface.php',
+        'Psr\\EventDispatcher\\ListenerProviderInterface' => __DIR__ . '/..' . '/psr/event-dispatcher/src/ListenerProviderInterface.php',
+        'Psr\\EventDispatcher\\StoppableEventInterface' => __DIR__ . '/..' . '/psr/event-dispatcher/src/StoppableEventInterface.php',
         'Psr\\Http\\Client\\ClientExceptionInterface' => __DIR__ . '/..' . '/psr/http-client/src/ClientExceptionInterface.php',
         'Psr\\Http\\Client\\ClientInterface' => __DIR__ . '/..' . '/psr/http-client/src/ClientInterface.php',
         'Psr\\Http\\Client\\NetworkExceptionInterface' => __DIR__ . '/..' . '/psr/http-client/src/NetworkExceptionInterface.php',
@@ -145,16 +149,23 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'Psr\\Http\\Message\\UploadedFileInterface' => __DIR__ . '/..' . '/psr/http-message/src/UploadedFileInterface.php',
         'Psr\\Http\\Message\\UriFactoryInterface' => __DIR__ . '/..' . '/psr/http-factory/src/UriFactoryInterface.php',
         'Psr\\Http\\Message\\UriInterface' => __DIR__ . '/..' . '/psr/http-message/src/UriInterface.php',
+        'Psr\\SimpleCache\\CacheException' => __DIR__ . '/..' . '/psr/simple-cache/src/CacheException.php',
+        'Psr\\SimpleCache\\CacheInterface' => __DIR__ . '/..' . '/psr/simple-cache/src/CacheInterface.php',
+        'Psr\\SimpleCache\\InvalidArgumentException' => __DIR__ . '/..' . '/psr/simple-cache/src/InvalidArgumentException.php',
         'WordPress\\AI_Client\\AI_Client' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/AI_Client.php',
         'WordPress\\AI_Client\\API_Credentials\\API_Credentials_Manager' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/API_Credentials/API_Credentials_Manager.php',
         'WordPress\\AI_Client\\API_Credentials\\API_Credentials_Settings_Screen' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/API_Credentials/API_Credentials_Settings_Screen.php',
+        'WordPress\\AI_Client\\Builders\\Exception\\Prompt_Prevented_Exception' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/Builders/Exception/Prompt_Prevented_Exception.php',
         'WordPress\\AI_Client\\Builders\\Helpers\\Ability_Function_Resolver' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/Builders/Helpers/Ability_Function_Resolver.php',
         'WordPress\\AI_Client\\Builders\\Prompt_Builder' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/Builders/Prompt_Builder.php',
         'WordPress\\AI_Client\\Builders\\Prompt_Builder_With_WP_Error' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/Builders/Prompt_Builder_With_WP_Error.php',
+        'WordPress\\AI_Client\\Cache\\WordPress_Cache' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/Cache/WordPress_Cache.php',
         'WordPress\\AI_Client\\Capabilities\\Capabilities_Manager' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/Capabilities/Capabilities_Manager.php',
+        'WordPress\\AI_Client\\Events\\WordPress_Event_Dispatcher' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/Events/WordPress_Event_Dispatcher.php',
         'WordPress\\AI_Client\\HTTP\\WP_AI_Client_Discovery_Strategy' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/HTTP/WP_AI_Client_Discovery_Strategy.php',
         'WordPress\\AI_Client\\HTTP\\WordPress_HTTP_Client' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/HTTP/WordPress_HTTP_Client.php',
         'WordPress\\AI_Client\\REST_API\\AI_Prompt_REST_Controller' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/REST_API/AI_Prompt_REST_Controller.php',
+        'WordPress\\AI_Client\\REST_API\\AI_Providers_Models_REST_Controller' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/REST_API/AI_Providers_Models_REST_Controller.php',
         'WordPress\\AI_Client\\REST_API\\JSON_Schema_To_WP_Schema_Converter' => __DIR__ . '/..' . '/wordpress/wp-ai-client/includes/REST_API/JSON_Schema_To_WP_Schema_Converter.php',
         'WordPress\\AiClient\\AiClient' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/AiClient.php',
         'WordPress\\AiClient\\Builders\\MessageBuilder' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Builders/MessageBuilder.php',
@@ -162,10 +173,15 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'WordPress\\AiClient\\Common\\AbstractDataTransferObject' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/AbstractDataTransferObject.php',
         'WordPress\\AiClient\\Common\\AbstractEnum' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/AbstractEnum.php',
         'WordPress\\AiClient\\Common\\Contracts\\AiClientExceptionInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/Contracts/AiClientExceptionInterface.php',
+        'WordPress\\AiClient\\Common\\Contracts\\CachesDataInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/Contracts/CachesDataInterface.php',
         'WordPress\\AiClient\\Common\\Contracts\\WithArrayTransformationInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/Contracts/WithArrayTransformationInterface.php',
         'WordPress\\AiClient\\Common\\Contracts\\WithJsonSchemaInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/Contracts/WithJsonSchemaInterface.php',
         'WordPress\\AiClient\\Common\\Exception\\InvalidArgumentException' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/Exception/InvalidArgumentException.php',
         'WordPress\\AiClient\\Common\\Exception\\RuntimeException' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/Exception/RuntimeException.php',
+        'WordPress\\AiClient\\Common\\Exception\\TokenLimitReachedException' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/Exception/TokenLimitReachedException.php',
+        'WordPress\\AiClient\\Common\\Traits\\WithDataCachingTrait' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Common/Traits/WithDataCachingTrait.php',
+        'WordPress\\AiClient\\Events\\AfterGenerateResultEvent' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Events/AfterGenerateResultEvent.php',
+        'WordPress\\AiClient\\Events\\BeforeGenerateResultEvent' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Events/BeforeGenerateResultEvent.php',
         'WordPress\\AiClient\\Files\\DTO\\File' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Files/DTO/File.php',
         'WordPress\\AiClient\\Files\\Enums\\FileTypeEnum' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Files/Enums/FileTypeEnum.php',
         'WordPress\\AiClient\\Files\\Enums\\MediaOrientationEnum' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Files/Enums/MediaOrientationEnum.php',
@@ -181,19 +197,6 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'WordPress\\AiClient\\Operations\\Contracts\\OperationInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Operations/Contracts/OperationInterface.php',
         'WordPress\\AiClient\\Operations\\DTO\\GenerativeAiOperation' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Operations/DTO/GenerativeAiOperation.php',
         'WordPress\\AiClient\\Operations\\Enums\\OperationStateEnum' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Operations/Enums/OperationStateEnum.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Anthropic\\AnthropicApiKeyRequestAuthentication' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Anthropic/AnthropicApiKeyRequestAuthentication.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Anthropic\\AnthropicModelMetadataDirectory' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Anthropic/AnthropicModelMetadataDirectory.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Anthropic\\AnthropicProvider' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Anthropic/AnthropicProvider.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Anthropic\\AnthropicTextGenerationModel' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Anthropic/AnthropicTextGenerationModel.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Google\\GoogleApiKeyRequestAuthentication' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Google/GoogleApiKeyRequestAuthentication.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Google\\GoogleImageGenerationModel' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Google/GoogleImageGenerationModel.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Google\\GoogleModelMetadataDirectory' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Google/GoogleModelMetadataDirectory.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Google\\GoogleProvider' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Google/GoogleProvider.php',
-        'WordPress\\AiClient\\ProviderImplementations\\Google\\GoogleTextGenerationModel' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/Google/GoogleTextGenerationModel.php',
-        'WordPress\\AiClient\\ProviderImplementations\\OpenAi\\OpenAiImageGenerationModel' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/OpenAi/OpenAiImageGenerationModel.php',
-        'WordPress\\AiClient\\ProviderImplementations\\OpenAi\\OpenAiModelMetadataDirectory' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/OpenAi/OpenAiModelMetadataDirectory.php',
-        'WordPress\\AiClient\\ProviderImplementations\\OpenAi\\OpenAiProvider' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/OpenAi/OpenAiProvider.php',
-        'WordPress\\AiClient\\ProviderImplementations\\OpenAi\\OpenAiTextGenerationModel' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/ProviderImplementations/OpenAi/OpenAiTextGenerationModel.php',
         'WordPress\\AiClient\\Providers\\AbstractProvider' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/AbstractProvider.php',
         'WordPress\\AiClient\\Providers\\ApiBasedImplementation\\AbstractApiBasedModel' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/ApiBasedImplementation/AbstractApiBasedModel.php',
         'WordPress\\AiClient\\Providers\\ApiBasedImplementation\\AbstractApiBasedModelMetadataDirectory' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/ApiBasedImplementation/AbstractApiBasedModelMetadataDirectory.php',
@@ -210,6 +213,7 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'WordPress\\AiClient\\Providers\\DTO\\ProviderModelsMetadata' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/DTO/ProviderModelsMetadata.php',
         'WordPress\\AiClient\\Providers\\Enums\\ProviderTypeEnum' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Enums/ProviderTypeEnum.php',
         'WordPress\\AiClient\\Providers\\Enums\\ToolTypeEnum' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Enums/ToolTypeEnum.php',
+        'WordPress\\AiClient\\Providers\\Http\\Abstracts\\AbstractClientDiscoveryStrategy' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Abstracts/AbstractClientDiscoveryStrategy.php',
         'WordPress\\AiClient\\Providers\\Http\\Collections\\HeadersCollection' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Collections/HeadersCollection.php',
         'WordPress\\AiClient\\Providers\\Http\\Contracts\\ClientWithOptionsInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Contracts/ClientWithOptionsInterface.php',
         'WordPress\\AiClient\\Providers\\Http\\Contracts\\HttpTransporterInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Contracts/HttpTransporterInterface.php',
@@ -221,6 +225,7 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'WordPress\\AiClient\\Providers\\Http\\DTO\\RequestOptions' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/DTO/RequestOptions.php',
         'WordPress\\AiClient\\Providers\\Http\\DTO\\Response' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/DTO/Response.php',
         'WordPress\\AiClient\\Providers\\Http\\Enums\\HttpMethodEnum' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Enums/HttpMethodEnum.php',
+        'WordPress\\AiClient\\Providers\\Http\\Enums\\RequestAuthenticationMethod' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Enums/RequestAuthenticationMethod.php',
         'WordPress\\AiClient\\Providers\\Http\\Exception\\ClientException' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Exception/ClientException.php',
         'WordPress\\AiClient\\Providers\\Http\\Exception\\NetworkException' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Exception/NetworkException.php',
         'WordPress\\AiClient\\Providers\\Http\\Exception\\RedirectException' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Exception/RedirectException.php',
@@ -230,8 +235,8 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'WordPress\\AiClient\\Providers\\Http\\HttpTransporterFactory' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/HttpTransporterFactory.php',
         'WordPress\\AiClient\\Providers\\Http\\Traits\\WithHttpTransporterTrait' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Traits/WithHttpTransporterTrait.php',
         'WordPress\\AiClient\\Providers\\Http\\Traits\\WithRequestAuthenticationTrait' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Traits/WithRequestAuthenticationTrait.php',
+        'WordPress\\AiClient\\Providers\\Http\\Util\\ErrorMessageExtractor' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Util/ErrorMessageExtractor.php',
         'WordPress\\AiClient\\Providers\\Http\\Util\\ResponseUtil' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Util/ResponseUtil.php',
-        'WordPress\\AiClient\\Providers\\Http\\Utilities\\ErrorMessageExtractor' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Http/Utilities/ErrorMessageExtractor.php',
         'WordPress\\AiClient\\Providers\\Models\\Contracts\\ModelInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Models/Contracts/ModelInterface.php',
         'WordPress\\AiClient\\Providers\\Models\\DTO\\ModelConfig' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Models/DTO/ModelConfig.php',
         'WordPress\\AiClient\\Providers\\Models\\DTO\\ModelMetadata' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Models/DTO/ModelMetadata.php',
@@ -248,6 +253,8 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
         'WordPress\\AiClient\\Providers\\Models\\TextGeneration\\Contracts\\TextGenerationOperationModelInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Models/TextGeneration/Contracts/TextGenerationOperationModelInterface.php',
         'WordPress\\AiClient\\Providers\\Models\\TextToSpeechConversion\\Contracts\\TextToSpeechConversionModelInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Models/TextToSpeechConversion/Contracts/TextToSpeechConversionModelInterface.php',
         'WordPress\\AiClient\\Providers\\Models\\TextToSpeechConversion\\Contracts\\TextToSpeechConversionOperationModelInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Models/TextToSpeechConversion/Contracts/TextToSpeechConversionOperationModelInterface.php',
+        'WordPress\\AiClient\\Providers\\Models\\VideoGeneration\\Contracts\\VideoGenerationModelInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Models/VideoGeneration/Contracts/VideoGenerationModelInterface.php',
+        'WordPress\\AiClient\\Providers\\Models\\VideoGeneration\\Contracts\\VideoGenerationOperationModelInterface' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/Models/VideoGeneration/Contracts/VideoGenerationOperationModelInterface.php',
         'WordPress\\AiClient\\Providers\\OpenAiCompatibleImplementation\\AbstractOpenAiCompatibleImageGenerationModel' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/OpenAiCompatibleImplementation/AbstractOpenAiCompatibleImageGenerationModel.php',
         'WordPress\\AiClient\\Providers\\OpenAiCompatibleImplementation\\AbstractOpenAiCompatibleModelMetadataDirectory' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/OpenAiCompatibleImplementation/AbstractOpenAiCompatibleModelMetadataDirectory.php',
         'WordPress\\AiClient\\Providers\\OpenAiCompatibleImplementation\\AbstractOpenAiCompatibleTextGenerationModel' => __DIR__ . '/..' . '/wordpress/php-ai-client/src/Providers/OpenAiCompatibleImplementation/AbstractOpenAiCompatibleTextGenerationModel.php',
@@ -266,9 +273,9 @@ class ComposerStaticInite96838d1ca1936b052d417515e33674c
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInite96838d1ca1936b052d417515e33674c::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInite96838d1ca1936b052d417515e33674c::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInite96838d1ca1936b052d417515e33674c::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitd627e3cc273a901d3abf2ba88488aff2::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitd627e3cc273a901d3abf2ba88488aff2::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitd627e3cc273a901d3abf2ba88488aff2::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace WordPress\AiClient;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
+use Psr\SimpleCache\CacheInterface;
 use WordPress\AiClient\Builders\PromptBuilder;
 use WordPress\AiClient\Common\Exception\InvalidArgumentException;
 use WordPress\AiClient\Common\Exception\RuntimeException;
-use WordPress\AiClient\ProviderImplementations\Anthropic\AnthropicProvider;
-use WordPress\AiClient\ProviderImplementations\Google\GoogleProvider;
-use WordPress\AiClient\ProviderImplementations\OpenAi\OpenAiProvider;
 use WordPress\AiClient\Providers\Contracts\ProviderAvailabilityInterface;
 use WordPress\AiClient\Providers\Contracts\ProviderInterface;
-use WordPress\AiClient\Providers\Http\HttpTransporterFactory;
 use WordPress\AiClient\Providers\Models\Contracts\ModelInterface;
 use WordPress\AiClient\Providers\Models\DTO\ModelConfig;
 use WordPress\AiClient\Providers\ProviderRegistry;
@@ -86,9 +84,24 @@ use WordPress\AiClient\Results\DTO\GenerativeAiResult;
 class AiClient
 {
     /**
+     * @var string The version of the AI Client.
+     */
+    public const VERSION = '1.3.0';
+
+    /**
      * @var ProviderRegistry|null The default provider registry instance.
      */
     private static ?ProviderRegistry $defaultRegistry = null;
+
+    /**
+     * @var EventDispatcherInterface|null The event dispatcher for prompt lifecycle events.
+     */
+    private static ?EventDispatcherInterface $eventDispatcher = null;
+
+    /**
+     * @var CacheInterface|null The PSR-16 cache for storing and retrieving cached data.
+     */
+    private static ?CacheInterface $cache = null;
 
     /**
      * Gets the default provider registry instance.
@@ -100,17 +113,66 @@ class AiClient
     public static function defaultRegistry(): ProviderRegistry
     {
         if (self::$defaultRegistry === null) {
-            $registry = new ProviderRegistry();
-
-            // Set up default HTTP transporter and register built-in providers.
-            $registry->setHttpTransporter(HttpTransporterFactory::createTransporter());
-            $registry->registerProvider(AnthropicProvider::class);
-            $registry->registerProvider(GoogleProvider::class);
-            $registry->registerProvider(OpenAiProvider::class);
-            self::$defaultRegistry = $registry;
+            self::$defaultRegistry = new ProviderRegistry();
         }
 
         return self::$defaultRegistry;
+    }
+
+    /**
+     * Sets the event dispatcher for prompt lifecycle events.
+     *
+     * The event dispatcher will be used to dispatch BeforeGenerateResultEvent and
+     * AfterGenerateResultEvent during prompt generation.
+     *
+     * @since 0.4.0
+     *
+     * @param EventDispatcherInterface|null $dispatcher The event dispatcher, or null to disable.
+     * @return void
+     */
+    public static function setEventDispatcher(?EventDispatcherInterface $dispatcher): void
+    {
+        self::$eventDispatcher = $dispatcher;
+    }
+
+    /**
+     * Gets the event dispatcher for prompt lifecycle events.
+     *
+     * @since 0.4.0
+     *
+     * @return EventDispatcherInterface|null The event dispatcher, or null if not set.
+     */
+    public static function getEventDispatcher(): ?EventDispatcherInterface
+    {
+        return self::$eventDispatcher;
+    }
+
+    /**
+     * Sets the PSR-16 cache for storing and retrieving cached data.
+     *
+     * The cache can be used to store AI responses and other data to avoid
+     * redundant API calls and improve performance.
+     *
+     * @since 0.4.0
+     *
+     * @param CacheInterface|null $cache The PSR-16 cache instance, or null to disable caching.
+     * @return void
+     */
+    public static function setCache(?CacheInterface $cache): void
+    {
+        self::$cache = $cache;
+    }
+
+    /**
+     * Gets the PSR-16 cache instance.
+     *
+     * @since 0.4.0
+     *
+     * @return CacheInterface|null The cache instance, or null if not set.
+     */
+    public static function getCache(): ?CacheInterface
+    {
+        return self::$cache;
     }
 
     /**
@@ -170,7 +232,11 @@ class AiClient
      */
     public static function prompt($prompt = null, ?ProviderRegistry $registry = null): PromptBuilder
     {
-        return new PromptBuilder($registry ?? self::defaultRegistry(), $prompt);
+        return new PromptBuilder(
+            $registry ?? self::defaultRegistry(),
+            $prompt,
+            self::$eventDispatcher
+        );
     }
 
     /**
@@ -223,7 +289,6 @@ class AiClient
         self::validateModelOrConfigParameter($modelOrConfig);
         return self::getConfiguredPromptBuilder($prompt, $modelOrConfig, $registry)->generateTextResult();
     }
-
 
     /**
      * Generates an image using the traditional API approach.
@@ -295,6 +360,30 @@ class AiClient
     ): GenerativeAiResult {
         self::validateModelOrConfigParameter($modelOrConfig);
         return self::getConfiguredPromptBuilder($prompt, $modelOrConfig, $registry)->generateSpeechResult();
+    }
+
+    /**
+     * Generates a video using the traditional API approach.
+     *
+     * @since 1.3.0
+     *
+     * @param Prompt $prompt The prompt content.
+     * @param ModelInterface|ModelConfig|null $modelOrConfig Optional specific model to use,
+     *                                                        or model configuration for auto-discovery,
+     *                                                        or null for defaults.
+     * @param ProviderRegistry|null $registry Optional custom registry. If null, uses default.
+     * @return GenerativeAiResult The generation result.
+     *
+     * @throws \InvalidArgumentException If the prompt format is invalid.
+     * @throws \RuntimeException If no suitable model is found.
+     */
+    public static function generateVideoResult(
+        $prompt,
+        $modelOrConfig = null,
+        ?ProviderRegistry $registry = null
+    ): GenerativeAiResult {
+        self::validateModelOrConfigParameter($modelOrConfig);
+        return self::getConfiguredPromptBuilder($prompt, $modelOrConfig, $registry)->generateVideoResult();
     }
 
     /**

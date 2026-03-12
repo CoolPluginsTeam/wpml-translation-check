@@ -13,7 +13,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
   const connectorsUrl = data.connectors_url || "#";
   // Helper function to mask API keys
   const maskApiKey = (apiKey) => {
-    if (!apiKey || apiKey.includes('*')) {
+    if (!apiKey || apiKey.includes("*")) {
       return apiKey;
     }
     if (apiKey.length < 12) {
@@ -143,23 +143,34 @@ const AiTranslation = ({ onBack, onContinue }) => {
 
       // Success: show a single general success message
       if (window.wpml_at_setup) {
-        window.wpml_at_setup.saved_credentials = window.wpml_at_setup.saved_credentials || {};
-        if (requestData.openai_key !== undefined && requestData.openai_key !== "") {
-          window.wpml_at_setup.saved_credentials.openai_key = maskApiKey(requestData.openai_key);
+        window.wpml_at_setup.saved_credentials =
+          window.wpml_at_setup.saved_credentials || {};
+        if (
+          requestData.openai_key !== undefined &&
+          requestData.openai_key !== ""
+        ) {
+          window.wpml_at_setup.saved_credentials.openai_key = maskApiKey(
+            requestData.openai_key,
+          );
         } else if (requestData.openai_key === "") {
           delete window.wpml_at_setup.saved_credentials.openai_key;
         }
-        if (requestData.google_key !== undefined && requestData.google_key !== "") {
-          window.wpml_at_setup.saved_credentials.google_key = maskApiKey(requestData.google_key);
+        if (
+          requestData.google_key !== undefined &&
+          requestData.google_key !== ""
+        ) {
+          window.wpml_at_setup.saved_credentials.google_key = maskApiKey(
+            requestData.google_key,
+          );
         } else if (requestData.google_key === "") {
           delete window.wpml_at_setup.saved_credentials.google_key;
         }
       }
-    
-          // Success: show a single general success message
-          setGeneralMessage(__("API keys saved.", "wpml-translation-check"));
-          setIsError(false);
-          return true;
+
+      // Success: show a single general success message
+      setGeneralMessage(__("API keys saved.", "wpml-translation-check"));
+      setIsError(false);
+      return true;
     } catch (err) {
       const fieldErrors = err?.data?.errors || {};
 
@@ -361,15 +372,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                       ✓
                     </span>
                   )}
-                  {!isOpenaiProviderInstalled ? (
-                    <button
-                      type="button"
-                      onClick={() => window.open(connectorsUrl, '_blank', 'noopener,noreferrer')}
-                      className="button button-primary automl-reset-key-btn"
-                    >
-                      {__("Install", "wpml-translation-check")}
-                    </button>
-                  ) : hasExistingOpenaiKey ? (
+                  {hasExistingOpenaiKey ? (
                     <button
                       type="button"
                       onClick={() => handleReset("openai")}
@@ -444,7 +447,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                 }}
               />
               {(isUsingConnectorsAi ||
-                (!hasExistingGoogleKey && !googleEditMode)) && (
+                (hasExistingGoogleKey && !googleEditMode)) && (
                 <>
                   {!isUsingConnectorsAi && (
                     <span
@@ -457,15 +460,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                       ✓
                     </span>
                   )}
-                  {!isGoogleProviderInstalled ? (
-                    <button
-                      type="button"
-                      onClick={() => window.open(connectorsUrl, '_blank', 'noopener,noreferrer')}
-                      className="button button-primary automl-reset-key-btn"
-                    >
-                      {__("Install", "wpml-translation-check")}
-                    </button>
-                  ) : hasExistingGoogleKey ? (
+                  {hasExistingGoogleKey ? (
                     <button
                       type="button"
                       onClick={() => handleReset("google")}
@@ -557,14 +552,14 @@ const AiTranslation = ({ onBack, onContinue }) => {
         >
           <SetupBackButton onClick={onBack} />
           <SetupContinueButton
-    onClick={ async () => {
-        const saved = await handleSave();
-        if ( !saved ) return;
-        onContinue();
-    }}
-    label={ __( 'Continue', 'wpml-translation-check' ) }
-    disabled={ saving || !hasValidApiKey() }
-/>
+            onClick={async () => {
+              const saved = await handleSave();
+              if (!saved) return;
+              onContinue();
+            }}
+            label={__("Continue", "wpml-translation-check")}
+            disabled={saving || !hasValidApiKey()}
+          />
         </div>
       </div>
 

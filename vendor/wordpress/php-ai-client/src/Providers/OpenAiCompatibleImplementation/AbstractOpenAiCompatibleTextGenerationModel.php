@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace WordPress\AiClient\Providers\OpenAiCompatibleImplementation;
 
-use Generator;
 use WordPress\AiClient\Common\Exception\InvalidArgumentException;
 use WordPress\AiClient\Common\Exception\RuntimeException;
 use WordPress\AiClient\Messages\DTO\Message;
@@ -92,21 +91,6 @@ abstract class AbstractOpenAiCompatibleTextGenerationModel extends AbstractApiBa
         $response = $httpTransporter->send($request);
         $this->throwIfNotSuccessful($response);
         return $this->parseResponseToGenerativeAiResult($response);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 0.1.0
-     */
-    final public function streamGenerateTextResult(array $prompt): Generator
-    {
-        $params = $this->prepareGenerateTextParams($prompt);
-
-        // TODO: Implement streaming support.
-        throw new RuntimeException(
-            'Streaming is not yet implemented.'
-        );
     }
 
     /**
@@ -313,6 +297,13 @@ abstract class AbstractOpenAiCompatibleTextGenerationModel extends AbstractApiBa
     {
         $type = $part->getType();
         if ($type->isText()) {
+            /*
+             * The OpenAI Chat Completions API spec does not support annotating thought parts as input,
+             * so we instead skip them.
+             */
+            if ($part->getChannel()->isThought()) {
+                return null;
+            }
             return [
                 'type' => 'text',
                 'text' => $part->getText(),
@@ -408,14 +399,15 @@ abstract class AbstractOpenAiCompatibleTextGenerationModel extends AbstractApiBa
             $args = $functionCall->getArgs();
 
             /*
-             * Ensure empty arrays become empty objects for JSON encoding.
+             * Ensure null or empty arrays become empty objects for JSON encoding.
              * While in theory the JSON schema could also dictate a type of
              * 'array', in practice function arguments are typically of type
              * 'object'. More importantly, the OpenAI API specification seems
              * to expect that, and does not support passing arrays as the root
-             * value.
+             * value. The null check handles the case where FunctionCall normalizes
+             * empty arrays to null.
              */
-            if (is_array($args) && count($args) === 0) {
+            if ($args === null || (is_array($args) && count($args) === 0)) {
                 $args = new \stdClass();
             }
 
@@ -621,7 +613,7 @@ abstract class AbstractOpenAiCompatibleTextGenerationModel extends AbstractApiBa
             $tokenUsage = new TokenUsage(0, 0, 0);
         }
 
-        // Use any other data from the response as provider metadata.
+        // Use any other data from the response as provider-specific response metadata.
         $additionalData = $responseData;
         unset($additionalData['id'], $additionalData['choices'], $additionalData['usage']);
 

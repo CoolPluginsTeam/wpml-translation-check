@@ -187,6 +187,36 @@ class ModelConfig extends AbstractDataTransferObject
     protected array $customOptions = [];
 
     /**
+     * Creates a deep clone of this configuration.
+     *
+     * Clones nested objects (functionDeclarations, webSearch) to ensure
+     * the cloned configuration is independent of the original.
+     * Enum value objects (outputModalities, outputFileType, outputMediaOrientation)
+     * are intentionally shared as they are immutable.
+     *
+     * @since 0.4.2
+     */
+    public function __clone()
+    {
+        // Deep clone function declarations if set
+        if ($this->functionDeclarations !== null) {
+            $clonedDeclarations = [];
+            foreach ($this->functionDeclarations as $declaration) {
+                $clonedDeclarations[] = clone $declaration;
+            }
+            $this->functionDeclarations = $clonedDeclarations;
+        }
+
+        // Clone web search if set
+        if ($this->webSearch !== null) {
+            $this->webSearch = clone $this->webSearch;
+        }
+
+        // Note: Enum value objects (outputModalities, outputFileType, outputMediaOrientation)
+        // are immutable and can be safely shared.
+    }
+
+    /**
      * Sets the output modalities.
      *
      * @since 0.1.0
@@ -491,17 +521,17 @@ class ModelConfig extends AbstractDataTransferObject
      *
      * @since 0.1.0
      *
-     * @param list<FunctionDeclaration> $function_declarations The function declarations.
+     * @param list<FunctionDeclaration> $functionDeclarations The function declarations.
      *
      * @throws InvalidArgumentException If the array is not a list.
      */
-    public function setFunctionDeclarations(array $function_declarations): void
+    public function setFunctionDeclarations(array $functionDeclarations): void
     {
-        if (!array_is_list($function_declarations)) {
+        if (!array_is_list($functionDeclarations)) {
             throw new InvalidArgumentException('Function declarations must be a list array.');
         }
 
-        $this->functionDeclarations = $function_declarations;
+        $this->functionDeclarations = $functionDeclarations;
     }
 
     /**
@@ -521,11 +551,11 @@ class ModelConfig extends AbstractDataTransferObject
      *
      * @since 0.1.0
      *
-     * @param WebSearch $web_search The web search configuration.
+     * @param WebSearch $webSearch The web search configuration.
      */
-    public function setWebSearch(WebSearch $web_search): void
+    public function setWebSearch(WebSearch $webSearch): void
     {
-        $this->webSearch = $web_search;
+        $this->webSearch = $webSearch;
     }
 
     /**
@@ -629,6 +659,12 @@ class ModelConfig extends AbstractDataTransferObject
      */
     public function setOutputMediaOrientation(MediaOrientationEnum $outputMediaOrientation): void
     {
+        if ($this->outputMediaAspectRatio) {
+            $this->validateMediaOrientationAspectRatioCompatibility(
+                $outputMediaOrientation,
+                $this->outputMediaAspectRatio
+            );
+        }
         $this->outputMediaOrientation = $outputMediaOrientation;
     }
 
@@ -660,6 +696,12 @@ class ModelConfig extends AbstractDataTransferObject
                 'Output media aspect ratio must be in the format "width:height" (e.g. 3:2, 16:9).'
             );
         }
+        if ($this->outputMediaOrientation) {
+            $this->validateMediaOrientationAspectRatioCompatibility(
+                $this->outputMediaOrientation,
+                $outputMediaAspectRatio
+            );
+        }
         $this->outputMediaAspectRatio = $outputMediaAspectRatio;
     }
 
@@ -673,6 +715,36 @@ class ModelConfig extends AbstractDataTransferObject
     public function getOutputMediaAspectRatio(): ?string
     {
         return $this->outputMediaAspectRatio;
+    }
+
+    /**
+     * Validates that the given media orientation and aspect ratio values do not conflict with each other.
+     *
+     * @since 0.4.0
+     *
+     * @param MediaOrientationEnum $orientation The desired media orientation.
+     * @param string $aspectRatio The desired media aspect ratio.
+     */
+    protected function validateMediaOrientationAspectRatioCompatibility(
+        MediaOrientationEnum $orientation,
+        string $aspectRatio
+    ): void {
+        $aspectRatioParts = explode(':', $aspectRatio);
+        if ($orientation->isSquare() && $aspectRatioParts[0] !== $aspectRatioParts[1]) {
+            throw new InvalidArgumentException(
+                'The aspect ratio "' . $aspectRatio . '" is not compatible with the square orientation.'
+            );
+        }
+        if ($orientation->isLandscape() && $aspectRatioParts[0] <= $aspectRatioParts[1]) {
+            throw new InvalidArgumentException(
+                'The aspect ratio "' . $aspectRatio . '" is not compatible with the landscape orientation.'
+            );
+        }
+        if ($orientation->isPortrait() && $aspectRatioParts[0] >= $aspectRatioParts[1]) {
+            throw new InvalidArgumentException(
+                'The aspect ratio "' . $aspectRatio . '" is not compatible with the portrait orientation.'
+            );
+        }
     }
 
     /**
@@ -919,8 +991,8 @@ class ModelConfig extends AbstractDataTransferObject
 
         if ($this->functionDeclarations !== null) {
             $data[self::KEY_FUNCTION_DECLARATIONS] = array_map(
-                static function (FunctionDeclaration $function_declaration): array {
-                    return $function_declaration->toArray();
+                static function (FunctionDeclaration $functionDeclaration): array {
+                    return $functionDeclaration->toArray();
                 },
                 $this->functionDeclarations
             );
@@ -1024,8 +1096,8 @@ class ModelConfig extends AbstractDataTransferObject
 
         if (isset($array[self::KEY_FUNCTION_DECLARATIONS])) {
             $config->setFunctionDeclarations(array_map(
-                static function (array $function_declaration_data): FunctionDeclaration {
-                    return FunctionDeclaration::fromArray($function_declaration_data);
+                static function (array $functionDeclarationData): FunctionDeclaration {
+                    return FunctionDeclaration::fromArray($functionDeclarationData);
                 },
                 $array[self::KEY_FUNCTION_DECLARATIONS]
             ));

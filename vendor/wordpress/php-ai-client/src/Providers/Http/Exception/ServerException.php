@@ -6,7 +6,7 @@ namespace WordPress\AiClient\Providers\Http\Exception;
 
 use WordPress\AiClient\Common\Exception\RuntimeException;
 use WordPress\AiClient\Providers\Http\DTO\Response;
-use WordPress\AiClient\Providers\Http\Utilities\ErrorMessageExtractor;
+use WordPress\AiClient\Providers\Http\Util\ErrorMessageExtractor;
 
 /**
  * Exception thrown for 5xx HTTP server errors.
@@ -38,6 +38,7 @@ class ServerException extends RuntimeException
             503 => 'Service Unavailable',
             504 => 'Gateway Timeout',
             507 => 'Insufficient Storage',
+            529 => 'Overloaded',
         ];
 
         if (isset($statusTexts[$statusCode])) {

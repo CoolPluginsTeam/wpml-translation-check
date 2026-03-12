@@ -1,0 +1,41 @@
+<?php return array(
+    'root' => array(
+        'name' => 'cool-plugins/automl-ai-providers',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '98a9aac022cd640f37d5ceba3eb738dc3d56afc3',
+        'type' => 'library',
+        'install_path' => __DIR__ . '/../../',
+        'aliases' => array(),
+        'dev' => true,
+    ),
+    'versions' => array(
+        'cool-plugins/automl-ai-providers' => array(
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '98a9aac022cd640f37d5ceba3eb738dc3d56afc3',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'wordpress/ai-provider-for-google' => array(
+            'pretty_version' => '1.0.2',
+            'version' => '1.0.2.0',
+            'reference' => 'a2fe8b9c8e36702a69c0d47d994c7995a2ae6f4c',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../wordpress/ai-provider-for-google',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'wordpress/ai-provider-for-openai' => array(
+            'pretty_version' => '1.0.2',
+            'version' => '1.0.2.0',
+            'reference' => '80dc9458bf99820ab587b269c49cd158c4b7ded1',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../wordpress/ai-provider-for-openai',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+    ),
+);

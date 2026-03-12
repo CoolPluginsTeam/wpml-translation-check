@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace WordPress\AiClient\Builders;
 
+use Psr\EventDispatcher\EventDispatcherInterface;
 use WordPress\AiClient\Common\Exception\InvalidArgumentException;
 use WordPress\AiClient\Common\Exception\RuntimeException;
+use WordPress\AiClient\Events\AfterGenerateResultEvent;
+use WordPress\AiClient\Events\BeforeGenerateResultEvent;
 use WordPress\AiClient\Files\DTO\File;
 use WordPress\AiClient\Files\Enums\FileTypeEnum;
+use WordPress\AiClient\Files\Enums\MediaOrientationEnum;
 use WordPress\AiClient\Messages\DTO\Message;
 use WordPress\AiClient\Messages\DTO\MessagePart;
 use WordPress\AiClient\Messages\DTO\UserMessage;
@@ -24,6 +28,7 @@ use WordPress\AiClient\Providers\Models\ImageGeneration\Contracts\ImageGeneratio
 use WordPress\AiClient\Providers\Models\SpeechGeneration\Contracts\SpeechGenerationModelInterface;
 use WordPress\AiClient\Providers\Models\TextGeneration\Contracts\TextGenerationModelInterface;
 use WordPress\AiClient\Providers\Models\TextToSpeechConversion\Contracts\TextToSpeechConversionModelInterface;
+use WordPress\AiClient\Providers\Models\VideoGeneration\Contracts\VideoGenerationModelInterface;
 use WordPress\AiClient\Providers\ProviderRegistry;
 use WordPress\AiClient\Results\DTO\GenerativeAiResult;
 use WordPress\AiClient\Tools\DTO\FunctionDeclaration;
@@ -81,6 +86,11 @@ class PromptBuilder
      */
     protected ?RequestOptions $requestOptions = null;
 
+    /**
+     * @var EventDispatcherInterface|null The event dispatcher for prompt lifecycle events.
+     */
+    private ?EventDispatcherInterface $eventDispatcher = null;
+
     // phpcs:disable Generic.Files.LineLength.TooLong
     /**
      * Constructor.
@@ -89,12 +99,17 @@ class PromptBuilder
      *
      * @param ProviderRegistry $registry The provider registry for finding suitable models.
      * @param Prompt $prompt Optional initial prompt content.
+     * @param EventDispatcherInterface|null $eventDispatcher Optional event dispatcher for lifecycle events.
      */
     // phpcs:enable Generic.Files.LineLength.TooLong
-    public function __construct(ProviderRegistry $registry, $prompt = null)
-    {
+    public function __construct(
+        ProviderRegistry $registry,
+        $prompt = null,
+        ?EventDispatcherInterface $eventDispatcher = null
+    ) {
         $this->registry = $registry;
         $this->modelConfig = new ModelConfig();
+        $this->eventDispatcher = $eventDispatcher;
 
         if ($prompt === null) {
             return;
@@ -109,6 +124,36 @@ class PromptBuilder
         // Parse it as a user message
         $userMessage = $this->parseMessage($prompt, MessageRoleEnum::user());
         $this->messages[] = $userMessage;
+    }
+
+    /**
+     * Creates a deep clone of this builder.
+     *
+     * Clones all mutable state including messages, model configuration, and request options.
+     * Service objects (registry, model, event dispatcher) are intentionally NOT cloned
+     * as they are shared dependencies.
+     *
+     * @since 0.4.2
+     */
+    public function __clone()
+    {
+        // Deep clone messages array (Message has __clone)
+        $clonedMessages = [];
+        foreach ($this->messages as $message) {
+            $clonedMessages[] = clone $message;
+        }
+        $this->messages = $clonedMessages;
+
+        // Clone model config (ModelConfig has __clone)
+        $this->modelConfig = clone $this->modelConfig;
+
+        // Clone request options if set (contains only primitives)
+        if ($this->requestOptions !== null) {
+            $this->requestOptions = clone $this->requestOptions;
+        }
+
+        // Note: $registry, $model, and $eventDispatcher are service objects
+        // and are intentionally NOT cloned - they should be shared references.
     }
 
     /**
@@ -233,7 +278,9 @@ class PromptBuilder
      * @since 0.2.0
      *
      * @param string|ModelInterface|array{0:string,1:string} ...$preferredModels The preferred models as model IDs,
-     * model instances, or [model ID, provider ID] tuples.
+     * model instances, or [provider ID, model ID] tuples. For broader compatibility, it is recommended you specify
+     * only model IDs or model instances, as that will allow for different providers that expose the same model to be
+     * considered.
      * @return self
      *
      * @throws InvalidArgumentException When a preferred model has an invalid type or identifier.
@@ -414,7 +461,7 @@ class PromptBuilder
      */
     public function usingStopSequences(string ...$stopSequences): self
     {
-        $this->modelConfig->setCustomOption('stopSequences', $stopSequences);
+        $this->modelConfig->setStopSequences($stopSequences);
         return $this;
     }
 
@@ -583,6 +630,51 @@ class PromptBuilder
     }
 
     /**
+     * Sets the output media orientation.
+     *
+     * @since 1.3.0
+     *
+     * @param MediaOrientationEnum $orientation The output media orientation.
+     * @return self
+     */
+    public function asOutputMediaOrientation(MediaOrientationEnum $orientation): self
+    {
+        $this->modelConfig->setOutputMediaOrientation($orientation);
+        return $this;
+    }
+
+    /**
+     * Sets the output media aspect ratio.
+     *
+     * If set, this supersedes the output media orientation, as it is a more
+     * specific configuration.
+     *
+     * @since 1.3.0
+     *
+     * @param string $aspectRatio The aspect ratio (e.g. "16:9", "3:2").
+     * @return self
+     */
+    public function asOutputMediaAspectRatio(string $aspectRatio): self
+    {
+        $this->modelConfig->setOutputMediaAspectRatio($aspectRatio);
+        return $this;
+    }
+
+    /**
+     * Sets the output speech voice.
+     *
+     * @since 1.3.0
+     *
+     * @param string $voice The output speech voice.
+     * @return self
+     */
+    public function asOutputSpeechVoice(string $voice): self
+    {
+        $this->modelConfig->setOutputSpeechVoice($voice);
+        return $this;
+    }
+
+    /**
      * Configures the prompt for JSON response output.
      *
      * @since 0.1.0
@@ -665,6 +757,9 @@ class PromptBuilder
         }
         if ($model instanceof SpeechGenerationModelInterface) {
             return CapabilityEnum::speechGeneration();
+        }
+        if ($model instanceof VideoGenerationModelInterface) {
+            return CapabilityEnum::videoGeneration();
         }
 
         // No supported interface found
@@ -837,7 +932,38 @@ class PromptBuilder
 
         $model = $this->getConfiguredModel($capability);
 
+        // Dispatch BeforeGenerateResultEvent
+        $this->dispatchEvent(
+            new BeforeGenerateResultEvent($this->messages, $model, $capability)
+        );
+
         // Route to the appropriate generation method based on capability
+        $result = $this->executeModelGeneration($model, $capability, $this->messages);
+
+        // Dispatch AfterGenerateResultEvent
+        $this->dispatchEvent(
+            new AfterGenerateResultEvent($this->messages, $model, $capability, $result)
+        );
+
+        return $result;
+    }
+
+    /**
+     * Executes the model generation based on capability.
+     *
+     * @since 0.4.0
+     *
+     * @param ModelInterface $model The model to use for generation.
+     * @param CapabilityEnum $capability The capability to use.
+     * @param list<Message> $messages The messages to send.
+     * @return GenerativeAiResult The generated result.
+     * @throws RuntimeException If the model doesn't support the required capability.
+     */
+    private function executeModelGeneration(
+        ModelInterface $model,
+        CapabilityEnum $capability,
+        array $messages
+    ): GenerativeAiResult {
         if ($capability->isTextGeneration()) {
             if (!$model instanceof TextGenerationModelInterface) {
                 throw new RuntimeException(
@@ -847,7 +973,7 @@ class PromptBuilder
                     )
                 );
             }
-            return $model->generateTextResult($this->messages);
+            return $model->generateTextResult($messages);
         }
 
         if ($capability->isImageGeneration()) {
@@ -859,7 +985,7 @@ class PromptBuilder
                     )
                 );
             }
-            return $model->generateImageResult($this->messages);
+            return $model->generateImageResult($messages);
         }
 
         if ($capability->isTextToSpeechConversion()) {
@@ -871,7 +997,7 @@ class PromptBuilder
                     )
                 );
             }
-            return $model->convertTextToSpeechResult($this->messages);
+            return $model->convertTextToSpeechResult($messages);
         }
 
         if ($capability->isSpeechGeneration()) {
@@ -883,12 +1009,19 @@ class PromptBuilder
                     )
                 );
             }
-            return $model->generateSpeechResult($this->messages);
+            return $model->generateSpeechResult($messages);
         }
 
         if ($capability->isVideoGeneration()) {
-            // Video generation is not yet implemented
-            throw new RuntimeException('Output modality "video" is not yet supported.');
+            if (!$model instanceof VideoGenerationModelInterface) {
+                throw new RuntimeException(
+                    sprintf(
+                        'Model "%s" does not support video generation.',
+                        $model->metadata()->getId()
+                    )
+                );
+            }
+            return $model->generateVideoResult($messages);
         }
 
         // TODO: Add support for other capabilities when interfaces are available
@@ -967,6 +1100,24 @@ class PromptBuilder
 
         // Generate and return the result with text-to-speech conversion capability
         return $this->generateResult(CapabilityEnum::textToSpeechConversion());
+    }
+
+    /**
+     * Generates a video result from the prompt.
+     *
+     * @since 1.3.0
+     *
+     * @return GenerativeAiResult The generated result containing video candidates.
+     * @throws InvalidArgumentException If the prompt or model validation fails.
+     * @throws RuntimeException If the model doesn't support video generation.
+     */
+    public function generateVideoResult(): GenerativeAiResult
+    {
+        // Include video in output modalities
+        $this->includeOutputModalities(ModalityEnum::video());
+
+        // Generate and return the result with video generation capability
+        return $this->generateResult(CapabilityEnum::videoGeneration());
     }
 
     /**
@@ -1098,6 +1249,39 @@ class PromptBuilder
         }
 
         return $this->generateSpeechResult()->toFiles();
+    }
+
+    /**
+     * Generates a video from the prompt.
+     *
+     * @since 1.3.0
+     *
+     * @return File The generated video file.
+     * @throws InvalidArgumentException If the prompt or model validation fails.
+     * @throws RuntimeException If no video is generated.
+     */
+    public function generateVideo(): File
+    {
+        return $this->generateVideoResult()->toFile();
+    }
+
+    /**
+     * Generates multiple videos from the prompt.
+     *
+     * @since 1.3.0
+     *
+     * @param int|null $candidateCount The number of videos to generate.
+     * @return list<File> The generated video files.
+     * @throws InvalidArgumentException If the prompt or model validation fails.
+     * @throws RuntimeException If no videos are generated.
+     */
+    public function generateVideos(?int $candidateCount = null): array
+    {
+        if ($candidateCount !== null) {
+            $this->usingCandidateCount($candidateCount);
+        }
+
+        return $this->generateVideoResult()->toFiles();
     }
 
     /**
@@ -1518,6 +1702,21 @@ class PromptBuilder
         // Update if we have new modalities to add
         if (!empty($toAdd)) {
             $this->modelConfig->setOutputModalities(array_merge($existing, $toAdd));
+        }
+    }
+
+    /**
+     * Dispatches an event if an event dispatcher is registered.
+     *
+     * @since 0.4.0
+     *
+     * @param object $event The event to dispatch.
+     * @return void
+     */
+    private function dispatchEvent(object $event): void
+    {
+        if ($this->eventDispatcher !== null) {
+            $this->eventDispatcher->dispatch($event);
         }
     }
 }

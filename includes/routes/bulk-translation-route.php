@@ -520,7 +520,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 					if ( is_array( $automl_validation_result ) && ! empty( $automl_validation_result['message'] ) ) {
 						$errors[$provider] = $automl_validation_result['message'];
 						continue; // Skip updating the key for this provider since it's invalid.
-					}		
+					}
 					$updated_providers_key[$provider]=$data['key'];
 				}else{
 					if(function_exists('_wp_register_default_connector_settings')){
@@ -549,7 +549,6 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 				)
 			);
 		}
-
 		if(function_exists('_wp_register_default_connector_settings')){
 			foreach ($updated_providers_key as $provider => $key) {
 				update_option('connectors_ai_'.$provider.'_api_key', $key);
@@ -573,118 +572,64 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
  * @return true|array         true on success, or ['message' => 'error text'] on failure.
  */
 private function validate_provider_api_key( $provider_id, $api_key ) {
-	if ( ! $provider_id || ! $api_key ) {
-		return array( 'message' => __( 'Provider and API key are required.', 'wpml-translation-check' ) );
-	}
+    if ( ! $provider_id || ! $api_key ) {
+        return array( 'message' => __( 'Provider and API key are required.', 'wpml-translation-check' ) );
+    }
 
-	if ( ! class_exists( 'WordPress\AiClient\AiClient' ) ) {
-		return array( 'message' => __( 'AI client is not available.', 'wpml-translation-check' ) );
-	}
+    if ( ! class_exists( 'WordPress\AiClient\AiClient' ) ) {
+        return array( 'message' => __( 'AI client is not available.', 'wpml-translation-check' ) );
+    }
 
-	$registry = \WordPress\AiClient\AiClient::defaultRegistry();
-	if ( ! $registry->hasProvider( $provider_id ) ) {
-		return array( 'message' => __( 'Invalid AI provider.', 'wpml-translation-check' ) );
-	}
+    $registry = \WordPress\AiClient\AiClient::defaultRegistry();
+    if ( ! $registry->hasProvider( $provider_id ) ) {
+        return array( 'message' => __( 'Invalid AI provider.', 'wpml-translation-check' ) );
+    }
 
-	// Simple cooldown per provider + key (so changing the key allows a fresh validation; same key is still rate-limited).
-	$is_gemini = ( 'google' === strtolower( $provider_id ) ) || str_contains( strtolower( $provider_id ), 'gemini' );
-	$cooldown  = $is_gemini ? 60 : 5;
-	$lock_key  = 'automl_ai_test_lock_' . md5( $provider_id . '|' . $api_key );
+    $is_gemini = ( 'google' === strtolower( $provider_id ) ) || str_contains( strtolower( $provider_id ), 'gemini' );
+    $cooldown  = $is_gemini ? 60 : 5;
+    $lock_key  = 'automl_ai_test_lock_' . md5( $provider_id . '|' . $api_key );
 
-	if ( get_transient( $lock_key ) ) {
-		return array(
-			'message' => $is_gemini
-				? __( 'Gemini rate limit reached. Please wait a minute and try again.', 'wpml-translation-check' )
-				: __( 'Please wait a few seconds before testing again.', 'wpml-translation-check' ),
-		);
-	}
+    if ( get_transient( $lock_key ) ) {
+        return array(
+            'message' => $is_gemini
+                ? __( 'Gemini rate limit reached. Please wait a minute and try again.', 'wpml-translation-check' )
+                : __( 'Please wait a few seconds before testing again.', 'wpml-translation-check' ),
+        );
+    }
 
-	// Inject the API key into the provider (must be done before any registry calls that need auth).
-	$auth_class = 'WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication';
-	$registry->setProviderRequestAuthentication(
-		$provider_id,
-		new $auth_class( $api_key )
-	);
+    // Inject the test API key into the registry (same as the REST controller does).
+    $auth_class = 'WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication';
+    $registry->setProviderRequestAuthentication(
+        $provider_id,
+        new $auth_class( $api_key )
+    );
 
-	// Choose a default test model per provider (hardcoded to avoid discovery, which can use a stale cache).
-	$provider_id_lower = strtolower( $provider_id );
-	$test_model_id     = '';
-	if ( str_contains( $provider_id_lower, 'openai' ) ) {
-		$test_model_id = 'gpt-4o-mini';
-	} elseif ( str_contains( $provider_id_lower, 'anthropic' ) ) {
-		$test_model_id = 'claude-3-haiku-20240307';
-	} elseif ( str_contains( $provider_id_lower, 'google' ) ) {
-		$test_model_id = 'gemini-2.5-flash';
-	}
+    set_transient( $lock_key, 1, $cooldown );
 
-	// Resolve model instance first (using our injected auth). Avoid using_provider() so the prompt
-	// builder never runs discovery and hits "No models found" from a stale cache.
-	$model_instance = null;
-	if ( ! empty( $test_model_id ) ) {
-		try {
-			$model_instance = $registry->getProviderModel( $provider_id, $test_model_id );
-		} catch ( \Exception $e ) {
-			// Fall back to discovery only if the hardcoded model id is missing or invalid.
-			$model_instance = null;
-		}
-	}
-	if ( ! $model_instance
-		&& class_exists( 'WordPress\AiClient\Providers\Models\DTO\ModelRequirements' )
-		&& class_exists( 'WordPress\AiClient\Providers\Models\Enums\CapabilityEnum' )
-	) {
-		$requirements     = new \WordPress\AiClient\Providers\Models\DTO\ModelRequirements(
-			array( \WordPress\AiClient\Providers\Models\Enums\CapabilityEnum::textGeneration() ),
-			array()
-		);
-		$models_metadata  = $registry->findProviderModelsMetadataForSupport( $provider_id, $requirements );
-		if ( ! empty( $models_metadata ) ) {
-			$first          = reset( $models_metadata );
-			$test_model_id  = $first->getId();
-			$model_instance = $registry->getProviderModel( $provider_id, $test_model_id );
-		}
-	}
-	
-	if ( ! $model_instance ) {
-		return array( 'message' => __( 'Invalid API key.', 'wpml-translation-check' ) );
-	}
+    try {
+        $provider_classname       = $registry->getProviderClassName( $provider_id );
+        $provider_availability    = $provider_classname::availability();
 
-	// Set cooldown only when we are about to call the API, so invalid-key attempts don't block retries.
-	set_transient( $lock_key, 1, $cooldown );
+        if ( ! $provider_availability->isConfigured() ) {
+            return array( 'message' => __( 'API key is not configured for this provider.', 'wpml-translation-check' ) );
+        }
 
-	try {
+        $model_metadata_directory = $provider_classname::modelMetadataDirectory();
+        $model_metadata_directory->listModelMetadata(); // throws on invalid key
 
-		$builder = null;
+    } catch ( \Exception $e ) {
+        $msg = $e->getMessage();
+        if ( str_contains( strtolower( $msg ), '429' ) ) {
+            return array(
+                'message' => $is_gemini
+                    ? __( 'Gemini free tier rate limit exceeded. Please wait and try again.', 'wpml-translation-check' )
+                    : __( 'Rate limit exceeded. Please try again later.', 'wpml-translation-check' ),
+            );
+        }
+        return array( 'message' => __( 'Invalid API key. Please check your credentials.', 'wpml-translation-check' ) );
+    }
 
-		if(function_exists('wp_ai_client_prompt')){
-			$builder = wp_ai_client_prompt();
-		}else{
-			$builder = \WordPress\AI_Client\AI_Client::prompt();
-		}
-		
-		if(is_null($builder)){
-			return array( 'message' => __( 'AI client is not available.', 'wpml-translation-check' ) );
-		}
-
-		$result = $builder
-			->using_model( $model_instance )
-			->with_text( 'ok' )
-			->generate_text();
-
-	} catch ( \Exception $e ) {
-		return array( 'message' => $e->getMessage() );
-	}
-
-	if ( is_wp_error( $result ) ) {
-		$error_message = $result->get_error_message();
-		if ( str_contains( strtolower( $error_message ), '429' ) ) {
-			$error_message = $is_gemini
-				? __( 'Gemini free tier rate limit exceeded. Please wait and try again.', 'wpml-translation-check' )
-				: __( 'Rate limit exceeded. Please try again later.', 'wpml-translation-check' );
-		}
-		return array( 'message' => $error_message );
-	}
-
-	return true;
+    return true;
 }
 
 	/**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace WordPress\AiClient\Providers;
 
+use Http\Discovery\Exception\NotFoundException as DiscoveryNotFoundException;
 use WordPress\AiClient\Common\Exception\InvalidArgumentException;
 use WordPress\AiClient\Common\Exception\RuntimeException;
 use WordPress\AiClient\Providers\Contracts\ProviderInterface;
@@ -14,7 +15,7 @@ use WordPress\AiClient\Providers\Http\Contracts\HttpTransporterInterface;
 use WordPress\AiClient\Providers\Http\Contracts\RequestAuthenticationInterface;
 use WordPress\AiClient\Providers\Http\Contracts\WithHttpTransporterInterface;
 use WordPress\AiClient\Providers\Http\Contracts\WithRequestAuthenticationInterface;
-use WordPress\AiClient\Providers\Http\DTO\ApiKeyRequestAuthentication;
+use WordPress\AiClient\Providers\Http\HttpTransporterFactory;
 use WordPress\AiClient\Providers\Http\Traits\WithHttpTransporterTrait;
 use WordPress\AiClient\Providers\Models\Contracts\ModelInterface;
 use WordPress\AiClient\Providers\Models\DTO\ModelConfig;
@@ -86,14 +87,27 @@ class ProviderRegistry implements WithHttpTransporterInterface
         // If there is already a HTTP transporter instance set, hook it up to the provider as needed.
         try {
             $httpTransporter = $this->getHttpTransporter();
-            $this->setHttpTransporterForProvider($className, $httpTransporter);
         } catch (RuntimeException $e) {
             /*
              * If this fails, it's okay. There is no defined sequence between setting the HTTP transporter in the
              * registry and registering providers in it, so it might be that the transporter is set later. It will be
              * hooked up then.
-             * Therefore we can simply ignore this exception.
+             * But for now we can ignore this exception and attempt to set the default HTTP transporter, if possible.
              */
+            try {
+                $this->setHttpTransporter(HttpTransporterFactory::createTransporter());
+                $httpTransporter = $this->getHttpTransporter();
+            } catch (DiscoveryNotFoundException $e) {
+                /*
+                 * If no HTTP client implementation can be discovered yet, we can ignore this for now.
+                 * It might be set later, so it's not a hard error at this point.
+                 * We'll try again the next time a provider is registered, or maybe by that time an explicit
+                 * HTTP transporter will have been set.
+                 */
+            }
+        }
+        if (isset($httpTransporter)) {
+            $this->setHttpTransporterForProvider($className, $httpTransporter);
         }
 
         // Hook up the request authentication instance, using a default if not set.
@@ -135,8 +149,8 @@ class ProviderRegistry implements WithHttpTransporterInterface
      */
     public function hasProvider(string $idOrClassName): bool
     {
-        return isset($this->registeredIdsToClassNames[$idOrClassName]) ||
-            isset($this->registeredClassNamesToIds[$idOrClassName]);
+        return $this->isRegisteredId($idOrClassName) ||
+            $this->isRegisteredClassName($idOrClassName);
     }
 
     /**
@@ -145,18 +159,18 @@ class ProviderRegistry implements WithHttpTransporterInterface
      * @since 0.1.0
      *
      * @param string|class-string<ProviderInterface> $idOrClassName The provider ID or class name.
-     * @return string The provider class name.
+     * @return class-string<ProviderInterface> The provider class name.
      * @throws InvalidArgumentException If the provider is not registered.
      */
     public function getProviderClassName(string $idOrClassName): string
     {
         // If it's already a class name, return it
-        if (isset($this->registeredClassNamesToIds[$idOrClassName])) {
+        if ($this->isRegisteredClassName($idOrClassName)) {
             return $idOrClassName;
         }
 
         // If it's a registered ID, return its class name
-        if (isset($this->registeredIdsToClassNames[$idOrClassName])) {
+        if ($this->isRegisteredId($idOrClassName)) {
             return $this->registeredIdsToClassNames[$idOrClassName];
         }
 
@@ -178,12 +192,12 @@ class ProviderRegistry implements WithHttpTransporterInterface
     public function getProviderId(string $idOrClassName): string
     {
         // If it's already an ID, return it
-        if (isset($this->registeredIdsToClassNames[$idOrClassName])) {
+        if ($this->isRegisteredId($idOrClassName)) {
             return $idOrClassName;
         }
 
         // If it's a registered class name, return its ID
-        if (isset($this->registeredClassNamesToIds[$idOrClassName])) {
+        if ($this->isRegisteredClassName($idOrClassName)) {
             return $this->registeredClassNamesToIds[$idOrClassName];
         }
 
@@ -339,17 +353,20 @@ class ProviderRegistry implements WithHttpTransporterInterface
      */
     private function resolveProviderClassName(string $idOrClassName): string
     {
-        // Handle both ID and class name
-        $className = $this->registeredIdsToClassNames[$idOrClassName] ?? $idOrClassName;
-
-        if (!$this->hasProvider($idOrClassName)) {
-            throw new InvalidArgumentException(
-                sprintf('Provider not registered: %s', $idOrClassName)
-            );
+        // If it's already a class name, return it
+        if ($this->isRegisteredClassName($idOrClassName)) {
+            return $idOrClassName;
         }
 
-        // @phpstan-ignore-next-line return.type (Interface implementation guaranteed by registration validation)
-        return $className;
+        // If it's a registered ID, return its class name
+        if ($this->isRegisteredId($idOrClassName)) {
+            return $this->registeredIdsToClassNames[$idOrClassName];
+        }
+
+        // Not found
+        throw new InvalidArgumentException(
+            sprintf('Provider not registered: %s', $idOrClassName)
+        );
     }
 
     /**
@@ -440,11 +457,36 @@ class ProviderRegistry implements WithHttpTransporterInterface
      *
      * @param class-string<ProviderInterface> $className The provider class name.
      * @param RequestAuthenticationInterface $requestAuthentication The authentication instance.
+     *
+     * @throws InvalidArgumentException If the authentication instance is not of the expected type.
      */
     private function setRequestAuthenticationForProvider(
         string $className,
         RequestAuthenticationInterface $requestAuthentication
     ): void {
+        $authenticationMethod = $className::metadata()->getAuthenticationMethod();
+        if ($authenticationMethod === null) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Provider %s does not expect any authentication, but got %s.',
+                    $className,
+                    get_class($requestAuthentication)
+                )
+            );
+        }
+
+        $expectedClass = $authenticationMethod->getImplementationClass();
+        if (!$requestAuthentication instanceof $expectedClass) {
+            throw new InvalidArgumentException(
+                sprintf(
+                    'Provider %s expects authentication of type %s, but got %s.',
+                    $className,
+                    $expectedClass,
+                    get_class($requestAuthentication)
+                )
+            );
+        }
+
         $availability = $className::availability();
         if ($availability instanceof WithRequestAuthenticationInterface) {
             $availability->setRequestAuthentication($requestAuthentication);
@@ -475,14 +517,19 @@ class ProviderRegistry implements WithHttpTransporterInterface
     private function createDefaultProviderRequestAuthentication(
         string $className
     ): ?RequestAuthenticationInterface {
-        $providerId = $className::metadata()->getId();
+        $providerMetadata = $className::metadata();
+        $providerId = $providerMetadata->getId();
+        $authenticationMethod = $providerMetadata->getAuthenticationMethod();
 
-        /*
-         * For now, we assume API key authentication is used by default.
-         * In the future, this could be made more flexible by allowing the provider to express a specific type of
-         * request authentication to use.
-         */
-        $authenticationClass = ApiKeyRequestAuthentication::class;
+        if ($authenticationMethod === null) {
+            return null;
+        }
+
+        $authenticationClass = $authenticationMethod->getImplementationClass();
+        if ($authenticationClass === null) {
+            return null;
+        }
+
         $authenticationSchema = $authenticationClass::getJsonSchema();
 
         // Iterate over all JSON schema object properties to try to determine the necessary authentication data.
@@ -532,7 +579,36 @@ class ProviderRegistry implements WithHttpTransporterInterface
             }
         }
 
+        /** @var RequestAuthenticationInterface */
+        /** @var array<string, mixed> $authenticationData */
         return $authenticationClass::fromArray($authenticationData);
+    }
+
+    /**
+     * Checks if the given value is a registered provider class name.
+     *
+     * @since 0.4.0
+     *
+     * @param string $idOrClassName The value to check.
+     * @return bool True if it's a registered class name.
+     * @phpstan-assert-if-true class-string<ProviderInterface> $idOrClassName
+     */
+    private function isRegisteredClassName(string $idOrClassName): bool
+    {
+        return isset($this->registeredClassNamesToIds[$idOrClassName]);
+    }
+
+    /**
+     * Checks if the given value is a registered provider ID.
+     *
+     * @since 0.4.0
+     *
+     * @param string $idOrClassName The value to check.
+     * @return bool True if it's a registered provider ID.
+     */
+    private function isRegisteredId(string $idOrClassName): bool
+    {
+        return isset($this->registeredIdsToClassNames[$idOrClassName]);
     }
 
     /**
