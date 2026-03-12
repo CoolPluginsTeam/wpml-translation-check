@@ -1,7 +1,7 @@
 <?php
 /**
- * Plugin Name: AutoML – AI Translation for WPML
- * Description: AutoML – AI translation addon for WPML that helps translate WordPress pages and posts content faster and more accurately.
+ * Plugin Name: AutoMLP – AI Translation for WPML
+ * Description: AutoMLP – AI translation addon for WPML that helps translate WordPress pages and posts content faster and more accurately.
  * Version: 1.0.0
  * Author: Cool Plugins
  * Text Domain: wpml-translation-check
@@ -20,41 +20,38 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Define plugin constants.
-if ( ! defined( 'AUTOML_AI_VERSION' ) ) {
-	define( 'AUTOML_AI_VERSION', '1.0.0' );
+if ( ! defined( 'AUTOMLP_AI_VERSION' ) ) {
+	define( 'AUTOMLP_AI_VERSION', '1.0.0' );
 }
-if ( ! defined( 'AUTOML_AI_PLUGIN_DIR' ) ) {
-	define( 'AUTOML_AI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+if ( ! defined( 'AUTOMLP_AI_PLUGIN_DIR' ) ) {
+	define( 'AUTOMLP_AI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 }
-if ( ! defined( 'AUTOML_AI_PLUGIN_URL' ) ) {
-	define( 'AUTOML_AI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+if ( ! defined( 'AUTOMLP_AI_PLUGIN_URL' ) ) {
+	define( 'AUTOMLP_AI_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 }
-if ( ! defined( 'AUTOML_AI_PLUGIN_BASENAME' ) ) {
-	define( 'AUTOML_AI_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+if ( ! defined( 'AUTOMLP_AI_PLUGIN_BASENAME' ) ) {
+	define( 'AUTOMLP_AI_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 }
 
-use WordPress\AI_Client\AI_Client;
-use WordPress\AiClient\AiClient;
+use AUTOMLP_WPML\Includes\Routes\Bulk_Translation_Route;
 
-use AUTOML_WPML\Includes\Routes\Bulk_Translation_Route;
-use AUTOML_WPML\Helper\Helper;
 
 /**
  * Main plugin class.
  */
-final class AUTOML_Ai_Translate_Addon {
+final class AUTOMLP_Ai_Translate_Addon {
 
 	/**
 	 * Plugin instance.
 	 *
-	 * @var AUTOML_Ai_Translate_Addon
+	 * @var AUTOMLP_Ai_Translate_Addon
 	 */
 	private static $instance = null;
 
 	/**
 	 * Get plugin instance.
 	 *
-	 * @return AUTOML_Ai_Translate_Addon
+	 * @return AUTOMLP_Ai_Translate_Addon
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -71,12 +68,12 @@ final class AUTOML_Ai_Translate_Addon {
 		$this->init();
 		add_action( 'init', array($this, 'register_ai_client') );
 		add_filter(
-			'plugin_action_links_' . AUTOML_AI_PLUGIN_BASENAME,
+			'plugin_action_links_' . AUTOMLP_AI_PLUGIN_BASENAME,
 			array( $this, 'add_settings_action_link' )
 		);
 	
 		add_action( 'admin_init', array( $this, 'register_ai_model_setting' ) );
-		add_action( 'admin_menu', array( $this, 'register_automl_ai_dashboard_menu' ), 20 );
+		add_action( 'admin_menu', array( $this, 'register_automlp_ai_dashboard_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'hide_wp_ai_client_menu' ), 99 );
 	}
 
@@ -85,7 +82,7 @@ final class AUTOML_Ai_Translate_Addon {
 		$is_wp70 = function_exists( 'wp_has_ai_client' ) && wp_has_ai_client();
 	
 		if ( ! $is_wp70 ) {
-			$sdk_autoload = AUTOML_AI_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
+			$sdk_autoload = AUTOMLP_AI_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
 			if ( file_exists( $sdk_autoload ) ) {
 				require_once $sdk_autoload;
 			}
@@ -94,7 +91,7 @@ final class AUTOML_Ai_Translate_Addon {
 			}
 		}
 	
-		$providers_autoload = AUTOML_AI_PLUGIN_DIR . 'ai-providers/vendor/autoload.php';
+		$providers_autoload = AUTOMLP_AI_PLUGIN_DIR . 'ai-providers/vendor/autoload.php';
 		if ( file_exists( $providers_autoload ) ) {
 			require_once $providers_autoload;
 		}
@@ -126,7 +123,7 @@ final class AUTOML_Ai_Translate_Addon {
 	public function register_ai_model_setting() {
 		register_setting(
 			'wp-ai-client-settings',              // option group (matches settings_fields in settings.php)
-			'automl_ai_translation_models',      // option name
+			'automlp_ai_translation_models',      // option name
 			array(
 				'type'              => 'array',
 				'default'           => array(),
@@ -154,13 +151,13 @@ final class AUTOML_Ai_Translate_Addon {
 	 */
 	public function add_settings_action_link( $links ) {
 		// Only show settings link if wizard setup is complete
-		if ( ! get_option( 'automl_ai_setup_complete', false ) ) {
+		if ( ! get_option( 'automlp_ai_setup_complete', false ) ) {
 			return $links;
 		}
 
 		$url  = add_query_arg(
 			array(
-				'page' => 'automl_ai_dashboard',
+				'page' => 'automlp_ai_dashboard',
 				'tab'  => 'settings',
 			),
 			admin_url( 'admin.php' )
@@ -176,8 +173,8 @@ final class AUTOML_Ai_Translate_Addon {
 		return $links;
 	}
 
-	public function register_automl_ai_dashboard_menu() {
-		if ( ! get_option( 'automl_ai_setup_complete' ) ) {
+	public function register_automlp_ai_dashboard_menu() {
+		if ( ! get_option( 'automlp_ai_setup_complete' ) ) {
 			return;
 		}
 		global $menu;
@@ -198,11 +195,11 @@ final class AUTOML_Ai_Translate_Addon {
 	
 		add_submenu_page(
 			$parent_slug, // parent (WPML) menu slug
-			__( 'AUTOML AI Translate', 'wpml-translation-check' ), // page title
-			__( 'AutoML AI', 'wpml-translation-check' ),      // menu title
+			__( 'AUTOMLP AI Translate', 'wpml-translation-check' ), // page title
+			__( 'AutoMLP AI', 'wpml-translation-check' ),      // menu title
 			'manage_options',       	                                  // capability
-			'automl_ai_dashboard',                                    // menu slug
-			array( \AUTOML_Ai_Dashboard::get_instance(), 'automl_ai_render_dashboard_page' ) // callback
+			'automlp_ai_dashboard',                                    // menu slug
+			array( \AUTOMLP_Ai_Dashboard::get_instance(), 'automlp_ai_render_dashboard_page' ) // callback
 		);
 	}
 
@@ -234,17 +231,17 @@ final class AUTOML_Ai_Translate_Addon {
 			'includes/string-translation/string-translation.php',
 			'includes/bulk-translation/register-assets.php',
 			'includes/string-translation/register-assets.php',
-			'includes/class-automl-ai-helper.php',
-			'includes/class-automl-ai-strings-ajax.php',
-			'includes/class-automl-ai-update-translate-data-ajax.php',
+			'includes/class-automlp-ai-helper.php',
+			'includes/class-automlp-ai-strings-ajax.php',
+			'includes/class-automlp-ai-update-translate-data-ajax.php',
 			'includes/routes/bulk-translation-route.php',
-			'admin/class-automl_ai_dashboard.php',
+			'admin/class-automlp_ai_dashboard.php',
 			'admin/cpt_dashboard/cpt_dashboard.php',
 			'modules/wizard/load.php',
 		);
 
 		foreach ( $files as $file ) {
-			$file_path = AUTOML_AI_PLUGIN_DIR . $file;
+			$file_path = AUTOMLP_AI_PLUGIN_DIR . $file;
 			if ( file_exists( $file_path ) ) {
 				require_once $file_path;
 			}
@@ -265,23 +262,23 @@ final class AUTOML_Ai_Translate_Addon {
 		}
 
 		// Initialize AJAX handlers.
-		if ( class_exists( AUTOML_AI_Strings_Ajax::class ) ) {
-			AUTOML_AI_Strings_Ajax::init();
+		if ( class_exists( AUTOMLP_AI_Strings_Ajax::class ) ) {
+			AUTOMLP_AI_Strings_Ajax::init();
 		}
-		if ( class_exists( 'AUTOML_AI_Update_Translate_Data_Ajax' ) ) {
-			AUTOML_AI_Update_Translate_Data_Ajax::init();
+		if ( class_exists( 'AUTOMLP_AI_Update_Translate_Data_Ajax' ) ) {
+			AUTOMLP_AI_Update_Translate_Data_Ajax::init();
 		}
 		if ( class_exists( Bulk_Translation_Route::class ) ) {
-			new Bulk_Translation_Route( 'automl-bulk-translate' );
+			new Bulk_Translation_Route( 'automlp-bulk-translate' );
 		}
 		
 		// Initialize admin classes.
 		if ( is_admin() ) {
-			if ( class_exists( 'AUTOML_Ai_Dashboard' ) ) {
-				AUTOML_Ai_Dashboard::get_instance();
+			if ( class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
+				AUTOMLP_Ai_Dashboard::get_instance();
 			}
-			if ( class_exists( 'AUTOML_Ai_Cpt_Dashboard' ) ) {
-				new AUTOML_Ai_Cpt_Dashboard();
+			if ( class_exists( 'AUTOMLP_Ai_Cpt_Dashboard' ) ) {
+				new AUTOMLP_Ai_Cpt_Dashboard();
 			}
 		}
 	}
@@ -307,7 +304,7 @@ final class AUTOML_Ai_Translate_Addon {
 		?>
 		<div class="notice notice-error">
 			<p>
-				<strong><?php esc_html_e( 'AUTOML AI Translate Addon:', 'wpml-translation-check' ); ?></strong>
+				<strong><?php esc_html_e( 'AUTOMLP AI Translate Addon:', 'wpml-translation-check' ); ?></strong>
 				<?php esc_html_e( 'This plugin requires WPML to be installed and activated.', 'wpml-translation-check' ); ?>
 			</p>
 		</div>
@@ -318,11 +315,11 @@ final class AUTOML_Ai_Translate_Addon {
 /**
  * Initialize the plugin.
  */
-function automl_ai_translate_addon() {
-	return AUTOML_Ai_Translate_Addon::get_instance();
+function automlp_ai_translate_addon() {
+	return AUTOMLP_Ai_Translate_Addon::get_instance();
 }
 
-register_activation_hook( __FILE__, array( \AUTOML_WPML\Modules\Wizard\AUTOML_Ai_Wizard::class, 'start_wizard' ) );
+register_activation_hook( __FILE__, array( \AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard::class, 'start_wizard' ) );
 
 // Start the plugin.
-automl_ai_translate_addon();
+automlp_ai_translate_addon();

@@ -7,7 +7,7 @@ import SetupContinueButton, { SetupBackButton } from "./SetupContinueButton";
 
 const Languages = ({ onBack, onContinue }) => {
   const data = window.wpml_at_setup || {};
-  const dashboardUrl = data.dashboard_url || ( data.admin_url || '' ).replace( 'admin.php', 'admin.php?automl_ai_dashboard&tab=settings' );
+  const dashboardUrl = data.dashboard_url || ( data.admin_url || '' ).replace( 'admin.php', 'admin.php?automlp_ai_dashboard&tab=settings' );
   const defaultCode = (data.default_language || "").toLowerCase();
   const allLanguages = Array.isArray(data.wpml_languages)
     ? data.wpml_languages
@@ -62,7 +62,7 @@ const Languages = ({ onBack, onContinue }) => {
 	
 		  try {
 			await apiFetch({
-			  path: "automl-bulk-translate/wizard-save-language",
+			  path: "automlp-bulk-translate/wizard-save-language",
 			  method: "POST",
 			  headers: {
 				"Content-Type": "application/json",
@@ -86,24 +86,24 @@ const Languages = ({ onBack, onContinue }) => {
 
   return (
     <>
-      <div className="automl-ai-wizard-card">
+      <div className="automlp-ai-wizard-card">
         <div
-          className="automl-ai-wizard-language-container"
+          className="automlp-ai-wizard-language-container"
           style={{ flex: 1, marginBottom: 20 }}
         >
           <h2 style={{ marginTop: 0 }}>
             {__("Select Language for AI Translation", "wpml-translation-check")}
           </h2>
 
-          <p className="automl-ai-wizard-intro" style={{ color: "#6b7280" }}>
+          <p className="automlp-ai-wizard-intro" style={{ color: "#6b7280" }}>
             {__(
-              "Choose your website language you want to translate using AI. The free version of AutoML allows AI translation for one language only.",
+              "Choose your website language you want to translate using AI. The free version of AutoMLP allows AI translation for one language only.",
               "wpml-translation-check",
             )}
           </p>
 
           <label
-            htmlFor="automl-ai-wizard-language-select"
+            htmlFor="automlp-ai-wizard-language-select"
             style={{
               display: "block",
               fontSize: ".85rem",
@@ -116,10 +116,10 @@ const Languages = ({ onBack, onContinue }) => {
           </label>
 
           <select
-            id="automl-ai-wizard-language-select"
+            id="automlp-ai-wizard-language-select"
             value={selectedCode}
             onChange={(event) => setSelectedCode(event.target.value)}
-            className="automl-ai-wizard-select"
+            className="automlp-ai-wizard-select"
           >
             <option value="">
               {__("Select an option", "wpml-translation-check")}
@@ -147,9 +147,9 @@ const Languages = ({ onBack, onContinue }) => {
             </p>
           )}
 
-          <div className="automl-ai-wizard-card-language-footer">
+          <div className="automlp-ai-wizard-card-language-footer">
             <span
-              className="automl-ai-wizard-card-language-footer-icon"
+              className="automlp-ai-wizard-card-language-footer-icon"
               aria-hidden="true"
             >
               <img
@@ -163,7 +163,7 @@ const Languages = ({ onBack, onContinue }) => {
                 style={{ display: "block" }}
               />
             </span>
-            <div className="automl-ai-wizard-card-language-footer-content">
+            <div className="automlp-ai-wizard-card-language-footer-content">
               <p>
                 <strong>
                   {__(
@@ -180,7 +180,7 @@ const Languages = ({ onBack, onContinue }) => {
                 href={data.upgrade_url || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="automl-ai-wizard-card-language-footer-link"
+                className="automlp-ai-wizard-card-language-footer-link"
               >
                 {__("Upgrade to Pro →", "wpml-translation-check")}
               </a>
@@ -188,7 +188,7 @@ const Languages = ({ onBack, onContinue }) => {
           </div>
         </div>
 
-        <div className="automl-ai-wizard-footer" style={{ marginTop: 24 }}>
+        <div className="automlp-ai-wizard-footer" style={{ marginTop: 24 }}>
           <SetupBackButton onClick={onBack} />
           <SetupContinueButton
             onClick={async () => {
@@ -196,7 +196,7 @@ const Languages = ({ onBack, onContinue }) => {
               if (!saved) return;
               try {
                 await apiFetch({
-                  path: "automl-bulk-translate/wizard-complete",
+                  path: "automlp-bulk-translate/wizard-complete",
                   method: "POST",
                   headers: { "X-WP-Nonce": getNonce() },
                 });
@@ -211,7 +211,7 @@ const Languages = ({ onBack, onContinue }) => {
         </div>
       </div>
 
-      <div className="automl-ai-wizard-card-footer">
+      <div className="automlp-ai-wizard-card-footer">
         {__("Need help? Visit our", "wpml-translation-check")}{" "}
         <a
           href={data.doc_url || "https://docs.coolplugins.net/"}

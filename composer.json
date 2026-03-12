@@ -1,5 +1,5 @@
 {
-    "name": "cool-plugins/automl-ai-translation-for-wpml",
+    "name": "cool-plugins/automlp-ai-translation-for-wpml",
     "description": "WPML Google Auto Translate Addon – bulk and per-row translation with Google Translate and optional AI (OpenRouter/OpenAI)",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",

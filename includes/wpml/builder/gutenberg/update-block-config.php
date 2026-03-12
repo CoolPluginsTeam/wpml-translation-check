@@ -1,6 +1,6 @@
 <?php
 
-namespace AUTOML_WPML\Includes\Wpml\Builder\Gutenberg;
+namespace AUTOMLP_WPML\Includes\Wpml\Builder\Gutenberg;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,7 +13,7 @@ if ( class_exists( Update_Block_Config::class ) ) {
 /**
  * Update_Block_Config
  *
- * @package AUTOML_WPML\Includes\Wpml\Builder\Gutenberg
+ * @package AUTOMLP_WPML\Includes\Wpml\Builder\Gutenberg
  */
 class Update_Block_Config {
 
@@ -81,7 +81,7 @@ class Update_Block_Config {
 
 	private function get_block_parse_rules() {
 		$response = wp_remote_get(
-			esc_url_raw( AUTOML_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/blocks-config.json' ),
+			esc_url_raw( AUTOMLP_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/blocks-config.json' ),
 			array(
 				'timeout' => 15,
 			)
@@ -97,7 +97,7 @@ class Update_Block_Config {
 
 			WP_Filesystem();
 
-			$local_path = AUTOML_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/blocks-config.json';
+			$local_path = AUTOMLP_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/blocks-config.json';
 			if ( $wp_filesystem->exists( $local_path ) && $wp_filesystem->is_readable( $local_path ) ) {
 				$block_rules = $wp_filesystem->get_contents( $local_path );
 			} else {
@@ -118,7 +118,7 @@ class Update_Block_Config {
 
 	private function get_block_default_support_child_block(): array {
 		$response = wp_remote_get(
-			esc_url_raw( AUTOML_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/default-support-child-block.json' ),
+			esc_url_raw( AUTOMLP_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/default-support-child-block.json' ),
 			array(
 				'timeout' => 15,
 			)
@@ -134,7 +134,7 @@ class Update_Block_Config {
 
 			WP_Filesystem();
 
-			$local_path = AUTOML_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/default-support-child-block.json';
+			$local_path = AUTOMLP_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/default-support-child-block.json';
 			if ( $wp_filesystem->exists( $local_path ) && $wp_filesystem->is_readable( $local_path ) ) {
 				$block_default_support_child_block = $wp_filesystem->get_contents( $local_path );
 			} else {
@@ -155,7 +155,7 @@ class Update_Block_Config {
 
 	private function get_block_default_attributes_value(): array {
 		$response = wp_remote_get(
-			esc_url_raw( AUTOML_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/attr-default-value.json' ),
+			esc_url_raw( AUTOMLP_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/attr-default-value.json' ),
 			array(
 				'timeout' => 15,
 			)
@@ -171,7 +171,7 @@ class Update_Block_Config {
 
 			WP_Filesystem();
 
-			$local_path = AUTOML_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/attr-default-value.json';
+			$local_path = AUTOMLP_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/attr-default-value.json';
 			if ( $wp_filesystem->exists( $local_path ) && $wp_filesystem->is_readable( $local_path ) ) {
 				$block_default_attributes_value = $wp_filesystem->get_contents( $local_path );
 			} else {
@@ -322,7 +322,7 @@ class Update_Block_Config {
 	}
 
 	public function is_content_update() {
-		return ( defined( 'DOING_AUTOML_WPML_GUTENBERG_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOML_WPML_GUTENBERG_CONTENT_UPDATE' ) ) || ( defined( 'DOING_AUTOML_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOML_WPML_BULK_POST_TRANSLATION' ) );
+		return ( defined( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) ) || ( defined( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) );
 	}
 
 	public function get_update_block_config() {
@@ -377,9 +377,9 @@ class Update_Block_Config {
 			}
 
 			if ( isset( $custom_config[ $block['blockName'] ]->attributes ) ) {
-				$automl_block_default_attrs = $custom_config[ $block['blockName'] ]->attributes;
+				$automlp_block_default_attrs = $custom_config[ $block['blockName'] ]->attributes;
 
-				foreach ( $automl_block_default_attrs as $attr_key => $attr_value ) {
+				foreach ( $automlp_block_default_attrs as $attr_key => $attr_value ) {
 					$attr_value = isset( $this->block_default_attributes_value[ $block['blockName'] ]['attributes'][ $attr_key ] ) ? $this->block_default_attributes_value[ $block['blockName'] ]['attributes'][ $attr_key ] : ( isset( $block_attrs[ $attr_key ] ) ? $block_attrs[ $attr_key ] : null );
 
 					if ( is_null( $attr_value ) ) {
@@ -521,7 +521,7 @@ class Update_Block_Config {
 	}
 
 	private function update_package_strings( array &$append_data, $html, $field_key, $field_name, $text, $type, $format, $translate ): void {
-		if ( defined( 'DOING_AUTOML_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOML_WPML_BULK_POST_TRANSLATION' ) ) {
+		if ( defined( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) ) {
 			$this->set_content_data( $append_data, 'html', $html );
 			$this->set_content_data( $append_data, 'text', $text );
 		} else {

@@ -1,11 +1,11 @@
 (()=>{
     const enableBulkTranslateBtn=()=>{
-        const AutoMlSubsubsubList = jQuery('.automl_wpml_subsubsub');
-        const AutoMlBulkTranslateBtn = jQuery('.automl-wpml-bulk-translate-btn');
+        const AutoMlSubsubsubList = jQuery('.automlp_wpml_subsubsub');
+        const AutoMlBulkTranslateBtn = jQuery('.automlp-wpml-bulk-translate-btn');
 
-        const automl_wpml_admin_object = window.automl_wpml_admin_object;
-        const wizardLanguage = automl_wpml_admin_object.wizardLanguage;
-        const currentLanguage = automl_wpml_admin_object.currentLanguage;
+        const automlp_wpml_admin_object = window.automlp_wpml_admin_object;
+        const wizardLanguage = automlp_wpml_admin_object.wizardLanguage;
+        const currentLanguage = automlp_wpml_admin_object.currentLanguage;
 
         if(currentLanguage === wizardLanguage) {
             AutoMlBulkTranslateBtn.prop('disabled', true);
@@ -13,7 +13,7 @@
         }
     
         if(AutoMlSubsubsubList.length){
-            const $defaultSubsubsub = jQuery('ul.subsubsub:not(.automl_wpml_subsubsub_list)');
+            const $defaultSubsubsub = jQuery('ul.subsubsub:not(.automlp_wpml_subsubsub_list)');
     
             if($defaultSubsubsub.length){
                 $defaultSubsubsub.after(AutoMlSubsubsubList);

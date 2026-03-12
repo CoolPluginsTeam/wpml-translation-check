@@ -7,20 +7,20 @@ const VideoIntro = ({ onGetStarted }) => {
 
 	return (
 		<>
-		<div className="automl-ai-wizard-card">
+		<div className="automlp-ai-wizard-card">
 			<div style={{ textAlign: 'center', marginBottom: 24 }}>
-				<h3 className="automl-ai-wizard-card-title h3" style={{ fontSize: '1.5rem', marginBottom: 12, paddingTop: 24 }}>
+				<h3 className="automlp-ai-wizard-card-title h3" style={{ fontSize: '1.5rem', marginBottom: 12, paddingTop: 24 }}>
 					{ __( 'Watch Setup Guide', 'wpml-translation-check' ) }
 				</h3>
 				<p style={{ color: '#6b7280', marginBottom: 24, textAlign: 'center' }}>
-					{ __( 'Learn how to set up AutoML and start translating your pages', 'wpml-translation-check' ) }
+					{ __( 'Learn how to set up AutoMLP and start translating your pages', 'wpml-translation-check' ) }
 					<br />
 					{ __( 'automatically using AI.', 'wpml-translation-check' ) }
 				</p>
 			</div>
 			<div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
 				<iframe
-					title={ __( 'AutoML Setup Guide', 'wpml-translation-check' ) }
+					title={ __( 'AutoMLP Setup Guide', 'wpml-translation-check' ) }
 					style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', borderRadius: 8 }}
 					src={ videoUrl }
 					frameBorder="0"
@@ -34,7 +34,7 @@ const VideoIntro = ({ onGetStarted }) => {
 				</button>
 			</div>
 		</div>
-		<div className="automl-ai-wizard-card-footer">
+		<div className="automlp-ai-wizard-card-footer">
 			{ __( 'Need help? Visit our', 'wpml-translation-check' ) }{ ' ' }
 			<a href={ '#' } target="_blank" rel="noopener noreferrer">
 				{ __( 'Documentation', 'wpml-translation-check' ) }

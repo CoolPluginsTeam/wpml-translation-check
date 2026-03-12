@@ -5,7 +5,7 @@
  * @package WPML_Auto_Translate
  */
 
-namespace AUTOML_WPML\Modules\Wizard;
+namespace AUTOMLP_WPML\Modules\Wizard;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,4 +13,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/wizard.php';
 
-$automl_ai_wizard = new AUTOML_Ai_Wizard();
+$automlp_ai_wizard = new AUTOMLP_Ai_Wizard();

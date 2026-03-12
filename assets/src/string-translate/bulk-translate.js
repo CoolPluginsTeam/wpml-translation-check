@@ -37,7 +37,7 @@ const bulkTranslateStrings = async ({
   selectedStrings = {},
   stringLanguageStatus = {},
 }) => {
-  const nonce = automl_wpml_bulk_translate_object.nonce;
+  const nonce = automlp_wpml_bulk_translate_object.nonce;
   const stringsByLanguage = {};
   const totalPerLanguage = {};
   const stringKeys = []; // only used for count; we don't put 10k keys in Redux
@@ -79,9 +79,9 @@ const bulkTranslateStrings = async ({
     stringsByLanguage[lang] = strings;
   
     const flagUrl =
-      automl_wpml_bulk_translate_object.languageObject[lang]?.flag || "";
+      automlp_wpml_bulk_translate_object.languageObject[lang]?.flag || "";
     const languageName =
-      automl_wpml_bulk_translate_object.languageObject[lang]?.name || lang;
+      automlp_wpml_bulk_translate_object.languageObject[lang]?.name || lang;
   
     // One Redux entry per language
     const key = `strings_${lang}`;
@@ -111,7 +111,7 @@ const bulkTranslateStrings = async ({
       success: false,
       message: __(
         "No strings found to translate.",
-        "automl-ai-translation-for-wpml",
+        "automlp-ai-translation-for-wpml",
       ),
     };
   }
@@ -136,7 +136,7 @@ const bulkTranslateStrings = async ({
  */
 const translateStringsWithChromeAI = (strings, sourceLang, targetLang) => {
   const languageObject =
-    automl_wpml_bulk_translate_object?.languageObject || {};
+    automlp_wpml_bulk_translate_object?.languageObject || {};
   const textContentObject = strings.reduce((acc, text, i) => {
     acc[i] = text || "";
     return acc;
@@ -169,7 +169,7 @@ const translateStringsWithChromeAI = (strings, sourceLang, targetLang) => {
             new Error(
               __(
                 "Chrome AI is not available. Use Chrome and enable the Translation API.",
-                "automl-ai-translation-for-wpml",
+                "automlp-ai-translation-for-wpml",
               ),
             ),
           );
@@ -204,7 +204,7 @@ const initBulkTranslateStrings = async (
   });
 
   const sourceLang =
-    automl_wpml_bulk_translate_object.default_language_slug || "en";
+    automlp_wpml_bulk_translate_object.default_language_slug || "en";
   const BATCH_SIZE = 500;
 
   const translateStringsForLanguage = async (lang, initialStrings) => {
@@ -286,7 +286,7 @@ const initBulkTranslateStrings = async (
           if (batchToSave.length > 0) {
             timeTakenSec = (Date.now() - batchStartTime) / 1000;
             await saveStringTranslations(lang, batchToSave, nonce);
-            if (automl_wpml_bulk_translate_object?.update_translate_data_nonce) {
+            if (automlp_wpml_bulk_translate_object?.update_translate_data_nonce) {
               const batchWords = batch.reduce(
                 (sum, s) =>
                   sum +
@@ -331,7 +331,7 @@ const initBulkTranslateStrings = async (
                 currentPostId: saveId,
                 editorType: "strings",
                 updateTranslateDataNonce:
-                  automl_wpml_bulk_translate_object.update_translate_data_nonce,
+                  automlp_wpml_bulk_translate_object.update_translate_data_nonce,
                 extraData: {},
               });
             }
@@ -386,7 +386,7 @@ const initBulkTranslateStrings = async (
         } else {
           const fallbackMsg = __(
             "Translation failed",
-            "automl-ai-translation-for-wpml",
+            "automlp-ai-translation-for-wpml",
           );
 
           const raw = translationResponse?.data;
@@ -407,7 +407,7 @@ const initBulkTranslateStrings = async (
                 messageClass: "error",
                 errorMessage: fallbackMsg,
                 errorHtml:
-                  '<div class="automl-wpml-error-html">' + errorHtml + "</div>",
+                  '<div class="automlp-wpml-error-html">' + errorHtml + "</div>",
               },
             }),
           );
@@ -418,7 +418,7 @@ const initBulkTranslateStrings = async (
       } catch (err) {
         const fallbackMsg = __(
           "Translation failed",
-          "automl-ai-translation-for-wpml",
+          "automlp-ai-translation-for-wpml",
         );
 
         let errorHtml = err?.message || "";
@@ -443,7 +443,7 @@ const initBulkTranslateStrings = async (
               messageClass: "error",
               errorMessage: fallbackMsg,
               errorHtml:
-                '<div class="automl-wpml-error-html">' + errorHtml + "</div>",
+                '<div class="automlp-wpml-error-html">' + errorHtml + "</div>",
             },
           }),
         );
@@ -476,10 +476,10 @@ const saveStringTranslations = async (
   nonce,
   stats = null,
 ) => {
-  const ajaxUrl = automl_wpml_bulk_translate_object.ajax_url;
+  const ajaxUrl = automlp_wpml_bulk_translate_object.ajax_url;
 
   const body = {
-    action: "automl_wpml_google_auto_translate_save_string_translations",
+    action: "automlp_wpml_google_auto_translate_save_string_translations",
     nonce: nonce,
     target_lang: targetLang,
     translated_strings: translatedStrings,
@@ -491,7 +491,7 @@ const saveStringTranslations = async (
   try {
     const response = await fetch(
       ajaxUrl +
-        "?action=automl_wpml_google_auto_translate_save_string_translations",
+        "?action=automlp_wpml_google_auto_translate_save_string_translations",
       {
         method: "POST",
         headers: {

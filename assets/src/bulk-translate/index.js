@@ -25,19 +25,19 @@ import LocalAITranslate from './components/translate-provider/local-ai/local-ai-
 
         // 1️⃣ Clear old cached data on page load
         const clearOldTranslatorCacheOnLoad = () => {
-            const loadKey = 'AUTOML_WPML_LOCAL_AI_PAGE_LOADED';
+            const loadKey = 'AUTOMLP_WPML_LOCAL_AI_PAGE_LOADED';
 
             if (sessionStorage.getItem(loadKey)) {
                 return;
             }
 
-            localStorage.removeItem('AUTOML_WPML_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES');
+            localStorage.removeItem('AUTOMLP_WPML_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES');
             sessionStorage.setItem(loadKey, '1');
         };
 
         // 2️⃣ Language pack availability check (gesture-based)
         const checkLanguagePackAvailability = async () => {
-            const languagesObj = { ...automl_wpml_bulk_translate_object.languageObject };
+            const languagesObj = { ...automlp_wpml_bulk_translate_object.languageObject };
             const supportedLanguages = LocalAITranslate.supportedLanguages || [];
 
             delete languagesObj.en;
@@ -45,7 +45,7 @@ import LocalAITranslate from './components/translate-provider/local-ai/local-ai-
             let savedLanguages = [];
             try {
                 savedLanguages = JSON.parse(
-                    localStorage.getItem('AUTOML_WPML_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES')
+                    localStorage.getItem('AUTOMLP_WPML_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES')
                 ) || [];
             } catch {
                 savedLanguages = [];
@@ -70,7 +70,7 @@ import LocalAITranslate from './components/translate-provider/local-ai/local-ai-
                             delete languagesObj[targetLang] ;
                             savedLanguages.push(targetLang);
                             localStorage.setItem(
-                                'AUTOML_WPML_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES',
+                                'AUTOMLP_WPML_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES',
                                 JSON.stringify(savedLanguages)
                             );
                         }
@@ -108,7 +108,7 @@ import LocalAITranslate from './components/translate-provider/local-ai/local-ai-
 
             let checkboxClass = 'table.widefat input[name="post[]"]:checked';
 
-            if (automl_wpml_bulk_translate_object.taxonomy_page && '' !== automl_wpml_bulk_translate_object.taxonomy_page) {
+            if (automlp_wpml_bulk_translate_object.taxonomy_page && '' !== automlp_wpml_bulk_translate_object.taxonomy_page) {
                 checkboxClass = 'table.widefat input[name="delete_tags[]"]:checked';
             }
 
@@ -165,7 +165,7 @@ import LocalAITranslate from './components/translate-provider/local-ai/local-ai-
 
 
     window.addEventListener('load', async () => {
-        const prefix = 'automl-wpml-bulk-translate';
+        const prefix = 'automlp-wpml-bulk-translate';
 
         await new Promise(resolve => setTimeout(resolve, 500));
 

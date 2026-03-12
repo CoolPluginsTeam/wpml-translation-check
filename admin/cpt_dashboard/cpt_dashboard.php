@@ -10,13 +10,13 @@ if(!defined('ABSPATH')){
  * example:
  * 
  * Dashbord initialize
- * if(!class_exists('AUTOML_Ai_Cpt_Dashboard')){
- * $dashboard=AUTOML_Ai_Cpt_Dashboard::instance();
+ * if(!class_exists('AUTOMLP_Ai_Cpt_Dashboard')){
+ * $dashboard=AUTOMLP_Ai_Cpt_Dashboard::instance();
  * }
  * 
  * Store options
- * if(class_exists('AUTOML_Ai_Cpt_Dashboard')){
- *  AUTOML_Ai_Cpt_Dashboard::store_options(
+ * if(class_exists('AUTOMLP_Ai_Cpt_Dashboard')){
+ *  AUTOMLP_Ai_Cpt_Dashboard::store_options(
  *      'prefix', // Required plugin prefix
  *      'unique_key',// Optional unique key is used to update the data based on post/page id or plugin/themes name
  *      'update', // Optional preview string count or character count update or replace
@@ -35,7 +35,7 @@ if(!defined('ABSPATH')){
  * }
  * 
  * Add Tabs
- * add_filter('AUTOML_Ai_Cpt_Dashboard_tabs', function($tabs){
+ * add_filter('AUTOMLP_Ai_Cpt_Dashboard_tabs', function($tabs){
  *  $tabs[]=array(
  *      'prefix'=>'tab_name', // Required
  *      'tab_name'=>'Tab Name', // Required
@@ -53,8 +53,8 @@ if(!defined('ABSPATH')){
  * });
  * 
  * Display review notice
- * if(class_exists('AUTOML_Ai_Cpt_Dashboard')){
- *  AUTOML_Ai_Cpt_Dashboard::review_notice(
+ * if(class_exists('AUTOMLP_Ai_Cpt_Dashboard')){
+ *  AUTOMLP_Ai_Cpt_Dashboard::review_notice(
  *      'prefix', // Required
  *      'plugin_name', // Required
  *      'url', // Required
@@ -62,8 +62,8 @@ if(!defined('ABSPATH')){
  * }
  * 
  * Get translation data
- * if(class_exists('AUTOML_Ai_Cpt_Dashboard')){
- *  AUTOML_Ai_Cpt_Dashboard::get_translation_data(
+ * if(class_exists('AUTOMLP_Ai_Cpt_Dashboard')){
+ *  AUTOMLP_Ai_Cpt_Dashboard::get_translation_data(
  *      'prefix', // Required
  *      array(
  *          'editor_type' => 'gutenberg', // optional return data based on editor type
@@ -73,9 +73,9 @@ if(!defined('ABSPATH')){
  * }
  */
 
- if(!class_exists('AUTOML_Ai_Cpt_Dashboard'))
+ if(!class_exists('AUTOMLP_Ai_Cpt_Dashboard'))
     {
-        class AUTOML_Ai_Cpt_Dashboard{
+        class AUTOMLP_Ai_Cpt_Dashboard{
 
         /**
          * Init
@@ -101,7 +101,7 @@ if(!defined('ABSPATH')){
         }
 
         public function __construct(){
-            add_action('wp_ajax_automl_ai_hide_review_notice', array($this, 'automl_ai_hide_review_notice'));
+            add_action('wp_ajax_automlp_ai_hide_review_notice', array($this, 'automlp_ai_hide_review_notice'));
         }
 
         /**
@@ -128,7 +128,7 @@ if(!defined('ABSPATH')){
         public static function store_options($prefix='', $unique_key='', $old_data='update', array $data = array()){
             if(!empty($prefix) && isset($data['string_count']) && isset($data['character_count'])){
                 $prefix = sanitize_key($prefix);
-                $all_data = get_option('automl_ai_dashboard_data', array());
+                $all_data = get_option('automlp_ai_dashboard_data', array());
                 
                 if(isset($all_data[$prefix])){
                     $data_update = false;
@@ -174,7 +174,7 @@ if(!defined('ABSPATH')){
                     $all_data[$prefix][] = array_map('sanitize_text_field', $data);
                 }
 
-                update_option('automl_ai_dashboard_data', $all_data);
+                update_option('automlp_ai_dashboard_data', $all_data);
             }
         }
 
@@ -185,7 +185,7 @@ if(!defined('ABSPATH')){
          */
         public static function get_translation_data($prefix, $key_exists=array()){
             $prefix = sanitize_key($prefix);
-            $all_data = get_option('automl_ai_dashboard_data', array());
+            $all_data = get_option('automlp_ai_dashboard_data', array());
             $data = array();
 
             if(isset($all_data[$prefix])){
@@ -230,10 +230,10 @@ if(!defined('ABSPATH')){
         }
 
         public static function ctp_enqueue_assets(){
-            if(function_exists('wp_style_is') && !wp_style_is('automl_ai_review-style', 'enqueued')){
+            if(function_exists('wp_style_is') && !wp_style_is('automlp_ai_review-style', 'enqueued')){
                 $plugin_url = plugin_dir_url(__FILE__);
-                wp_enqueue_style('automl_ai_review-style', esc_url($plugin_url.'assets/css/cpt-dashboard.css'), array(), '1.0.0', 'all');
-                wp_enqueue_script('automl_ai_review-script', esc_url($plugin_url.'assets/js/cpt-dashboard.js'), array('jquery'), '1.0.0', true);
+                wp_enqueue_style('automlp_ai_review-style', esc_url($plugin_url.'assets/css/cpt-dashboard.css'), array(), '1.0.0', 'all');
+                wp_enqueue_script('automlp_ai_review-script', esc_url($plugin_url.'assets/js/cpt-dashboard.js'), array('jquery'), '1.0.0', true);
             }
         }
 
@@ -247,7 +247,7 @@ if(!defined('ABSPATH')){
         }
 
         public static function review_notice($prefix, $plugin_name, $url){
-            if(self::automl_ai_hide_review_notice_status($prefix)){
+            if(self::automlp_ai_hide_review_notice_status($prefix)){
                 return;
             }
             
@@ -293,31 +293,31 @@ if(!defined('ABSPATH')){
             add_action('admin_notices', function() use ($message, $prefix, $url, $allowed){
                 $html= '<div class="notice notice-info is-dismissible cpt-review-notice">';
                 
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="automl-wpml-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('automl_wpml_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'wpml-translation-check').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'wpml-translation-check').'</button></div></div></div>';
+                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="automlp-wpml-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('automlp_wpml_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'wpml-translation-check').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'wpml-translation-check').'</button></div></div></div>';
                 
                 echo wp_kses($html, $allowed);
             });
 
-            add_action('automl-wpml_display_admin_notices', function() use ($message, $prefix, $url, $allowed){
+            add_action('automlp-wpml_display_admin_notices', function() use ($message, $prefix, $url, $allowed){
                 $html= '<div class="notice notice-info is-dismissible cpt-review-notice">';
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="automl-wpml-review-notice-dismiss" data-prefix="'.$prefix.'" data-nonce="'.wp_create_nonce('automl_wpml_hide_review_notice').'"><a href="'. $url .'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.__('Not Interested', 'wpml-translation-check').'</button><button class="button cpt-already-reviewed">'.__('Already Reviewed', 'wpml-translation-check').'</button></div></div></div>';
+                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="automlp-wpml-review-notice-dismiss" data-prefix="'.$prefix.'" data-nonce="'.wp_create_nonce('automlp_wpml_hide_review_notice').'"><a href="'. $url .'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.__('Not Interested', 'wpml-translation-check').'</button><button class="button cpt-already-reviewed">'.__('Already Reviewed', 'wpml-translation-check').'</button></div></div></div>';
                 
                 echo wp_kses($html, $allowed);
             });
         }
 
-        public static function automl_ai_hide_review_notice_status($prefix){
+        public static function automlp_ai_hide_review_notice_status($prefix){
             $review_notice_dismissed = get_option('cpt_review_notice_dismissed', array());
             return isset($review_notice_dismissed[$prefix]) ? $review_notice_dismissed[$prefix] : false;
         }
 
-        public function automl_ai_hide_review_notice(){
+        public function automlp_ai_hide_review_notice(){
             if(!current_user_can('manage_options')){
                 wp_send_json_error( __( 'Unauthorized', 'wpml-translation-check' ), 403 );
                 wp_die( '0', 403 );
             }
 
-            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'automl_wpml_hide_review_notice')){
+            if(isset($_POST['nonce']) && wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['nonce'])), 'automlp_wpml_hide_review_notice')){
                 $prefix = isset($_POST['prefix']) ? sanitize_key(wp_unslash($_POST['prefix'])) : '';
                 $review_notice_dismissed = get_option('cpt_review_notice_dismissed', array());
                 $review_notice_dismissed[$prefix] = true;

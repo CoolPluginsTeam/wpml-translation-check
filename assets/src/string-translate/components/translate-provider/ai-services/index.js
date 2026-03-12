@@ -12,8 +12,8 @@ import {translateFieldNameSort} from "../../../helper/index";
 
 class AIService {
     constructor({ postId = '', sourceLang = '', targetLangs = [], totalPosts = 0, prefix = '', createTranslatePostNonce = '', updateContent = () => { }, storeDispatch = () => { }, updateDestoryHandler = () => { }, previousCompletedStrings = 0 }) {
-        this.CONCURRENCY_LIMIT = window?.automl_wpml_bulk_translate_object?.AIRequestBatchSize || 5;
-        this.MAX_TOKENS=window?.automl_wpml_bulk_translate_object?.AIRequestMaxTokens || 500;
+        this.CONCURRENCY_LIMIT = window?.automlp_wpml_bulk_translate_object?.AIRequestBatchSize || 5;
+        this.MAX_TOKENS=window?.automlp_wpml_bulk_translate_object?.AIRequestMaxTokens || 500;
 
         this.activePostId = postId;
         this.activeTargetLangs = '';

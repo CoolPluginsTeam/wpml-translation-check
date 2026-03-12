@@ -11,9 +11,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Register and handle wp_ajax_automl_wpml_update_translate_data.
+ * Register and handle wp_ajax_automlp_wpml_update_translate_data.
  */
-class AUTOML_AI_Update_Translate_Data_Ajax {
+class AUTOMLP_AI_Update_Translate_Data_Ajax {
 
 	/**
 	 * Initialize: register the AJAX action.
@@ -21,7 +21,7 @@ class AUTOML_AI_Update_Translate_Data_Ajax {
 	 * @return void
 	 */
 	public static function init() {
-		add_action( 'wp_ajax_automl_wpml_update_translate_data', array( __CLASS__, 'handle_update_translate_data' ) );
+		add_action( 'wp_ajax_automlp_wpml_update_translate_data', array( __CLASS__, 'handle_update_translate_data' ) );
 	}
 
 	/**
@@ -34,11 +34,11 @@ class AUTOML_AI_Update_Translate_Data_Ajax {
 			wp_send_json_error( array( 'msg' => __( 'Unauthorized', 'wpml-translation-check' ) ), 403 );
 		}
 
-		$nonce = isset( $_POST['automl_wpml_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['automl_wpml_nonce'] ) ) : '';
+		$nonce = isset( $_POST['automlp_wpml_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['automlp_wpml_nonce'] ) ) : '';
 if ( empty( $nonce ) && isset( $_POST['translate_data_nonce'] ) ) {
 	$nonce = sanitize_text_field( wp_unslash( $_POST['translate_data_nonce'] ) );
 }
-if ( ! wp_verify_nonce( $nonce, 'automl_wpml_update_translate_data' ) ) {
+if ( ! wp_verify_nonce( $nonce, 'automlp_wpml_update_translate_data' ) ) {
 	wp_send_json_error( array( 'msg' => __( 'Invalid nonce', 'wpml-translation-check' ) ), 400 );
 }
     
@@ -62,7 +62,7 @@ if ( ! wp_verify_nonce( $nonce, 'automl_wpml_update_translate_data' ) ) {
 			wp_send_json_error( array( 'msg' => __( 'Missing required fields', 'wpml-translation-check' ) ), 400 );
 		}
     
-		if ( class_exists( 'AUTOML_Ai_Cpt_Dashboard' ) ) {
+		if ( class_exists( 'AUTOMLP_Ai_Cpt_Dashboard' ) ) {
 			$data = array(
 				'post_id'              => $post_id,
 				'service_provider'     => $provider,
@@ -80,7 +80,7 @@ if ( ! wp_verify_nonce( $nonce, 'automl_wpml_update_translate_data' ) ) {
 				'extra_data'           => $extra_data,
 				'bulk_translate'       => $bulk_translate,
 			);
-			AUTOML_Ai_Cpt_Dashboard::store_options( 'automl_ai', 'post_id', 'update', $data );
+			AUTOMLP_Ai_Cpt_Dashboard::store_options( 'automlp_ai', 'post_id', 'update', $data );
 		}
 
 		wp_send_json_success();

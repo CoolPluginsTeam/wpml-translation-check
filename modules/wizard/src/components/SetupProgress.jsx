@@ -23,7 +23,7 @@ const SetupProgress = ({
 
   return (
     <>
-      <div className="automl-ai-wizard-steps">
+      <div className="automlp-ai-wizard-steps">
         {STEPS.map((step, index) => {
           const isActive = step.key === currentStep;
           const isPast = index < currentIndex;
@@ -36,20 +36,20 @@ const SetupProgress = ({
 
           return (
             <React.Fragment key={step.key}>
-              <div className="automl-ai-wizard-step-item">
-                <span className={`automl-ai-wizard-step-circle ${circleClass}`}>
+              <div className="automlp-ai-wizard-step-item">
+                <span className={`automlp-ai-wizard-step-circle ${circleClass}`}>
                   {isPast ? "✓" : index + 1}
                 </span>
-                <span className={`automl-ai-wizard-step-label ${labelClass}`}>
+                <span className={`automlp-ai-wizard-step-label ${labelClass}`}>
                   {step.label}
                 </span>
               </div>
 
               {index < STEPS.length - 1 && (
                 <div
-                  className={`automl-ai-wizard-step-connector${
+                  className={`automlp-ai-wizard-step-connector${
                     currentIndex > index
-                      ? " automl-ai-wizard-step-connector--filled"
+                      ? " automlp-ai-wizard-step-connector--filled"
                       : ""
                   }`}
                   aria-hidden="true"

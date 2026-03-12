@@ -1,6 +1,6 @@
 <?php
 
-namespace AUTOML_WPML\Helper;
+namespace AUTOMLP_WPML\Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,7 +13,7 @@ if ( class_exists( Sanitized_Content::class ) ) {
 	/**
 	 * Sanitized_Content
 	 *
-	 * @package AUTOML_WPML\Helper
+	 * @package AUTOMLP_WPML\Helper
 	 */
 class Sanitized_Content {
 
@@ -268,7 +268,7 @@ class Sanitized_Content {
 		}
 
 		// Add the filter to allow the flex styles
-		add_filter( 'safe_style_css', array( $this, 'automl_wpml_allow_flex_styles' ), 10, 1 );
+		add_filter( 'safe_style_css', array( $this, 'automlp_wpml_allow_flex_styles' ), 10, 1 );
 
 		// Extract allowed tags + attributes from source HTML.
 		$allowed_html_tags = $this->extract_allowed_html_from_string( $this->source_html );
@@ -280,10 +280,10 @@ class Sanitized_Content {
 
 		$this->sanitized_html = $this->normalize_boolean_attributes_conditionally( $this->sanitized_html, $boolean_attrs_to_fix );
 
-		remove_filter( 'safe_style_css', array( $this, 'automl_wpml_allow_flex_styles' ), 10 );
+		remove_filter( 'safe_style_css', array( $this, 'automlp_wpml_allow_flex_styles' ), 10 );
 	}
 
-	public function automl_wpml_allow_flex_styles( array $styles ): array {
+	public function automlp_wpml_allow_flex_styles( array $styles ): array {
 		if(isset($this->allowed_styles) && !empty($this->allowed_styles)){
 			$styles = array_merge($styles, $this->allowed_styles);
 		}

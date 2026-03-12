@@ -118,7 +118,7 @@ const FilterGutenbergContent = async ({content, service, blockParseRules, postId
             
             string=string.replace(/\s/g, '');
             if(string && '' !== string){
-                const uniqueKey=[...keys, index].join('_automl_wpml_');
+                const uniqueKey=[...keys, index].join('_automlp_wpml_');
                 const stringContent=await getStringContent(innerContent[index], uniqueKey, ['script', 'style']);
 
                 if(stringContent && '' !== stringContent){ 
@@ -142,7 +142,7 @@ const FilterGutenbergContent = async ({content, service, blockParseRules, postId
 
             const runLoopAsyncInner=async(key, index)=>{
                 if(typeof blockRule[key] === 'boolean' && true === blockRule[key] && currentBlock && currentBlock[key]){
-                    const uniqueKey=[...keys, key].join('_automl_wpml_');
+                    const uniqueKey=[...keys, key].join('_automlp_wpml_');
                     const stringContent=await getStringContent(currentBlock[key], uniqueKey);
 
                     if(stringContent && '' !== stringContent){
@@ -158,7 +158,7 @@ const FilterGutenbergContent = async ({content, service, blockParseRules, postId
         }else if(Object.getPrototypeOf(blockRule) === Array.prototype){
             const runLoopAsyncInner=async(item, index)=>{
                 if(typeof blockRule[0] === 'boolean' && true === blockRule[0]){
-                    const uniqueKey=[...keys, index].join('_automl_wpml_');
+                    const uniqueKey=[...keys, index].join('_automlp_wpml_');
 
                     const stringContent=await getStringContent(item, uniqueKey);
 
@@ -197,7 +197,7 @@ const FilterGutenbergContent = async ({content, service, blockParseRules, postId
 
             if(true === activeBlockRule){
                 currentKey.push(key);
-                const uniqueKey=currentKey.join('_automl_wpml_');
+                const uniqueKey=currentKey.join('_automlp_wpml_');
                 if(currentBlock[key] && '' !== currentBlock[key]){
                     const stringContent=await getStringContent(currentBlock[key], uniqueKey);
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace AUTOML_WPML\Includes\Wpml;
+namespace AUTOMLP_WPML\Includes\Wpml;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,12 +13,12 @@ use DOMXPath;
 use WPML_Package;
 use Exception;
 use WPML_AT_Helper;
-use AUTOML_WPML\Includes\Wpml\Builder\Gutenberg\Update_Block_Config;
+use AUTOMLP_WPML\Includes\Wpml\Builder\Gutenberg\Update_Block_Config;
 
 /**
  * Get_Package_Content
  *
- * @package AUTOML_WPML\Includes\Wpml
+ * @package AUTOMLP_WPML\Includes\Wpml
  */
 class Get_Package_Content {
 
@@ -39,9 +39,9 @@ class Get_Package_Content {
 		$this->source_lang = $source_lang;
 		Update_Block_Config::get_instance();
 
-		$automl_wpml_file_exists = $this->include_required_files();
+		$automlp_wpml_file_exists = $this->include_required_files();
 
-		if ( ! $automl_wpml_file_exists ) {
+		if ( ! $automlp_wpml_file_exists ) {
 			throw new Exception( 'WPML Element Translation Package file not found Please check "WPML String Translation" plugin is installed and activated' );
 		}
 
@@ -49,16 +49,16 @@ class Get_Package_Content {
 	}
 
 	private function is_bulk_translation() {
-		return ( defined( 'DOING_AUTOML_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOML_WPML_BULK_POST_TRANSLATION' ) );
+		return ( defined( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) );
 	}
 
 	private function is_create_post() {
-		return ( defined( 'DOING_AUTOML_WPML_CREATE_TRANSLATED_POST' ) && true === constant( 'DOING_AUTOML_WPML_CREATE_TRANSLATED_POST' ) );
+		return ( defined( 'DOING_AUTOMLP_WPML_CREATE_TRANSLATED_POST' ) && true === constant( 'DOING_AUTOMLP_WPML_CREATE_TRANSLATED_POST' ) );
 	}
 
 	private function include_required_files() {
 
-		$automl_wpml_file_exists = true;
+		$automlp_wpml_file_exists = true;
 
 		if ( ! class_exists( WPML_Element_Translation_Package::class ) ) {
 			$base = WP_PLUGIN_DIR . '/sitepress-multilingual-cms/classes';
@@ -66,7 +66,7 @@ class Get_Package_Content {
 			if ( file_exists( $file ) ) {
 				require_once $file;
 			} else {
-				$automl_wpml_file_exists = false;
+				$automlp_wpml_file_exists = false;
 			}
 		}
 
@@ -75,18 +75,18 @@ class Get_Package_Content {
 			if ( file_exists( $file ) ) {
 				require_once $file;
 			} else {
-				$automl_wpml_file_exists = false;
+				$automlp_wpml_file_exists = false;
 			}
 		}
 
-		return $automl_wpml_file_exists;
+		return $automlp_wpml_file_exists;
 	}
 
 	private function create_package() {
 
 		if ( wpml_is_st_loaded() ) {
-			$automl_wpml_package_helper = new WPML_Package_Helper();
-			$this->package              = $automl_wpml_package_helper->get_post_string_packages( false, $this->post_id );
+			$automlp_wpml_package_helper = new WPML_Package_Helper();
+			$this->package              = $automlp_wpml_package_helper->get_post_string_packages( false, $this->post_id );
 
 			if ( empty( $this->package ) ) {
 				$builder = new WPML_Element_Translation_Package( null );
@@ -97,7 +97,7 @@ class Get_Package_Content {
 					true // is original
 				);
 
-				$this->package = $automl_wpml_package_helper->get_post_string_packages( false, $this->post_id );
+				$this->package = $automlp_wpml_package_helper->get_post_string_packages( false, $this->post_id );
 			}
 
 			if ( ! empty( $this->package ) ) {
@@ -165,11 +165,11 @@ class Get_Package_Content {
 				}
 			}
 		}
-		$automl_wpml_content_translation = $this->extract_translatable_strings( $translation_package );
+		$automlp_wpml_content_translation = $this->extract_translatable_strings( $translation_package );
 
-		$automl_wpml_content_translation = array( 'contents' => $automl_wpml_content_translation );
+		$automlp_wpml_content_translation = array( 'contents' => $automlp_wpml_content_translation );
 
-		return $automl_wpml_content_translation;
+		return $automlp_wpml_content_translation;
 	}
 
 	public function get_translatable_strings() {

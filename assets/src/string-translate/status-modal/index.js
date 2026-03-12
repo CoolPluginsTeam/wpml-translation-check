@@ -37,10 +37,10 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     sprintf(
       __(
         "Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.",
-        "automl-ai-translation-for-wpml",
+        "automlp-ai-translation-for-wpml",
       ),
-      automl_wpml_bulk_translate_object.post_label,
-      automl_wpml_bulk_translate_object.post_label,
+      automlp_wpml_bulk_translate_object.post_label,
+      automlp_wpml_bulk_translate_object.post_label,
     ),
   );
   let progressStatus = useSelector(selectProgressStatus);
@@ -71,7 +71,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
           response.message ||
             __(
               "No strings found to translate.",
-              "automl-ai-translation-for-wpml",
+              "automlp-ai-translation-for-wpml",
             ),
         );
         return;
@@ -179,13 +179,13 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
   const getBulkStatus = () => {
     switch (bulkStatus) {
       case "running":
-        return __("In Progress", "automl-ai-translation-for-wpml");
+        return __("In Progress", "automlp-ai-translation-for-wpml");
       case "pending":
-        return __("Pending", "automl-ai-translation-for-wpml");
+        return __("Pending", "automlp-ai-translation-for-wpml");
       case "completed":
-        return __("Completed", "automl-ai-translation-for-wpml");
+        return __("Completed", "automlp-ai-translation-for-wpml");
       default:
-        return __("Status", "automl-ai-translation-for-wpml");
+        return __("Status", "automlp-ai-translation-for-wpml");
     }
   };
 
@@ -206,7 +206,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
       setTimeout(() => {
         setProgressBarVisibility(false);
         setCharactersCountVisibility(false);
-      }, 7500);
+      }, 1500);
     }
   }, [pendingPosts]);
   useEffect(() => {
@@ -270,7 +270,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     <ErrorModalBox
       message={errorModalData.errorHtml}
       onClose={closeErrorModal}
-      Title={__("Bulk Translation Error", "automl-ai-translation-for-wpml")}
+      Title={__("Bulk Translation Error", "automlp-ai-translation-for-wpml")}
       prefix={prefix}
     >
       {errorModalData.aiError && (
@@ -280,14 +280,14 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
             data-status="translateAgain"
             onClick={AIErrorBtnHandler}
           >
-            {__("Translate", "automl-ai-translation-for-wpml")}
+            {__("Translate", "automlp-ai-translation-for-wpml")}
           </button>
           <button
             className={`${prefix}-ai-error-button button`}
             data-status="continue"
             onClick={AIErrorBtnHandler}
           >
-            {__("Continue", "automl-ai-translation-for-wpml")}
+            {__("Continue", "automlp-ai-translation-for-wpml")}
           </button>
         </div>
       )}
@@ -297,11 +297,11 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
       <div className={`${prefix}-header`}>
         <div className={`${prefix}-modal-header-inner`}>
           <span className={`${prefix}-step-label`}>
-            {__("STEP 3 OF 3", "automl-ai-translation-for-wpml")}
+            {__("STEP 3 OF 3", "automlp-ai-translation-for-wpml")}
           </span>
           <h2 className={`${prefix}-bulk-status-heading ${bulkStatus}`}>
             {sprintf(
-              __("Bulk Translation %s", "automl-ai-translation-for-wpml"),
+              __("Bulk Translation %s", "automlp-ai-translation-for-wpml"),
               getBulkStatus(),
             )}
             {bulkStatus === "running" && (
@@ -318,7 +318,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
               <p className={`${prefix}-modal-desc`}>
                 {__(
                   "Your content is being translated. Please wait for a moment.",
-                  "automl-ai-translation-for-wpml",
+                  "automlp-ai-translation-for-wpml",
                 )}
               </p>
             )}
@@ -334,7 +334,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
               <p className={`${prefix}-modal-desc`}>
                 {__(
                   "Your content has been translated successfully.",
-                  "automl-ai-translation-for-wpml",
+                  "automlp-ai-translation-for-wpml",
                 )}
               </p>
             )}
@@ -438,7 +438,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
               <div className={`${prefix}-count-container`}>
                 <div className={`${prefix}-count-stat-cell`}>
                   <span className={`${prefix}-count-stat-label`}>
-                    {__("STRINGS", "automl-ai-translation-for-wpml")}
+                    {__("STRINGS", "automlp-ai-translation-for-wpml")}
                   </span>
                   <br />
                   <span className={`${prefix}-count-stat-value`}>
@@ -447,7 +447,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 </div>
                 <div className={`${prefix}-count-stat-cell`}>
                   <span className={`${prefix}-count-stat-label`}>
-                    {__("CHARACTERS", "automl-ai-translation-for-wpml")}
+                    {__("CHARACTERS", "automlp-ai-translation-for-wpml")}
                   </span>
                   <br />
                   <span className={`${prefix}-count-stat-value`}>
@@ -458,16 +458,16 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                   className={`${prefix}-count-stat-cell ${prefix}-count-stat-cell--time`}
                 >
                   <span className={`${prefix}-count-stat-label`}>
-                    {__("TIME TAKEN", "automl-ai-translation-for-wpml")}
+                    {__("TIME TAKEN", "automlp-ai-translation-for-wpml")}
                   </span>
                   <br />
                   <span className={`${prefix}-count-stat-value`}>
                     {(() => {
                       const time = countInfo.timeTaken ?? 0;
                       if (time > 0 && time < 1) {
-                        return `${Math.round(time * 1000)} ${__("ms", "automl-ai-translation-for-wpml")}`;
+                        return `${Math.round(time * 1000)} ${__("ms", "automlp-ai-translation-for-wpml")}`;
                       }
-                      return `${Math.round(time)} ${__("seconds", "automl-ai-translation-for-wpml")}`;
+                      return `${Math.round(time)} ${__("seconds", "automlp-ai-translation-for-wpml")}`;
                     })()}
                   </span>
                 </div>
@@ -493,7 +493,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                 {errorPostsInfo[key]?.title ||
                                   __(
                                     "Untitled",
-                                    "automl-ai-translation-for-wpml",
+                                    "automlp-ai-translation-for-wpml",
                                   )}
                               </div>
                             </div>
@@ -570,13 +570,13 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                   {info.status === "completed" &&
                                     __(
                                       "Completed",
-                                      "automl-ai-translation-for-wpml",
+                                      "automlp-ai-translation-for-wpml",
                                     )}
 
                                   {info.status === "pending" &&
                                     __(
                                       "Pending",
-                                      "automl-ai-translation-for-wpml",
+                                      "automlp-ai-translation-for-wpml",
                                     )}
 
                                   {info.status === "error" && (
@@ -588,7 +588,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                       >
                                         {__(
                                           "Error Details",
-                                          "automl-ai-translation-for-wpml",
+                                          "automlp-ai-translation-for-wpml",
                                         )}
                                       </button>
                                     </>
@@ -598,7 +598,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                               {info.status === "completed"
                                 ? `${total} ${__(
                                     "Strings",
-                                    "automl-ai-translation-for-wpml",
+                                    "automlp-ai-translation-for-wpml",
                                   )}`
                                 : `${completed} / ${total}`}
                             </div>

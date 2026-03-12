@@ -1,18 +1,18 @@
 <?php
 
-namespace AUTOML_WPML\Includes\Bulk_Translation;
+namespace AUTOMLP_WPML\Includes\Bulk_Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 use WPML_AT_Helper;
-use AUTOML_Ai_Cpt_Dashboard;
+use AUTOMLP_Ai_Cpt_Dashboard;
 
 /**
  * Bulk_Translation
  *
- * @package AUTOML_WPML\Includes\Bulk_Translation
+ * @package AUTOMLP_WPML\Includes\Bulk_Translation
  */
 class Bulk_Translation {
 	/**
@@ -47,23 +47,23 @@ class Bulk_Translation {
 			return;
 		}
 
-		add_filter( "views_{$screen->id}", array( $this, 'automl_wpml_bulk_translate_button' ) );
+		add_filter( "views_{$screen->id}", array( $this, 'automlp_wpml_bulk_translate_button' ) );
 
 		add_action( 'admin_footer', array( $this, 'bulk_translate_container' ) );
 	}
 
-	public function automl_wpml_bulk_translate_button( $views ) {
-		echo "<button class='button automl-wpml-bulk-translate-btn button-primary' style='display:none;'>AI Translate</button>";
+	public function automlp_wpml_bulk_translate_button( $views ) {
+		echo "<button class='button automlp-wpml-bulk-translate-btn button-primary' style='display:none;'>AI Translate</button>";
 
 		return $views;
 	}
 
 	public function bulk_translate_container() {
-		echo "<div id='automl-wpml-bulk-translate-wrapper'></div>";
+		echo "<div id='automlp-wpml-bulk-translate-wrapper'></div>";
 	}
 
 	public function hide_page_builders_translation_editor_warning( $show, $post_id ) {
-		$status = get_post_meta( $post_id, '_automl_translation_editor_native', true );
+		$status = get_post_meta( $post_id, '_automlp_translation_editor_native', true );
 		
 		if($post_id == $status) {
 			return false;
@@ -86,9 +86,9 @@ class Bulk_Translation {
 
 				$post_id=$post->ID;
 				
-				$status = get_post_meta( $post_id, '_automl_translation_editor_native', true );
+				$status = get_post_meta( $post_id, '_automlp_translation_editor_native', true );
 				if($post_id == $status) {
-					$exclude_post_ids[$current_post_id] = __( 'This post was translated using AutoML AI Translation and cannot be translated by WPML. There is no need to open the WPML Advanced Translation Editor.', 'wpml-translation-check' );
+					$exclude_post_ids[$current_post_id] = __( 'This post was translated using AutoMLP AI Translation and cannot be translated by WPML. There is no need to open the WPML Advanced Translation Editor.', 'wpml-translation-check' );
 				}
 			};
 		}

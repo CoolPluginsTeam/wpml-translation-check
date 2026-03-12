@@ -17,25 +17,25 @@ WPML Auto Dashboard - Admin Panel Styles
 }
 
 /* General Wrapper */
-.automl_ai_dashboard-wrapper {
+.automlp_ai_dashboard-wrapper {
     margin: 0 auto;
     padding: 0 20px 0 0;
     max-width: 1240px;
     box-sizing: border-box;
 }
 
-.automl_ai_dashboard-wrapper * {
+.automlp_ai_dashboard-wrapper * {
     box-sizing: border-box;
     font-family: Inter, Roboto, Helvetica, Arial, sans-serif;
 }
 
-.automl_ai_dashboard-wrapper h3 {
+.automlp_ai_dashboard-wrapper h3 {
     margin: 0 0 20px;
     padding: 0;
 }
 
 /* Adjust WP admin body margins for this page */
-:is(.settings_page_automl_ai_dashboard) #wpbody #wpbody-content {
+:is(.settings_page_automlp_ai_dashboard) #wpbody #wpbody-content {
     margin-top: 80px !important;
     margin-block-start: 80px !important;
 }
@@ -43,12 +43,12 @@ WPML Auto Dashboard - Admin Panel Styles
 /* ================================================
    Buttons & Links
 ================================================ */
-.automl_ai_dashboard-btns-row {
+.automlp_ai_dashboard-btns-row {
     display: flex;
     gap: 10px;
 }
 
-.automl_ai_dashboard-btn {
+.automlp_ai_dashboard-btn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -62,23 +62,23 @@ WPML Auto Dashboard - Admin Panel Styles
     color: var(--text-color);
 }
 
-.automl_ai_dashboard-logo-text{
+.automlp_ai_dashboard-logo-text{
     font-size: 20px;
     font-weight: 600;
     color: #000;
 }
 
-.automl_ai_dashboard-btn:focus {
+.automlp_ai_dashboard-btn:focus {
    box-shadow: none;
 }
 
-.automl_ai_dashboard-btn.primary {
+.automlp_ai_dashboard-btn.primary {
     background: var(--primary-color);
     color: #fff;
     border-color: var(--secondary-color);
 }
 
-.automl_ai_dashboard-btn:hover {
+.automlp_ai_dashboard-btn:hover {
     background: #efffef;
     color: var(--primary-color);
     border-color: var(--border-color);
@@ -87,7 +87,7 @@ WPML Auto Dashboard - Admin Panel Styles
 /* ================================================
    Header Section
 ================================================ */
-.automl_ai_dashboard-header {
+.automlp_ai_dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -104,37 +104,37 @@ WPML Auto Dashboard - Admin Panel Styles
     height: 70px;
 }
 
-.automl_ai_dashboard-social-icons a:focus {
+.automlp_ai_dashboard-social-icons a:focus {
     box-shadow: none;
 }
 
-.automl_ai_dashboard-header-left {
+.automlp_ai_dashboard-header-left {
     display: flex;
     align-items: center;
     gap: 5px;
 }
 
-.automl_ai_dashboard-logo-link:focus,
-.automl_ai_dashboard-logo-link:hover {
+.automlp_ai_dashboard-logo-link:focus,
+.automlp_ai_dashboard-logo-link:hover {
     box-shadow: none;
 }
 
-.automl_ai_dashboard-header-left img {
+.automlp_ai_dashboard-header-left img {
     max-width: 45px;
     margin-left: 10px;
 }
 
-.automl_ai_dashboard-header-left svg {
+.automlp_ai_dashboard-header-left svg {
     height: 50px;
 }
 
-.automl_ai_dashboard-tab-title {
+.automlp_ai_dashboard-tab-title {
     display: flex;
     gap: 5px;
     font-size: 14px;
 }
 
-.automl_ai_dashboard-header-right {
+.automlp_ai_dashboard-header-right {
     display: flex;
     align-items: center;
     gap: 15px;
@@ -143,7 +143,7 @@ WPML Auto Dashboard - Admin Panel Styles
 /* ================================================
    Dashboard Layout
 ================================================ */
-.automl_ai_dashboard-dashboard {
+.automlp_ai_dashboard-dashboard {
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -152,13 +152,13 @@ WPML Auto Dashboard - Admin Panel Styles
 }
 
 @media (min-width: 768px) {
-    .automl_ai_dashboard-dashboard {
+    .automlp_ai_dashboard-dashboard {
         flex-direction: row;
         gap: 40px;
     }
 }
 
-.automl_ai_dashboard-left-section {
+.automlp_ai_dashboard-left-section {
     width: auto;
     flex: 2;
     margin-top: 25px;
@@ -167,7 +167,7 @@ WPML Auto Dashboard - Admin Panel Styles
 /* ================================================
    Get Started / Welcome Section
 ================================================ */
-.automl_ai_dashboard-welcome {
+.automlp_ai_dashboard-welcome {
     display: flex;
     justify-content: space-between;
     padding: 20px;
@@ -178,7 +178,7 @@ WPML Auto Dashboard - Admin Panel Styles
     gap: 5px;
 }
 
-.automl_ai_dashboard-get-started {
+.automlp_ai_dashboard-get-started {
     padding: 20px;
     background: #fff;
     border-radius: 8px;
@@ -186,59 +186,59 @@ WPML Auto Dashboard - Admin Panel Styles
     box-shadow: var(--shadow);
 }
 
-.automl_ai_dashboard-get-started-grid {
+.automlp_ai_dashboard-get-started-grid {
     background: white;
     border: 1px solid var(--border-color);
     border-radius: 14px;
     padding: 13px 15px 15px 15px;
 }
 
-.automl_ai_dashboard-get-started-grid div {
+.automlp_ai_dashboard-get-started-grid div {
     max-width: 100%;
 }
 
-.automl_ai_dashboard-get-started-grid div ul {
+.automlp_ai_dashboard-get-started-grid div ul {
     list-style: disc;
     padding-left: 30px;
 }
 
-.automl_ai_dashboard-get-started-grid div:nth-child(2) {
+.automlp_ai_dashboard-get-started-grid div:nth-child(2) {
    display: flex;
 }
 
-.automl_ai_dashboard-get-started-grid iframe {
+.automlp_ai_dashboard-get-started-grid iframe {
     max-width: 100%;
     width: 100%;
     aspect-ratio: 2/1;
 }
 
-.automl_ai_dashboard-get-started-grid:nth-child(3) {
+.automlp_ai_dashboard-get-started-grid:nth-child(3) {
     margin-block: 24px;
 }
 
-.automl_ai_dashboard-translation-providers {
+.automlp_ai_dashboard-translation-providers {
     margin-top: 24px;
 }
 
-.automl_ai_dashboard-welcome-text {
+.automlp_ai_dashboard-welcome-text {
     width: calc(100% - 45px);
     flex-direction: column;
 }
 
-.automl_ai_dashboard-welcome-text h2 {
+.automlp_ai_dashboard-welcome-text h2 {
     font-size: 1.5rem;
     font-weight: bold;
     margin: 10px 0;
     line-height: 25px;
 }
 
-.automl_ai_dashboard-welcome p {
+.automlp_ai_dashboard-welcome p {
     font-size: 0.875rem;
     color: var(--text-color-light);
     margin: 10px 0 20px;
 }
 
-.automl_ai_dashboard-welcome-video {
+.automlp_ai_dashboard-welcome-video {
     width: 300px;
     display: flex;
     align-items: center;
@@ -246,7 +246,7 @@ WPML Auto Dashboard - Admin Panel Styles
     position: relative;
 }
 
-.automl_ai_dashboard-welcome-video .play-icon {
+.automlp_ai_dashboard-welcome-video .play-icon {
     width: 54px;
     height: 54px;
     position: absolute;
@@ -255,12 +255,12 @@ WPML Auto Dashboard - Admin Panel Styles
     animation: play-icon 1s ease-in-out infinite;
 }
 
-.automl_ai_dashboard-welcome-video img.loco-video {
+.automlp_ai_dashboard-welcome-video img.loco-video {
     width: 100%;
     height: auto;
 }
 
-a.automl_ai_dashboard-docs {
+a.automlp_ai_dashboard-docs {
     display: flex;
     align-items: center;
     gap: 5px;
@@ -271,20 +271,20 @@ a.automl_ai_dashboard-docs {
     text-decoration: underline;
 }
 
-a.automl_ai_dashboard-docs:hover {
+a.automlp_ai_dashboard-docs:hover {
     color: var(--primary-color);
 }
 
 /* ================================================
    Translation Providers (generic)
 ================================================ */
-.automl_ai_dashboard-providers-grid {
+.automlp_ai_dashboard-providers-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 20px;
 }
 
-.automl_ai_dashboard-provider-card {
+.automlp_ai_dashboard-provider-card {
     background: #fff;
     padding: 15px;
     border-radius: 8px;
@@ -292,7 +292,7 @@ a.automl_ai_dashboard-docs:hover {
     box-shadow: var(--shadow);
 }
 
-.automl_ai_dashboard-provider-header {
+.automlp_ai_dashboard-provider-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -300,11 +300,11 @@ a.automl_ai_dashboard-docs:hover {
     padding-bottom: 15px;
 }
 
-.automl_ai_dashboard-provider-header img {
+.automlp_ai_dashboard-provider-header img {
     height: 25px;
 }
 
-.automl_ai_dashboard-badge {
+.automlp_ai_dashboard-badge {
     background: #131413;
     color: #fff;
     padding: 2px 8px;
@@ -312,11 +312,11 @@ a.automl_ai_dashboard-docs:hover {
     border-radius: 12px;
 }
 
-.automl_ai_dashboard-badge.free {
+.automlp_ai_dashboard-badge.free {
     background: var(--primary-color);
 }
 
-.automl_ai_dashboard-provider-buttons {
+.automlp_ai_dashboard-provider-buttons {
     display: flex;
     gap: 10px;
     font-size: 11px;
@@ -325,7 +325,7 @@ a.automl_ai_dashboard-docs:hover {
 /* ================================================
    Sidebar
 ================================================ */
-.automl_ai_dashboard-sidebar {
+.automlp_ai_dashboard-sidebar {
     width: 548px;
     display: flex;
     flex-direction: column;
@@ -335,7 +335,7 @@ a.automl_ai_dashboard-docs:hover {
 }
 
 /* Translation Status */
-.automl_ai_dashboard-sidebar .automl_ai_dashboard-status {
+.automlp_ai_dashboard-sidebar .automlp_ai_dashboard-status {
     display: flex;
     justify-content: space-between;
     padding: 20px 20px 10px;
@@ -346,7 +346,7 @@ a.automl_ai_dashboard-docs:hover {
     flex-direction: column;
 }
 
-.automl_ai_dashboard-sts-top {
+.automlp_ai_dashboard-sts-top {
     display: flex;
     flex-direction: column;
     margin: 15px 0;
@@ -356,17 +356,17 @@ a.automl_ai_dashboard-docs:hover {
     font-size: 15px;
 }
 
-.automl_ai_dashboard-sts-top span:first-child {
+.automlp_ai_dashboard-sts-top span:first-child {
     font-weight: 800;
     font-size: 24px;
 }
 
-ul.automl_ai_dashboard-sts-btm {
+ul.automlp_ai_dashboard-sts-btm {
     padding: 0;
     margin: 9px 0;
 }
 
-ul.automl_ai_dashboard-sts-btm li {
+ul.automlp_ai_dashboard-sts-btm li {
     display: flex;
     justify-content: space-between;
     gap: 10px;
@@ -374,12 +374,12 @@ ul.automl_ai_dashboard-sts-btm li {
     padding: 0;
 }
 
-ul.automl_ai_dashboard-sts-btm li span:first-child {
+ul.automlp_ai_dashboard-sts-btm li span:first-child {
     font-weight: 600;
 }
 
 /* Full Website Translate */
-.automl_ai_dashboard-translate-full .automl_ai_dashboard-addon {
+.automlp_ai_dashboard-translate-full .automlp_ai_dashboard-addon {
     border-bottom: 1px solid #c3c4c7;
     margin-bottom: 15px;
     padding-bottom: 15px;
@@ -389,23 +389,23 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     align-items: center;
 }
 
-.automl_ai_dashboard-addon.first {
+.automlp_ai_dashboard-addon.first {
     border-top: 1px solid #c3c4c7;
     padding-top: 15px;
 }
 
-.automl_ai_dashboard-addon-l {
+.automlp_ai_dashboard-addon-l {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: 3px;
 }
 
-.automl_ai_dashboard-addon-r img {
+.automlp_ai_dashboard-addon-r img {
     width: 72px;
 }
 
-.automl_ai_dashboard-translate-full .installed {
+.automlp_ai_dashboard-translate-full .installed {
     background: #cfd5d1;
     color: #7f7f7f;
     padding: 4px 10px;
@@ -413,7 +413,7 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     font-weight: 500;
 }
 
-.automl_ai_dashboard-translate-full .addon-desc {
+.automlp_ai_dashboard-translate-full .addon-desc {
     font-size: 12px;
     color: #838389;
     margin-bottom: 5px;
@@ -422,7 +422,7 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
 /* ================================================
    Rate Us Section
 ================================================ */
-.automl_ai_dashboard-rate-us {
+.automlp_ai_dashboard-rate-us {
     background: #fff;
     padding: 15px;
     border-radius: 8px;
@@ -430,11 +430,11 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     box-shadow: var(--shadow);
 }
 
-.automl_ai_dashboard-rate-us h3 {
+.automlp_ai_dashboard-rate-us h3 {
     line-height: 25px;
 }
 
-.automl_ai_dashboard-rate-us .review-link {
+.automlp_ai_dashboard-rate-us .review-link {
     display: inline-block;
     margin-top: 10px;
     color: #007cba;
@@ -453,7 +453,7 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
 /*===============================================
     Tab Content
 ================================================ */
-.automl_ai_dashboard-wrapper .tab-content {
+.automlp_ai_dashboard-wrapper .tab-content {
     display: flex;
     gap: 25px !important;
 }
@@ -462,31 +462,31 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     margin-top: 70px !important;
 }
 
-.automl_ai_dashboard-free-vs-pro .header,
-.automl_ai_dashboard-ai-translations .header,
-.automl_ai_dashboard-license .header,
-.automl_ai_dashboard-settings .header {
+.automlp_ai_dashboard-free-vs-pro .header,
+.automlp_ai_dashboard-ai-translations .header,
+.automlp_ai_dashboard-license .header,
+.automlp_ai_dashboard-settings .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
 }
 
-:where(.automl_ai_dashboard-free-vs-pro,
-       .automl_ai_dashboard-ai-translations,
-       .automl_ai_dashboard-license,
-       .automl_ai_dashboard-settings)
-       .automl_ai_dashboard-status {
+:where(.automlp_ai_dashboard-free-vs-pro,
+       .automlp_ai_dashboard-ai-translations,
+       .automlp_ai_dashboard-license,
+       .automlp_ai_dashboard-settings)
+       .automlp_ai_dashboard-status {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-:where(.automl_ai_dashboard-free-vs-pro,
-       .automl_ai_dashboard-ai-translations,
-       .automl_ai_dashboard-license,
-       .automl_ai_dashboard-settings)
-       .automl_ai_dashboard-status span {
+:where(.automlp_ai_dashboard-free-vs-pro,
+       .automlp_ai_dashboard-ai-translations,
+       .automlp_ai_dashboard-license,
+       .automlp_ai_dashboard-settings)
+       .automlp_ai_dashboard-status span {
     font-size: 15px;
     font-weight: 600;
 }
@@ -494,26 +494,26 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
 /* ================================================
    Free vs Other Solutions
 ================================================ */
-.automl_ai_dashboard-free-vs-pro {
+.automlp_ai_dashboard-free-vs-pro {
     width: 100%;
     margin-top: 25px;
     flex: 2;
 }
 
-.automl_ai_dashboard-free-vs-pro-container {
+.automlp_ai_dashboard-free-vs-pro-container {
     background: white;
     padding: 24px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
 }
 
-.automl_ai_dashboard-free-vs-pro p {
+.automlp_ai_dashboard-free-vs-pro p {
     font-size: 14px;
     color: #666;
     margin-bottom: 20px;
 }
 
-.automl_ai_dashboard-free-vs-pro table {
+.automlp_ai_dashboard-free-vs-pro table {
     width: 100%;
     border-collapse: collapse;
     border-radius: 10px;
@@ -521,7 +521,7 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     border: 1px solid #eee;
 }
 
-.automl_ai_dashboard-free-vs-pro th {
+.automlp_ai_dashboard-free-vs-pro th {
     background-color: #e7e7e7;
     text-align: left;
     font-size: 14px;
@@ -529,25 +529,25 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     padding: 12px;
 }
 
-.automl_ai_dashboard-free-vs-pro td {
+.automlp_ai_dashboard-free-vs-pro td {
     padding: 12px;
     font-size: 14px;
     border-bottom: 1px solid #eee;
 }
 
-.automl_ai_dashboard-free-vs-pro .check {
+.automlp_ai_dashboard-free-vs-pro .check {
     color: green;
     font-size: 16px;
 }
 
-.automl_ai_dashboard-free-vs-pro .cross {
+.automlp_ai_dashboard-free-vs-pro .cross {
     color: red;
     font-size: 16px;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .automl_ai_dashboard-free-vs-pro {
+    .automlp_ai_dashboard-free-vs-pro {
         width: 100%;
         padding: 16px;
     }
@@ -556,32 +556,32 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
 /* ================================================
    AI Translations
 ================================================ */
-.automl_ai_dashboard-ai-translations {
+.automlp_ai_dashboard-ai-translations {
     width: auto;
     flex: 2;
     margin-top: 25px;
 }
 
-.automl_ai_dashboard-ai-translations-container {
+.automlp_ai_dashboard-ai-translations-container {
     background: white;
     padding: 24px;
     border-radius: 10px;
     border: 1px solid var(--border-color);
 }
 
-.automl_ai_dashboard-ai-translations .description {
+.automlp_ai_dashboard-ai-translations .description {
     font-size: 14px;
     color: #666;
     margin: 10px 0;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-translations {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
     display: flex;
     flex-wrap: wrap;
     gap: 20px;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-translation-card {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card {
     margin-top: 35px;
     position: relative;
     background: white;
@@ -592,17 +592,17 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     width: 31.5%;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-translation-card h3 {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card h3 {
     margin-top: 12px;
     font-size: 1.0rem;
     margin-bottom: 10px;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-translation-card p {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card p {
     padding-right: 4px;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-translation-card .logo {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card .logo {
     background-color: white;
     left: 20px;
     position: absolute;
@@ -616,21 +616,21 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     justify-content: center;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-translation-card .logo img {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card .logo img {
     width: 100%;
     height: 20px;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-translation-card .play-btn-container img {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card .play-btn-container img {
     width: 100%;
     height: 100%;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-translation-card .play-btn-container a:focus {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card .play-btn-container a:focus {
     box-shadow: none;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-play-btn {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-play-btn {
     background: #00cc66;
     color: white;
     border: none;
@@ -640,20 +640,20 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     font-size: 18px;
 }
 
-.automl_ai_dashboard-ai-translations .automl_ai_dashboard-ai-translations-container .header h1 {
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-ai-translations-container .header h1 {
     line-height: 25px;
 }
 
 /* ================================================
    License
 ================================================ */
-.automl_ai_dashboard-license {
+.automlp_ai_dashboard-license {
     width: 100%;
     margin-top: 25px;
     flex: 2;
 }
 
-.automl_ai_dashboard-license-container {
+.automlp_ai_dashboard-license-container {
     background: white;
     font-family: Arial, sans-serif;
     color: #333;
@@ -662,19 +662,19 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     border-radius: 5px;
 }
 
-.automl_ai_dashboard-license h1 {
+.automlp_ai_dashboard-license h1 {
     font-weight: 600;
     color: #000;
     margin: 14px 0px 22px 0px;
     font-size: 22px;
 }
 
-.automl_ai_dashboard-license p {
+.automlp_ai_dashboard-license p {
     margin: 5px 0;
     font-size: 14px;
 }
 
-.automl_ai_dashboard-upgrade-box {
+.automlp_ai_dashboard-upgrade-box {
     background-color: #f3fcf3;
     padding: 10px;
     border-radius: 5px;
@@ -682,17 +682,17 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     border-left: 4px solid #30b230;
 }
 
-.automl_ai_dashboard-upgrade-box a {
+.automlp_ai_dashboard-upgrade-box a {
     color: #0073aa;
     text-decoration: none;
     font-weight: bold;
 }
 
-.automl_ai_dashboard-upgrade-box a:hover {
+.automlp_ai_dashboard-upgrade-box a:hover {
     text-decoration: underline;
 }
 
-.automl_ai_dashboard-upgrade-box em {
+.automlp_ai_dashboard-upgrade-box em {
     display: block;
     margin-top: 5px;
     font-size: 13px;
@@ -702,48 +702,48 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
 /* ================================================
    Settings Section
 ================================================ */
-.automl_ai_dashboard-settings {
+.automlp_ai_dashboard-settings {
     width: 100%;
     margin-top: 25px;
     flex: 2;
 }
 
-.automl_ai_dashboard-settings-container {
+.automlp_ai_dashboard-settings-container {
     padding: 24px;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
 }
 
-.automl_ai_dashboard-settings h1 {
+.automlp_ai_dashboard-settings h1 {
     margin: 14px 0px 22px 0px;
     font-size: 22px;
     line-height: 25px;
 }
 
-.automl_ai_dashboard-feedback-container {
+.automlp_ai_dashboard-feedback-container {
     margin: 25px 0px 18px 0px;
 }
 
 
-.automl_ai_dashboard-api-settings {
+.automlp_ai_dashboard-api-settings {
     width: 100%;
 }
 
-.automl_ai_dashboard-api-settings label {
+.automlp_ai_dashboard-api-settings label {
     display: block;
     font-weight: bold;
     margin: 30px 0px 10px 0px;
 }
 
-.automl_ai_dashboard-api-settings .input-group {
+.automlp_ai_dashboard-api-settings .input-group {
     display: flex;
     align-items: center;
     gap: 10px;
     width: 60%;
 }
 
-.automl_ai_dashboard-api-settings .input-group input {
+.automlp_ai_dashboard-api-settings .input-group input {
     width: calc(100% - 70px);
     padding: 8px 12px;
     border: 1px solid var(--border-color);
@@ -752,7 +752,7 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     letter-spacing: 0.05em;
 }
 
-.automl_ai_dashboard-api-settings input[type="text"] {
+.automlp_ai_dashboard-api-settings input[type="text"] {
     width: 100%;
     padding: 8px;
     border: 1px solid #ccc;
@@ -760,13 +760,13 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     letter-spacing: 0.05em;
 }
 
-.automl_ai_dashboard-feedback-row {
+.automlp_ai_dashboard-feedback-row {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.automl_ai_dashboard-api-settings textarea {
+.automlp_ai_dashboard-api-settings textarea {
     width: 100%;
     min-height: 100px;
     padding: 8px 12px;
@@ -778,7 +778,7 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     resize: vertical;
 }
 
-.automl_ai_dashboard-api-settings a {
+.automlp_ai_dashboard-api-settings a {
     margin: 10px 0px 10px 0px;
     display: inline-block;
     font-size: 14px;
@@ -786,23 +786,23 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     text-decoration: none;
 }
 
-.automl_ai_dashboard-ai-request-container > div[class^="automl_ai_dashboard-ai-"] {
+.automlp_ai_dashboard-ai-request-container > div[class^="automlp_ai_dashboard-ai-"] {
     display: flex;
     gap: 1rem;
     margin-top: 1.5rem;
 }
 
-.automl_ai_dashboard-ai-request-container label {
+.automlp_ai_dashboard-ai-request-container label {
     margin: 0;
     white-space: nowrap;
     min-width: 150px;
 }
 
-.automl_ai_dashboard-ai-request-container h2 {
+.automlp_ai_dashboard-ai-request-container h2 {
     margin: 0px 0 10px;
 }
 
-.automl_ai_dashboard-ai-request-container p {
+.automlp_ai_dashboard-ai-request-container p {
     padding: 0;
     margin: 3px 0 0;
 }
@@ -823,14 +823,14 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     margin-block: 0px;
 }
 
-.automl_ai_dashboard-api-settings .automl_ai_dashboard-save-btn-container {
+.automlp_ai_dashboard-api-settings .automlp_ai_dashboard-save-btn-container {
     margin-top: 20px;
 }
 
 /* ================================================
    Info / Footer
 ================================================ */
-.automl_ai_dashboard-info {
+.automlp_ai_dashboard-info {
     margin-top: 70px;
     text-align: center;
     display: flex;
@@ -838,68 +838,68 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
     align-items: center;
 }
 
-.automl_ai_dashboard-info-links {
+.automlp_ai_dashboard-info-links {
     font-size: 14px;
 }
 
-.automl_ai_dashboard-info-links p {
+.automlp_ai_dashboard-info-links p {
     display: flex;
     align-items: center;
     gap: 10px;
 }
 
-.automl_ai_dashboard-info .logo {
+.automlp_ai_dashboard-info .logo {
     width: 150px;
     height: 16px;
     margin-bottom: 10px;
 }
 
-.automl_ai_dashboard-info .logo a:focus {
+.automlp_ai_dashboard-info .logo a:focus {
     box-shadow: none;
 }
 
-.automl_ai_dashboard-info-links a {
+.automlp_ai_dashboard-info-links a {
     color: #0073aa;
     text-decoration: none;
 }
 
-.automl_ai_dashboard-social-icons a:focus {
+.automlp_ai_dashboard-social-icons a:focus {
      text-decoration: underline;
 }
 
-.automl_ai_dashboard-social-icons img {
+.automlp_ai_dashboard-social-icons img {
     margin-top: 10px;
 }
 
-.automl_ai_dashboard-social-icons svg {
+.automlp_ai_dashboard-social-icons svg {
     width: 32px;
     height: 32px;
 }
 
 /* Responsive tweaks */
 @media (max-width: 488px) and (min-width: 100px) {
-    .automl_ai_dashboard-ai-translations .automl_ai_dashboard-ai-translations-container .header,
-    .automl_ai_dashboard-free-vs-pro-container .header,
-    .automl_ai_dashboard-settings-container .header,
-    .automl_ai_dashboard-license-container .header {
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-ai-translations-container .header,
+    .automlp_ai_dashboard-free-vs-pro-container .header,
+    .automlp_ai_dashboard-settings-container .header,
+    .automlp_ai_dashboard-license-container .header {
         flex-direction: column;
         align-items: start;
         padding-bottom: 10px;
     }
-    .automl_ai_dashboard-ai-translations .automl_ai_dashboard-translations {
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
         flex-direction: column;
     }
 }
 
 @media (max-width: 767px) {
-    .automl_ai_dashboard-wrapper .tab-content {
+    .automlp_ai_dashboard-wrapper .tab-content {
         flex-direction: column;
         gap: 0px;
     }
-    .automl_ai_dashboard-sidebar {
+    .automlp_ai_dashboard-sidebar {
         width: auto;
     }
-    .automl_ai_dashboard-header {
+    .automlp_ai_dashboard-header {
         padding: 0px 11px 11px 20px;
         height: auto;
         min-height: 110px;
@@ -907,63 +907,63 @@ ul.automl_ai_dashboard-sts-btm li span:first-child {
         gap: 15px;
         top: 0;
     }
-    .automl_ai_dashboard-welcome {
+    .automlp_ai_dashboard-welcome {
         flex-direction: column;
     }
-    .automl_ai_dashboard-welcome-text {
+    .automlp_ai_dashboard-welcome-text {
         width: 100%;
     }
-    .automl_ai_dashboard-welcome-video {
+    .automlp_ai_dashboard-welcome-video {
         width: 100%;
     }
-    .automl_ai_dashboard-wrapper {
+    .automlp_ai_dashboard-wrapper {
         padding: 60px 12px 0px 0px;
     }
-    .automl_ai_dashboard-header-right {
+    .automlp_ai_dashboard-header-right {
         gap: 6px;
     }
-    .automl_ai_dashboard-ai-translations .automl_ai_dashboard-ai-translations-container .header,
-    .automl_ai_dashboard-free-vs-pro-container .header,
-    .automl_ai_dashboard-settings-container .header,
-    .automl_ai_dashboard-license-container .header {
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-ai-translations-container .header,
+    .automlp_ai_dashboard-free-vs-pro-container .header,
+    .automlp_ai_dashboard-settings-container .header,
+    .automlp_ai_dashboard-license-container .header {
         flex-direction: column;
         align-items: start;
         padding-bottom: 10px;
     }
-    .automl_ai_dashboard-ai-translations .automl_ai_dashboard-translations {
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
         flex-direction: column;
     }
 }
 
 @media (max-width: 766px) and (min-width: 601px) {
-    .automl_ai_dashboard-header {
+    .automlp_ai_dashboard-header {
         top: 0px;
     }
 }
 
 @media (max-width: 767px) and (min-width: 375px) {
-    .automl_ai_dashboard-header {
+    .automlp_ai_dashboard-header {
         height: 110px;
     }
 }
 
 @media (max-width: 1024px) {
-    .automl_ai_dashboard-header-left svg {
+    .automlp_ai_dashboard-header-left svg {
         max-width: 120px;
     }
-    .automl_ai_dashboard-header {
+    .automlp_ai_dashboard-header {
         gap: 15px;
     }
-    .automl_ai_dashboard-header-left img {
+    .automlp_ai_dashboard-header-left img {
         max-width: 56px;
     }
-    .automl_ai_dashboard-btn {
+    .automlp_ai_dashboard-btn {
         padding: 8px 6px;
     }
-    .automl_ai_dashboard-header-right {
+    .automlp_ai_dashboard-header-right {
         gap: 13px;
     }
-    .automl_ai_dashboard-ai-translations .automl_ai_dashboard-translations {
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
         gap: 7px;
     }
 }

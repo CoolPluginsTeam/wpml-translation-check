@@ -1,22 +1,22 @@
 <?php
 
-namespace AUTOML_WPML\Includes\Wpml;
+namespace AUTOMLP_WPML\Includes\Wpml;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-use AUTOML_WPML\Includes\Wpml\Get_Package_Content;
-use AUTOML_WPML\Includes\Wpml\Builder\Elementor\Elementor_Update;
-use AUTOML_WPML\Includes\Wpml\Builder\Gutenberg\Gutenberg_Update;
-use AUTOML_WPML\Includes\Wpml\Builder\Content_Update_Base;
+use AUTOMLP_WPML\Includes\Wpml\Get_Package_Content;
+use AUTOMLP_WPML\Includes\Wpml\Builder\Elementor\Elementor_Update;
+use AUTOMLP_WPML\Includes\Wpml\Builder\Gutenberg\Gutenberg_Update;
+use AUTOMLP_WPML\Includes\Wpml\Builder\Content_Update_Base;
 use WPML_AT_Helper;
-use AUTOML_WPML\Helper\Sanitized_Content;
+use AUTOMLP_WPML\Helper\Sanitized_Content;
 
 /**
  * Create_Translated_Post
  *
- * @package AUTOML_WPML\Includes\Wpml
+ * @package AUTOMLP_WPML\Includes\Wpml
  */
 class Create_Translated_Post {
 
@@ -148,21 +148,21 @@ class Create_Translated_Post {
 		if(function_exists('wpml_get_post_status_helper')){
 			$post_status_helper = wpml_get_post_status_helper();
 			$post_status_helper->set_status( $this->translated_post_id, 10 );
-			update_post_meta( $this->translated_post_id, '_automl_translation_editor_native', $this->translated_post_id );
+			update_post_meta( $this->translated_post_id, '_automlp_translation_editor_native', $this->translated_post_id );
 		};
 	}
 
 	private function is_create_post() {
-		return ( defined( 'DOING_AUTOML_WPML_CREATE_TRANSLATED_POST' ) && true === constant( 'DOING_AUTOML_WPML_CREATE_TRANSLATED_POST' ) );
+		return ( defined( 'DOING_AUTOMLP_WPML_CREATE_TRANSLATED_POST' ) && true === constant( 'DOING_AUTOMLP_WPML_CREATE_TRANSLATED_POST' ) );
 	}
 
 	private function defined_post_translation_constant(): void {
 		if ( $this->editor_type === 'Elementor' ) {
-			! defined( 'DOING_AUTOML_WPML_ELEMENTOR_CONTENT_UPDATE' ) && define( 'DOING_AUTOML_WPML_ELEMENTOR_CONTENT_UPDATE', true );
+			! defined( 'DOING_AUTOMLP_WPML_ELEMENTOR_CONTENT_UPDATE' ) && define( 'DOING_AUTOMLP_WPML_ELEMENTOR_CONTENT_UPDATE', true );
 		}
 
 		if ( $this->editor_type === 'Gutenberg' ) {
-			! defined( 'DOING_AUTOML_WPML_GUTENBERG_CONTENT_UPDATE' ) && define( 'DOING_AUTOML_WPML_GUTENBERG_CONTENT_UPDATE', true );
+			! defined( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) && define( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE', true );
 		}
 	}
 
@@ -217,24 +217,24 @@ class Create_Translated_Post {
 	}
 
 	private function update_translate_strings(): void {
-		$automl_wpml_content_update = null;
+		$automlp_wpml_content_update = null;
 
 		if ( ! is_array( $this->translate_strings ) || empty( $this->translate_strings ) ) {
 			return;
 		}
 
 		if ( $this->editor_type === 'Elementor' ) {
-			$nonce                      = wp_create_nonce( 'automl_wpml_elementor_content_update_nonce' );
-			$automl_wpml_content_update = new Elementor_Update( $this->post_id, $this->translated_post_id, $this->translate_strings, $this->target_language, $nonce );
+			$nonce                      = wp_create_nonce( 'automlp_wpml_elementor_content_update_nonce' );
+			$automlp_wpml_content_update = new Elementor_Update( $this->post_id, $this->translated_post_id, $this->translate_strings, $this->target_language, $nonce );
 		}
 
 		if ( $this->editor_type === 'Gutenberg' ) {
-			$nonce                      = wp_create_nonce( 'automl_wpml_gutenberg_content_update_nonce' );
-			$automl_wpml_content_update = new Gutenberg_Update( $this->post_id, $this->translated_post_id, $this->translate_strings, $this->target_language, $nonce );
+			$nonce                      = wp_create_nonce( 'automlp_wpml_gutenberg_content_update_nonce' );
+			$automlp_wpml_content_update = new Gutenberg_Update( $this->post_id, $this->translated_post_id, $this->translate_strings, $this->target_language, $nonce );
 		}
 
-		if ( isset( $automl_wpml_content_update ) && $automl_wpml_content_update instanceof Content_Update_Base ) {
-			$automl_wpml_content_update->update_content();
+		if ( isset( $automlp_wpml_content_update ) && $automlp_wpml_content_update instanceof Content_Update_Base ) {
+			$automlp_wpml_content_update->update_content();
 		}
 	}
 
@@ -263,8 +263,8 @@ class Create_Translated_Post {
 								);
 							} elseif ( ! empty( $package_content['html'] ) ) {
 
-								$automl_wpml_sanitized_content = new Sanitized_Content( $package_content['html'] );
-								$final_value                   = $automl_wpml_sanitized_content->get_sanitized_content( $translate_strings[ $package_key ]['html'] );
+								$automlp_wpml_sanitized_content = new Sanitized_Content( $package_content['html'] );
+								$final_value                   = $automlp_wpml_sanitized_content->get_sanitized_content( $translate_strings[ $package_key ]['html'] );
 
 								$this->translate_strings[ $package_key ] = array(
 									$this->target_language => array(

@@ -3,13 +3,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<div class="automl_ai_dashboard-ai-translations">
-	<div class="automl_ai_dashboard-ai-translations-container">
+<div class="automlp_ai_dashboard-ai-translations">
+	<div class="automlp_ai_dashboard-ai-translations-container">
 		<div class="header">
 			<h1><?php esc_html_e( 'AI Translations', 'wpml-translation-check' ); ?></h1>
-			<div class="automl_ai_dashboard-status">
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=automl_ai_dashboard&tab=settings' ) ); ?>"
-					class="automl_ai_dashboard-btn"
+			<div class="automlp_ai_dashboard-status">
+				<a href="<?php echo esc_url( admin_url( 'admin.php?page=automlp_ai_dashboard&tab=settings' ) ); ?>"
+					class="automlp_ai_dashboard-btn"
 					target="_blank">
 					<?php esc_html_e( 'Configure AI Provider', 'wpml-translation-check' ); ?>
 				</a>
@@ -23,9 +23,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 			); ?>
 		</p>
 
-		<div class="automl_ai_dashboard-translations">
+		<div class="automlp_ai_dashboard-translations">
 			<?php
-			$automl_wpml_ai_translations = array(
+			$automlp_wpml_ai_translations = array(
 				array(
 					'logo'       => 'openai-translate-logo.png',
 					'alt'        => 'OpenAI',
@@ -44,19 +44,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 				),
 			);
 
-			foreach ( $automl_wpml_ai_translations as $automl_wpml_ai_translation ) :
+			foreach ( $automlp_wpml_ai_translations as $automlp_wpml_ai_translation ) :
 				?>
-				<div class="automl_ai_dashboard-translation-card">
+				<div class="automlp_ai_dashboard-translation-card">
 					<div class="logo">
-						<img src="<?php echo esc_url( AUTOML_AI_PLUGIN_URL . 'assets/images/' . $automl_wpml_ai_translation['logo'] ); ?>"
-							alt="<?php echo esc_attr( $automl_wpml_ai_translation['alt'] ); ?>">
+						<img src="<?php echo esc_url( AUTOMLP_AI_PLUGIN_URL . 'assets/images/' . $automlp_wpml_ai_translation['logo'] ); ?>"
+							alt="<?php echo esc_attr( $automlp_wpml_ai_translation['alt'] ); ?>">
 					</div>
-					<h3><?php echo esc_html( $automl_wpml_ai_translation['title'] ); ?></h3>
-					<p><?php echo esc_html( $automl_wpml_ai_translation['description'] ); ?></p>
+					<h3><?php echo esc_html( $automlp_wpml_ai_translation['title'] ); ?></h3>
+					<p><?php echo esc_html( $automlp_wpml_ai_translation['description'] ); ?></p>
 					<div class="play-btn-container">
-						<a href="<?php echo esc_url( $automl_wpml_ai_translation['url'] ); ?>" target="_blank">
-							<img src="<?php echo esc_url( AUTOML_AI_PLUGIN_URL . 'admin/automl-ai-dashboard/images/' . $automl_wpml_ai_translation['icon'] ); ?>"
-								alt="<?php echo esc_attr( $automl_wpml_ai_translation['alt'] ); ?>">
+						<a href="<?php echo esc_url( $automlp_wpml_ai_translation['url'] ); ?>" target="_blank">
+							<img src="<?php echo esc_url( AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/' . $automlp_wpml_ai_translation['icon'] ); ?>"
+								alt="<?php echo esc_attr( $automlp_wpml_ai_translation['alt'] ); ?>">
 						</a>
 					</div>
 				</div>

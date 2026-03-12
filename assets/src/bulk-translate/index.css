@@ -1,8 +1,8 @@
-.automl-wpml-bulk-translate-btn_re_translation {
+.automlp-wpml-bulk-translate-btn_re_translation {
   margin-left: 10px !important;
 }
 
-.automl-wpml-bulk-translate-notice {
+.automlp-wpml-bulk-translate-notice {
   -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
           box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
   border: 1px solid #c3c4c7;
@@ -11,25 +11,25 @@
   margin-top: 8px;
 }
 
-.automl-wpml-bulk-translate-notice p {
+.automlp-wpml-bulk-translate-notice p {
   padding: 0;
   margin: 0;
   font-size: 14px;
 }
 
-.automl-wpml-bulk-translate-notice-warning {
+.automlp-wpml-bulk-translate-notice-warning {
   border-left-color: #f0ad4e;
 }
 
-.automl-wpml-bulk-translate-notice-error {
+.automlp-wpml-bulk-translate-notice-error {
   border-left-color: #d9534f;
 }
 
-.automl-wpml-bulk-translate-notice-success {
+.automlp-wpml-bulk-translate-notice-success {
   border-left-color: #5cb85c;
 }
 
-.automl-wpml-bulk-translate-modal-header-inner .automl-wpml-bulk-translate-modal-desc {
+.automlp-wpml-bulk-translate-modal-header-inner .automlp-wpml-bulk-translate-modal-desc {
   font-size: 12px !important;
   font-weight: 500;
   margin: 0;
@@ -37,13 +37,13 @@
   color: #888;
 }
 
-.automl-wpml-bulk-translate-modal-header-inner .automl-wpml-bulk-translate-step-label {
+.automlp-wpml-bulk-translate-modal-header-inner .automlp-wpml-bulk-translate-step-label {
   font-size: 10px;
   font-weight: 600;
   color: #3737e7;
 }
 
-.automl-wpml-bulk-translate-modal-close {
+.automlp-wpml-bulk-translate-modal-close {
   border: none;
   background: none;
   cursor: pointer;
@@ -54,12 +54,12 @@
   height: 24px;
 }
 
-#automl-wpml-bulk-translate-wrapper {
+#automlp-wpml-bulk-translate-wrapper {
   display: none;
   font-family: Inter, Figtree, sans-serif;
 }
 
-#automl-wpml-bulk-translate-wrapper.automl-wpml-bulk-translate-active {
+#automlp-wpml-bulk-translate-wrapper.automlp-wpml-bulk-translate-active {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -87,7 +87,7 @@
           align-items: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container {
   background: white;
   position: relative;
   border-radius: 8px;
@@ -98,21 +98,21 @@
   /* Setting Modal CSS End */
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-status-modal-active {
   width: clamp(200px, 800px, 90%);
   height: auto;
   max-height: 70vh;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active.automl-wpml-bulk-translate-empty-posts {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-status-modal-active.automlp-wpml-bulk-translate-empty-posts {
   height: auto;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active.automl-wpml-bulk-translate-empty-posts .automl-wpml-bulk-translate-modal-desc {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-status-modal-active.automlp-wpml-bulk-translate-empty-posts .automlp-wpml-bulk-translate-modal-desc {
   margin-bottom: 10px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active.automl-wpml-bulk-translate-empty-posts p {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-status-modal-active.automlp-wpml-bulk-translate-empty-posts p {
   font-size: 1rem;
   color: #1d2327;
   font-weight: 500;
@@ -122,7 +122,7 @@
   margin-block: 15px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-status-modal-active .automl-wpml-bulk-translate-progress-skeleton {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-status-modal-active .automlp-wpml-bulk-translate-progress-skeleton {
   background: -webkit-gradient(linear, left top, right top, color-stop(25%, #e0e0e0), color-stop(50%, #f5f5f5), color-stop(75%, #e0e0e0));
   background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
   background-size: 200% 100%;
@@ -137,20 +137,20 @@
   margin-bottom: .5rem;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-setting-modal-active {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-setting-modal-active {
   height: auto;
   max-height: 90vh;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-language-container {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-language-container {
   max-width: 500px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container {
   height: 100%;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content {
   border-radius: 0px;
   padding: 0px;
   display: -webkit-box;
@@ -163,7 +163,7 @@
   height: 100%;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-header h2 {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-setting-modal-header h2 {
   height: unset;
   padding: 8px 36px 8px 25px;
   border: none;
@@ -175,7 +175,7 @@
   margin: 0;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-header .automl-wpml-bulk-translate-setting-modal-close {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-setting-modal-header .automlp-wpml-bulk-translate-setting-modal-close {
   right: 15px;
   top: 13px;
   border-radius: 0 !important;
@@ -188,12 +188,12 @@
   cursor: pointer;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-body {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-setting-modal-body {
   max-width: 100vw;
   overflow-x: auto;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-body .automl-wpml-bulk-translate-provider-cards {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-setting-modal-body .automlp-wpml-bulk-translate-provider-cards {
   display: -ms-grid;
   display: grid;
   -ms-grid-columns: (1fr)[2];
@@ -204,7 +204,7 @@
   min-width: 500px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card {
   position: relative;
   padding: 12px;
   border: 2px solid #e2e8f0;
@@ -228,7 +228,7 @@
   cursor: pointer;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-body {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -239,18 +239,18 @@
   gap: 10px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card:hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card:hover {
   border-color: #cbd5e1;
   -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
           box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card--disabled {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card--disabled {
   opacity: 0.7;
   cursor: not-allowed;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card--disabled .automl-wpml-bulk-translate-provider-error {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card--disabled .automlp-wpml-bulk-translate-provider-error {
   color: #64748b;
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
@@ -258,23 +258,23 @@
   cursor: pointer;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card--disabled .automl-wpml-bulk-translate-provider-error:hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card--disabled .automlp-wpml-bulk-translate-provider-error:hover {
   color: var(--wp-admin-theme-color, #2271b1);
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card--selected {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card--selected {
   border-color: var(--wp-admin-theme-color, #2271b1) !important;
   -webkit-box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #2271b1);
           box-shadow: 0 0 0 1px var(--wp-admin-theme-color, #2271b1);
   background: #eff6ff;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card--selected .automl-wpml-bulk-translate-provider-card-check {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card--selected .automlp-wpml-bulk-translate-provider-card-check {
   border-color: var(--wp-admin-theme-color, #2271b1);
   background: var(--wp-admin-theme-color, #2271b1);
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card--selected .automl-wpml-bulk-translate-provider-card-check::after {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card--selected .automlp-wpml-bulk-translate-provider-card-check::after {
   content: '';
   position: absolute;
   left: 6px;
@@ -287,7 +287,7 @@
           transform: rotate(45deg);
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-icon {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-icon {
   width: 25px;
   height: 25px;
   display: -webkit-box;
@@ -301,21 +301,21 @@
           justify-content: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-icon img {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-icon img {
   width: 24px;
   height: 24px;
   -o-object-fit: contain;
      object-fit: contain;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-name {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-name {
   font-weight: 700;
   font-size: 14px;
   color: #0f172a;
   display: block;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-desc {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-desc {
   font-size: 0.8125rem;
   color: #64748b;
   line-height: 1.45;
@@ -325,7 +325,7 @@
           flex: 1;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-actions {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-actions {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -338,7 +338,7 @@
   width: 100%;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-docs {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-docs {
   color: #64748b;
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
@@ -346,11 +346,11 @@
   margin-right: auto;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-docs:hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-docs:hover {
   color: var(--wp-admin-theme-color, #2271b1);
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-check {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-check {
   position: relative;
   display: block;
   width: 22px;
@@ -362,11 +362,11 @@
   margin-left: auto;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-provider-card-error {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-provider-card-error {
   font-size: 0.8125rem;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-footer {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-setting-modal-footer {
   border: none;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -379,23 +379,23 @@
   border-top: 2px solid #00000012;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-footer .automl-wpml-bulk-translate-setting-close {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-setting-modal-footer .automlp-wpml-bulk-translate-setting-close {
   background-color: #ffffff;
   border: none;
   color: #000000;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-footer .automl-wpml-bulk-translate-setting-close:hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-setting-modal-footer .automlp-wpml-bulk-translate-setting-close:hover {
   background-color: #fff;
   border-color: #fff;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-setting-modal-container .automl-wpml-bulk-translate-setting-modal-content .automl-wpml-bulk-translate-setting-modal-footer .automl-wpml-bulk-translate-setting-start-translation:disabled {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container .automlp-wpml-bulk-translate-setting-modal-content .automlp-wpml-bulk-translate-setting-modal-footer .automlp-wpml-bulk-translate-setting-start-translation:disabled {
   cursor: not-allowed;
   opacity: .6;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container {
   background-color: #fff;
   border-radius: 8px;
   -webkit-box-sizing: border-box;
@@ -415,11 +415,11 @@
   width: 100%;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-header + div {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-header + div {
   margin-top: 16px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-modal-close {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-modal-close {
   background: none;
   border: none;
   cursor: pointer;
@@ -430,19 +430,19 @@
   width: 24px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container h2 {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container h2 {
   margin: 0;
   padding: 0;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container h2.running span {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container h2.running span {
   width: 18px;
   aspect-ratio: 3;
   background: radial-gradient(circle closest-side, #1d2327 50%, #0000 80%) 0/calc(100%/3) 100% space;
   -webkit-clip-path: inset(0 100% 0 0);
           clip-path: inset(0 100% 0 0);
-  -webkit-animation: automl-wpml-blink 1s steps(4) infinite;
-          animation: automl-wpml-blink 1s steps(4) infinite;
+  -webkit-animation: automlp-wpml-blink 1s steps(4) infinite;
+          animation: automlp-wpml-blink 1s steps(4) infinite;
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -453,28 +453,28 @@
   margin-left: 1px;
 }
 
-@-webkit-keyframes automl-wpml-blink {
+@-webkit-keyframes automlp-wpml-blink {
   to {
     -webkit-clip-path: inset(0 -34% 0 0);
             clip-path: inset(0 -34% 0 0);
   }
 }
 
-@keyframes automl-wpml-blink {
+@keyframes automlp-wpml-blink {
   to {
     -webkit-clip-path: inset(0 -34% 0 0);
             clip-path: inset(0 -34% 0 0);
   }
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-modal-desc {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-modal-desc {
   font-size: 12px !important;
   font-weight: 500;
   margin-top: 0 !important;
   color: #888;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-overall-progress .automl-wpml-bulk-translate-progress-bar {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-overall-progress .automlp-wpml-bulk-translate-progress-bar {
   width: calc(100% - 48px);
   margin-inline: 24px;
   background: #ddd;
@@ -493,7 +493,7 @@
   animation-direction: reverse;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-overall-progress .automl-wpml-bulk-translate-progress-bar .automl-wpml-bulk-translate-progress {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-overall-progress .automlp-wpml-bulk-translate-progress-bar .automlp-wpml-bulk-translate-progress {
   height: 100%;
   background: #2271b1;
   width: 0%;
@@ -521,7 +521,7 @@
   }
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-translator-strings-count {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-translator-strings-count {
   text-align: center;
   font-size: 1rem;
   margin-bottom: 10px;
@@ -529,7 +529,7 @@
   margin-inline: 24px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-count-container {
   display: -ms-grid;
   display: grid;
   -ms-grid-columns: auto auto auto;
@@ -547,17 +547,17 @@
   border: 1px solid #00000012;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container .automl-wpml-bulk-translate-count-text-heading {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-count-container .automlp-wpml-bulk-translate-count-text-heading {
   color: #8c8585;
   font-size: 12px;
   font-weight: 500;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container .automl-wpml-bulk-translate-count-text-heading ~ span {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-count-container .automlp-wpml-bulk-translate-count-text-heading ~ span {
   font-weight: 700;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container {
   display: -ms-grid;
   display: grid;
   -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr;
@@ -571,14 +571,14 @@
   border-bottom: 0px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container .automl-wpml-bulk-translate-status-flag-th,
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container .automl-wpml-bulk-translate-status-status-th,
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container .automl-wpml-bulk-translate-status-title-th,
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container .automl-wpml-bulk-translate-status-actions-th {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container .automlp-wpml-bulk-translate-status-flag-th,
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container .automlp-wpml-bulk-translate-status-status-th,
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container .automlp-wpml-bulk-translate-status-title-th,
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container .automlp-wpml-bulk-translate-status-actions-th {
   grid-column: span 1;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container .automl-wpml-bulk-translate-status-status-th {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container .automlp-wpml-bulk-translate-status-status-th {
   text-align: center;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -588,7 +588,7 @@
           justify-content: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container .automl-wpml-bulk-translate-status-title-th {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container .automlp-wpml-bulk-translate-status-title-th {
   grid-column: span 2;
   text-align: center;
   display: -webkit-box;
@@ -599,7 +599,7 @@
           justify-content: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container .automl-wpml-bulk-translate-status-actions-th {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container .automlp-wpml-bulk-translate-status-actions-th {
   text-align: right;
   padding-right: 5px;
   display: -webkit-box;
@@ -610,12 +610,12 @@
           justify-content: flex-end;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-header-container .automl-wpml-bulk-translate-status-actions-th .automl-wpml-bulk-translate-progress-skeleton {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-header-container .automlp-wpml-bulk-translate-status-actions-th .automlp-wpml-bulk-translate-progress-skeleton {
   width: 172px;
   margin-right: -5px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-footer {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-footer {
   border: none;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -628,17 +628,17 @@
   border-top: 2px solid #00000012;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-footer .automl-wpml-bulk-translate-progress-skeleton {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-footer .automlp-wpml-bulk-translate-progress-skeleton {
   height: 30px;
   width: 172px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-footer a {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-footer a {
   -webkit-transition: all .3s ease-in-out;
   transition: all .3s ease-in-out;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container {
   height: 100%;
   overflow: hidden;
   margin-top: 8px;
@@ -646,54 +646,54 @@
   margin-bottom: 16px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container > div {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container > div {
   height: 100%;
   overflow-y: auto;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-inner-item {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-inner-item {
   border: 1px solid #00000012;
   border-bottom-width: 0px;
   border-top-color: #00000017;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-inner-item:last-child {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-inner-item:last-child {
   border-bottom-width: 1px;
   border-radius: 0 0 13px 13px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-inner-item.automl-wpml-bulk-translate-status-target-post-error {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-inner-item.automlp-wpml-bulk-translate-status-target-post-error {
   background: #ff000014;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-inner-item.automl-wpml-bulk-translate-status-target-post-error .automl-wpml-bulk-translate-status-target-post-error {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-inner-item.automlp-wpml-bulk-translate-status-target-post-error .automlp-wpml-bulk-translate-status-target-post-error {
   color: #1d2327;
   font-size: .8rem;
   font-weight: 500;
   text-align: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-progress-bar-circular {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-progress-bar-circular {
   position: relative;
   width: 40px;
   height: 40px;
   display: inline-block;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-progress-bar-circular .automl-wpml-bulk-translate-circle {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-progress-bar-circular .automlp-wpml-bulk-translate-circle {
   width: 100%;
   height: 100%;
   -webkit-transform: rotate(-90deg);
           transform: rotate(-90deg);
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-progress-bar-circular .automl-wpml-bulk-translate-bg {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-progress-bar-circular .automlp-wpml-bulk-translate-bg {
   fill: none;
   stroke: #eee;
   stroke-width: 3;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-progress-bar-circular .automl-wpml-bulk-translate-progress {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-progress-bar-circular .automlp-wpml-bulk-translate-progress {
   fill: none;
   stroke: #2271b1;
   stroke-width: 3;
@@ -702,7 +702,7 @@
   transition: stroke-dasharray 0.6s ease;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-progress-bar-circular .automl-wpml-bulk-translate-percentage {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-progress-bar-circular .automlp-wpml-bulk-translate-percentage {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -713,17 +713,17 @@
   color: #333;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-group-title {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-group-title {
   border-block: 1px solid #ebebeb;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-group-title td {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-group-title td {
   font-weight: bold;
   background: #f7f7f7;
   padding-top: 15px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-error-button {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-error-button {
   padding: 0.2rem 0.5rem;
   border-radius: 3px;
   cursor: pointer;
@@ -735,19 +735,19 @@
   background: #ff3e51;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-error-button:hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-error-button:hover {
   background: #ff2037;
   border-color: #ff152d;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-parent-post-title {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-parent-post-title {
   font-weight: 600;
   font-size: 14px;
   padding: .8rem 1rem;
   background: #00000008;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post {
   display: -ms-grid;
   display: grid;
   -ms-grid-columns: 1fr 1fr 1fr 1fr 1fr;
@@ -758,7 +758,7 @@
   padding-inline: 1rem;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-flag {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-flag {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -767,11 +767,11 @@
           align-items: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-flag img {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-flag img {
   margin-right: 8px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-status span {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-status span {
   padding: 4px 8px;
   border-radius: 5px;
   font-size: 12px;
@@ -780,31 +780,31 @@
   font-weight: 600;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-status span.success {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-status span.success {
   color: #3db63d;
   background: #3db63d26;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-status span.error {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-status span.error {
   color: #ee4237;
   background: #ee423726;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-status span.warning {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-status span.warning {
   color: #6e6e6e;
   background: #fff297ab;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-status span.primary {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-status span.primary {
   color: #2271b1;
   background: #2271b126;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-title {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-title {
   text-align: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-title a {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-title a {
   width: 100%;
   overflow: hidden;
   display: inline-block;
@@ -812,7 +812,7 @@
   text-overflow: ellipsis;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-actions, #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post-error-button {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-actions, #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post-error-button {
   text-align: right;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -825,11 +825,11 @@
           justify-content: flex-end;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post > div {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post > div {
   grid-column: span 1;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-status-target-post > div:nth-child(2) {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-status-target-post > div:nth-child(2) {
   height: 55px;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -842,7 +842,7 @@
           justify-content: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-progress-skeleton {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-progress-skeleton {
   background: -webkit-gradient(linear, left top, right top, color-stop(25%, #e0e0e0), color-stop(50%, #f5f5f5), color-stop(75%, #e0e0e0));
   background: linear-gradient(90deg, #e0e0e0 25%, #f5f5f5 50%, #e0e0e0 75%);
   background-size: 200% 100%;
@@ -852,12 +852,12 @@
           animation: shimmer 1.2s infinite linear;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-progress-skeleton.short {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-progress-skeleton.short {
   padding: 0;
   width: 30px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-in-progress-text {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-in-progress-text {
   color: #2271b1;
   background: #2271b126;
   border-color: #2271b1;
@@ -873,14 +873,14 @@
   border-radius: 27px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-status-table-container .automl-wpml-bulk-translate-in-progress-text span {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-table-container .automlp-wpml-bulk-translate-in-progress-text span {
   width: 15px;
   aspect-ratio: 3;
   background: radial-gradient(circle closest-side, #2271b1 40%, #0000 90%) 0/calc(100%/3) 100% space;
   -webkit-clip-path: inset(0 100% 0 0);
           clip-path: inset(0 100% 0 0);
-  -webkit-animation: automl-wpml-bulk-translate-blink 1s steps(4) infinite;
-          animation: automl-wpml-bulk-translate-blink 1s steps(4) infinite;
+  -webkit-animation: automlp-wpml-bulk-translate-blink 1s steps(4) infinite;
+          animation: automlp-wpml-bulk-translate-blink 1s steps(4) infinite;
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -891,30 +891,30 @@
   margin-left: 1px;
 }
 
-@-webkit-keyframes automl-wpml-bulk-translate-blink {
+@-webkit-keyframes automlp-wpml-bulk-translate-blink {
   to {
     -webkit-clip-path: inset(0 -34% 0 0);
             clip-path: inset(0 -34% 0 0);
   }
 }
 
-@keyframes automl-wpml-bulk-translate-blink {
+@keyframes automlp-wpml-bulk-translate-blink {
   to {
     -webkit-clip-path: inset(0 -34% 0 0);
             clip-path: inset(0 -34% 0 0);
   }
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-progress-footer {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-progress-footer {
   text-align: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-progress-footer a {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-progress-footer a {
   padding: 2px 11px;
   margin-top: 1.2rem;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-header {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-header {
   -webkit-box-align: start;
       -ms-flex-align: start;
           align-items: flex-start;
@@ -929,12 +929,12 @@
   border-bottom: 2px solid #00000012;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-header + .automl-wpml-bulk-translate-progress-skeleton {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-header + .automlp-wpml-bulk-translate-progress-skeleton {
   margin-inline: 24px;
   width: calc(100% - 48px);
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-header .close {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-header .close {
   background: none;
   border: none;
   cursor: pointer;
@@ -945,7 +945,7 @@
   width: 24px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-header h2 {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-header h2 {
   background: 0 0;
   border: none;
   font-size: 18px;
@@ -955,7 +955,7 @@
   margin: 0;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message {
   color: #1d2327;
   padding: 15px 22px;
   font-weight: 600;
@@ -964,12 +964,12 @@
   height: unset !important;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message span {
   font-weight: 500;
   font-size: 16px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span ol {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message span ol {
   margin-block: 16px;
   list-style-type: decimal;
   margin-left: 32px;
@@ -978,18 +978,18 @@
   padding: 0;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span ol li {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message span ol li {
   margin-bottom: 12px;
   list-style: decimal;
   line-height: 1.2;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span p {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message span p {
   margin: 0;
   padding: 0;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span p * {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message span p * {
   font-size: 15px;
   -webkit-box-shadow: unset;
           box-shadow: unset;
@@ -998,22 +998,22 @@
   line-height: 1.5;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-message span p a {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message span p a {
   color: #2271b1 !important;
   text-decoration: underline;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-notice {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-notice {
   margin-top: 1rem;
   margin-inline: 25px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-loading {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-loading {
   color: #000;
   padding: 1rem;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-enabled-list {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages-enabled-list {
   display: -ms-grid;
   display: grid;
   -ms-grid-columns: (1fr)[3];
@@ -1022,13 +1022,13 @@
   padding: 1rem 25px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-disabled-lists {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages-disabled-lists {
   padding: 1rem 25px;
   background: #0000000a;
   border-radius: 8px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-disabled-lists > p {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages-disabled-lists > p {
   margin: 0;
   padding: 0;
   margin-bottom: 15px;
@@ -1036,13 +1036,13 @@
   font-weight: 600;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-disabled-lists > p a:focus {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages-disabled-lists > p a:focus {
   -webkit-box-shadow: none;
           box-shadow: none;
   outline: none;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages-disabled-lists > div {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages-disabled-lists > div {
   display: -ms-grid;
   display: grid;
   -ms-grid-columns: (1fr)[3];
@@ -1050,7 +1050,7 @@
   gap: 10px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language {
   display: -webkit-inline-box;
   display: -ms-inline-flexbox;
   display: inline-flex;
@@ -1059,7 +1059,7 @@
   border-radius: 8px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language input[type="checkbox"] {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language input[type="checkbox"] {
   position: absolute;
   left: 7px;
   width: 22px;
@@ -1076,7 +1076,7 @@
   border-radius: 0;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language-item {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language-item {
   position: relative;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1088,11 +1088,11 @@
   min-height: 22px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language-item .automl-wpml-bulk-translate-language-label {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language-item .automlp-wpml-bulk-translate-language-label {
   margin-left: 7px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language-item .automl-wpml-bulk-translate-check-visual {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language-item .automlp-wpml-bulk-translate-check-visual {
   display: inline-block;
   width: 22px;
   height: 22px;
@@ -1108,12 +1108,12 @@
   pointer-events: none;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language-item input:checked + .automl-wpml-bulk-translate-check-visual {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language-item input:checked + .automlp-wpml-bulk-translate-check-visual {
   border-color: #2271b1;
   background-color: #2271b1;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language-item input:checked + .automl-wpml-bulk-translate-check-visual::after {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language-item input:checked + .automlp-wpml-bulk-translate-check-visual::after {
   content: '';
   position: absolute;
   left: 6px;
@@ -1128,30 +1128,30 @@
           box-sizing: border-box;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language-item--selected {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language-item--selected {
   border-color: #2271b1;
   background-color: #f0f6ff;
   -webkit-box-shadow: 0 0 0 1px #2271b1;
           box-shadow: 0 0 0 1px #2271b1;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language input[name="languages"]:disabled ~ img {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language input[name="languages"]:disabled ~ img {
   opacity: 0.5;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-languages .automl-wpml-bulk-translate-language input[name="languages"]:disabled ~ span {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-languages .automlp-wpml-bulk-translate-language input[name="languages"]:disabled ~ span {
   opacity: 0.5;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-select-all-languages {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-select-all-languages {
   padding: 1rem 25px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-body .automl-wpml-bulk-translate-select-all-languages label {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-body .automlp-wpml-bulk-translate-select-all-languages label {
   margin-left: 2px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-footer {
   border: none;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1164,24 +1164,24 @@
   border-top: 2px solid #00000012;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-of-type(1) {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-footer .automlp-wpml-bulk-translate-footer-button:nth-of-type(1) {
   background: #ffffff;
   border: none;
   color: #000000;
   margin-right: 10px;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-of-type(2):disabled {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-footer .automlp-wpml-bulk-translate-footer-button:nth-of-type(2):disabled {
   cursor: not-allowed;
   opacity: .6;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-footer .automl-wpml-bulk-translate-footer-button:nth-child(1):hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-footer .automlp-wpml-bulk-translate-footer-button:nth-child(1):hover {
   background-color: #ffffff;
   border-color: #000000;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container {
   position: fixed;
   top: 0;
   left: 0;
@@ -1201,7 +1201,7 @@
   z-index: 99999;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-tooltip-element {
   position: relative;
   overflow: visible;
   cursor: pointer;
@@ -1209,11 +1209,11 @@
   color: #2271b1;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element svg {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-tooltip-element svg {
   color: #3c434a;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element .automl-wpml-bulk-translate-tooltip {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-tooltip-element .automlp-wpml-bulk-translate-tooltip {
   display: block;
   font-size: 12.8px;
   position: absolute;
@@ -1230,7 +1230,7 @@
   white-space: nowrap;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element .automl-wpml-bulk-translate-tooltip:after {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-tooltip-element .automlp-wpml-bulk-translate-tooltip:after {
   content: "";
   position: absolute;
   top: 98%;
@@ -1243,12 +1243,12 @@
   border-left: 8px solid transparent;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-tooltip-element .automl-wpml-bulk-translate-tooltip.automl-wpml-bulk-translate-tooltip-active {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-tooltip-element .automlp-wpml-bulk-translate-tooltip.automlp-wpml-bulk-translate-tooltip-active {
   -webkit-animation: slide-up 0.15s cubic-bezier(0.51, 0.92, 0.265, 1.55) both;
   animation: slide-up 0.15s cubic-bezier(0.51, 0.92, 0.265, 1.55) both;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box {
   background-color: #fefefe;
   width: clamp(200px, 500px, 80%);
   height: auto;
@@ -1258,7 +1258,7 @@
   overflow: hidden;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-header {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-header {
   position: relative;
   -webkit-box-align: start;
       -ms-flex-align: start;
@@ -1274,7 +1274,7 @@
   border-bottom: 2px solid #00000012;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-header .automl-wpml-bulk-translate-error-modal-box-close {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-header .automlp-wpml-bulk-translate-error-modal-box-close {
   border: none;
   background: none;
   cursor: pointer;
@@ -1286,7 +1286,7 @@
   line-height: 1;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-header h3 {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-header h3 {
   height: unset;
   padding: 0;
   border: none;
@@ -1298,7 +1298,7 @@
   color: #1d2327;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-body {
   min-height: 0px;
   max-height: 65vh;
   height: auto;
@@ -1306,7 +1306,7 @@
   overflow: auto;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body h4 {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-body h4 {
   margin: 0;
   margin-top: 0;
   margin-bottom: 24px;
@@ -1317,7 +1317,7 @@
           box-sizing: border-box;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body ol {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-body ol {
   margin-top: 16px;
   margin-bottom: 0px;
   list-style-type: decimal;
@@ -1327,17 +1327,17 @@
   padding: 0;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body ol li {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-body ol li {
   margin-bottom: 6px;
   list-style: decimal;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body p {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-body p {
   margin: 0;
   padding: 0;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body p * {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-body p * {
   font-size: 15px;
   -webkit-box-shadow: unset;
           box-shadow: unset;
@@ -1346,12 +1346,12 @@
   line-height: 1.5;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-body p a {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-body p a {
   color: #2271b1 !important;
   text-decoration: underline;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-footer {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-footer {
   border: none;
   display: -webkit-box;
   display: -ms-flexbox;
@@ -1364,32 +1364,32 @@
   border-top: 2px solid #00000012;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-footer .automl-wpml-bulk-translate-error-modal-box-close {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-footer .automlp-wpml-bulk-translate-error-modal-box-close {
   background-color: #ffffff;
   border: none;
   color: #000000;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-error-modal-box-footer .automl-wpml-bulk-translate-error-modal-box-close:hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-error-modal-box-footer .automlp-wpml-bulk-translate-error-modal-box-close:hover {
   background-color: #fff;
   border-color: #fff;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-pending-request {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-ai-pending-request {
   text-align: center;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-pending-request .automl-wpml-bulk-translate-ai-pending-request-heading {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-ai-pending-request .automlp-wpml-bulk-translate-ai-pending-request-heading {
   font-size: 1.2rem;
   font-weight: 600;
   margin-bottom: .4rem !important;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-pending-request p {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-ai-pending-request p {
   margin-block: .4rem !important;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-ai-error-buttons {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1400,7 +1400,7 @@
   margin-top: 1rem;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons button[data-status="translateAgain"] {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-ai-error-buttons button[data-status="translateAgain"] {
   background: #30b230 !important;
   color: #fff !important;
   border-color: #239d23 !important;
@@ -1408,12 +1408,12 @@
   transition: all .3s ease-in-out;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons button[data-status="translateAgain"]:hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-ai-error-buttons button[data-status="translateAgain"]:hover {
   background: #2da52d !important;
   border-color: #209120 !important;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons button[data-status="continue"] {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-ai-error-buttons button[data-status="continue"] {
   background: #0073aa !important;
   color: #fff !important;
   border-color: #2271b1 !important;
@@ -1421,7 +1421,7 @@
   transition: all .3s ease-in-out;
 }
 
-#automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container .automl-wpml-bulk-translate-error-modal-box-container .automl-wpml-bulk-translate-ai-error-buttons button[data-status="continue"]:hover {
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-modal-box-container .automlp-wpml-bulk-translate-ai-error-buttons button[data-status="continue"]:hover {
   background: #005682 !important;
   border-color: #004466 !important;
 }
@@ -1471,7 +1471,7 @@
 }
 
 @media (max-width: 992px) {
-  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container {
+  #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-translation-active #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-count-container {
     display: -ms-grid;
     display: grid;
     -ms-grid-columns: 1fr 1fr;
@@ -1479,18 +1479,18 @@
     -ms-grid-rows: auto auto;
         grid-template-rows: auto auto;
   }
-  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container > div:nth-child(1) {
+  #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-translation-active #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-count-container > div:nth-child(1) {
     -ms-grid-column: 1;
     -ms-grid-column-span: 2;
     grid-column: 1/3;
   }
-  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container > div:nth-child(2) {
+  #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-translation-active #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-count-container > div:nth-child(2) {
     -ms-grid-column: 1;
     grid-column: 1;
     -ms-grid-row: 2;
     grid-row: 2;
   }
-  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active #automl-wpml-bulk-translate-status-modal-container .automl-wpml-bulk-translate-count-container > div:nth-child(3) {
+  #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-translation-active #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-count-container > div:nth-child(3) {
     -ms-grid-column: 2;
     grid-column: 2;
     -ms-grid-row: 2;
@@ -1499,7 +1499,7 @@
 }
 
 @media (max-width: 576px) {
-  #automl-wpml-bulk-translate-wrapper #automl-wpml-bulk-translate-container.automl-wpml-bulk-translate-translation-active {
+  #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container.automlp-wpml-bulk-translate-translation-active {
     width: clamp(200px, 800px, 80%);
   }
 }
@@ -1509,7 +1509,7 @@ body > div.skiptranslate iframe.skiptranslate[frameborder][src][style="visibilit
   display: none !important;
 }
 
-#automl-wpml-bulk-translate-google-table-container {
+#automlp-wpml-bulk-translate-google-table-container {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
@@ -1532,11 +1532,11 @@ body > div.skiptranslate iframe.skiptranslate[frameborder][src][style="visibilit
   white-space: pre-wrap;
 }
 
-#automl-wpml-bulk-translate-google-table-container #automl-wpml-bulk-translate-google-translate-btn {
+#automlp-wpml-bulk-translate-google-table-container #automlp-wpml-bulk-translate-google-translate-btn {
   display: none;
 }
 
-body.automl-wpml-bulk-translate-google-translate {
+body.automlp-wpml-bulk-translate-google-translate {
   top: 0px !important;
 }
 

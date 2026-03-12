@@ -7,8 +7,8 @@ import { __ } from "@wordpress/i18n";
 import ErrorModalBox from "../components/error-modal-box";
 
 const SettingModal = (props) => {
-    const prefix=props.prefix || 'automl-wpml-bulk-translate';
-    const imgFolder = automl_wpml_bulk_translate_object.automl_wpml_url + 'assets/images/';
+    const prefix=props.prefix || 'automlp-wpml-bulk-translate';
+    const imgFolder = automlp_wpml_bulk_translate_object.automlp_wpml_url + 'assets/images/';
     const [errorModal, setErrorModal] = useState(false);
     const [selectedProvider, setSelectedProvider] = useState(null);
 

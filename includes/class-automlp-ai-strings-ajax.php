@@ -3,7 +3,7 @@
 /**
  * AJAX handlers for WPML String Translation (plugin/theme strings) via Google Translate.
  * Uses WPML ST APIs: icl_get_string_translations(), icl_add_string_translation().
- * Reuses the same nonce as post translation ('automl_wpml_auto_translate_nonce').
+ * Reuses the same nonce as post translation ('automlp_wpml_auto_translate_nonce').
  *
  * @package WPML_Auto_Translate
  */
@@ -15,7 +15,7 @@ if (! defined('ABSPATH')) {
 /**
  * Strings AJAX handler class.
  */
-class AUTOML_AI_Strings_Ajax
+class AUTOMLP_AI_Strings_Ajax
 {
 
 	/**
@@ -25,7 +25,7 @@ class AUTOML_AI_Strings_Ajax
 	 */
 	public static function init()
 	{
-		add_action('wp_ajax_automl_wpml_google_auto_translate_save_string_translations', array(__CLASS__, 'save_string_translations'));
+		add_action('wp_ajax_automlp_wpml_google_auto_translate_save_string_translations', array(__CLASS__, 'save_string_translations'));
 	}
 
 	/**
@@ -47,7 +47,7 @@ class AUTOML_AI_Strings_Ajax
 		if ($use_json) {
 			// Extract nonce from JSON for verification
 			$nonce = isset($json_data['nonce']) ? sanitize_text_field($json_data['nonce']) : '';
-			if (! wp_verify_nonce($nonce, 'automl_wpml_auto_translate_nonce')) {
+			if (! wp_verify_nonce($nonce, 'automlp_wpml_auto_translate_nonce')) {
 				wp_send_json_error(array('msg' => esc_html__('Security check failed. Please refresh the page and try again.', 'wpml-translation-check')));
 				return;
 			}
@@ -55,7 +55,7 @@ class AUTOML_AI_Strings_Ajax
 			$translated_strings = isset($json_data['translated_strings']) && is_array($json_data['translated_strings']) ? $json_data['translated_strings'] : array();
 		} else {
 			// Fallback to POST (backward compatibility)
-			if (! check_ajax_referer('automl_wpml_auto_translate_nonce', 'nonce', false)) {
+			if (! check_ajax_referer('automlp_wpml_auto_translate_nonce', 'nonce', false)) {
 				wp_send_json_error(array('msg' => esc_html__('Security check failed. Please refresh the page and try again.', 'wpml-translation-check')));
 				return;
 			}

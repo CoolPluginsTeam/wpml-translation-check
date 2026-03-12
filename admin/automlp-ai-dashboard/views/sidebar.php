@@ -7,14 +7,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Helpers
  */
 
-if ( ! function_exists( 'automl_ai_format_time_taken' ) ) :
+if ( ! function_exists( 'automlp_ai_format_time_taken' ) ) :
 	/**
 	 * Format total time taken in a readable way.
 	 *
 	 * @param int $time_taken Seconds.
 	 * @return string
 	 */
-	function automl_ai_format_time_taken( $time_taken ) {
+	function automlp_ai_format_time_taken( $time_taken ) {
 		if ( 0 === intval( $time_taken ) ) {
 			return esc_html__( '0', 'wpml-translation-check' );
 		}
@@ -40,14 +40,14 @@ if ( ! function_exists( 'automl_ai_format_time_taken' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'automl_ai_is_plugin_installed' ) ) :
+if ( ! function_exists( 'automlp_ai_is_plugin_installed' ) ) :
 	/**
 	 * Check if a specific plugin is installed.
 	 *
 	 * @param string $plugin_slug Plugin slug key.
 	 * @return bool
 	 */
-	function automl_ai_is_plugin_installed( $plugin_slug ) {
+	function automlp_ai_is_plugin_installed( $plugin_slug ) {
 		if ( ! function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
@@ -63,14 +63,14 @@ if ( ! function_exists( 'automl_ai_is_plugin_installed' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'automl_ai_get_plugin_display_name' ) ) :
+if ( ! function_exists( 'automlp_ai_get_plugin_display_name' ) ) :
 	/**
 	 * Get display name for addon plugin (free / pro).
 	 *
 	 * @param string $plugin_slug Plugin slug.
 	 * @return string
 	 */
-	function automl_ai_get_plugin_display_name( $plugin_slug ) {
+	function automlp_ai_get_plugin_display_name( $plugin_slug ) {
 		$plugins = function_exists( 'get_plugins' ) ? get_plugins() : array();
 
 		$plugin_paths = array(
@@ -99,14 +99,14 @@ if ( ! function_exists( 'automl_ai_get_plugin_display_name' ) ) :
 	}
 endif;
 
-if ( ! function_exists( 'automl_ai_format_number' ) ) :
+if ( ! function_exists( 'automlp_ai_format_number' ) ) :
 	/**
 	 * Format big numbers as K/M/B.
 	 *
 	 * @param int $number Number.
 	 * @return string
 	 */
-	function automl_ai_format_number( $number ) {
+	function automlp_ai_format_number( $number ) {
 		$number = intval( $number );
 
 		if ( $number >= 1000000000 ) {
@@ -123,21 +123,21 @@ endif;
 ?>
 
 <!-- Right Sidebar -->
-<div class="automl_ai_dashboard-sidebar">
-	<div class="automl_ai_dashboard-status">
+<div class="automlp_ai_dashboard-sidebar">
+	<div class="automlp_ai_dashboard-status">
 		<h3><?php esc_html_e( 'Auto Translation Status', 'wpml-translation-check' ); ?></h3>
-		<div class="automl_ai_dashboard-sts-top">
+		<div class="automlp_ai_dashboard-sts-top">
 			<?php
 			// You can later store stats in an option similar to this.
-			$automl_wpml_all_translation_data = get_option( 'automl_ai_dashboard_data', array() );
+			$automlp_wpml_all_translation_data = get_option( 'automlp_ai_dashboard_data', array() );
 
-			if ( ! is_array( $automl_wpml_all_translation_data ) || ! isset( $automl_wpml_all_translation_data['automl_ai'] ) ) {
-				$automl_wpml_all_translation_data['automl_ai'] = array();
+			if ( ! is_array( $automlp_wpml_all_translation_data ) || ! isset( $automlp_wpml_all_translation_data['automlp_ai'] ) ) {
+				$automlp_wpml_all_translation_data['automlp_ai'] = array();
 			}
 
-			$automl_valid_providers = array('openai'=>'OpenAI Characters', 'google_ai'=>'Google Characters');
+			$automlp_valid_providers = array('openai'=>'OpenAI Characters', 'google_ai'=>'Google Characters');
 			$totals = array_reduce(
-				$automl_wpml_all_translation_data['automl_ai'],
+				$automlp_wpml_all_translation_data['automlp_ai'],
 				function ( $carry, $translation ) {
 					$carry['string_count']    += intval( $translation['string_count'] ?? 0 );
 					$carry['character_count'] += intval( $translation['character_count'] ?? 0 );
@@ -161,21 +161,21 @@ endif;
 					'translation_count' => 0,
 				)
 			);
-			$automl_wpml_time_taken_str = automl_ai_format_time_taken( $totals['time_taken'] );
+			$automlp_wpml_time_taken_str = automlp_ai_format_time_taken( $totals['time_taken'] );
 			?>
-			<span><?php echo esc_html( automl_ai_format_number( $totals['character_count'] ) ); ?></span>
+			<span><?php echo esc_html( automlp_ai_format_number( $totals['character_count'] ) ); ?></span>
 			<span><?php esc_html_e( 'Total Characters Translated!', 'wpml-translation-check' ); ?></span>
 		</div>
-		<ul class="automl_ai_dashboard-sts-btm">
+		<ul class="automlp_ai_dashboard-sts-btm">
 			<li>
 				<span><?php esc_html_e( 'Total Strings', 'wpml-translation-check' ); ?></span>
-				<span><?php echo esc_html( automl_ai_format_number( $totals['string_count'] ) ); ?></span>
+				<span><?php echo esc_html( automlp_ai_format_number( $totals['string_count'] ) ); ?></span>
 			</li>
-			<?php foreach($automl_valid_providers as $provider_key => $provider_name): // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
+			<?php foreach($automlp_valid_providers as $provider_key => $provider_name): // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound ?>
 				<?php if(isset($totals[$provider_key])): ?>
 				<li>
 						<span><?php echo esc_html( ucfirst( $provider_name ) ); ?></span>
-						<span><?php echo esc_html( automl_ai_format_number( $totals[$provider_key] ) ); ?></span>
+						<span><?php echo esc_html( automlp_ai_format_number( $totals[$provider_key] ) ); ?></span>
 					</li>
 				<?php endif; ?>
 			<?php endforeach; ?>
@@ -185,7 +185,7 @@ endif;
 			</li>
 			<li>
 				<span><?php esc_html_e( 'Time Taken', 'wpml-translation-check' ); ?></span>
-				<span><?php echo esc_html( $automl_wpml_time_taken_str ); ?></span>
+				<span><?php echo esc_html( $automlp_wpml_time_taken_str ); ?></span>
 			</li>
 		</ul>
 	</div>

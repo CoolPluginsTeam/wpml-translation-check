@@ -15,15 +15,15 @@ import Notice from "./components/notice";
 
 const App = ({ onDestory, prefix, postIds }) => {
   const dispatch = useDispatch();
-  const { languageObject = {}, selected_language_object = {} } = automl_wpml_bulk_translate_object || {};
+  const { languageObject = {}, selected_language_object = {} } = automlp_wpml_bulk_translate_object || {};
   const wizardSelectedCode = Object.keys(selected_language_object)[0] || '';
-  const wizardLanguagesUrl = (automl_wpml_bulk_translate_object?.admin_url || '').replace(/\/?$/, '') + '/admin.php?page=automl_ai_wizard&step=languages';
+  const wizardLanguagesUrl = (automlp_wpml_bulk_translate_object?.admin_url || '').replace(/\/?$/, '') + '/admin.php?page=automlp_ai_wizard&step=languages';
   const emptyPostIdsErrorMessage = sprintf(
     __(
       "Please select at least one %s for translation.",
-      "automl-ai-translation-for-wpml",
+      "automlp-ai-translation-for-wpml",
     ),
-    automl_wpml_bulk_translate_object.post_label,
+    automlp_wpml_bulk_translate_object.post_label,
   );
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   // Don't show error for string translation page even if postIds is empty
@@ -40,7 +40,7 @@ const App = ({ onDestory, prefix, postIds }) => {
   const [errorModal, setErrorModal] = useState(false);
   const [localAiModalError, setLocalAiModalError] = useState(false);
   const targetLanguages=JSON.parse(JSON.stringify(languageObject));
-  delete targetLanguages[automl_wpml_bulk_translate_object.default_language_slug];
+  delete targetLanguages[automlp_wpml_bulk_translate_object.default_language_slug];
 
   const destroyApp = (e) => {
     setStatusModalVisibility(false);
@@ -62,7 +62,7 @@ const App = ({ onDestory, prefix, postIds }) => {
         status.type === "browser-not-supported"
       ) {
         setLocalAiModalError(
-          __(status.html[0].outerHTML, "automl-ai-translation-for-wpml"),
+          __(status.html[0].outerHTML, "automlp-ai-translation-for-wpml"),
         );
       }
 
@@ -83,7 +83,7 @@ const App = ({ onDestory, prefix, postIds }) => {
       setErrorMessage(
         __(
           "Please select at least one language",
-          "automl-ai-translation-for-wpml",
+          "automlp-ai-translation-for-wpml",
         ),
       );
       setErrorModal(true);
@@ -186,16 +186,16 @@ const App = ({ onDestory, prefix, postIds }) => {
         <div className={`${prefix}-header`}>
             <div className={`${prefix}-modal-header-inner`}>
               <span className={`${prefix}-step-label`}>
-                {__("STEP 1 OF 3", "automl-ai-translation-for-wpml")}
+                {__("STEP 1 OF 3", "automlp-ai-translation-for-wpml")}
               </span>
-              <h2>{__("Select Languages", "automl-ai-translation-for-wpml")}</h2>
+              <h2>{__("Select Languages", "automlp-ai-translation-for-wpml")}</h2>
             </div>
             <button
               type="button"
               className={`${prefix}-modal-close`}
               onClick={destroyApp}
-              title={__("Close", "automl-ai-translation-for-wpml")}
-              aria-label={__("Close", "automl-ai-translation-for-wpml")}
+              title={__("Close", "automlp-ai-translation-for-wpml")}
+              aria-label={__("Close", "automlp-ai-translation-for-wpml")}
             >
               &times;
             </button>
@@ -219,7 +219,7 @@ const App = ({ onDestory, prefix, postIds }) => {
     <div className={`${prefix}-languages`}>
       <div className={`${prefix}-languages-enabled-list`}>
         {(() => {
-          const defaultSlug = automl_wpml_bulk_translate_object.default_language_slug;
+          const defaultSlug = automlp_wpml_bulk_translate_object.default_language_slug;
           const allCodes = Object.keys(languageObject).filter(
             (lang) => !defaultSlug || defaultSlug !== lang
           );
@@ -303,13 +303,13 @@ const App = ({ onDestory, prefix, postIds }) => {
       </div>
 
       <div className={`${prefix}-languages-disabled-lists`}>
-      <p>{__('Multiple language translation available in Pro.', 'automl-ai-translation-for-wpml')}
+      <p>{__('Multiple language translation available in Pro.', 'wpml-translation-check')}
        &nbsp;
-      <a href='#' title={__('Buy Pro Version to Unlock All Languages', 'automl-ai-translation-for-wpml')} className={`${prefix}-buy-pro-version-link`}>{__('Upgrade now', 'automl-ai-translation-for-wpml')}</a>
+      <a href='#' title={__('Buy Pro Version to Unlock All Languages', 'wpml-translation-check')} className={`${prefix}-buy-pro-version-link`}>{__('Upgrade now', 'wpml-translation-check')}</a>
       </p>
       <div>
         {(() => {
-          const defaultSlug = automl_wpml_bulk_translate_object.default_language_slug;
+          const defaultSlug = automlp_wpml_bulk_translate_object.default_language_slug;
           const allCodes = Object.keys(languageObject).filter(
             (lang) => !defaultSlug || defaultSlug !== lang
           );
@@ -405,10 +405,10 @@ const App = ({ onDestory, prefix, postIds }) => {
       }}
     >
       <p style={{ margin: '0 0 8px', fontSize: 14 }}>
-        {__('Please select a translation language first.', 'automl-ai-translation-for-wpml')}
+        {__('Please select a translation language first.', 'wpml-translation-check')}
       </p>
       <a href={wizardLanguagesUrl} style={{ fontSize: 14 }}>
-        {__('Select language in Setup Wizard (Languages step)', 'automl-ai-translation-for-wpml')}
+        {__('Select language in Setup Wizard (Languages step)', 'wpml-translation-check')}
       </a>
     </div>
   )}
@@ -423,7 +423,7 @@ const App = ({ onDestory, prefix, postIds }) => {
                       : ""
                   }
                 >
-                  {__("Cancel", "automl-ai-translation-for-wpml")}
+                  {__("Cancel", "automlp-ai-translation-for-wpml")}
                 </button>
                 <button
                   className={`${prefix}-footer-button button button-primary`}
@@ -438,12 +438,12 @@ const App = ({ onDestory, prefix, postIds }) => {
                       : !selectedLanguages.length
                       ? __(
                           "Please select at least one language",
-                          "automl-ai-translation-for-wpml",
+                          "automlp-ai-translation-for-wpml",
                         )
                       : ""
                   }
                 >
-                                    {__("Next", "automl-ai-translation-for-wpml")} <span className={`${prefix}-next-arrow`}>&#8594;</span>
+                                    {__("Next", "automlp-ai-translation-for-wpml")} <span className={`${prefix}-next-arrow`}>&#8594;</span>
                 </button>
               </div>
             </>

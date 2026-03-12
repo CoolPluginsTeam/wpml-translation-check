@@ -25,14 +25,14 @@ import LocalAITranslate from "./components/translate-provider/local-ai/local-ai-
 
     // 1️⃣ Clear old cached data on page load
     const clearOldTranslatorCacheOnLoad = () => {
-      const loadKey = "automl_wpml_LOCAL_AI_PAGE_LOADED";
+      const loadKey = "automlp_wpml_LOCAL_AI_PAGE_LOADED";
 
       if (sessionStorage.getItem(loadKey)) {
         return;
       }
 
       localStorage.removeItem(
-        "automl_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
+        "automlp_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
       );
       sessionStorage.setItem(loadKey, "1");
     };
@@ -40,7 +40,7 @@ import LocalAITranslate from "./components/translate-provider/local-ai/local-ai-
     // 2️⃣ Language pack availability check (gesture-based)
     const checkLanguagePackAvailability = async () => {
       const languagesObj = {
-        ...automl_wpml_bulk_translate_object.languageObject,
+        ...automlp_wpml_bulk_translate_object.languageObject,
       };
       const supportedLanguages = LocalAITranslate.supportedLanguages || [];
 
@@ -51,7 +51,7 @@ import LocalAITranslate from "./components/translate-provider/local-ai/local-ai-
         savedLanguages =
           JSON.parse(
             localStorage.getItem(
-              "automl_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
+              "automlp_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
             ),
           ) || [];
       } catch {
@@ -80,7 +80,7 @@ import LocalAITranslate from "./components/translate-provider/local-ai/local-ai-
               delete languagesObj[targetLang];
               savedLanguages.push(targetLang);
               localStorage.setItem(
-                "automl_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
+                "automlp_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
                 JSON.stringify(savedLanguages),
               );
             }
@@ -257,7 +257,7 @@ window.wpmlStringFilters = stringFilters;
   };
 
   window.addEventListener("load", async () => {
-    const prefix = "automl-wpml-bulk-translate";
+    const prefix = "automlp-wpml-bulk-translate";
 
     // Move bulk translate button to correct position on string translation page
     const bulkTranslateBtn = document.querySelector(`.${prefix}-btn`);

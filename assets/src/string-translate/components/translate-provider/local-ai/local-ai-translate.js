@@ -199,7 +199,7 @@ class ChromeAiTranslator {
                     </li>
                 </ol>
                 <div style="text-align: right;">
-                    <button onclick="location.reload()" class="automl-wpml-error-reload-btn">Reload Page</button>
+                    <button onclick="location.reload()" class="automlp-wpml-error-reload-btn">Reload Page</button>
                 </div>
             </span>`);
             return { html: message, message: `Language pack downloading please wait or try again...`, type: 'language-pack-downloading' };

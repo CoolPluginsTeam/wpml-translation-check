@@ -1,18 +1,18 @@
 const FilterTargetContent = (props, storeUpdateContent) => {
     const { item, saveFilteredString } = props;
     const skipTags = props.skipTags || [];
-    const OpenSpanPlaceholder = '#automl_wpml_open_translate_span#';
-    const CloseSpanPlaceholder = '#automl_wpml_close_translate_span#';
-    const OpenTempTagPlaceholder = '#automl_wpml_temp_tag_open#';
-    const CloseTempTagPlaceholder = '#automl_wpml_temp_tag_close#';
-    const LessThanSymbol = '#automl_wpml_less_then_symbol#';
-    const GreaterThanSymbol = '#automl_wpml_greater_then_symbol#';
-    const entityOpenPlaceholder = '#automl_wpml_entity_open_translate_span#';
-    const entityClosePlaceholder = '#automl_wpml_entity_close_translate_span#';
-    const lineBreakNOpenPlaceholder = '#automl_wpml_line_break_n_open#';
-    const lineBreakNClosePlaceholder = '#automl_wpml_line_break_n_close#';
-    const lineBreakROpenPlaceholder = '#automl_wpml_line_break_r_open#';
-    const lineBreakRClosePlaceholder = '#automl_wpml_line_break_r_close#';
+    const OpenSpanPlaceholder = '#automlp_wpml_open_translate_span#';
+    const CloseSpanPlaceholder = '#automlp_wpml_close_translate_span#';
+    const OpenTempTagPlaceholder = '#automlp_wpml_temp_tag_open#';
+    const CloseTempTagPlaceholder = '#automlp_wpml_temp_tag_close#';
+    const LessThanSymbol = '#automlp_wpml_less_then_symbol#';
+    const GreaterThanSymbol = '#automlp_wpml_greater_then_symbol#';
+    const entityOpenPlaceholder = '#automlp_wpml_entity_open_translate_span#';
+    const entityClosePlaceholder = '#automlp_wpml_entity_close_translate_span#';
+    const lineBreakNOpenPlaceholder = '#automlp_wpml_line_break_n_open#';
+    const lineBreakNClosePlaceholder = '#automlp_wpml_line_break_n_close#';
+    const lineBreakROpenPlaceholder = '#automlp_wpml_line_break_r_open#';
+    const lineBreakRClosePlaceholder = '#automlp_wpml_line_break_r_close#';
 
     const removeInnerSpanPlaceholder = (content) => {
         return content.replace(new RegExp(OpenSpanPlaceholder, 'g'), '').replace(new RegExp(CloseSpanPlaceholder, 'g'), '');
@@ -449,7 +449,7 @@ const FilterTargetContent = (props, storeUpdateContent) => {
                     pTemp.innerText = filterContent(data);
                     const output=pTemp.innerHTML;
                     pTemp=null;
-                    return `<span class="notranslate automl-wpml-notraslate-tag" translate="no">${output}</span>`;
+                    return `<span class="notranslate automlp-wpml-notraslate-tag" translate="no">${output}</span>`;
                 } else {
                     return data;
                 }
@@ -473,7 +473,7 @@ const FilterTargetContent = (props, storeUpdateContent) => {
             ['yandex', 'localAiTranslator', 'google'].includes(props.service) ? content.map((data, index) => {
                 const notTranslate = notTranslatePattern.test(data);
                 if (notTranslate) {
-                    return <span key={index} className="notranslate automl-wpml-notraslate-tag" translate="no">{filterContent(data)}</span>;
+                    return <span key={index} className="notranslate automlp-wpml-notraslate-tag" translate="no">{filterContent(data)}</span>;
                 } else {
                     return data;
                 }

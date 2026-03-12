@@ -40,7 +40,7 @@ const updateGutenbergContent=async ({source, lang, translatedContent, servicePro
      * @param {string} key
      */
     const updateInnerHtmlContent=(key)=>{
-        const staticKey = key.replace(/(_automl_wpml_\d+)$/, '');
+        const staticKey = key.replace(/(_automlp_wpml_\d+)$/, '');
        
         const duplicateKey=Object.keys(translatedContent).filter(item=>item.includes(staticKey));
 
@@ -48,7 +48,7 @@ const updateGutenbergContent=async ({source, lang, translatedContent, servicePro
 
         const values=[];
         duplicateKey.forEach(key=>{
-            let keyArray=key.split('_automl_wpml_');
+            let keyArray=key.split('_automlp_wpml_');
             let currentBlock = source.content;
             const translateValue = getTransaltedValue(key);
             let parentBlock = null;
@@ -74,7 +74,7 @@ const updateGutenbergContent=async ({source, lang, translatedContent, servicePro
         let parentKey=null;
         let currentBlock = source.content;
 
-        staticKey.split('_automl_wpml_').slice(1).forEach(key=>{
+        staticKey.split('_automlp_wpml_').slice(1).forEach(key=>{
             parentBlock = currentBlock;
             parentKey = key;
             currentBlock = currentBlock[key];
@@ -129,7 +129,7 @@ const updateGutenbergContent=async ({source, lang, translatedContent, servicePro
         const customInnerBlockKeys=[];
 
         Object.keys(translation).forEach(key=>{
-            const keys=key.split('_automl_wpml_');
+            const keys=key.split('_automlp_wpml_');
             if(keys[0] === 'title' && source.title){
                 updateTitle(source, translation[keys[0]]);
             }else if(keys[0] === 'post_name' && source.post_name){
@@ -153,7 +153,7 @@ const updateGutenbergContent=async ({source, lang, translatedContent, servicePro
                     let innerContentKey=null;
                     let innerContentCurrentBlock=source.content;
 
-                    const joinBlockKey=blockKey.join('_automl_wpml_');
+                    const joinBlockKey=blockKey.join('_automlp_wpml_');
 
                     
                     if(!customInnerBlockKeys.includes(joinBlockKey)){
@@ -196,10 +196,10 @@ const updateGutenbergContent=async ({source, lang, translatedContent, servicePro
     }
 
     const updateCustomBlockInnerHtml=(key)=>{
-        const existingKeys=Object.keys(sourceEntries).filter(item=>item.startsWith('content_automl_wpml_'+key+'_automl_wpml_innerContent'));
+        const existingKeys=Object.keys(sourceEntries).filter(item=>item.startsWith('content_automlp_wpml_'+key+'_automlp_wpml_innerContent'));
 
         if(existingKeys.length > 0) return;
-        let currentBlockKeys=Object.keys(sourceEntries).filter(item=>item.startsWith('content_automl_wpml_'+key+'_automl_wpml_'+'attrs'));
+        let currentBlockKeys=Object.keys(sourceEntries).filter(item=>item.startsWith('content_automlp_wpml_'+key+'_automlp_wpml_'+'attrs'));
 
         let translatedStrings={};
         
@@ -218,7 +218,7 @@ const updateGutenbergContent=async ({source, lang, translatedContent, servicePro
             .reduce((acc, [k, v]) => { acc[k] = v; return acc; }, {});
 
 
-        let blockKey=key.split('_automl_wpml_');
+        let blockKey=key.split('_automlp_wpml_');
 
         let currentBlock=source.content;
         let parentBlock=null;

@@ -1,6 +1,6 @@
 <?php return array(
     'root' => array(
-        'name' => 'cool-plugins/automl-ai-translation-for-wpml',
+        'name' => 'cool-plugins/automlp-ai-translation-for-wpml',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
         'reference' => '98a9aac022cd640f37d5ceba3eb738dc3d56afc3',
@@ -10,7 +10,7 @@
         'dev' => true,
     ),
     'versions' => array(
-        'cool-plugins/automl-ai-translation-for-wpml' => array(
+        'cool-plugins/automlp-ai-translation-for-wpml' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
             'reference' => '98a9aac022cd640f37d5ceba3eb738dc3d56afc3',

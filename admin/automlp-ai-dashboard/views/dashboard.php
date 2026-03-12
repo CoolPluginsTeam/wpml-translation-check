@@ -3,17 +3,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<div class="automl_ai_dashboard-left-section">
+<div class="automlp_ai_dashboard-left-section">
 
-	<div class="automl_ai_dashboard-get-started">
-		<div class="automl_ai_dashboard-get-started-container">
+	<div class="automlp_ai_dashboard-get-started">
+		<div class="automlp_ai_dashboard-get-started-container">
 			<h3><?php echo esc_html__( 'Get Started', 'wpml-translation-check' ); ?></h3>
 
-			<div class="automl_ai_dashboard-get-started-grid">
-				<div class="automl_ai_dashboard-get-started-grid-content">
+			<div class="automlp_ai_dashboard-get-started-grid">
+				<div class="automlp_ai_dashboard-get-started-grid-content">
 					<h2><?php echo esc_html__( 'Automate the Translation Process :-', 'wpml-translation-check' ); ?></h2>
 					<iframe
-						title="Automate the Translation Process with AUTOML Ai Translate Addon"
+						title="Automate the Translation Process with AUTOMLP Ai Translate Addon"
 						src="https://www.youtube.com/embed/ecHsOyIL_J4?feature=oembed"
 						frameborder="0"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -78,8 +78,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</div>
 			</div>
 
-			<div class="automl_ai_dashboard-get-started-grid">
-				<div class="automl_ai_dashboard-get-started-grid-content">
+			<div class="automlp_ai_dashboard-get-started-grid">
+				<div class="automlp_ai_dashboard-get-started-grid-content">
 					<h2><?php echo esc_html__( 'Preview with Google Website Translator :-', 'wpml-translation-check' ); ?></h2>
 					<iframe
 						title="Preview Translations with Google Website Translator"

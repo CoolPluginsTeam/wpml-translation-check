@@ -1,6 +1,6 @@
 <?php
 /**
- * Helper functions for AUTOML Ai Translate Addon.
+ * Helper functions for AUTOMLP Ai Translate Addon.
  *
  * @package WPML_Auto_Translate
  */
@@ -214,7 +214,7 @@ public static function mask_api_key( $api_key ) {
 	 * @return string|null Language code (e.g. 'fr') or null if wizard has not restricted language.
 	 */
 	public static function get_wizard_allowed_language_code() {
-		$option = get_option( 'automl_ai_wizard_selected_language', array() );
+		$option = get_option( 'automlp_ai_wizard_selected_language', array() );
 		if ( ! is_array( $option ) || empty( $option['code'] ) ) {
 			return null;
 		}

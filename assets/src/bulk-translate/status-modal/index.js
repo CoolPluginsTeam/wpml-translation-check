@@ -24,7 +24,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     const [progressBarVisibility, setProgressBarVisibility] = useState(true);
     const [bulkStatus, setBulkStatus] = useState('status');
     const countInfo = useSelector(selectCountInfo);
-    let [emptyPostMessage, setEmptyPostMessage] = useState(sprintf(__('Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label, automl_wpml_bulk_translate_object.post_label));
+    let [emptyPostMessage, setEmptyPostMessage] = useState(sprintf(__('Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.', 'wpml-translation-check'), automlp_wpml_bulk_translate_object.post_label, automlp_wpml_bulk_translate_object.post_label));
     let progressStatus = useSelector(selectProgressStatus);
     progressStatus = progressStatus.toFixed(1);
     progressStatus = Math.min(progressStatus, 100);
@@ -65,11 +65,11 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
         const initBulkTranslation = async () => {
             const sendRequest = async () => {
-                const response = await fetch(automl_wpml_bulk_translate_object.bulkTranslateRouteUrl + '/automl_wpmlp/pending-posts-ids', {
+                const response = await fetch(automlp_wpml_bulk_translate_object.bulkTranslateRouteUrl + '/automlp_wpmlp/pending-posts-ids', {
                     method: 'POST',
-                    body: new URLSearchParams({ ids: JSON.stringify(postIds), lang: JSON.stringify(selectedLanguages), privateKey: automl_wpml_bulk_translate_object.pendingPostsIdsKey }),
+                    body: new URLSearchParams({ ids: JSON.stringify(postIds), lang: JSON.stringify(selectedLanguages), privateKey: automlp_wpml_bulk_translate_object.pendingPostsIdsKey }),
                     headers: {
-                        'X-WP-Nonce': automl_wpml_bulk_translate_object.nonce,
+                        'X-WP-Nonce': automlp_wpml_bulk_translate_object.nonce,
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                         'Accept': 'application/json'
                     }
@@ -85,8 +85,8 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
                         if (langauges && langauges.length > 0) {
                             langauges.forEach(lang => {
-                                const flagUrl = automl_wpml_bulk_translate_object.languageObject[lang].flag;
-                                const languageName = automl_wpml_bulk_translate_object.languageObject[lang].name;
+                                const flagUrl = automlp_wpml_bulk_translate_object.languageObject[lang].flag;
+                                const languageName = automlp_wpml_bulk_translate_object.languageObject[lang].name;
 
                                 let firstPostLanguage = false;
                                 if (!postIdExist.includes(postId)) {
@@ -310,11 +310,11 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 <div className={`${prefix}-header`}>
                     <div className={`${prefix}-modal-header-inner`}>
                         <span className={`${prefix}-step-label`}>
-                            {__("STEP 3 OF 3", "automl-ai-translation-for-wpml")}
+                            {__("STEP 3 OF 3", "automlp-ai-translation-for-wpml")}
                         </span>
                         <h2 className={`${prefix}-bulk-status-heading ${bulkStatus}`}>
                             {sprintf(
-                                __("Bulk Translation %s", "automl-ai-translation-for-wpml"),
+                                __("Bulk Translation %s", "automlp-ai-translation-for-wpml"),
                                 getBulkStatus(),
                             )}
                             {bulkStatus === "running" && (
@@ -488,7 +488,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                                             target="_blank"
                                                                             rel="noopener noreferrer"
                                                                             className="button button-primary"
-                                                                            title={sprintf(__('Open the translated %s for review', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label)}
+                                                                            title={sprintf(__('Open the translated %s for review', 'wpml-translation-check'), automlp_wpml_bulk_translate_object.post_label)}
                                                                         >
                                                                             {__('Review', 'wpml-translation-check')}
                                                                         </a>
@@ -496,7 +496,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                                         <button
                                                                             className="button disabled"
                                                                             disabled
-                                                                            title={sprintf(__('Please wait until all translations for this %s are complete before reviewing.', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label)}
+                                                                            title={sprintf(__('Please wait until all translations for this %s are complete before reviewing.', 'wpml-translation-check'), automlp_wpml_bulk_translate_object.post_label)}
                                                                         >
                                                                             {__('Review', 'wpml-translation-check')}
                                                                         </button>
@@ -518,8 +518,8 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                         <div className={`${prefix}-status-footer`}>
                             {isLoading ?
                              <div className={`${prefix}-progress-skeleton`}></div> :
-                             (!(countInfo.postsTranslated > 0 && !pendingPosts.length)) ? <div className={`${prefix}-progress-button button button-primary`} disabled>{sprintf(__('Check Translated %s', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label)}</div> :
-                             <a className={`${prefix}-progress-button button button-primary`} href={getTranslatedPostLink()}>{sprintf(__('Check Translated %s', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label)}</a>
+                             (!(countInfo.postsTranslated > 0 && !pendingPosts.length)) ? <div className={`${prefix}-progress-button button button-primary`} disabled>{sprintf(__('Check Translated %s', 'wpml-translation-check'), automlp_wpml_bulk_translate_object.post_label)}</div> :
+                             <a className={`${prefix}-progress-button button button-primary`} href={getTranslatedPostLink()}>{sprintf(__('Check Translated %s', 'wpml-translation-check'), automlp_wpml_bulk_translate_object.post_label)}</a>
                             }
                         </div>
                     </>

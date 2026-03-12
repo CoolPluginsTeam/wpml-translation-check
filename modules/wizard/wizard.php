@@ -1,20 +1,20 @@
 <?php
 /**
- * Main class for AutoML setup wizard.
+ * Main class for AutoMLP setup wizard.
  *
  * @package WPML_Auto_Translate
  */
 
-namespace AUTOML_WPML\Modules\Wizard;
+namespace AUTOMLP_WPML\Modules\Wizard;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 /**
- * Main class for AutoML wizard.
+ * Main class for AutoMLP wizard.
  */
-class AUTOML_Ai_Wizard {
+class AUTOMLP_Ai_Wizard {
 
 	/**
 	 * Constructor.
@@ -32,7 +32,7 @@ class AUTOML_Ai_Wizard {
 	 * @return void
 	 */
     public function add_admin_menu() {
-		if ( get_option( 'automl_ai_setup_complete' ) && $this->is_wizard_language_set() ) {
+		if ( get_option( 'automlp_ai_setup_complete' ) && $this->is_wizard_language_set() ) {
 			return;
 		}
 		$parent_slug = 'sitepress-multilingual-cms/menu/languages.php';
@@ -46,10 +46,10 @@ class AUTOML_Ai_Wizard {
 		}
 		add_submenu_page(
 			$parent_slug,
-			esc_html__( 'AutoML Setup Wizard', 'wpml-translation-check' ),
-			esc_html__( 'AutoML Setup', 'wpml-translation-check' ),
+			esc_html__( 'AutoMLP Setup Wizard', 'wpml-translation-check' ),
+			esc_html__( 'AutoMLP Setup', 'wpml-translation-check' ),
 			'manage_options',
-			'automl_ai_wizard',
+			'automlp_ai_wizard',
 			array( $this, 'display_wizard_page' )
 		);
 	}
@@ -64,7 +64,7 @@ class AUTOML_Ai_Wizard {
 		if ( wp_doing_ajax() || $network_wide ) {
 			return;
 		}
-		if ( get_option( 'automl_ai_setup_complete' ) ) {
+		if ( get_option( 'automlp_ai_setup_complete' ) ) {
 			return;
 		}
 		set_transient( 'wpml_at_activation_redirect', 1, 30 );
@@ -83,13 +83,13 @@ class AUTOML_Ai_Wizard {
 		if ( ! get_transient( 'wpml_at_activation_redirect' ) ) {
 			return;
 		}
-		if ( ( isset( $_GET['page'] ) && 'automl_ai_wizard' === sanitize_key( $_GET['page'] ) ) || isset( $_GET['activate-multi'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ( isset( $_GET['page'] ) && 'automlp_ai_wizard' === sanitize_key( $_GET['page'] ) ) || isset( $_GET['activate-multi'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			delete_transient( 'wpml_at_activation_redirect' );
 			return;
 		}
 		delete_transient( 'wpml_at_activation_redirect' );
 		wp_safe_redirect(
-			add_query_arg( array( 'page' => 'automl_ai_wizard' ), admin_url( 'admin.php' ) )
+			add_query_arg( array( 'page' => 'automlp_ai_wizard' ), admin_url( 'admin.php' ) )
 		);
 		exit;
 	}
@@ -100,7 +100,7 @@ class AUTOML_Ai_Wizard {
 	 * @return void
 	 */
     public function maybe_show_wizard_notice() {
-		if ( get_option( 'automl_ai_setup_complete' ) && $this->is_wizard_language_set() ) {
+		if ( get_option( 'automlp_ai_setup_complete' ) && $this->is_wizard_language_set() ) {
 			return;
 		}
 		if ( ! current_user_can( 'manage_options' ) ) {
@@ -110,7 +110,7 @@ class AUTOML_Ai_Wizard {
 		if ( ! $screen || ! in_array( $screen->base, array( 'edit', 'upload', 'options-general', 'dashboard' ), true ) ) {
 			return;
 		}
-		if ( isset( $_GET['page'] ) && 'automl_ai_wizard' === sanitize_key( $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['page'] ) && 'automlp_ai_wizard' === sanitize_key( $_GET['page'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}
 		ob_start();
@@ -138,7 +138,7 @@ class AUTOML_Ai_Wizard {
 	 * @return bool
 	 */
 	public function is_wizard() {
-		return isset( $_GET['page'] ) && 'automl_ai_wizard' === sanitize_key( $_GET['page'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return isset( $_GET['page'] ) && 'automlp_ai_wizard' === sanitize_key( $_GET['page'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	}
     	/**
 	 * Whether a translation language has been selected in the wizard.
@@ -146,7 +146,7 @@ class AUTOML_Ai_Wizard {
 	 * @return bool
 	 */
 	private function is_wizard_language_set() {
-		$opt = get_option( 'automl_ai_wizard_selected_language', array() );
+		$opt = get_option( 'automlp_ai_wizard_selected_language', array() );
 		return is_array( $opt ) && ! empty( $opt['code'] );
 	}
 
@@ -160,8 +160,8 @@ class AUTOML_Ai_Wizard {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'Sorry, you are not allowed to manage options for this site.', 'wpml-translation-check' ) );
 		}
-        if ( get_option( 'automl_ai_setup_complete' ) && $this->is_wizard_language_set() ) {
-			wp_safe_redirect( add_query_arg( array( 'page' => 'automl_ai_dashboard' ), admin_url( 'admin.php' ) ) );
+        if ( get_option( 'automlp_ai_setup_complete' ) && $this->is_wizard_language_set() ) {
+			wp_safe_redirect( add_query_arg( array( 'page' => 'automlp_ai_dashboard' ), admin_url( 'admin.php' ) ) );
 			exit;
 		}
 		include __DIR__ . '/view-wizard-page.php';
@@ -176,18 +176,18 @@ class AUTOML_Ai_Wizard {
 		if ( ! $this->is_wizard() ) {
 			return;
 		}
-		$asset_path = AUTOML_AI_PLUGIN_DIR . 'admin/assets/frontend/setup/setup.asset.php';
+		$asset_path = AUTOMLP_AI_PLUGIN_DIR . 'admin/assets/frontend/setup/setup.asset.php';
 		if ( ! file_exists( $asset_path ) ) {
 			wp_enqueue_style(
-				'automl-ai-wizard',
-				AUTOML_AI_PLUGIN_URL . 'modules/wizard/assets/wizard.css',
+				'automlp-ai-wizard',
+				AUTOMLP_AI_PLUGIN_URL . 'modules/wizard/assets/wizard.css',
 				array(),
-				AUTOML_AI_VERSION
+				AUTOMLP_AI_VERSION
 			);
 			return;
 		}
 		$asset   = require $asset_path;
-		$script  = AUTOML_AI_PLUGIN_URL . 'admin/assets/frontend/setup/setup.js';
+		$script  = AUTOMLP_AI_PLUGIN_URL . 'admin/assets/frontend/setup/setup.js';
 		wp_enqueue_script(
 			'wpml_at_setup',
 			$script,
@@ -232,14 +232,14 @@ class AUTOML_Ai_Wizard {
             'wpml_at_setup',
             'wpml_at_setup',
             array(
-                'api_url'        => rest_url( 'automl-bulk-translate/' ),
+                'api_url'        => rest_url( 'automlp-bulk-translate/' ),
                 'nonce'          => wp_create_nonce( 'wp_rest' ),
                 'admin_url'      => get_admin_url( null, 'admin.php' ),
-                'dashboard_url'  => add_query_arg( array( 'page' => 'automl_ai_dashboard&tab=settings' ), admin_url( 'admin.php' ) ),
+                'dashboard_url'  => add_query_arg( array( 'page' => 'automlp_ai_dashboard&tab=settings' ), admin_url( 'admin.php' ) ),
                 'home_url'       => $base_home_url,
                 'wpml_languages' => $wpml_languages,
                 'default_language' => $default_language,
-                'saved_language' => get_option( 'automl_ai_wizard_selected_language', array() ),
+                'saved_language' => get_option( 'automlp_ai_wizard_selected_language', array() ),
                 'saved_credentials' => array(
 					'openai_key' => isset( $saved_credentials['openai'] ) ? \WPML_AT_Helper::mask_api_key( $saved_credentials['openai'] ) : '',
                     'google_key' => isset( $saved_credentials['google'] ) ? \WPML_AT_Helper::mask_api_key( $saved_credentials['google'] ) : '',
@@ -251,10 +251,10 @@ class AUTOML_Ai_Wizard {
             )
         );
 		wp_enqueue_style(
-			'automl-ai-wizard',
-			AUTOML_AI_PLUGIN_URL . 'modules/wizard/assets/wizard.css',
+			'automlp-ai-wizard',
+			AUTOMLP_AI_PLUGIN_URL . 'modules/wizard/assets/wizard.css',
 			array(),
-			AUTOML_AI_VERSION
+			AUTOMLP_AI_VERSION
 		);
 	}
 }

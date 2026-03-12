@@ -1,6 +1,6 @@
 <?php
 
-namespace AUTOML_WPML\Includes\Bulk_Translation;
+namespace AUTOMLP_WPML\Includes\Bulk_Translation;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -11,7 +11,7 @@ use WPML_AT_Helper;
 /**
  * Register_Assets
  *
- * @package AUTOML_WPML\Includes\Bulk_Translation
+ * @package AUTOMLP_WPML\Includes\Bulk_Translation
  */
 class Register_Assets {
 	public function __construct() {
@@ -36,22 +36,22 @@ class Register_Assets {
 			return;
 		}
 
-		$automl_current_language=apply_filters( 'wpml_current_language', null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$automlp_current_language=apply_filters( 'wpml_current_language', null ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		$wizard_lang = WPML_AT_Helper::get_wizard_allowed_language_code();
 
-		wp_enqueue_script( 'automl-admin', AUTOML_AI_PLUGIN_URL . 'assets/js/automl-admin.min.js', array(), AUTOML_AI_VERSION, true );
+		wp_enqueue_script( 'automlp-admin', AUTOMLP_AI_PLUGIN_URL . 'assets/js/automlp-admin.min.js', array(), AUTOMLP_AI_VERSION, true );
 		wp_localize_script(
-			'automl-admin',
-			'automl_wpml_admin_object',
+			'automlp-admin',
+			'automlp_wpml_admin_object',
 			array(
 				'wizardLanguage' => $wizard_lang,
-				'currentLanguage' => $automl_current_language,
+				'currentLanguage' => $automlp_current_language,
 			)
 		);
 
 
-		if(isset($automl_current_language) && !empty($automl_current_language)) {
-			if($automl_current_language === $wizard_lang) {
+		if(isset($automlp_current_language) && !empty($automlp_current_language)) {
+			if($automlp_current_language === $wizard_lang) {
 				return;
 			}
 		}
@@ -80,18 +80,18 @@ class Register_Assets {
 			}
 		}
 
-		$slug_translation_option = get_option( 'automl_wpml_slug_translation_option', 'title_translate' );
+		$slug_translation_option = get_option( 'automlp_wpml_slug_translation_option', 'title_translate' );
 
-		$editor_script_asset = include AUTOML_AI_PLUGIN_DIR . 'assets/bulk-translate/index.asset.php';
+		$editor_script_asset = include AUTOMLP_AI_PLUGIN_DIR . 'assets/bulk-translate/index.asset.php';
 
 		$rtl      = function_exists( 'is_rtl' ) ? is_rtl() : false;
 		$css_file = $rtl ? 'index-rtl.css' : 'index.css';
 
-		wp_enqueue_script( 'automl-wpml-bulk-translate', AUTOML_AI_PLUGIN_URL . 'assets/bulk-translate/index.js', $editor_script_asset['dependencies'], $editor_script_asset['version'], true );
-		wp_enqueue_style( 'automl-wpml-bulk-translate', AUTOML_AI_PLUGIN_URL . 'assets/bulk-translate/' . $css_file, array(), $editor_script_asset['version'] );
+		wp_enqueue_script( 'automlp-wpml-bulk-translate', AUTOMLP_AI_PLUGIN_URL . 'assets/bulk-translate/index.js', $editor_script_asset['dependencies'], $editor_script_asset['version'], true );
+		wp_enqueue_style( 'automlp-wpml-bulk-translate', AUTOMLP_AI_PLUGIN_URL . 'assets/bulk-translate/' . $css_file, array(), $editor_script_asset['version'] );
 
 		$languages            = WPML_AT_Helper::get_wpml_languages();
-		$selected_language    = get_option( 'automl_ai_wizard_selected_language', array() );
+		$selected_language    = get_option( 'automlp_ai_wizard_selected_language', array() );
 		$selected_lang_object = array();
 		if ( ! empty( $selected_language['code'] ) ) {
 			$selected_lang_object[ $selected_language['code'] ] = array(
@@ -135,34 +135,34 @@ class Register_Assets {
 
 		$extra_data = array();
 
-		$ai_max_tokens = get_option( 'automl_wpml_ai_request_token_per_request', 500 );
-		$ai_batch_size = get_option( 'automl_wpml_ai_request_batch_size', 5 );
+		$ai_max_tokens = get_option( 'automlp_wpml_ai_request_token_per_request', 500 );
+		$ai_batch_size = get_option( 'automlp_wpml_ai_request_batch_size', 5 );
 
 		wp_localize_script(
-			'automl-wpml-bulk-translate',
-			'automl_wpml_bulk_translate_object',
+			'automlp-wpml-bulk-translate',
+			'automlp_wpml_bulk_translate_object',
 			array_merge(
 				array(
 					'ajax_url'                   => admin_url( 'admin-ajax.php' ),
 					'languageObject'             => $lang_object,
 					'selected_language_object'   => $selected_lang_object,
 					'nonce'                      => wp_create_nonce( 'wp_rest' ),
-					'bulkTranslateRouteUrl'      => get_rest_url( null, 'automl-bulk-translate' ),
-					'bulkTranslatePrivateKey'    => wp_create_nonce( 'automl_wpml_bulk_translate_entries_nonce' ),
-					'pendingPostsIdsKey'         => wp_create_nonce( 'automl_wpml_pending_posts_ids_nonce' ),
-					'automl_wpml_url'            => esc_url( AUTOML_AI_PLUGIN_URL ),
+					'bulkTranslateRouteUrl'      => get_rest_url( null, 'automlp-bulk-translate' ),
+					'bulkTranslatePrivateKey'    => wp_create_nonce( 'automlp_wpml_bulk_translate_entries_nonce' ),
+					'pendingPostsIdsKey'         => wp_create_nonce( 'automlp_wpml_pending_posts_ids_nonce' ),
+					'automlp_wpml_url'            => esc_url( AUTOMLP_AI_PLUGIN_URL ),
 					'AIServices'                 => $available_ai_services,
 					'admin_url'                  => admin_url(),
 					'ai_translate_route_nonce'   => wp_create_nonce( 'wp_rest' ),
-					'ai_translate_nonce'         => wp_create_nonce( 'automl_wpml_ai_translate_nonce' ),
-					'get_glossary_validate'      => wp_create_nonce( 'automl_wpml_get_glossary_private' ),
+					'ai_translate_nonce'         => wp_create_nonce( 'automlp_wpml_ai_translate_nonce' ),
+					'get_glossary_validate'      => wp_create_nonce( 'automlp_wpml_get_glossary_private' ),
 					'post_label'                 => $post_label,
-					'update_translate_data'      => 'automl_wpml_update_translate_data',
+					'update_translate_data'      => 'automlp_wpml_update_translate_data',
 					'slug_translation_option'    => $slug_translation_option,
 					'taxonomy_page'              => $taxonomy_page,
 					'AIRequestMaxTokens'         => $ai_max_tokens,
 					'AIRequestBatchSize'         => $ai_batch_size,
-					'automl_wpml_glossary_nonce' => wp_create_nonce( 'automl_wpml_glossary_nonce' ),
+					'automlp_wpml_glossary_nonce' => wp_create_nonce( 'automlp_wpml_glossary_nonce' ),
 					'default_language_slug'      => $default_language_slug,
 				),
 				$extra_data

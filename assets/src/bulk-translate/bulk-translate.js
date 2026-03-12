@@ -91,8 +91,8 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
     
     const updateContent = await updateFilterContent({ source: deepCloneSource, postId, lang, service });
 
-    const bulkTranslateRouteUrl = automl_wpml_bulk_translate_object.bulkTranslateRouteUrl;
-    const nonce = automl_wpml_bulk_translate_object.nonce;
+    const bulkTranslateRouteUrl = automlp_wpml_bulk_translate_object.bulkTranslateRouteUrl;
+    const nonce = automlp_wpml_bulk_translate_object.nonce;
     
     storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'in-progress', messageClass: 'in-progress' } }));
 
@@ -110,7 +110,7 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
         body.term_id = postId;
         body.taxonomy_name = updateContent.title || '';
         body.taxonomy_description = updateContent.content || '';
-        body.taxonomy = automl_wpml_bulk_translate_object.taxonomy_page;
+        body.taxonomy = automlp_wpml_bulk_translate_object.taxonomy_page;
 
         if (updateContent.post_name && updateContent.post_name.trim() !== '') {
             body.taxonomy_slug = updateContent.post_name;
@@ -141,7 +141,7 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
             const extraData = {};
 
             if (editorType === 'taxonomy') {
-                extraData.taxonomy = automl_wpml_bulk_translate_object.taxonomy_page;
+                extraData.taxonomy = automlp_wpml_bulk_translate_object.taxonomy_page;
             }
 
             updateTranslateData({ provider: service, sourceLang, targetLang: lang, currentPostId: data.data.post_id, parentPostId: postId, editorType, updateTranslateDataNonce: data?.data?.update_translate_data_nonce, extraData });
@@ -161,15 +161,15 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
                     errorHtml += '<br>Error Message:' + JSON.stringify(data.data.error);
                 }
 
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + errorHtml + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automlp-wpml-error-html">' + errorHtml + '</div>' };
             } else if (data.code && data.message) {
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + data.message + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automlp-wpml-error-html">' + data.message + '</div>' };
             } else if (!data.success || data.data) {
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + data.data + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automlp-wpml-error-html">' + data.data + '</div>' };
             } else if (!data.data.post_id) {
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + data.data + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automlp-wpml-error-html">' + data.data + '</div>' };
             } else if (typeof data === 'string') {
-                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + data + '</div>' };
+                updateData = { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automlp-wpml-error-html">' + data + '</div>' };
             }
         }
 
@@ -199,15 +199,15 @@ export const updateContent = async ({ source, postId, sourceLang, lang, editorTy
             }
         }
 
-        storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automl-wpml-error-html">' + errorHtml + '</div>' } }));
+        storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'error', messageClass: 'error', errorMessage: __('Post not created. Please try again.', 'wpml-translation-check'), errorHtml: '<div class="automlp-wpml-error-html">' + errorHtml + '</div>' } }));
     })
 }
 
 const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
 
-    const bulkTranslateRouteUrl = automl_wpml_bulk_translate_object.bulkTranslateRouteUrl;
-    const bulkTranslatePrivateKey = automl_wpml_bulk_translate_object.bulkTranslatePrivateKey;
-    const nonce = automl_wpml_bulk_translate_object.nonce;
+    const bulkTranslateRouteUrl = automlp_wpml_bulk_translate_object.bulkTranslateRouteUrl;
+    const bulkTranslatePrivateKey = automlp_wpml_bulk_translate_object.bulkTranslatePrivateKey;
+    const nonce = automlp_wpml_bulk_translate_object.nonce;
 
     const body = {
         ids: JSON.stringify(ids),
@@ -215,11 +215,11 @@ const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
         privateKey: bulkTranslatePrivateKey,
     }
 
-    let postUrl = 'automl_wpmlp/bulk-translate-entries';
+    let postUrl = 'automlp_wpmlp/bulk-translate-entries';
 
-    if (automl_wpml_bulk_translate_object.taxonomy_page && '' !== automl_wpml_bulk_translate_object.taxonomy_page) {
-        body.taxonomy = automl_wpml_bulk_translate_object.taxonomy_page;
-        postUrl = 'automl_wpmlp/bulk-translate-taxonomy-entries';
+    if (automlp_wpml_bulk_translate_object.taxonomy_page && '' !== automlp_wpml_bulk_translate_object.taxonomy_page) {
+        body.taxonomy = automlp_wpml_bulk_translate_object.taxonomy_page;
+        postUrl = 'automlp_wpmlp/bulk-translate-taxonomy-entries';
     }
 
     const untranslatedPosts = await fetch(bulkTranslateRouteUrl + '/' + postUrl, {
@@ -263,7 +263,7 @@ const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
     }
 
     if (!untranslatedPostsData.data.posts || Object.keys(untranslatedPostsData.data.posts).length === 0) {
-        return { success: false, message: sprintf(__('Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.', 'wpml-translation-check'), automl_wpml_bulk_translate_object.post_label, automl_wpml_bulk_translate_object.post_label) };
+        return { success: false, message: sprintf(__('Translations already exist for all selected %s in the chosen languages. There are no new %s to translate.', 'wpml-translation-check'), automlp_wpml_bulk_translate_object.post_label, automlp_wpml_bulk_translate_object.post_label) };
     }
 
     if (!untranslatedPostsData.data.CreateTranslatePostNonce) {
@@ -303,8 +303,8 @@ const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
                         firstPostLanguage = true;
                     }
 
-                    const flagUrl = automl_wpml_bulk_translate_object.languageObject[language].flag;
-                    const languageName = automl_wpml_bulk_translate_object.languageObject[language].name;
+                    const flagUrl = automlp_wpml_bulk_translate_object.languageObject[language].flag;
+                    const languageName = automlp_wpml_bulk_translate_object.languageObject[language].name;
                     storeDispatch(updatePendingPosts([postId + '_' + language]));
                     storeDispatch(updateTranslatePostInfo({ [postId + '_' + language]: { parentPostId: postId, targetPostId: null, targetLanguage: language, postLink: null, status: 'pending', parentPostTitle, firstPostLanguage, flagUrl, languageName, messageClass: 'warning' } }));
                 });
@@ -335,7 +335,7 @@ const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
                     errorMessage: sprintf(
                         __('Set source language for this %s %s before translating.', 'wpml-translation-check'),
                         titleLink ? '<a href="' + titleLink + '" target="_blank" rel="noopener noreferrer">' + postTitle + '</a>' : postTitle,
-                        window?.automl_wpml_bulk_translate_object?.taxonomy_page || window?.automl_wpml_bulk_translate_object?.post_label
+                        window?.automlp_wpml_bulk_translate_object?.taxonomy_page || window?.automlp_wpml_bulk_translate_object?.post_label
                     )
                 }
 

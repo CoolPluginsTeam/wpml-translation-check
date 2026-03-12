@@ -9,4 +9,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
-<div id="automl-ai-setup"></div>
+<div id="automlp-ai-setup"></div>

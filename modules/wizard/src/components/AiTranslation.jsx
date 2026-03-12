@@ -132,7 +132,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 
     try {
       await apiFetch({
-        path: "automl-bulk-translate/wizard-save-credentials",
+        path: "automlp-bulk-translate/wizard-save-credentials",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -184,7 +184,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 
       // No key at all
       if (
-        err?.code === "automl_no_api_key" &&
+        err?.code === "automlp_no_api_key" &&
         !fieldErrors.openai &&
         !fieldErrors.google
       ) {
@@ -257,7 +257,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 
     try {
       await apiFetch({
-        path: "automl-bulk-translate/wizard-save-credentials",
+        path: "automlp-bulk-translate/wizard-save-credentials",
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -293,9 +293,9 @@ const AiTranslation = ({ onBack, onContinue }) => {
 
   return (
     <>
-      <div className="automl-ai-wizard-card">
+      <div className="automlp-ai-wizard-card">
         <div
-          className="automl-ai-wizard-language-container"
+          className="automlp-ai-wizard-language-container"
           style={{ flex: 1 }}
         >
           <h2 style={{ marginTop: 0 }}>
@@ -321,11 +321,11 @@ const AiTranslation = ({ onBack, onContinue }) => {
           )}
 
           <div
-            className="automl-ai-wizard-api-key-container"
+            className="automlp-ai-wizard-api-key-container"
             style={{ marginBottom: 16, color: "#6b7280" }}
           >
             <label
-              htmlFor="automl-ai-wizard-openai-key"
+              htmlFor="automlp-ai-wizard-openai-key"
               style={{ display: "block", marginBottom: 6, fontWeight: 500 }}
             >
               {__("OpenAI API key", "wpml-translation-check")}
@@ -339,7 +339,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
               }}
             >
               <input
-                id="automl-ai-wizard-openai-key"
+                id="automlp-ai-wizard-openai-key"
                 type={"text"}
                 value={openaiKey}
                 onChange={(e) => setOpenaiKey(e.target.value)}
@@ -376,7 +376,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                     <button
                       type="button"
                       onClick={() => handleReset("openai")}
-                      className="button button-primary automl-reset-key-btn"
+                      className="button button-primary automlp-reset-key-btn"
                     >
                       {__("Reset", "wpml-translation-check")}
                     </button>
@@ -409,11 +409,11 @@ const AiTranslation = ({ onBack, onContinue }) => {
           </div>
 
           <div
-            className="automl-ai-wizard-api-key-container"
+            className="automlp-ai-wizard-api-key-container"
             style={{ marginBottom: 16, color: "#6b7280" }}
           >
             <label
-              htmlFor="automl-ai-wizard-google-key"
+              htmlFor="automlp-ai-wizard-google-key"
               style={{ display: "block", marginBottom: 6, fontWeight: 500 }}
             >
               {__("Google / Gemini API key", "wpml-translation-check")}
@@ -427,7 +427,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
               }}
             >
               <input
-                id="automl-ai-wizard-google-key"
+                id="automlp-ai-wizard-google-key"
                 type={"text"}
                 value={googleKey}
                 onChange={(e) => setGoogleKey(e.target.value)}
@@ -464,7 +464,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                     <button
                       type="button"
                       onClick={() => handleReset("google")}
-                      className="button button-primary automl-reset-key-btn"
+                      className="button button-primary automlp-reset-key-btn"
                     >
                       {__("Reset", "wpml-translation-check")}
                     </button>
@@ -496,9 +496,9 @@ const AiTranslation = ({ onBack, onContinue }) => {
             )}
           </div>
 
-          <div className="automl-ai-wizard-card-language-footer">
+          <div className="automlp-ai-wizard-card-language-footer">
             <span
-              className="automl-ai-wizard-card-language-footer-icon"
+              className="automlp-ai-wizard-card-language-footer-icon"
               aria-hidden="true"
             >
               <img
@@ -512,7 +512,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                 style={{ display: "block" }}
               />
             </span>
-            <div className="automl-ai-wizard-card-language-footer-content">
+            <div className="automlp-ai-wizard-card-language-footer-content">
               <p>
                 <strong>
                   {__("Chrome Built-in AI", "wpml-translation-check")}
@@ -527,23 +527,23 @@ const AiTranslation = ({ onBack, onContinue }) => {
                 href={data.upgrade_url || "#"}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="automl-ai-wizard-card-language-footer-link"
+                className="automlp-ai-wizard-card-language-footer-link"
               >
                 {__("Upgrade to Pro →", "wpml-translation-check")}
               </a>
             </div>
           </div>
 
-          <p className="automl-ai-wizard-api-note">
+          <p className="automlp-ai-wizard-api-note">
             {__(
-              "API keys are saved securely and can be updated anytime in WPML → AutoML AI → Settings.",
+              "API keys are saved securely and can be updated anytime in WPML → AutoMLP AI → Settings.",
               "wpml-translation-check",
             )}
           </p>
         </div>
 
         <div
-          className="automl-ai-wizard-footer"
+          className="automlp-ai-wizard-footer"
           style={{
             display: "flex",
             justifyContent: "space-between",
@@ -563,7 +563,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
         </div>
       </div>
 
-      <div className="automl-ai-wizard-card-footer">
+      <div className="automlp-ai-wizard-card-footer">
         {__("Need help? Visit our", "wpml-translation-check")}{" "}
         <a href={data.doc_url || "#"} target="_blank" rel="noopener noreferrer">
           {__("Documentation", "wpml-translation-check")}

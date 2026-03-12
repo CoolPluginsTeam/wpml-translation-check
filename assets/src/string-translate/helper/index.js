@@ -42,7 +42,7 @@ export const updateTranslateData = ({
   const sourceStringCount = sourceCount.stringsCount;
   const date = new Date().toISOString();
 
-  const ajaxUrl = automl_wpml_bulk_translate_object.ajax_url;
+  const ajaxUrl = automlp_wpml_bulk_translate_object.ajax_url;
 
   const data = {
     provider,
@@ -57,8 +57,8 @@ export const updateTranslateData = ({
     sourceLang,
     targetLang,
     timeTaken,
-    action: automl_wpml_bulk_translate_object.update_translate_data,
-    automl_wpml_nonce: updateTranslateDataNonce,
+    action: automlp_wpml_bulk_translate_object.update_translate_data,
+    automlp_wpml_nonce: updateTranslateDataNonce,
     post_id: currentPostId,
     ajax_url: ajaxUrl,
     extraData: JSON.stringify(extraData),
@@ -87,8 +87,8 @@ export const AITranslationRequest = async ({
   target_language,
 }) => {
   const data = {
-    automl_wpml_nonce: automl_wpml_bulk_translate_object.ai_translate_nonce,
-    action: "automl_wpml_ai_translation",
+    automlp_wpml_nonce: automlp_wpml_bulk_translate_object.ai_translate_nonce,
+    action: "automlp_wpml_ai_translation",
     strings: JSON.stringify(Strings),
     source_language: source_language,
     target_language: target_language,
@@ -96,14 +96,14 @@ export const AITranslationRequest = async ({
   };
 
   const response = await fetch(
-    `${automl_wpml_bulk_translate_object.ai_translate_route_url}/${slug}/translate-text`,
+    `${automlp_wpml_bulk_translate_object.ai_translate_route_url}/${slug}/translate-text`,
     {
       method: "POST",
       headers: {
         "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
         Accept: "application/json",
         "X-WP-Nonce":
-          automl_wpml_bulk_translate_object.ai_translate_route_nonce,
+          automlp_wpml_bulk_translate_object.ai_translate_route_nonce,
       },
       signal: controller.signal,
       body: new URLSearchParams(data),

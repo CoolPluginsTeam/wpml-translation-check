@@ -1,15 +1,15 @@
 <?php
 
-namespace AUTOML_WPML\Includes\String_Translation;
+namespace AUTOMLP_WPML\Includes\String_Translation;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-use AUTOML_WPML\Helper\Helper;
+use AUTOMLP_WPML\Helper\Helper;
 
 /**
  * String_Translation
  *
- * @package AUTOML_WPML\Includes\String_Translation
+ * @package AUTOMLP_WPML\Includes\String_Translation
  */
 class String_Translation {
 	/**
@@ -63,7 +63,7 @@ class String_Translation {
 	public function render_string_bulk_translate_button()
 	{
     ?>
-		<button class="button button-primary automl-wpml-bulk-translate-btn" style="display: none;">
+		<button class="button button-primary automlp-wpml-bulk-translate-btn" style="display: none;">
 			<?php esc_html_e('AI Translate', 'wpml-translation-check'); ?>
 		</button>
 	<?php
@@ -82,7 +82,7 @@ class String_Translation {
 			return;
 		}
 	?>
-		<div id="automl-wpml-bulk-translate-wrapper"></div>
+		<div id="automlp-wpml-bulk-translate-wrapper"></div>
 <?php
 	}
 }

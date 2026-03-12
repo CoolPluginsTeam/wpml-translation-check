@@ -1,6 +1,6 @@
 <?php
 
-namespace AUTOML_WPML\Includes\Wpml\Builder\Elementor;
+namespace AUTOMLP_WPML\Includes\Wpml\Builder\Elementor;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,11 +13,11 @@ use WPML_String_Registration_Factory;
 use WPML_Elementor_Register_Strings;
 use WPML_Elementor_Update_Translation;
 use WPML_Page_Builders_Integration;
-use AUTOML_WPML\Includes\Wpml\Builder\Content_Update_Base;
+use AUTOMLP_WPML\Includes\Wpml\Builder\Content_Update_Base;
 /**
  * Elementor_Update
  *
- * @package AUTOML_WPML\Includes\Wpml
+ * @package AUTOMLP_WPML\Includes\Wpml
  */
 class Elementor_Update extends Content_Update_Base {
 	/**
@@ -35,7 +35,7 @@ class Elementor_Update extends Content_Update_Base {
 	}
 
 	protected function is_content_update() {
-		return ( defined( 'DOING_AUTOML_WPML_ELEMENTOR_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOML_WPML_ELEMENTOR_CONTENT_UPDATE' ) );
+		return ( defined( 'DOING_AUTOMLP_WPML_ELEMENTOR_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOMLP_WPML_ELEMENTOR_CONTENT_UPDATE' ) );
 	}
 
 	protected function cretae_builder_integration(): void {
@@ -67,9 +67,9 @@ class Elementor_Update extends Content_Update_Base {
 
 		$source_post = get_post( $this->post_id );
 
-		$automl_wpml_elementor_data = get_post_meta( $this->post_id, '_elementor_data', true );
+		$automlp_wpml_elementor_data = get_post_meta( $this->post_id, '_elementor_data', true );
 
-		if ( empty( $automl_wpml_elementor_data ) ) {
+		if ( empty( $automlp_wpml_elementor_data ) ) {
 			return;
 		}
 

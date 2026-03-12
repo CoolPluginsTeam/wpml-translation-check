@@ -1,6 +1,6 @@
 <?php
 
-namespace AUTOML_WPML\Includes\Wpml\Builder;
+namespace AUTOMLP_WPML\Includes\Wpml\Builder;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -11,7 +11,7 @@ use WPML_Gutenberg_Blocks_Integration;
 /**
  * Content_Update_Base
  *
- * @package AUTOML_WPML\Includes\Wpml
+ * @package AUTOMLP_WPML\Includes\Wpml
  */
 class Content_Update_Base {
 	/**
@@ -48,7 +48,7 @@ class Content_Update_Base {
 			exit;
 		}
 
-		$nonce_name = 'automl_wpml_' . sanitize_text_field( strtolower( $this->editor_type ) ) . '_content_update_nonce';
+		$nonce_name = 'automlp_wpml_' . sanitize_text_field( strtolower( $this->editor_type ) ) . '_content_update_nonce';
 
 		if ( ! wp_verify_nonce( sanitize_text_field( wp_unslash( $nonce ) ), $nonce_name ) ) {
 			wp_send_json_error( 'You are not authorized to perform this action. Invalid nonce.' );

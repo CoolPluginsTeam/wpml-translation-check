@@ -1,6 +1,6 @@
 <?php
 
-namespace AUTOML_WPML\Includes\Wpml\Builder\Gutenberg;
+namespace AUTOMLP_WPML\Includes\Wpml\Builder\Gutenberg;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -16,8 +16,8 @@ use WPML\PB\TranslateLinks as WPML_TranslateLinks;
 use WPML\PB\Gutenberg\StringsInBlock\Collection as StringsInBlockCollection;
 use WPML\PB\Gutenberg\StringsInBlock\HTML as StringsInBlockHTML;
 use WPML\PB\Gutenberg\StringsInBlock\Attributes as StringsInBlockAttributes;
-use AUTOML_WPML\Includes\Wpml\Builder\Content_Update_Base;
-use AUTOML_WPML\Includes\Wpml\Builder\Gutenberg\Update_Block_Config;
+use AUTOMLP_WPML\Includes\Wpml\Builder\Content_Update_Base;
+use AUTOMLP_WPML\Includes\Wpml\Builder\Gutenberg\Update_Block_Config;
 use WP_Block_Type_Registry;
 use WP_HTML_Tag_Processor;
 
@@ -25,7 +25,7 @@ use function WPML\Container\make;
 /**
  * Gutenberg_Update
  *
- * @package AUTOML_WPML\Includes\Wpml
+ * @package AUTOMLP_WPML\Includes\Wpml
  */
 class Gutenberg_Update extends Content_Update_Base {
 	/**
@@ -53,7 +53,7 @@ class Gutenberg_Update extends Content_Update_Base {
 	}
 
 	protected function is_content_update() {
-		return ( defined( 'DOING_AUTOML_WPML_GUTENBERG_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOML_WPML_GUTENBERG_CONTENT_UPDATE' ) );
+		return ( defined( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) );
 	}
 
 	protected function cretae_builder_integration(): void {
@@ -115,9 +115,9 @@ class Gutenberg_Update extends Content_Update_Base {
 			}
 
 			if ( isset( $this->block_default_attributes_value[ $block['blockName'] ]['attributes'] ) ) {
-				$automl_block_default_attrs = $this->block_default_attributes_value[ $block['blockName'] ]['attributes'];
+				$automlp_block_default_attrs = $this->block_default_attributes_value[ $block['blockName'] ]['attributes'];
 
-				foreach ( $automl_block_default_attrs as $attr_key => $attr_value ) {
+				foreach ( $automlp_block_default_attrs as $attr_key => $attr_value ) {
 					if ( ! isset( $block['attrs'][ $attr_key ] ) ) {
 						$block['attrs'][ $attr_key ] = $attr_value;
 					}
