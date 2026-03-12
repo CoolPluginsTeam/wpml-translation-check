@@ -78,9 +78,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 	}
 
 	public function register_ai_client() {
-		
-		$is_wp70 = function_exists( 'wp_has_ai_client' ) && wp_has_ai_client();
-	
+		$is_wp70 = function_exists( 'wp_ai_client_prompt' );
 		if ( ! $is_wp70 ) {
 			$sdk_autoload = AUTOMLP_AI_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
 			if ( file_exists( $sdk_autoload ) ) {
@@ -88,6 +86,23 @@ final class AUTOMLP_Ai_Translate_Addon {
 			}
 			if ( ! class_exists( \WordPress\AI_Client\AI_Client::class ) ) {
 				return;
+			}
+		}else{
+			update_option( 'automlp_ai_wp70_installed', true );
+		}
+		if ( get_option( 'automlp_ai_wp70_installed' ) && $is_wp70 ) {
+			if(!get_option('automlp_ai_credentials_migrated_to_wp70')){
+			$credentials = get_option('wp_ai_client_provider_credentials', array());
+			if ( ! is_array( $credentials ) ) {
+				$credentials = array();
+			}
+			
+			$allowed_providers = array('openai', 'google');
+			$providers = array_intersect($allowed_providers, array_keys($credentials));
+			foreach ($providers as $provider) {
+		     update_option('connectors_ai_'.$provider.'_api_key', $credentials[$provider]);	
+			}
+			update_option( 'automlp_ai_credentials_migrated_to_wp70', true );
 			}
 		}
 	
