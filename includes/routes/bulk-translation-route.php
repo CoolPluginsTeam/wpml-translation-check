@@ -348,13 +348,32 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             }
         
             $provider_class = $registry->getProviderClassName( $service_slug );
-        
+			if ( ! class_exists( '\WPML\TM\API\ATE\WebsiteContext' ) ) {
+				// WPML Translation Management is not active — bail out
+				return;
+			}
+			$website_context = \WPML\TM\API\ATE\WebsiteContext::getWebsiteContext();
+
             try {
                 $model = $provider_class::model( $model_id );
             } catch ( \Throwable $e ) {
                 wp_send_json_error( 'Invalid model: ' . $e->getMessage() );
             }
-        
+
+            // Extract site context fields to guide the AI translation tone/style.
+            $site_topic    = ! empty( $website_context['site_topic'] )    ? sanitize_text_field( $website_context['site_topic'] )    : '';
+            $site_purpose  = ! empty( $website_context['site_purpose'] )  ? sanitize_text_field( $website_context['site_purpose'] )  : '';
+            $site_audience = ! empty( $website_context['site_audience'] ) ? sanitize_text_field( $website_context['site_audience'] ) : '';
+
+            $context_instruction = '';
+            if ( $site_topic || $site_purpose || $site_audience ) {
+                $context_parts = array();
+                if ( $site_topic )    $context_parts[] = 'Topic: ' . $site_topic;
+                if ( $site_purpose )  $context_parts[] = 'Purpose: ' . $site_purpose;
+                if ( $site_audience ) $context_parts[] = 'Audience: ' . $site_audience;
+                $context_instruction = "\nInstruction 9: Use the following site context to guide tone and terminology — " . implode( ', ', $context_parts ) . '.';
+            }
+
             // Build one prompt with JSON instructions (your existing $content template).
             $strings_for_prompt = json_encode( $strings );
             $content = sprintf(
@@ -365,10 +384,11 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
         Instruction 5: Do not escape double quotes with backslashes. Output must be valid JSON without extra slashes.
         Instruction 6: Translate the provided JSON array into %s language, regardless of whether the values are the same and Ensure the JSON is well-formed and complete.
         Instruction 7: Decode any &lt; and &gt; HTML entities back to < and > symbols in the output & preserve and maintain whitespace.
-        Instruction 8: Return the output as a valid JSON object. Do not wrap the output in a string or markdown code block. Ensure the JSON is clean, parseable, and properly formatted. Please ensure that the output follows the format: {"key(numeric value)": "(translations of the strings in %s language)"} Strings are :- %s',
+        Instruction 8: Return the output as a valid JSON object. Do not wrap the output in a string or markdown code block. Ensure the JSON is clean, parseable, and properly formatted. Please ensure that the output follows the format: {"key(numeric value)": "(translations of the strings in %s language)"}%s Strings are :- %s',
                 $target_language,
                 $target_language,
                 $target_language,
+                $context_instruction,
                 $strings_for_prompt
             );
         
