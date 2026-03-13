@@ -293,7 +293,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 
   return (
     <>
-      <div className="automlp-ai-wizard-card">
+      <div className="automlp-ai-wizard-card" style={{ maxWidth: '680px' }}>
         <div
           className="automlp-ai-wizard-language-container"
           style={{ flex: 1 }}

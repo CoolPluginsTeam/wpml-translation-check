@@ -7,7 +7,7 @@ const VideoIntro = ({ onGetStarted }) => {
 
 	return (
 		<>
-		<div className="automlp-ai-wizard-card">
+		<div className="automlp-ai-wizard-card" style={{ maxWidth: '600px', padding: '0 40px' }}>
 			<div style={{ textAlign: 'center', marginBottom: 24 }}>
 				<h3 className="automlp-ai-wizard-card-title h3" style={{ fontSize: '1.5rem', marginBottom: 12, paddingTop: 24 }}>
 					{ __( 'Watch Setup Guide', 'wpml-translation-check' ) }

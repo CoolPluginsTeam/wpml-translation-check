@@ -348,11 +348,10 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             }
         
             $provider_class = $registry->getProviderClassName( $service_slug );
-			if ( ! class_exists( '\WPML\TM\API\ATE\WebsiteContext' ) ) {
-				// WPML Translation Management is not active — bail out
-				return;
+			$website_context = array();
+			if ( class_exists( '\WPML\TM\API\ATE\WebsiteContext' ) ) {
+				$website_context = \WPML\TM\API\ATE\WebsiteContext::getWebsiteContext();
 			}
-			$website_context = \WPML\TM\API\ATE\WebsiteContext::getWebsiteContext();
 
             try {
                 $model = $provider_class::model( $model_id );

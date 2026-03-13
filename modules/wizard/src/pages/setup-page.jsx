@@ -19,7 +19,6 @@ function setStepInUrl( step ) {
 
 const SetupPage = () => {
 	const [currentStep, setCurrentStep] = React.useState( getStepFromUrl );
-	const [showReady, setShowReady] = React.useState( false );
 
 	React.useEffect( () => {
 		setStepInUrl( currentStep );
@@ -35,20 +34,6 @@ const SetupPage = () => {
 	const handleFinish = () => {
 		setShowReady( true );
 	};
-
-	if ( showReady ) {
-		return (
-				<div className="automlp-ai-wizard-card" style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
-					<h2 style={{ marginTop: 0 }}>{ __( "You're ready to translate with AI", 'wpml-translation-check' ) }</h2>
-					<p style={{ color: '#6b7280', marginBottom: 24 }}>
-						{ __( "Use the AUTOMLP AI Translate dashboard to translate your posts and strings with AI.", 'wpml-translation-check' ) }
-					</p>
-					<a href={ dashboardUrl } className="button button-primary button-hero">
-						{ __( 'Open AUTOMLP AI Translate', 'wpml-translation-check' ) }
-					</a>
-				</div>
-		);
-	}
 
 	return (
 		<>
