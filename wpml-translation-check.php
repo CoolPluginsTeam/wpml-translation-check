@@ -341,7 +341,7 @@ public function wpml_missing_notice() {
 	?>
 	<div class="notice notice-error">
 		<p>
-			<strong><?php esc_html_e( 'AUTOMLP AI Translate Addon:', 'wpml-translation-check' ); ?></strong>
+			<strong><?php esc_html_e( 'AutoMLP – AI Translation for WPML:', 'wpml-translation-check' ); ?></strong>
 			<?php
 			printf(
 				/* translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link */
