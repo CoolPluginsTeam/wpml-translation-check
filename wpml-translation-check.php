@@ -88,23 +88,21 @@ final class AUTOMLP_Ai_Translate_Addon {
 				return;
 			}
 		}else{
-			update_option( 'automlp_ai_wp70_installed', true );
-		}
-		if ( get_option( 'automlp_ai_wp70_installed' ) && $is_wp70 ) {
 			if(!get_option('automlp_ai_credentials_migrated_to_wp70')){
-			$credentials = get_option('wp_ai_client_provider_credentials', array());
-			if ( ! is_array( $credentials ) ) {
-				$credentials = array();
-			}
-			
-			$allowed_providers = array('openai', 'google');
-			$providers = array_intersect($allowed_providers, array_keys($credentials));
-			foreach ($providers as $provider) {
-		     update_option('connectors_ai_'.$provider.'_api_key', $credentials[$provider]);	
-			}
-			update_option( 'automlp_ai_credentials_migrated_to_wp70', true );
-			}
+				$credentials = get_option('wp_ai_client_provider_credentials', array());
+				if ( ! is_array( $credentials ) ) {
+					$credentials = array();
+				}
+				
+				$allowed_providers = array('openai', 'google');
+				$providers = array_intersect($allowed_providers, array_keys($credentials));
+				foreach ($providers as $provider) {
+				 update_option('connectors_ai_'.$provider.'_api_key', $credentials[$provider]);	
+				}
+				update_option( 'automlp_ai_credentials_migrated_to_wp70', true );
+				}
 		}
+		
 	
 		$providers_autoload = AUTOMLP_AI_PLUGIN_DIR . 'ai-providers/vendor/autoload.php';
 		if ( file_exists( $providers_autoload ) ) {
