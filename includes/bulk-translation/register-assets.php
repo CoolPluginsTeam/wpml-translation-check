@@ -57,13 +57,21 @@ class Register_Assets {
 		}
 
 		$post_label    = __( 'Pages', 'wpml-translation-check' );
+		$post_singular_label = '';
 		$taxonomy_page = false;
 
 		if ( isset( $current_screen->post_type ) ) {
 			$post_type = $current_screen->post_type;
 
 			if ( isset( get_post_type_object( $post_type )->label ) && ! empty( get_post_type_object( $post_type )->label ) ) {
-				$post_label = get_post_type_object( $post_type )->label;
+				$post_object = get_post_type_object( $post_type );
+				$post_label = $post_object->label;
+
+				if(isset($post_object->labels->singular_name) && !empty($post_object->labels->singular_name)) {
+					$post_singular_label = $post_object->labels->singular_name;
+				}
+
+				$post_object=null;
 			}
 
 			if ( isset( $current_screen->taxonomy ) && ! empty( $current_screen->taxonomy ) ) {
@@ -157,6 +165,7 @@ class Register_Assets {
 					'ai_translate_nonce'         => wp_create_nonce( 'automlp_wpml_ai_translate_nonce' ),
 					'get_glossary_validate'      => wp_create_nonce( 'automlp_wpml_get_glossary_private' ),
 					'post_label'                 => $post_label,
+					'post_singular_label'        => $post_singular_label && !empty($post_singular_label) ? $post_singular_label : $post_label,
 					'update_translate_data'      => 'automlp_wpml_update_translate_data',
 					'slug_translation_option'    => $slug_translation_option,
 					'taxonomy_page'              => $taxonomy_page,

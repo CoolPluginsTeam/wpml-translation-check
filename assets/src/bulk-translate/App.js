@@ -16,7 +16,7 @@ const App = ({ onDestory, prefix, postIds }) => {
     const { languageObject = {}, selected_language_object = {} } = automlp_wpml_bulk_translate_object || {};
     const wizardSelectedCode = Object.keys(selected_language_object)[0] || '';
     const wizardLanguagesUrl = (automlp_wpml_bulk_translate_object?.admin_url || '').replace(/\/?$/, '') + '/admin.php?page=automlp_ai_wizard&step=languages';
-    const emptyPostIdsErrorMessage = sprintf(__('Please select at least one %s for translation.', 'wpml-translation-check'), automlp_wpml_bulk_translate_object.post_label);
+    const emptyPostIdsErrorMessage = sprintf(__('Please select at least one %s for translation.', 'wpml-translation-check'), automlp_wpml_bulk_translate_object.post_singular_label);
     const [selectedLanguages, setSelectedLanguages] = useState([]);
     const isStringTranslationPage = false;
     const [errorMessage, setErrorMessage] = useState(postIds.length === 0 && !isStringTranslationPage ? emptyPostIdsErrorMessage : '');
