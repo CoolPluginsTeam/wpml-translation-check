@@ -805,26 +805,9 @@
   margin-right: 10px;
 }
 
-#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-footer .automlp-wpml-bulk-translate-footer-button:nth-of-type(2) {
-  background: #2271b1;
-  border: 1px solid #2271b1;
-  color: #fff;
-}
-
-#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-footer .automlp-wpml-bulk-translate-footer-button:nth-of-type(2):disabled {
-  background: #5493c5 !important;
-  border: 1px solid #3f8dcf !important;
-  color: white !important;
-}
-
 #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-footer .automlp-wpml-bulk-translate-footer-button:nth-child(1):hover {
   background-color: #ffffff;
   border-color: #000000;
-}
-
-#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-footer .automlp-wpml-bulk-translate-footer-button:not(:disabled):nth-child(2):hover {
-  background-color: #135e96;
-  border-color: #135e96;
 }
 
 .automlp-wpml-bulk-translate-modal-header-inner .automlp-wpml-bulk-translate-step-label{
