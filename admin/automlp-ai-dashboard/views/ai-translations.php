@@ -9,8 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h1><?php esc_html_e( 'AI Translations', 'wpml-translation-check' ); ?></h1>
 			<div class="automlp_ai_dashboard-status">
 				<a href="<?php echo esc_url( admin_url( 'admin.php?page=automlp_ai_dashboard&tab=settings' ) ); ?>"
-					class="automlp_ai_dashboard-btn"
-					target="_blank">
+					class="automlp_ai_dashboard-btn">
 					<?php esc_html_e( 'Configure AI Provider', 'wpml-translation-check' ); ?>
 				</a>
 			</div>

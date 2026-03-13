@@ -205,7 +205,7 @@ const Languages = ({ onBack, onContinue }) => {
               }
               setTimeout(() => {
               window.location.href = dashboardUrl;
-            }, 1500);
+            }, 2000);
             }}
             label={__("Finish setup", "wpml-translation-check")}
             disabled={!selectedCode}

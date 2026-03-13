@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AutoMLP – AI Translation for WPML
  * Description: AutoMLP – AI translation addon for WPML that helps translate WordPress pages and posts content faster and more accurately.
- * Version: 1.0.0
+ * Version: 1.2.0
  * Author: Cool Plugins
  * Text Domain: wpml-translation-check
  * Domain Path: /languages
@@ -64,17 +64,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->load_dependencies();
 		$this->init();
-		add_action( 'init', array($this, 'register_ai_client') );
-		add_filter(
-			'plugin_action_links_' . AUTOMLP_AI_PLUGIN_BASENAME,
-			array( $this, 'add_settings_action_link' )
-		);
-	
-		add_action( 'admin_init', array( $this, 'register_ai_model_setting' ) );
-		add_action( 'admin_menu', array( $this, 'register_automlp_ai_dashboard_menu' ), 20 );
-		add_action( 'admin_menu', array( $this, 'hide_wp_ai_client_menu' ), 99 );
 	}
 
 	public function register_ai_client() {
@@ -163,8 +153,22 @@ final class AUTOMLP_Ai_Translate_Addon {
 	 * @return array
 	 */
 	public function add_settings_action_link( $links ) {
+		
 		// Only show settings link if wizard setup is complete
-		if ( ! get_option( 'automlp_ai_setup_complete', false ) ) {
+		if ( ! get_option( 'automlp_ai_setup_complete' ) ) {
+			$setup_url = add_query_arg(
+				array(
+					'page' => 'automlp_ai_wizard',
+					'step' => 'video_intro',
+				),
+				admin_url( 'admin.php' )
+			);
+			$settings_link = sprintf(
+				'<a href="%s">%s</a>',
+				esc_url( $setup_url ),
+				esc_html__( 'Setup', 'wpml-translation-check' )
+			);
+			array_unshift( $links, $settings_link ); // Put Settings first (before Deactivate).
 			return $links;
 		}
 
@@ -273,6 +277,16 @@ final class AUTOMLP_Ai_Translate_Addon {
 			add_action( 'admin_notices', array( $this, 'wpml_missing_notice' ) );
 			return;
 		}
+		register_activation_hook( __FILE__, array( \AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard::class, 'start_wizard' ) );
+		$this->load_dependencies();
+		add_filter(
+			'plugin_action_links_' . AUTOMLP_AI_PLUGIN_BASENAME,
+			array( $this, 'add_settings_action_link' )
+		);
+		add_action( 'init', array($this, 'register_ai_client') );
+		add_action( 'admin_init', array( $this, 'register_ai_model_setting' ) );
+		add_action( 'admin_menu', array( $this, 'register_automlp_ai_dashboard_menu' ), 20 );
+		add_action( 'admin_menu', array( $this, 'hide_wp_ai_client_menu' ), 99 );
 
 		// Initialize AJAX handlers.
 		if ( class_exists( AUTOMLP_AI_Strings_Ajax::class ) ) {
@@ -297,32 +311,49 @@ final class AUTOMLP_Ai_Translate_Addon {
 	}
 
 	/**
-	 * Check if WPML is active.
-	 *
-	 * @return bool
-	 */
-	private function is_wpml_active() {
-		return defined( 'ICL_SITEPRESS_VERSION' ) || class_exists( 'SitePress' );
-	}
+ * Check if required WPML plugins are active.
+ *
+ * Requires BOTH:
+ * - WPML Multilingual CMS
+ * - WPML String Translation
+ *
+ * @return bool
+ */
+private function is_wpml_active() {
+    // WPML Multilingual CMS (core).
+    $has_wpml_core = defined( 'ICL_SITEPRESS_VERSION' ) || class_exists( 'SitePress' );
+
+    // WPML String Translation.
+    $has_wpml_st = defined( 'WPML_ST_VERSION' ) || class_exists( 'WPML_String_Translation' );
+
+    return $has_wpml_core && $has_wpml_st;
+}
 
 	/**
-	 * Display notice if WPML is not active.
-	 *
-	 * @return void
-	 */
-	public function wpml_missing_notice() {
-		if ( ! current_user_can( 'activate_plugins' ) ) {
-			return;
-		}
-		?>
-		<div class="notice notice-error">
-			<p>
-				<strong><?php esc_html_e( 'AUTOMLP AI Translate Addon:', 'wpml-translation-check' ); ?></strong>
-				<?php esc_html_e( 'This plugin requires WPML to be installed and activated.', 'wpml-translation-check' ); ?>
-			</p>
-		</div>
-		<?php
+ * Display notice if required WPML plugins are not active.
+ *
+ * @return void
+ */
+public function wpml_missing_notice() {
+	if ( ! current_user_can( 'activate_plugins' ) ) {
+		return;
 	}
+	?>
+	<div class="notice notice-error">
+		<p>
+			<strong><?php esc_html_e( 'AUTOMLP AI Translate Addon:', 'wpml-translation-check' ); ?></strong>
+			<?php
+			printf(
+				/* translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link */
+				esc_html__( 'This plugin requires both %1$s and %2$s to be installed and activated.', 'wpml-translation-check' ),
+				'<a href="' . esc_url( 'https://wpml.org/purchase' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'WPML Multilingual CMS', 'wpml-translation-check' ) . '</a>',
+				'<a href="' . esc_url( 'https://wpml.org/purchase' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'WPML String Translation', 'wpml-translation-check' ) . '</a>'
+			);
+			?>
+		</p>
+	</div>
+	<?php
+}
 }
 
 /**
@@ -332,7 +363,6 @@ function automlp_ai_translate_addon() {
 	return AUTOMLP_Ai_Translate_Addon::get_instance();
 }
 
-register_activation_hook( __FILE__, array( \AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard::class, 'start_wizard' ) );
 
 // Start the plugin.
 automlp_ai_translate_addon();

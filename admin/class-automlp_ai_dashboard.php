@@ -119,7 +119,7 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 							<img src="<?php echo esc_url( AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/automlp-ai-logo.png' ); ?>" alt="<?php esc_attr_e( 'WPML Auto Logo', 'wpml-translation-check' ); ?>">
 						</a>
 						<div>
-							<span class="automlp_ai_dashboard-logo-text">AutoML</span>
+							<span class="automlp_ai_dashboard-logo-text">AutoMLP</span>
 						</div>
 						<div class="automlp_ai_dashboard-tab-title">
 							<span>↳</span> <?php echo esc_html( $valid_tabs[ $current_tab ] ); ?>

@@ -8,8 +8,6 @@ const AiTranslation = ({ onBack, onContinue }) => {
   const data = window.wpml_at_setup || {};
   const savedCreds = data.saved_credentials || {};
   const isUsingConnectorsAi = data.is_connectors_ai || false;
-  const isOpenaiProviderInstalled = data.is_openai_provider_installed || false;
-  const isGoogleProviderInstalled = data.is_google_provider_installed || false;
   const connectorsUrl = data.connectors_url || "#";
   // Helper function to mask API keys
   const maskApiKey = (apiKey) => {
@@ -53,7 +51,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
   const [googleMessage, setGoogleMessage] = React.useState(null); // error under Google
   const [generalMessage, setGeneralMessage] = React.useState(null); // success / general error
   const [isError, setIsError] = React.useState(false);
-
+  const wp_version_check = data.wp_version_check || false;
   // Track if fields are in edit mode
   const [openaiEditMode, setOpenaiEditMode] = React.useState(
     !hasExistingOpenaiKey,
@@ -533,13 +531,39 @@ const AiTranslation = ({ onBack, onContinue }) => {
               </a>
             </div>
           </div>
-
-          <p className="automlp-ai-wizard-api-note">
-            {__(
-              "API keys are saved securely and can be updated anytime in WPML → AutoMLP AI → Settings.",
-              "wpml-translation-check",
-            )}
-          </p>
+            
+          {!wp_version_check && (
+  <div className="automlp-ai-wizard-api-note">
+    <span className="dashicons dashicons-warning"></span>
+    <p>
+      <em>
+        {__(
+          "API keys are saved securely and can be updated anytime in WPML → AutoMLP AI → Settings.",
+          "wpml-translation-check",
+        )}
+      </em>
+    </p>
+  </div>
+)}
+{wp_version_check && (
+  <div className="automlp-ai-wizard-api-note">
+    <span className="dashicons dashicons-warning"></span>
+    <p>
+      <em>
+        {__(
+          "Note: API keys configured here are linked with the",
+          "wpml-translation-check",
+        )}
+        {" "}
+        <a href={ connectorsUrl } target="_blank" rel="noopener noreferrer">
+         <strong>{__( "AI → Connectors", "wpml-translation-check" )}</strong>
+        </a>
+        {" "}
+        {__( "settings in WordPress.", "wpml-translation-check" )}
+      </em>
+    </p>
+  </div>
+)}
         </div>
 
         <div

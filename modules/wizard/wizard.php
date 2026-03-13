@@ -225,8 +225,6 @@ class AUTOMLP_Ai_Wizard {
 		}
 
 		$is_using_connectors_ai             = function_exists('_wp_register_default_connector_settings');
-		$is_openai_provider_installed = $is_using_connectors_ai && class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' ) ? true : false;
-		$is_google_provider_installed = $is_using_connectors_ai && class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' ) ? true : false;
 
 		wp_localize_script(
             'wpml_at_setup',
@@ -235,7 +233,13 @@ class AUTOMLP_Ai_Wizard {
                 'api_url'        => rest_url( 'automlp-bulk-translate/' ),
                 'nonce'          => wp_create_nonce( 'wp_rest' ),
                 'admin_url'      => get_admin_url( null, 'admin.php' ),
-                'dashboard_url'  => add_query_arg( array( 'page' => 'automlp_ai_dashboard&tab=settings' ), admin_url( 'admin.php' ) ),
+                'dashboard_url'  => add_query_arg(
+				array(
+					'page' => 'automlp_ai_dashboard',
+					'tab'  => 'settings',
+				),
+				admin_url( 'admin.php' )
+			),
                 'home_url'       => $base_home_url,
                 'wpml_languages' => $wpml_languages,
                 'default_language' => $default_language,
@@ -244,9 +248,8 @@ class AUTOMLP_Ai_Wizard {
 					'openai_key' => isset( $saved_credentials['openai'] ) ? \WPML_AT_Helper::mask_api_key( $saved_credentials['openai'] ) : '',
                     'google_key' => isset( $saved_credentials['google'] ) ? \WPML_AT_Helper::mask_api_key( $saved_credentials['google'] ) : '',
                 ),
+				'wp_version_check' => get_option( 'automlp_ai_credentials_migrated_to_wp70'),
 				'is_connectors_ai'            => $is_using_connectors_ai,
-				'is_openai_provider_installed' => $is_openai_provider_installed,
-				'is_google_provider_installed' => $is_google_provider_installed,
 				'connectors_url'              => admin_url( 'options-connectors.php' ),
             )
         );

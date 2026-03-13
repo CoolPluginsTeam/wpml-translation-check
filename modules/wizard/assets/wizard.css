@@ -258,12 +258,29 @@ input#automlp-ai-wizard-google-key:focus {
   box-shadow: 0 0 0 1px #4caf50 !important;
 }
 
+/* Footer Note */
 .automlp-ai-wizard-api-note {
-	margin-top: 16px !important;
-	font-size: 0.8125rem !important;
-	font-style: italic !important;
-	color: #6b7280 !important;
-	text-align: center !important;
+    padding: 16px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 2px;
+}
+.automlp-ai-wizard-api-note .dashicons {
+    color: #d63638;
+    /* Warning color, maybe orange #dba617 if purely warning, red if danger */
+    color: #dba617;
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+}
+.automlp-ai-wizard-api-note p {
+    margin: 0;
+    font-size: 13px;
+    color: #646970;
+    font-style: italic;
+    line-height: 1.5;
+    text-align: left;
 }
 
 /* Ready table (if used) */
