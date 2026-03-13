@@ -5,7 +5,7 @@ import SetupContinueButton, { SetupBackButton } from "./SetupContinueButton";
 import { getNonce } from "../utils";
 
 const AiTranslation = ({ onBack, onContinue }) => {
-  const data = window.wpml_at_setup || {};
+  const data = window.automlp_ai_setup || {};
   const savedCreds = data.saved_credentials || {};
   const isUsingConnectorsAi = data.is_connectors_ai || false;
   const connectorsUrl = data.connectors_url || "#";
@@ -140,28 +140,28 @@ const AiTranslation = ({ onBack, onContinue }) => {
       });
 
       // Success: show a single general success message
-      if (window.wpml_at_setup) {
-        window.wpml_at_setup.saved_credentials =
-          window.wpml_at_setup.saved_credentials || {};
+      if (window.automlp_ai_setup) {
+        window.automlp_ai_setup.saved_credentials =
+          window.automlp_ai_setup.saved_credentials || {};
         if (
           requestData.openai_key !== undefined &&
           requestData.openai_key !== ""
         ) {
-          window.wpml_at_setup.saved_credentials.openai_key = maskApiKey(
+          window.automlp_ai_setup.saved_credentials.openai_key = maskApiKey(
             requestData.openai_key,
           );
         } else if (requestData.openai_key === "") {
-          delete window.wpml_at_setup.saved_credentials.openai_key;
+          delete window.automlp_ai_setup.saved_credentials.openai_key;
         }
         if (
           requestData.google_key !== undefined &&
           requestData.google_key !== ""
         ) {
-          window.wpml_at_setup.saved_credentials.google_key = maskApiKey(
+          window.automlp_ai_setup.saved_credentials.google_key = maskApiKey(
             requestData.google_key,
           );
         } else if (requestData.google_key === "") {
-          delete window.wpml_at_setup.saved_credentials.google_key;
+          delete window.automlp_ai_setup.saved_credentials.google_key;
         }
       }
 

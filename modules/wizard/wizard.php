@@ -189,7 +189,7 @@ class AUTOMLP_Ai_Wizard {
 		$asset   = require $asset_path;
 		$script  = AUTOMLP_AI_PLUGIN_URL . 'admin/assets/frontend/setup/setup.js';
 		wp_enqueue_script(
-			'wpml_at_setup',
+			'automlp_ai_setup',
 			$script,
 			$asset['dependencies'],
 			$asset['version'],
@@ -227,8 +227,8 @@ class AUTOMLP_Ai_Wizard {
 		$is_using_connectors_ai             = function_exists('_wp_register_default_connector_settings');
 
 		wp_localize_script(
-            'wpml_at_setup',
-            'wpml_at_setup',
+            'automlp_ai_setup',
+            'automlp_ai_setup',
             array(
                 'api_url'        => rest_url( 'automlp-bulk-translate/' ),
                 'nonce'          => wp_create_nonce( 'wp_rest' ),

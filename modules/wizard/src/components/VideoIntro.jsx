@@ -2,7 +2,7 @@ import React from 'react';
 import { __ } from '@wordpress/i18n';
 
 const VideoIntro = ({ onGetStarted }) => {
-	const data = window.wpml_at_setup || {};
+	const data = window.automlp_ai_setup || {};
 	const videoUrl = data.video_url || 'https://www.youtube.com/embed/dst_bf7uiTc';
 
 	return (

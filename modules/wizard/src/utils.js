@@ -2,5 +2,5 @@
  * Get nonce from localized script data.
  */
 export const getNonce = () => {
-	return window.wpml_at_setup?.nonce || '';
+	return window.automlp_ai_setup?.nonce || '';
 };

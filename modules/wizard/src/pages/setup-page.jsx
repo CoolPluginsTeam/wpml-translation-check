@@ -24,7 +24,7 @@ const SetupPage = () => {
 		setStepInUrl( currentStep );
 	}, [ currentStep ] );
 
-	const data = window.wpml_at_setup || {};
+	const data = window.automlp_ai_setup || {};
 	const dashboardUrl = data.dashboard_url || ( data.admin_url || '' ).replace( 'admin.php', 'admin.php?page=automlp_ai_dashboard' );
 
 	const handleGetStarted = () => {

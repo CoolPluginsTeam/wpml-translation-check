@@ -6,7 +6,7 @@ import { getNonce } from "../utils";
 import SetupContinueButton, { SetupBackButton } from "./SetupContinueButton";
 
 const Languages = ({ onBack, onContinue }) => {
-  const data = window.wpml_at_setup || {};
+  const data = window.automlp_ai_setup || {};
   const dashboardUrl = data.dashboard_url || ( data.admin_url || '' ).replace( 'admin.php', 'admin.php?automlp_ai_dashboard&tab=settings' );
   const defaultCode = (data.default_language || "").toLowerCase();
   const allLanguages = Array.isArray(data.wpml_languages)
@@ -72,8 +72,8 @@ const Languages = ({ onBack, onContinue }) => {
 			});
 	
 			// Persist selection in memory so Back button restores it.
-			if ( window.wpml_at_setup ) {
-			  window.wpml_at_setup.saved_language = payload.selected_language;
+			if ( window.automlp_ai_setup ) {
+			  window.automlp_ai_setup.saved_language = payload.selected_language;
 			}
 		  } catch (err) {
 			// Ignore and continue anyway.
