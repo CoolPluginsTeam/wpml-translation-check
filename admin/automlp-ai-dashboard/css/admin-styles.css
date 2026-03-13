@@ -708,6 +708,15 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
     flex: 2;
 }
 
+.automlp_ai_dashboard-api-note p {
+    margin: 0;
+    font-size: 13px;
+    color: #646970;
+    font-style: italic;
+    line-height: 1.5;
+    text-align: left;
+}
+
 .automlp_ai_dashboard-settings-container {
     padding: 24px;
     background: #fff;

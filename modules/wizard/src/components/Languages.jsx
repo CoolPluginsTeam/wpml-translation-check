@@ -18,11 +18,22 @@ const Languages = ({ onBack, onContinue }) => {
       )
     : allLanguages;
 
-  const savedCode =
+    const savedCode =
     data.saved_language && data.saved_language.code
       ? data.saved_language.code
       : "";
   const [selectedCode, setSelectedCode] = React.useState(savedCode);
+  
+  const handleLanguageChange = (code) => {
+    setSelectedCode(code);
+    // Persist immediately so Back → Continue restores the selection.
+    if (window.automlp_ai_setup) {
+      const lang = wpmlLanguages.find((l) => l.code === code) || null;
+      window.automlp_ai_setup.saved_language = lang
+        ? { code: lang.code, name: lang.name || lang.code, flag_url: lang.flag_url, locale: lang.locale }
+        : { code, name: "", flag_url: "" };
+    }
+  };
 
   // Options for dropdown.
   const languageOptions = wpmlLanguages.map((lang) => ({
@@ -118,7 +129,7 @@ const Languages = ({ onBack, onContinue }) => {
           <select
             id="automlp-ai-wizard-language-select"
             value={selectedCode}
-            onChange={(event) => setSelectedCode(event.target.value)}
+            onChange={(event) => handleLanguageChange(event.target.value)}
             className="automlp-ai-wizard-select"
           >
             <option value="">

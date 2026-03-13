@@ -392,8 +392,27 @@ $automlp_connectors_url = admin_url( 'options-connectors.php' );
 							);
 							echo '<br/><br/>';
 						endforeach;
-						?>
-
+						if ( get_option( 'automlp_ai_credentials_migrated_to_wp70' ) ) : ?>
+							<div class="automlp_ai_dashboard-api-note">
+								<p>
+									<em>
+										<?php esc_html_e(
+											'Note: API keys configured here are linked with the',
+											'wpml-translation-check'
+										); ?>
+										<a href="<?php echo esc_url( $automlp_connectors_url ); ?>" target="_blank" rel="noopener noreferrer">
+											<strong>
+												<?php esc_html_e( 'AI → Connectors', 'wpml-translation-check' ); ?>
+											</strong>
+										</a>
+										<?php esc_html_e(
+											'settings in WordPress.',
+											'wpml-translation-check'
+										); ?>
+									</em>
+								</p>
+							</div>
+						<?php endif; ?>
 						<hr>
 						<div class="automlp_ai_dashboard-save-btn-container">
 							<?php submit_button( __( 'Save', 'wpml-translation-check' ), 'primary', 'submit', true, $automlp_wpml_wizard_language_set ? array() : array( 'disabled' => 'disabled' ) ); ?>
