@@ -211,7 +211,9 @@ class Gutenberg_Update extends Content_Update_Base {
 
 		$updated_content = $this->gutenberg_builder_factory->replace_strings_in_blocks( $source_content, $this->translate_strings, $this->target_language );
 
-		$updated_content = $this->decode_tags_attributes_in_blocks( parse_blocks( $updated_content ), $custom_blocks_config );
+		$updated_content=parse_blocks( $updated_content );
+
+		$updated_content = $this->decode_tags_attributes_in_blocks( $updated_content, $custom_blocks_config );
 
 		$updated_content = serialize_blocks( $updated_content );
 
