@@ -1,0 +1,19 @@
+.cool-feedback-notice-wrapper.notice.notice-info.is-dismissible {
+    margin: 10px 20px 10px 0 !important;
+    padding-right: 38px !important;
+    position: relative;
+    max-width: 790px !important;
+}
+.cool-feedback-notice-wrapper .message_container {
+    width: calc(100% - 120px);
+    display: inline-block;
+    margin: 0;
+    vertical-align: top;
+}
+.cool-feedback-notice-wrapper ul li {
+    float: left;
+    margin: 0px 5px;
+}
+.clrfix{
+    clear:both;
+}

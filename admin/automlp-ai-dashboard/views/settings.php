@@ -414,6 +414,40 @@ $automlp_connectors_url = admin_url( 'options-connectors.php' );
 							</div>
 						<?php endif; ?>
 						<hr>
+						<?php
+						 // Handle feedback checkbox
+    $feedback_opt_in = null;
+
+
+        // If user opted out, remove the cron job
+        if ($feedback_opt_in === 'no' && wp_next_scheduled('automlp-ai_extra_data_update')) {
+            wp_clear_scheduled_hook('automlp-ai_extra_data_update');
+        }
+
+    if ($feedback_opt_in === 'yes' && !wp_next_scheduled('automlp-ai_extra_data_update')) {
+
+            wp_schedule_event(time(), 'every_30_days', 'automlp-ai_extra_data_update');   
+
+    }
+					   if (get_option('cpfm_opt_in_choice_cool_automlp_translations')) : ?>
+                            <div class="automlp-ai-dashboard-feedback-container">
+                                <div class="automlp-ai-dashboard-feedback-row">
+                                    <input type="checkbox" 
+                                        id="automlp_ai_dashboard_feedback_checkbox" 
+                                        name="automlp_ai_dashboard_feedback_checkbox"
+                                        <?php checked(get_option('automlp_feedback_opt_in'), 'yes'); ?>>
+                                    <p><?php echo esc_html__('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'wpml-translation-check'); ?></p>
+                                    <a href="#" class="cpfm-see-terms">[See terms]</a>
+                                </div>
+                                <div id="termsBox" style="display: none;padding-left: 20px; margin-top: 10px; font-size: 12px; color: #999;">
+                                        <p><?php echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect:", 'wpml-translation-check'); ?> <a href="https://my.coolplugins.net/terms/usage-tracking/?utm_source=automlp-ai_plugin&utm_medium=inside&utm_campaign=terms&utm_content=dashboard" target="_blank"><?php echo esc_html__('Click Here', 'wpml-translation-check'); ?></a></p>
+                                        <ul style="list-style-type:auto;">
+                                            <li><?php echo esc_html__('Your website home URL and WordPress admin email.', 'ccpw'); ?></li>
+                                            <li><?php echo esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'ccpw'); ?></li>
+                                        </ul>
+                                </div>
+                            </div>
+                        <?php endif; ?>
 						<div class="automlp_ai_dashboard-save-btn-container">
 							<?php submit_button( __( 'Save', 'wpml-translation-check' ), 'primary', 'submit', true, $automlp_wpml_wizard_language_set ? array() : array( 'disabled' => 'disabled' ) ); ?>
 						</div>
@@ -573,11 +607,13 @@ if ( $automlp_wpml_wizard_language_set ) :
 		
 		var openaiModel = document.getElementById('automlp_ai_selected_openai_model') ? document.getElementById('automlp_ai_selected_openai_model').value : '';
 		var googleModel = document.getElementById('automlp_ai_selected_google_model') ? document.getElementById('automlp_ai_selected_google_model').value : '';
-		
+		var feedbackCheckbox = document.getElementById('automlp_ai_dashboard_feedback_checkbox');
+       var feedbackOptIn = feedbackCheckbox && feedbackCheckbox.checked ? 'yes' : 'no';
 		// Build request data - only include keys that should be updated
 		var requestData = {
 			openai_model: openaiModel || null,
-			google_model: googleModel || null
+			google_model: googleModel || null,
+			automlp_feedback_opt_in: feedbackOptIn
 		};
 		
 		if (openaiInput && (openaiKey !== '' || (openaiInput.getAttribute('data-has-key') === '1' && openaiInput.value.trim() === ''))) {

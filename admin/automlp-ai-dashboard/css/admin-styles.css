@@ -717,6 +717,12 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
     text-align: left;
 }
 
+.automlp-ai-dashboard-feedback-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .automlp_ai_dashboard-settings-container {
     padding: 24px;
     background: #fff;

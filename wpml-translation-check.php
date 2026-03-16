@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define plugin constants.
 if ( ! defined( 'AUTOMLP_AI_VERSION' ) ) {
-	define( 'AUTOMLP_AI_VERSION', '1.0.0' );
+	define( 'AUTOMLP_AI_VERSION', '1.2.0' );
 }
 if ( ! defined( 'AUTOMLP_AI_PLUGIN_DIR' ) ) {
 	define( 'AUTOMLP_AI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -31,6 +31,9 @@ if ( ! defined( 'AUTOMLP_AI_PLUGIN_URL' ) ) {
 }
 if ( ! defined( 'AUTOMLP_AI_PLUGIN_BASENAME' ) ) {
 	define( 'AUTOMLP_AI_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+}
+if( !defined( 'AUTOMLP_AI_FEEDBACK_API' ) ) {
+	define( 'AUTOMLP_AI_FEEDBACK_API', 'https://feedback.coolplugins.net/' );
 }
 
 use AUTOMLP_WPML\Includes\Routes\Bulk_Translation_Route;
@@ -65,7 +68,21 @@ final class AUTOMLP_Ai_Translate_Addon {
 	 */
 	public function __construct() {
 		$this->init();
+		$this->init_feedback_notice();
+		$this->init_cron();
 	}
+
+
+	/**
+		 * Initialize the cron job for the plugin.
+		 */
+		public function init_cron(){
+			// if (is_admin()) {
+			require_once AUTOMLP_AI_PLUGIN_DIR . '/admin/cpfm-feedback/cron/automlp-cron.php';
+			$cron = new AUTOMLP_cronjob();
+			$cron->automlp_cron_init_hooks();
+			// }
+			}
 
 	public function register_ai_client() {
 		$is_wp70 = function_exists( 'wp_ai_client_prompt' );
@@ -121,6 +138,103 @@ final class AUTOMLP_Ai_Translate_Addon {
 			}
 		}
 	}
+
+	public function init_feedback_notice() {
+
+		if (is_admin()) {
+			add_action('admin_enqueue_scripts', array($this, 'automlp_ai_load_scripts'));
+			if(!class_exists('CPFM_Feedback_Notice')){
+				require_once AUTOMLP_AI_PLUGIN_DIR . '/admin/cpfm-feedback/cpfm-common-notice.php';
+
+			}
+
+		add_action('cpfm_register_notice', function () {
+			if (!class_exists('CPFM_Feedback_Notice') || !current_user_can('manage_options')) {
+				return;
+			}
+			
+			$notice = [
+				'title' => __('AutoMLP – AI Translation for WPML', 'wpml-translation-check'),
+				'message' => __('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'wpml-translation-check'),
+				'pages' => ['automlp_ai_dashboard'],
+				'always_show_on' => ['automlp_ai_dashboard'], // This enables auto-show
+				'plugin_name'=>'wpml-translation-check'
+			];
+			CPFM_Feedback_Notice::cpfm_register_notice('cool_automlp_translations', $notice);
+				if (!isset($GLOBALS['cool_plugins_feedback'])) {
+					$GLOBALS['cool_plugins_feedback'] = [];
+				}
+				$GLOBALS['cool_plugins_feedback']['cool_automlp_translations'][] = $notice;
+		});
+
+		add_action('cpfm_after_opt_in_wpml-translation-check', function($category) {
+			if ($category === 'cool_automlp_translations') {
+				AUTOMLP_cronjob::automlp_send_data();
+				$options = get_option('automlp_feedback_opt_in');
+				$options = 'yes';
+				update_option('automlp_feedback_opt_in', $options);	
+			}
+			});
+		}
+	}
+
+
+	public function automlp_ai_load_scripts() {
+		if(!wp_script_is( 'automlp-data-share-setting.js' )){
+			$screen = get_current_screen(); 
+			if (strpos($screen->id, 'wpml_page_automlp_ai_dashboard') !== false) {
+			  wp_enqueue_script('automlp-data-share-setting', AUTOMLP_AI_PLUGIN_URL . 'assets/js/automlp-data-share-setting.js', array('jquery'), AUTOMLP_AI_VERSION, true);
+		  }
+	  }
+	}
+
+		/*
+		|------------------------------------------------------------------------
+		|  Get user info
+		|------------------------------------------------------------------------
+		*/
+
+		public static function automlp_get_user_info() {
+			global $wpdb;
+			$server_info = [
+			'server_software'        => sanitize_text_field($_SERVER['SERVER_SOFTWARE'] ?? 'N/A'),
+			'mysql_version'          => sanitize_text_field($wpdb->get_var("SELECT VERSION()")),
+			'php_version'            => sanitize_text_field(phpversion()),
+			'wp_version'             => sanitize_text_field(get_bloginfo('version')),
+			'wp_debug'               => sanitize_text_field(defined('WP_DEBUG') && WP_DEBUG ? 'Enabled' : 'Disabled'),
+			'wp_memory_limit'        => sanitize_text_field(ini_get('memory_limit')),
+			'wp_max_upload_size'     => sanitize_text_field(ini_get('upload_max_filesize')),
+			'wp_permalink_structure' => sanitize_text_field(get_option('permalink_structure', 'Default')),
+			'wp_multisite'           => sanitize_text_field(is_multisite() ? 'Enabled' : 'Disabled'),
+			'wp_language'            => sanitize_text_field(get_option('WPLANG', get_locale()) ?: get_locale()),
+			'wp_prefix'              => sanitize_key($wpdb->prefix), // Sanitizing database prefix
+			];
+			$theme_data = [
+			'name'      => sanitize_text_field(wp_get_theme()->get('Name')),
+			'version'   => sanitize_text_field(wp_get_theme()->get('Version')),
+			'theme_uri' => esc_url(wp_get_theme()->get('ThemeURI')),
+			];
+			if (!function_exists('get_plugins')) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			$plugin_data = array_map(function ($plugin) {
+			$plugin_info = get_plugin_data(WP_PLUGIN_DIR . '/' . sanitize_text_field($plugin));
+			$author_url = ( isset( $plugin_info['AuthorURI'] ) && !empty( $plugin_info['AuthorURI'] ) ) ? esc_url( $plugin_info['AuthorURI'] ) : 'N/A';
+			$plugin_url = ( isset( $plugin_info['PluginURI'] ) && !empty( $plugin_info['PluginURI'] ) ) ? esc_url( $plugin_info['PluginURI'] ) : '';
+			return [
+				'name'       => sanitize_text_field($plugin_info['Name']),
+				'version'    => sanitize_text_field($plugin_info['Version']),
+				'plugin_uri' => !empty($plugin_url) ? $plugin_url : $author_url,
+			];
+			}, get_option('active_plugins', []));
+			return [
+				'server_info' => $server_info,
+				'extra_details' => [
+					'wp_theme' => $theme_data,
+					'active_plugins' => $plugin_data,
+				]
+			];
+		}
 
 
 	public function register_ai_model_setting() {
@@ -277,7 +391,6 @@ final class AUTOMLP_Ai_Translate_Addon {
 			add_action( 'admin_notices', array( $this, 'wpml_missing_notice' ) );
 			return;
 		}
-		register_activation_hook( __FILE__, array( \AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard::class, 'start_wizard' ) );
 		$this->load_dependencies();
 		add_filter(
 			'plugin_action_links_' . AUTOMLP_AI_PLUGIN_BASENAME,
@@ -287,6 +400,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 		add_action( 'admin_init', array( $this, 'register_ai_model_setting' ) );
 		add_action( 'admin_menu', array( $this, 'register_automlp_ai_dashboard_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'hide_wp_ai_client_menu' ), 99 );
+		add_action( 'plugin_loaded', array( $this, 'automlp_feedback_form' ) );
 
 		// Initialize AJAX handlers.
 		if ( class_exists( AUTOMLP_AI_Strings_Ajax::class ) ) {
@@ -309,6 +423,23 @@ final class AUTOMLP_Ai_Translate_Addon {
 			}
 		}
 	}
+	
+	public function activate() {
+		update_option( 'AUTOMLP_AI_VERSION', AUTOMLP_AI_VERSION );
+		update_option( 'AUTOMLP_AI_TYPE', 'FREE' );
+		add_option( 'automlp_ai_activation_time', gmdate( 'Y-m-d h:i:s' ) );
+		add_option( 'automlp_ai_initial_save_version', AUTOMLP_AI_VERSION );
+	
+		if ( ! get_option( 'automlp_ai_install_date' ) ) {
+			add_option( 'automlp_ai_install_date', gmdate( 'Y-m-d h:i:s' ) );
+		}
+		$get_opt_in = get_option('automlp_feedback_opt_in');
+
+			if ($get_opt_in =='yes' && !wp_next_scheduled('automlp_extra_data_update')) {
+
+				wp_schedule_event(time(), 'every_30_days', 'automlp_extra_data_update');
+			}
+	}
 
 	/**
  * Check if required WPML plugins are active.
@@ -327,6 +458,17 @@ private function is_wpml_active() {
     $has_wpml_st = defined( 'WPML_ST_VERSION' ) || class_exists( 'WPML_String_Translation' );
 
     return $has_wpml_core && $has_wpml_st;
+}
+
+public function automlp_feedback_form() {
+	if(is_admin()){
+		require_once __DIR__ . '/admin/feedback/admin-feedback-form.php';
+		require_once __DIR__ . '/admin/class-admin-notice.php';
+	}
+
+	if(class_exists('automlp_admin_notices')){
+		new automlp_admin_notices();
+	}
 }
 
 	/**
@@ -361,6 +503,29 @@ public function wpml_missing_notice() {
  */
 function automlp_ai_translate_addon() {
 	return AUTOMLP_Ai_Translate_Addon::get_instance();
+}
+
+// Put this in the global scope (NOT inside the class).
+register_activation_hook( __FILE__, 'automlp_ai_on_activation' );
+register_deactivation_hook( __FILE__, 'automlp_ai_on_deactivation' );
+
+function automlp_ai_on_activation() {
+    // 1) Run the existing wizard activation.
+	if ( class_exists( '\AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard' ) ) {
+		\AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard::start_wizard( false );
+	}
+
+    // 2) Call your plugin's activate() method.
+    if ( function_exists( 'automlp_ai_translate_addon' ) ) {
+        $plugin = automlp_ai_translate_addon();
+        if ( $plugin instanceof AUTOMLP_Ai_Translate_Addon ) {
+            $plugin->activate();
+        }
+    }
+}
+
+function automlp_ai_on_deactivation() {
+    wp_clear_scheduled_hook('automlp_extra_data_update');
 }
 
 

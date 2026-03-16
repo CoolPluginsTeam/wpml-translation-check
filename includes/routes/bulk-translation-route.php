@@ -449,7 +449,10 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		$google_model = $request->get_param( 'google_model' );
 		$is_wizard    = $request->get_param( 'is_wizard' ); // Explicit flag from frontend
 		$is_reset     = $request->get_param( 'is_reset' );  // Flag for reset operations
-	
+		$automlp_feedback_opt_in = $request->get_param( 'automlp_feedback_opt_in' );
+		if (get_option('cpfm_opt_in_choice_cool_automlp_translations')) {
+			update_option('automlp_feedback_opt_in', $automlp_feedback_opt_in);
+		}
 		// Flags: what the user is actually enabling in THIS request.
 		$has_openai = ( $openai_key !== null && trim( $openai_key ) !== '' );
 		$has_google = ( $google_key !== null && trim( $google_key ) !== '' );
