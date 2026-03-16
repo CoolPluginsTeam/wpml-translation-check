@@ -477,24 +477,54 @@ public function automlp_feedback_form() {
  * @return void
  */
 public function wpml_missing_notice() {
-	if ( ! current_user_can( 'activate_plugins' ) ) {
-		return;
-	}
-	?>
-	<div class="notice notice-error">
-		<p>
-			<strong><?php esc_html_e( 'AutoMLP – AI Translation for WPML:', 'wpml-translation-check' ); ?></strong>
-			<?php
-			printf(
-				/* translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link */
-				esc_html__( 'This plugin requires both %1$s and %2$s to be installed and activated.', 'wpml-translation-check' ),
-				'<a href="' . esc_url( 'https://wpml.org/purchase' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'WPML Multilingual CMS', 'wpml-translation-check' ) . '</a>',
-				'<a href="' . esc_url( 'https://wpml.org/purchase' ) . '" target="_blank" rel="noopener noreferrer">' . esc_html__( 'WPML String Translation', 'wpml-translation-check' ) . '</a>'
-			);
-			?>
-		</p>
-	</div>
-	<?php
+    if ( ! current_user_can( 'activate_plugins' ) ) {
+        return;
+    }
+
+    $has_wpml_core = defined( 'ICL_SITEPRESS_VERSION' ) || class_exists( 'SitePress' );
+    $has_wpml_st   = defined( 'WPML_ST_VERSION' ) || class_exists( 'WPML_String_Translation' );
+
+    $links = array();
+
+    if ( ! $has_wpml_core ) {
+        $links[] = sprintf(
+            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url( 'https://wpml.org/purchase' ),
+            esc_html__( 'WPML Multilingual CMS', 'wpml-translation-check' )
+        );
+    }
+
+    if ( ! $has_wpml_st ) {
+        $links[] = sprintf(
+            '<a href="%s" target="_blank" rel="noopener noreferrer">%s</a>',
+            esc_url( 'https://wpml.org/purchase' ),
+            esc_html__( 'WPML String Translation', 'wpml-translation-check' )
+        );
+    }
+
+    ?>
+    <div class="notice notice-error">
+        <p>
+            <strong><?php esc_html_e( 'AutoMLP – AI Translation for WPML:', 'wpml-translation-check' ); ?></strong>
+            <?php
+            if ( count( $links ) === 2 ) {
+                printf(
+                    /* translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link */
+                    esc_html__( 'This plugin requires both %1$s and %2$s to be installed and activated.', 'wpml-translation-check' ),
+                    $links[0],
+                    $links[1]
+                );
+            } elseif ( count( $links ) === 1 ) {
+                printf(
+                    /* translators: %s: Missing plugin link */
+                    esc_html__( 'This plugin requires %s to be installed and activated.', 'wpml-translation-check' ),
+                    $links[0]
+                );
+            }
+            ?>
+        </p>
+    </div>
+    <?php
 }
 }
 
