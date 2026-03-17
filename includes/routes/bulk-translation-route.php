@@ -415,8 +415,14 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
                     ->with_text( $content )
                     ->generate_text();
             } catch ( \Throwable $e ) {
-                wp_send_json_error( 'Error during text generation: ' . $e->getMessage() );
+                wp_send_json_error( __( 'Error during text generation.', 'wpml-translation-check' ) . ' ' . $e->getMessage() );
             }
+
+			if ( ! is_string( $raw ) || $raw === '' ) {
+				wp_send_json_error(
+					__( 'Invalid AI response received.', 'wpml-translation-check' )
+				);
+			}
            	// Clean the text
 			$cleanText = preg_replace( '/(^```json\n|```$)/', '', $raw );
 
@@ -425,7 +431,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 
 			$translated_text = json_decode( $final_text, true );
             if ( ! is_array( $translated_text ) ) {
-                wp_send_json_error( 'AI response is not valid JSON.' );
+                wp_send_json_error( __( 'AI response is not valid JSON.', 'wpml-translation-check' ) );
             }
         
             // Frontend expects: { success: true, data: { translate_data: { "0": "...", "1": "..." } } }

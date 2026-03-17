@@ -38,8 +38,17 @@ class AUTOMLP_AI_Strings_Ajax
 		global $wpdb;
 
 		// Read JSON data from request body to avoid max_input_vars limit
-		$raw_input = file_get_contents('php://input');
-		$json_data = json_decode($raw_input, true);
+		$raw_input = file_get_contents( 'php://input' );
+
+		if ( ! is_string( $raw_input ) ) {
+			wp_send_json_error( 'Invalid request body' );
+		}
+
+		if ( strlen( $raw_input ) > 1048576 ) { // 1MB
+			wp_send_json_error( 'Payload too large' );
+		}
+
+		$json_data = json_decode( $raw_input, true );
 
 		// Determine if we're using JSON or POST (backward compatibility)
 		$use_json = (json_last_error() === JSON_ERROR_NONE && ! empty($json_data) && isset($json_data['action']));
@@ -99,8 +108,20 @@ class AUTOMLP_AI_Strings_Ajax
 			}
 
 			// Sanitize the value
-			$value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-			$value = wp_kses_post($value);
+			$value = html_entity_decode( (string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+
+			$allowed = array(
+				'a'      => array( 'href' => true, 'title' => true, 'target' => true, 'rel' => true ),
+				'br'     => array(),
+				'em'     => array(),
+				'strong' => array(),
+				'p'      => array(),
+				'ul'     => array(),
+				'ol'     => array(),
+				'li'     => array(),
+			);
+
+			$value = wp_kses( $value, $allowed );
 
 			$string_ids[] = $string_id;
 			$rows_data[] = array(

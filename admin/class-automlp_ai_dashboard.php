@@ -56,12 +56,9 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 				return;
 			}
 		
-			// Remove all regular admin notices on wizard page.
+			// Completely suppress notices on the wizard page.
 			remove_all_actions( 'admin_notices' );
 			remove_all_actions( 'all_admin_notices' );
-		
-			// Now output only our plugin review notices registered on this custom hook.
-			do_action( 'automlp-wpml_display_admin_notices' );
 		}
 
 		/**
@@ -132,10 +129,10 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 					</div>
 					<div class="automlp_header-right">
 						<span>AI translator for WPML</span>
-						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/" class="automlp_btn primary" target="_blank" aria-label="premium">
+						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=product_page&utm_content=dashboard_header" class="automlp_btn primary" target="_blank" aria-label="premium">
 							✦ Unlock More Features
 						</a>
-						<a href="https://docs.coolplugins.net/plugin/ai-translation-for-wpml/" class="automlp_btn" target="_blank" aria-label="document">
+						<a href="https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_header" class="automlp_btn" target="_blank" aria-label="document">
 							✎ Docs
 						</a>
 						<a href="https://wordpress.org/support/plugin/wpml-translation-check/" class="automlp_btn" target="_blank" aria-label="contact">

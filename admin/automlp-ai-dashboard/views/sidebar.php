@@ -199,6 +199,6 @@ endif;
 	<div class="automlp_sidebar-box">
 		<h3>Happy with AutoMLP? ✨</h3>
 		<p>If AutoMLP helped you translate your site faster and save translation costs, please take a minute to leave a review.</p>
-		<a href="https://wordpress.org/support/plugin/wpml-translation-check/" target="_blank" class="automlp_btn">Leave a Review ★★★★★</a>
+		<a href="https://wordpress.org/support/plugin/wpml-translation-check/reviews/#new-post" target="_blank" class="automlp_btn">Leave a Review ★★★★★</a>
 	</div>
 </div>

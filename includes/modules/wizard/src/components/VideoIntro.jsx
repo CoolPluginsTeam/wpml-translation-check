@@ -36,7 +36,7 @@ const VideoIntro = ({ onGetStarted }) => {
 		</div>
 		<div className="automlp-ai-wizard-card-footer">
 			{ __( 'Need help? Visit our', 'wpml-translation-check' ) }{ ' ' }
-			<a href={ '#' } target="_blank" rel="noopener noreferrer">
+			<a href={ 'https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=setup&utm_campaign=docs&utm_content=wizard_footer' } target="_blank" rel="noopener noreferrer">
 				{ __( 'Documentation', 'wpml-translation-check' ) }
 			</a>
 		</div>

@@ -231,12 +231,12 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 						$automlp_wpml_api_settings = array(
 							'openai' => array(
 								'name'        => 'OpenAI',
-								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-openai-api-key/',
+								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-openai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_api_key',
 								'placeholder' => 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 							),
 							'google' => array(
 								'name'        => 'Google Gemini',
-								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/',
+								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_api_key',
 								'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 							),
 						);
@@ -440,10 +440,10 @@ $automlp_connectors_url = admin_url( 'options-connectors.php' );
                                     <a href="#" class="cpfm-see-terms">[See terms]</a>
                                 </div>
                                 <div id="termsBox" style="display: none;padding-left: 20px; margin-top: 10px; font-size: 12px; color: #999;">
-                                        <p><?php echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect:", 'wpml-translation-check'); ?> <a href="https://my.coolplugins.net/terms/usage-tracking/?utm_source=automlp-ai_plugin&utm_medium=inside&utm_campaign=terms&utm_content=dashboard" target="_blank"><?php echo esc_html__('Click Here', 'wpml-translation-check'); ?></a></p>
+                                        <p><?php echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect:", 'wpml-translation-check'); ?> <a href="https://my.coolplugins.net/terms/usage-tracking/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=terms&utm_content=dashboard" target="_blank"><?php echo esc_html__('Click Here', 'wpml-translation-check'); ?></a></p>
                                         <ul style="list-style-type:auto;">
-                                            <li><?php echo esc_html__('Your website home URL and WordPress admin email.', 'ccpw'); ?></li>
-                                            <li><?php echo esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'ccpw'); ?></li>
+                                            <li><?php echo esc_html__('Your website home URL and WordPress admin email.', 'wpml-translation-check'); ?></li>
+                                            <li><?php echo esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'wpml-translation-check'); ?></li>
                                         </ul>
                                 </div>
                             </div>

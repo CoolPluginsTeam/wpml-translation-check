@@ -7,8 +7,8 @@
         "start": "wp-scripts start ./assets/src/bulk-translate/index.js --output-path=./assets/bulk-translate/",
         "build:string": "wp-scripts build ./assets/src/string-translate/index.js --output-path=./assets/bulk-string-translate/",
         "start:string": "wp-scripts start ./assets/src/string-translate/index.js --output-path=./assets/bulk-string-translate/ --watch",
-        "build:wizard": "wp-scripts build modules/wizard/src/setup.js --output-path=admin/assets/frontend/setup",
-        "start:wizard": "wp-scripts start modules/wizard/src/setup.js --output-path=admin/assets/frontend/setup --watch"
+        "build:wizard": "wp-scripts build ./includes/modules/wizard/src/setup.js --output-path=admin/assets/frontend/setup",
+        "start:wizard": "wp-scripts start ./includes/modules/wizard/src/setup.js --output-path=admin/assets/frontend/setup --watch"
     },
     "repository": {
         "type": "git",
