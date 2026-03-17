@@ -96,6 +96,10 @@ All automatic translations are powered by third-party auto-translate providers (
 - Install & Activate plugin.
 - Now you can translate any page content or strings via AI.
 
+== Screenshots == 
+1. AutoMLP Page Translation
+2. AutoMLP String Translation
+
 == Frequently Asked Questions ==
 
 = Do I need WPML to use AutoMLP? =
