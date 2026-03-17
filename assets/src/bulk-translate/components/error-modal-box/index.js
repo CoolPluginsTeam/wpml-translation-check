@@ -61,7 +61,7 @@ const ErrorModalBox = ({ message, onClose, Title, prefix, children }) => {
                     {children}
                 </div>
                 <div className={`${prefix}-error-modal-box-footer`}>
-                    <button className={`${prefix}-error-modal-box-close button button-primary`} onClick={onClose}>{__('Back', 'autopoly-ai-translation-for-polylang-pro')}</button>
+                    <button className={`${prefix}-error-modal-box-close button button-primary`} onClick={onClose}>{__('Back', 'wpml-translation-check')}</button>
                 </div>
             </div>
         </div>
