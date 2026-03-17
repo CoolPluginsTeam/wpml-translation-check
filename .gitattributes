@@ -1,0 +1,30 @@
+# Folders to ignore on export
+.cursor/ export-ignore
+.git/ export-ignore
+node_modules/ export-ignore
+.github/ export-ignore
+.wordpress-org/ export-ignore
+.ds_store export-ignore
+.idea/ export-ignore
+.vscode/ export-ignore
+
+# Files to ignore on export
+composer.json export-ignore
+composer.lock export-ignore
+package-lock.json export-ignore
+package.json export-ignore
+tailwind.config.js export-ignore
+postcss.config.js export-ignore
+webpack.config.js export-ignore
+.vscode/ export-ignore
+README.md export-ignore
+.gitignore export-ignore
+.gitattributes export-ignore
+.babelrc export-ignore
+LICENSE export-ignore
+*.scss export-ignore
+*.js.LICENSE.txt export-ignore
+.distignore export-ignore
+tsconfig.json export-ignore
+assets/src
+includes/modules/wizard/src
