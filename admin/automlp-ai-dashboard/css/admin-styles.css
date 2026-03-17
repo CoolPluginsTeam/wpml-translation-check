@@ -5,9 +5,10 @@ WPML Auto Dashboard - Admin Panel Styles
 */
 
 :root {
-    --primary-color: #30b230;
-    --secondary-color: #239d23;
-    --background-color: #f8f9fa;
+    --primary-color: #36899f;
+    --secondary-color: #3a7283;
+    --primary-light-color: #e5f9ff;
+    --background-color: #ffffff;
     --border-color: #ddd;
     --text-color: #222;
     --text-color-light: #666;
@@ -18,9 +19,9 @@ WPML Auto Dashboard - Admin Panel Styles
 
 /* General Wrapper */
 .automlp_ai_dashboard-wrapper {
-    margin: 0 auto;
-    padding: 0 20px 0 0;
-    max-width: 1240px;
+    margin: 0 0 0 -20px;
+    padding: 0;
+    width: calc(100% + 20px);
     box-sizing: border-box;
 }
 
@@ -43,56 +44,67 @@ WPML Auto Dashboard - Admin Panel Styles
 /* ================================================
    Buttons & Links
 ================================================ */
-.automlp_ai_dashboard-btns-row {
+.automlp_btns-row {
     display: flex;
     gap: 10px;
 }
 
-.automlp_ai_dashboard-btn {
+.automlp_btn {
     display: inline-flex;
     align-items: center;
     gap: 5px;
     padding: 8px 16px;
     border-radius: 6px;
-    font-weight: 500;
+    font-weight: 600;
+    font-size: 13px;
     text-decoration: none;
     transition: all 0.3s ease-in-out;
-    border: 1px solid var(--border-color);
+    border: 1px solid #c6ced0;
     background: var(--background-color);
     color: var(--text-color);
+    box-shadow: inset 1px 1px 2px #00000010;
 }
 
-.automlp_ai_dashboard-logo-text{
-    font-size: 20px;
-    font-weight: 600;
-    color: #000;
-}
-
-.automlp_ai_dashboard-btn:focus {
+.automlp_btn:focus {
    box-shadow: none;
+   border-radius: 6px;
+   background: var(--primary-light-color);
+   color: var(--primary-color);
+   border-color: var(--secondary-color);
+   box-shadow: 0 0 0px 3px var(--primary-light-color);
 }
 
-.automlp_ai_dashboard-btn.primary {
+.automlp_btn.primary {
     background: var(--primary-color);
     color: #fff;
     border-color: var(--secondary-color);
 }
 
-.automlp_ai_dashboard-btn:hover {
-    background: #efffef;
+.automlp_btn:hover {
+    background: var(--primary-light-color);
     color: var(--primary-color);
-    border-color: var(--border-color);
+    border-color: var(--secondary-color);
+}
+
+.automlp_btn.primary:hover {
+    background: var(--secondary-color);
+    color: #fff;
+}
+
+.automlp_btn img {
+    max-height: 18px;
+    width: auto;
 }
 
 /* ================================================
    Header Section
 ================================================ */
-.automlp_ai_dashboard-header {
+.automlp_header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: var(--background-color);
-    padding: 5px 20px;
+    padding: 5px 30px;
     border-bottom: 1px solid var(--border-color);
     border-radius: 6px 6px 0 0;
     position: absolute;
@@ -101,44 +113,47 @@ WPML Auto Dashboard - Admin Panel Styles
     width: calc(100% + 20px);
     margin: 0 0 0 -20px;
     box-shadow: var(--shadow);
-    height: 70px;
+    height: 68px;
 }
 
-.automlp_ai_dashboard-social-icons a:focus {
-    box-shadow: none;
-}
-
-.automlp_ai_dashboard-header-left {
+.automlp_header-left {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
 }
 
-.automlp_ai_dashboard-logo-link:focus,
-.automlp_ai_dashboard-logo-link:hover {
+.automlp_header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.automlp_header-logo-link:focus,
+.automlp_header-logo-link:hover {
     box-shadow: none;
+    text-decoration: none;;
 }
 
-.automlp_ai_dashboard-header-left img {
-    max-width: 45px;
-    margin-left: 10px;
+.automlp_header-logo-link img {
+    width: 42px;
+    max-width: 42px;
+    margin: 0;
+    display: block;
 }
 
-.automlp_ai_dashboard-header-left svg {
-    height: 50px;
+.automlp_header-logo-text{
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
 }
 
-.automlp_ai_dashboard-tab-title {
+.automlp_header-title {
     display: flex;
     gap: 5px;
     font-size: 14px;
 }
 
-.automlp_ai_dashboard-header-right {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+
 
 /* ================================================
    Dashboard Layout
@@ -161,7 +176,7 @@ WPML Auto Dashboard - Admin Panel Styles
 .automlp_ai_dashboard-left-section {
     width: auto;
     flex: 2;
-    margin-top: 25px;
+    margin-top: 30px;
 }
 
 /* ================================================
@@ -326,12 +341,38 @@ a.automlp_ai_dashboard-docs:hover {
    Sidebar
 ================================================ */
 .automlp_ai_dashboard-sidebar {
-    width: 548px;
+    width: 450px;
+    max-width: 450px;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    margin-top: 25px;
+    margin-top: 30px;
     flex: 1;
+}
+
+.automlp_sidebar-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.automlp_sidebar-box h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.7em;
+}
+
+.automlp_sidebar-box p {
+    font-size: 14px;
+    line-height: 1.6em;
+    padding: 0;
+    margin: 0 0 10px;
 }
 
 /* Translation Status */
@@ -455,11 +496,21 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
 ================================================ */
 .automlp_ai_dashboard-wrapper .tab-content {
     display: flex;
-    gap: 25px !important;
+    gap: 30px !important;
+    padding: 0 30px;
 }
 
-.nav-tab-wrapper{
-    margin-top: 70px !important;
+.automlp_ai_dashboard-wrapper .nav-tab-wrapper{
+    margin-top: 76px !important;
+}
+
+.automlp_ai_dashboard-wrapper .nav-tab:first-child {
+    margin-left: 30px;
+}
+
+.automlp_ai_dashboard-wrapper .nav-tab-wrapper a {
+    padding: 10px 12px;
+    border-radius: 6px 6px 0 0;
 }
 
 .automlp_ai_dashboard-free-vs-pro .header,
@@ -845,50 +896,21 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
 /* ================================================
    Info / Footer
 ================================================ */
-.automlp_ai_dashboard-info {
-    margin-top: 70px;
-    text-align: center;
+.automlp_ai_dashboard-footer {
     display: flex;
-    justify-content: center;
+    margin: 20px 0 50px;
+    padding: 0 30px;
+    flex-direction: row;
     align-items: center;
-}
-
-.automlp_ai_dashboard-info-links {
+    gap: 8px;
     font-size: 14px;
+    color: #666;
+    font-weight: 300;
 }
-
-.automlp_ai_dashboard-info-links p {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.automlp_ai_dashboard-info .logo {
-    width: 150px;
-    height: 16px;
-    margin-bottom: 10px;
-}
-
-.automlp_ai_dashboard-info .logo a:focus {
-    box-shadow: none;
-}
-
-.automlp_ai_dashboard-info-links a {
-    color: #0073aa;
-    text-decoration: none;
-}
-
-.automlp_ai_dashboard-social-icons a:focus {
-     text-decoration: underline;
-}
-
-.automlp_ai_dashboard-social-icons img {
-    margin-top: 10px;
-}
-
-.automlp_ai_dashboard-social-icons svg {
-    width: 32px;
-    height: 32px;
+.automlp_footer-logo img {
+    width: 120px;
+    height: auto;
+    display: block;
 }
 
 /* Responsive tweaks */
@@ -914,7 +936,7 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
     .automlp_ai_dashboard-sidebar {
         width: auto;
     }
-    .automlp_ai_dashboard-header {
+    .automlp_header {
         padding: 0px 11px 11px 20px;
         height: auto;
         min-height: 110px;
@@ -934,7 +956,7 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
     .automlp_ai_dashboard-wrapper {
         padding: 60px 12px 0px 0px;
     }
-    .automlp_ai_dashboard-header-right {
+    .automlp_header-right {
         gap: 6px;
     }
     .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-ai-translations-container .header,
@@ -951,31 +973,31 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
 }
 
 @media (max-width: 766px) and (min-width: 601px) {
-    .automlp_ai_dashboard-header {
+    .automlp_header {
         top: 0px;
     }
 }
 
 @media (max-width: 767px) and (min-width: 375px) {
-    .automlp_ai_dashboard-header {
+    .automlp_header {
         height: 110px;
     }
 }
 
 @media (max-width: 1024px) {
-    .automlp_ai_dashboard-header-left svg {
+    .automlp_header-left svg {
         max-width: 120px;
     }
-    .automlp_ai_dashboard-header {
+    .automlp_header {
         gap: 15px;
     }
-    .automlp_ai_dashboard-header-left img {
+    .automlp_header-left img {
         max-width: 56px;
     }
     .automlp_ai_dashboard-btn {
         padding: 8px 6px;
     }
-    .automlp_ai_dashboard-header-right {
+    .automlp_header-right {
         gap: 13px;
     }
     .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
