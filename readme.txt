@@ -13,9 +13,9 @@ Save on WPML translation credits by using your own OpenAI or Gemini API keys to 
 
 == Description ==
 
-**AutoMLP - AI Translation for WPML** is an AI translation addon for WPML. It allows you to translate your WordPress website using different AI services  like **OpenAI** and **Google Gemini**, at low cost.
+**AutoMLP - AI Translation for WPML** is WPML automatic translation addon. It allows you to translate your WordPress website using different AI services  like **OpenAI** and **Google Gemini**, at low cost.
 
-As a **WPML** user, you may already know that its automatic translation feature works using translation credits. Typically, translating around **$0.86 per 1,000 credits**. Each time content is translated automatically, credits are used based on the number of characters being translated.
+As a **WPML** user, you may already know that its automatic translation feature works using translation credits. Typically, around **$0.86 per 1,000 credits**. Each time content is translated automatically, credits are used based on the number of characters being translated.
 
 However, **AutoMLP** provides a different approach. Instead of using translation credits, it allows you to connect your own AI service API keys such as **OpenAI** or **Google Gemini**. This means translations are generated using your own API. The usage limits depend only on the limits of the API service you are using.
 
@@ -40,15 +40,6 @@ However, **AutoMLP** provides a different approach. Instead of using translation
 * Lightweight & Easy to Use.
 
 * Fully Responsive.
-
-### Cost Comparison
-
-| Feature | WPML Credits | AutoMLP |
-| :--- | :--- | :--- |
-| **Cost (1M chars)** | **About ~$195 – ~$200** | **~$0.19 (OpenAI) / ~$0.125 (Gemini)** |
-| **Model Choice** | Fixed | **GPT-4o-mini, gemini-2.5-flash-lite, etc.** |
-| **Speed** | Standard | **Instant (High-limit APIs)** |
-| **Control** | Middleman Managed | **Direct API Billing** |
 
 ### Generate API Keys
 👉 Get your OpenAI API key here: [https://platform.openai.com/api-keys](https://platform.openai.com/api-keys)
@@ -91,7 +82,20 @@ A special thanks to the authors of the [WPML](https://wpml.org/) plugin for crea
 
 All automatic translations are powered by third-party auto-translate providers (OpenAI and Gemini AI), so we don't guarantee 100% correctness. Please check all translated text carefully before making it live on your production site.
 
-[AutoMLP – AI Translation for WPML on GitHub.](https://github.com/CoolPluginsTeam/wpml-translation-check)
+### Important Links & Information
+
+- **OpenAI Privacy Policy:**
+[https://openai.com/policies/row-privacy-policy/](https://openai.com/policies/row-privacy-policy/)
+- **OpenAI Terms of Use:**
+[https://openai.com/policies/row-terms-of-use/](https://openai.com/policies/row-terms-of-use/)
+- **Google Gemini Privacy Policy:**
+[https://safety.google/intl/en_in/products/gemini/](https://safety.google/intl/en_in/products/gemini/)
+- **Google Gemini API Terms:**
+[https://ai.google.dev/gemini-api/terms](https://ai.google.dev/gemini-api/terms)
+
+== Screenshots == 
+1. AutoMLP Page Translation
+2. AutoMLP String Translation
 
 == Installation ==
 - Go to **Plugins > Add New** in your WordPress admin area.
@@ -99,26 +103,27 @@ All automatic translations are powered by third-party auto-translate providers (
 - Install & Activate plugin.
 - Now you can translate any page content or strings via AI.
 
-== Screenshots == 
-1. AutoMLP Page Translation
-2. AutoMLP String Translation
-
 == Frequently Asked Questions ==
 
 = Do I need WPML to use AutoMLP? =
-Yes. AutoMLP is an addon for WPML, so both WPML Multilingual CMS and WPML String Translation must be installed and activated on your WordPress website before using this plugin.
+Yes. AutoMLP is automatic translation addon for WPML, so both WPML Multilingual CMS and WPML String Translation must be installed and activated on your WordPress website before using this plugin.
 
 = Which AI translation engines are supported? =
 AutoMLP provides faster and accurate translations using AI services such as OpenAI and Google Gemini.
 
-= How can I translate plugin or theme strings via AI using WPML? =
-AutoMLP is an AI translation addon for WPML that allows you to automatically translate theme and plugin strings using AI instead of translating them manually. It works with the WPML String Translation system and uses AI services like OpenAI or Google Gemini to generate translations quickly.
+= How can I translate plugin or theme strings using WPML AI? =
+AutoMLP is an AI automatic translation addon for WPML that allows you to translate theme and plugin strings using AI instead of translating them manually. It works with the WPML String Translation system and uses AI services like OpenAI or Google Gemini to generate translations quickly.
 
 = Is AI translation accurate enough for websites? =
 AI translation is highly accurate and context-aware, but it is recommended to review translations before publishing them on a live website.
 
-= What type of content can I translate? =
+= What type of content can I translate using WPML AI addon? =
 Using AutoMLP, you can translate pages, posts or theme's or plugin's strings automatically.
+
+= How do I automatically translate a string in WPML? =
+You can automatically translate strings in WPML using AI, without any manual effort using AutoMLP plugin.
+
+Once this WPML AI addon activated, you can connect your OpenAI or Google Gemini API key, to generate string translations instantly.
 
 = What happens if my WPML translation credits run out? =
 If WPML translation credits are exhausted, automatic translations stop working.
@@ -133,6 +138,39 @@ AutoMLP does not rely on translation credits. Instead, it lets you connect your 
 = How fast is AI translation with AutoMLP? =
 AI translation can process thousands of characters in seconds. This allows you to translate large pages or multiple posts much faster than manual translation.
 
+= How does AutoMLP compare to WPML automatic translation credits in cost and performance? =
+Here is a simple comparison between WPML automatic credits and AutoMLP:
+
+| Feature | WPML Credits | AutoMLP |
+| :--- | :--- | :--- |
+| **Cost (1M chars)** | About ~$195 – ~$200 | **~$0.19 (OpenAI) / ~$0.125 (Gemini)** |
+| **Model Choice** | Fixed | **GPT-4o-mini, gemini-2.5-flash-lite, etc.** |
+| **Speed** | Standard | **Instant (High-limit APIs)** |
+| **Control** | Middleman Managed | **Direct API Billing** |
+
+= How can I clear WPML cache? =
+Follow the steps below to clear WPML cache:
+
+1. Go to your WordPress dashboard.
+2. Navigate to **WPML** > **Support**.
+3. Scroll down to the Troubleshooting section.
+4. Click on the **“Troubleshooting”** link.
+5. On the troubleshooting page, find and click:
+   - Clear the cache in WPML.
+   - Remove ghost entries from translation tables (optional).
+   - Fix element_type collation (optional).
+
+After clearing the cache, refresh your website.
+
+= How do I translate media metadata in WPML? =
+To translate media details like alt text, title, and caption:
+1. Go to **WPML** > **Media Translation**.
+2. Click the edit icon next to the image.
+3. Enter translated title, alt text, and description.
+4. Click Save.
+
+Your translated media details will be applied to the selected language.
+
 = Do I need coding knowledge to use this plugin? =
 No. AutoMLP works inside the WordPress dashboard and uses the familiar WPML translation workflow, so no coding knowledge is required.
 
@@ -140,7 +178,7 @@ No. AutoMLP works inside the WordPress dashboard and uses the familiar WPML tran
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage, and handle any security vulnerabilities [Report a security vulnerability](https://patchstack.com/database/vdp/wpml-translation-check/).
 
 == Changelog ==
-= Version 1.2.0 (Major Update) | 18/03/2026 =
+= Version 1.2.0 (Major Update) | 16/03/2026 =
 
 * Introduced:- AutoMLP - AI Translation For WPML.
 * Added:- Full compatibility with WPML Multilingual CMS.
@@ -170,5 +208,5 @@ Initial version.
 
 == Upgrade Notice ==
 = 1.2.0 =
-WPML Translation Check  is transitioning to our new *AutoMLP** AI Translation For WPML.
+WPML Translation Check  is transitioning to our new *AutoMLP** AI Translation For WPML.
 WPML Translation Check is now under new ownership by [Cool Plugins](https://profiles.wordpress.org/coolplugins/) and is actively maintained.
