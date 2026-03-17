@@ -90,6 +90,8 @@ A special thanks to the authors of the [WPML](https://wpml.org/) plugin for crea
 
 All automatic translations are powered by third-party auto-translate providers (OpenAI and Gemini AI), so we don't guarantee 100% correctness. Please check all translated text carefully before making it live on your production site.
 
+[AutoMLP – AI Translation for WPML on GitHub.](https://github.com/CoolPluginsTeam/wpml-translation-check)
+
 == Installation ==
 - Go to **Plugins > Add New** in your WordPress admin area.
 - Search for **"AutoMLP"**.
