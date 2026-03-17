@@ -1,5 +1,6 @@
 === AutoMLP – AI Translation for WPML ===
 Contributors: coolplugins, narinder-singh, satindersingh
+Donate link: https://donate.stripe.com/5kQdR92iBevO75WbPm6c00i
 Tags: WPML, Automatic Translation, WPML Addon, Block Translation
 Tested up to: 6.9
 Stable tag: 1.2.0
