@@ -120,17 +120,27 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 			$current_tab = array_key_exists( $tab, $valid_tabs ) ? $tab : 'dashboard';
 			?>
 			<div class="automlp_ai_dashboard-wrapper">
-				<div class="automlp_ai_dashboard-header">
-					<div class="automlp_ai_dashboard-header-left">
-						<a href="<?php echo esc_url( admin_url( 'admin.php?page=automlp_ai_dashboard&tab=dashboard' ) ); ?>" class="automlp_ai_dashboard-logo-link">
+				<div class="automlp_header">
+					<div class="automlp_header-left">
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=automlp_ai_dashboard&tab=dashboard' ) ); ?>" class="automlp_header-logo-link">
 							<img src="<?php echo esc_url( AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/automlp-ai-logo.png' ); ?>" alt="<?php esc_attr_e( 'WPML Auto Logo', 'wpml-translation-check' ); ?>">
 						</a>
-						<div>
-							<span class="automlp_ai_dashboard-logo-text">AutoMLP</span>
+						<div class="automlp_header-logo-text">AutoMLP</div>
+						<div class="automlp_header-title">
+							↳ <?php echo esc_html( $valid_tabs[ $current_tab ] ); ?>
 						</div>
-						<div class="automlp_ai_dashboard-tab-title">
-							<span>↳</span> <?php echo esc_html( $valid_tabs[ $current_tab ] ); ?>
-						</div>
+					</div>
+					<div class="automlp_header-right">
+						<span>AI translator for WPML</span>
+						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/" class="automlp_btn primary" target="_blank" aria-label="premium">
+							✦ Unlock More Features
+						</a>
+						<a href="https://docs.coolplugins.net/plugin/ai-translation-for-wpml/" class="automlp_btn" target="_blank" aria-label="document">
+							✎ Docs
+						</a>
+						<a href="https://wordpress.org/support/plugin/wpml-translation-check/" class="automlp_btn" target="_blank" aria-label="contact">
+							🗨 Support
+						</a>
 					</div>
 				</div>
 
