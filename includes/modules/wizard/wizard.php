@@ -180,7 +180,7 @@ class AUTOMLP_Ai_Wizard {
 		if ( ! file_exists( $asset_path ) ) {
 			wp_enqueue_style(
 				'automlp-ai-wizard',
-				AUTOMLP_AI_PLUGIN_URL . 'modules/wizard/assets/wizard.css',
+				AUTOMLP_AI_PLUGIN_URL . 'includes/modules/wizard/assets/wizard.css',
 				array(),
 				AUTOMLP_AI_VERSION
 			);
@@ -255,7 +255,7 @@ class AUTOMLP_Ai_Wizard {
         );
 		wp_enqueue_style(
 			'automlp-ai-wizard',
-			AUTOMLP_AI_PLUGIN_URL . 'modules/wizard/assets/wizard.css',
+			AUTOMLP_AI_PLUGIN_URL . 'includes/modules/wizard/assets/wizard.css',
 			array(),
 			AUTOMLP_AI_VERSION
 		);

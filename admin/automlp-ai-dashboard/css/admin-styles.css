@@ -35,7 +35,7 @@ WPML Auto Dashboard - Admin Panel Styles
 }
 
 /* Adjust WP admin body margins for this page */
-:is(.settings_page_automlp_ai_dashboard) #wpbody #wpbody-content {
+:is(.wpml_page_automlp_ai_dashboard) #wpbody #wpbody-content {
     margin-top: 80px !important;
     margin-block-start: 80px !important;
 }
@@ -458,9 +458,6 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
     gap: 25px !important;
 }
 
-.nav-tab-wrapper{
-    margin-top: 70px !important;
-}
 
 .automlp_ai_dashboard-free-vs-pro .header,
 .automlp_ai_dashboard-ai-translations .header,

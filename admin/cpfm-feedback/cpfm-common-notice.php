@@ -202,6 +202,7 @@ class CPFM_Feedback_Notice {
             $output .= '<ul>';
             $output .= '<li>' . esc_html__('Your website home URL and WordPress admin email.', 'ccpw') . '</li>';
             $output .= '<li>' . esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'ccpw') . '</li>';
+            $output .= '<li>' . esc_html__( 'To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'ccpw' ) . ' <a href="https://my.coolplugins.net/terms/usage-tracking/?utm_source=automlp-ai_plugin&utm_medium=inside&utm_campaign=terms&utm_content=dashboard" target="_blank">' . esc_html__( 'Click Here', 'wpml-translation-check' ) . '</a></li>';
             $output .= '</ul>';
             
             $output .= '</div>';

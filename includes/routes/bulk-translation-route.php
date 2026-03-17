@@ -445,6 +445,48 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	public function wizard_save_credentials( $request ) {
 		$openai_key   = $request->get_param( 'openai_key' );
 		$google_key   = $request->get_param( 'google_key' );
+		// Basic format validation 
+		if ( $openai_key !== null ) {
+			$key_trimmed =  $openai_key;
+			if ( strlen( $key_trimmed ) < 10 ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid OpenAI API key.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+			if ( preg_match( '/[<>"\']/', $key_trimmed ) ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid OpenAI API key format. Please check your credentials.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+			if ( ! preg_match( '/^sk-[a-zA-Z0-9_-]{20,}$/', $key_trimmed ) ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid OpenAI API key format.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+		}
+		if ( $google_key !== null ) {
+			$key_trimmed =  $google_key;
+			if ( strlen( $key_trimmed ) < 10 ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid Google API key.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+			if ( preg_match( '/[<>"\']/', $key_trimmed ) ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid Google API key format. Please check your credentials.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+		}
 		$openai_model = $request->get_param( 'openai_model' );
 		$google_model = $request->get_param( 'google_model' );
 		$is_wizard    = $request->get_param( 'is_wizard' ); // Explicit flag from frontend
@@ -453,6 +495,19 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		if (get_option('cpfm_opt_in_choice_cool_automlp_translations')) {
 			update_option('automlp_feedback_opt_in', $automlp_feedback_opt_in);
 		}
+		// If user opted out, clear the scheduled cron.
+      $normalized_opt_in = is_string( $automlp_feedback_opt_in ) ? strtolower( $automlp_feedback_opt_in ) : $automlp_feedback_opt_in;
+
+	  if ( $normalized_opt_in === 'yes' || $normalized_opt_in === '1' || $normalized_opt_in === 1 || $normalized_opt_in === true ) {
+		if ( ! wp_next_scheduled( 'automlp_extra_data_update' ) ) {
+			wp_schedule_event( time(), 'every_30_days', 'automlp_extra_data_update' );
+		}
+	} else {
+		// Any other value ("no", empty, etc.) → clear scheduled cron.
+		if ( wp_next_scheduled( 'automlp_extra_data_update' ) ) {
+			wp_clear_scheduled_hook( 'automlp_extra_data_update' );
+		}
+	}
 		// Flags: what the user is actually enabling in THIS request.
 		$has_openai = ( $openai_key !== null && trim( $openai_key ) !== '' );
 		$has_google = ( $google_key !== null && trim( $google_key ) !== '' );
@@ -597,6 +652,19 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
     if ( ! $provider_id || ! $api_key ) {
         return array( 'message' => __( 'Provider and API key are required.', 'wpml-translation-check' ) );
     }
+	// Basic format validation - reject obviously invalid keys before API call.
+$key_trimmed = trim( $api_key );
+if ( strlen( $key_trimmed ) < 10 ) {
+    return array( 'message' => __( 'API key appears to be invalid or too short.', 'wpml-translation-check' ) );
+}
+// Reject keys with HTML/script characters or obvious junk.
+if ( preg_match( '/[<>"\']/', $key_trimmed ) ) {
+    return array( 'message' => __( 'Invalid API key format. Please check your credentials.', 'wpml-translation-check' ) );
+}
+// OpenAI keys must start with sk-
+if ( 'openai' === strtolower( $provider_id ) && ! preg_match( '/^sk-[a-zA-Z0-9_-]{20,}$/', $key_trimmed ) ) {
+    return array( 'message' => __( 'OpenAI API keys must start with sk- and be in the correct format.', 'wpml-translation-check' ) );
+}
 
     if ( ! class_exists( 'WordPress\AiClient\AiClient' ) ) {
         return array( 'message' => __( 'AI client is not available.', 'wpml-translation-check' ) );

@@ -50,11 +50,18 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 		public function suppress_admin_notices() {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
-			$no_notice_pages = array( 'automlp_ai_dashboard', 'automlp_ai_wizard' );
-			if ( in_array( $page, $no_notice_pages, true ) ) {
-				remove_all_actions( 'admin_notices' );
-				remove_all_actions( 'all_admin_notices' );
+			$no_notice_pages = array( 'automlp_ai_wizard' );
+		
+			if ( ! in_array( $page, $no_notice_pages, true ) ) {
+				return;
 			}
+		
+			// Remove all regular admin notices on wizard page.
+			remove_all_actions( 'admin_notices' );
+			remove_all_actions( 'all_admin_notices' );
+		
+			// Now output only our plugin review notices registered on this custom hook.
+			do_action( 'automlp-wpml_display_admin_notices' );
 		}
 
 		/**

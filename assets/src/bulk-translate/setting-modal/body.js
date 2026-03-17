@@ -15,10 +15,24 @@ const SettingModalBody = (props) => {
     const google_aiDisabled = !automlp_wpml_bulk_translate_object?.AIServices?.includes('google');
     const deepl_aiDisabled = !automlp_wpml_bulk_translate_object?.AIServices?.includes('deepl');
     const openrouter_aiDisabled = !automlp_wpml_bulk_translate_object?.AIServices?.includes('openrouter');
+
+    const providerDisabled = {
+        openai_ai: openai_aiDisabled,
+        google_ai: google_aiDisabled,
+        localAiTranslator: localAiModalError,
+    };
+
+    const orderedProviderKeys = Object.keys(ServiceProviders).sort((a, b) => {
+        const aSetup = !providerDisabled[a];
+        const bSetup = !providerDisabled[b];
+        if (aSetup === bSetup) return 0;
+        return aSetup ? -1 : 1;
+    });
+
     return (
         <div className={`${prefix}-setting-modal-body`}>
             <div className={`${prefix}-provider-cards`}>
-            {Object.keys(ServiceProviders).map((provider) => (
+            {orderedProviderKeys.map((provider) => (
                     <Providers
                         key={provider}
                         {...props}
