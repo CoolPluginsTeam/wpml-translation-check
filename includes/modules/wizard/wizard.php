@@ -200,15 +200,15 @@ class AUTOMLP_Ai_Wizard {
 			$wpml_languages = \WPML_AT_Helper::get_wpml_languages();
             $default_language = \WPML_AT_Helper::get_default_language();
 		}
-		$get_providers_key=\WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
+		$automlp_get_providers_key=\WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
 		$saved_credentials = array();
 
-		if(isset($get_providers_key['openai']) && !empty($get_providers_key['openai'])){
-			$saved_credentials['openai']=$get_providers_key['openai'];
+		if(isset($automlp_get_providers_key['openai']) && !empty($automlp_get_providers_key['openai'])){
+			$saved_credentials['openai']=$automlp_get_providers_key['openai'];
 		}
 
-		if(isset($get_providers_key['google']) && !empty($get_providers_key['google'])){
-			$saved_credentials['google']=$get_providers_key['google'];
+		if(isset($automlp_get_providers_key['google']) && !empty($automlp_get_providers_key['google'])){
+			$saved_credentials['google']=$automlp_get_providers_key['google'];
 		}
 
 		$home_url_with_lang = get_home_url();      // e.g. http://wpml-plugin.local/en/

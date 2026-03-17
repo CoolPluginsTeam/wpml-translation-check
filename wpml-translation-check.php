@@ -195,7 +195,9 @@ final class AUTOMLP_Ai_Translate_Addon {
 		public static function automlp_get_user_info() {
 			global $wpdb;
 			$server_info = [
-			'server_software'        => sanitize_text_field($_SERVER['SERVER_SOFTWARE'] ?? 'N/A'),
+			'server_software' => isset( $_SERVER['SERVER_SOFTWARE'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) )
+			: 'N/A',
 			'mysql_version'          => sanitize_text_field($wpdb->get_var("SELECT VERSION()")),
 			'php_version'            => sanitize_text_field(phpversion()),
 			'wp_version'             => sanitize_text_field(get_bloginfo('version')),
@@ -510,19 +512,19 @@ public function wpml_missing_notice() {
             <strong><?php esc_html_e( 'AutoMLP – AI Translation for WPML:', 'wpml-translation-check' ); ?></strong>
             <?php
             if ( count( $links ) === 2 ) {
-                printf(
-                    /* translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link */
-                    esc_html__( 'This plugin requires both %1$s and %2$s to be installed and activated.', 'wpml-translation-check' ),
-                    $links[0],
-                    $links[1]
-                );
-            } elseif ( count( $links ) === 1 ) {
-                printf(
-                    /* translators: %s: Missing plugin link */
-                    esc_html__( 'This plugin requires %s to be installed and activated.', 'wpml-translation-check' ),
-                    $links[0]
-                );
-            }
+				printf(
+					/* translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link */
+					esc_html__( 'This plugin requires both %1$s and %2$s to be installed and activated.', 'wpml-translation-check' ),
+					wp_kses_post( $links[0] ),
+					wp_kses_post( $links[1] )
+				);
+			} elseif ( count( $links ) === 1 ) {
+				printf(
+					/* translators: %s: Missing plugin link */
+					esc_html__( 'This plugin requires %s to be installed and activated.', 'wpml-translation-check' ),
+					wp_kses_post( $links[0] )
+				);
+			}
             ?>
         </p>
     </div>
