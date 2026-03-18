@@ -973,7 +973,7 @@ if ( 'openai' === strtolower( $provider_id ) && ! preg_match( '/^sk-[a-zA-Z0-9_-
 
 			$post_link      = html_entity_decode( get_the_permalink( $translated_post_id ) );
 			$post_title     = html_entity_decode( get_the_title( $translated_post_id ) );
-			$post_edit_link = html_entity_decode( get_edit_post_link( $translated_post_id ) );
+			$post_edit_link = $editor_type === 'Elementor' ?$this->get_elementor_editor_link( $translated_post_id ) :html_entity_decode( get_edit_post_link( $translated_post_id ) );
 				
 			wp_send_json_success(
 				array(
@@ -985,6 +985,18 @@ if ( 'openai' === strtolower( $provider_id ) && ! preg_match( '/^sk-[a-zA-Z0-9_-
 					'update_translate_data_nonce' => wp_create_nonce( 'automlp_wpml_update_translate_data' ),
 				)
 			);
+		}
+
+		private function get_elementor_editor_link( int $post_id ): string {
+			$editor_link = add_query_arg(
+				[
+					'post' => absint( $post_id ),
+					'action' => 'elementor',
+				],
+				admin_url( 'post.php' )
+			);
+
+			return html_entity_decode( esc_url( $editor_link ) );
 		}
 
 		public function get_editor_type( int $post_id, $default = 'block' ): string {
