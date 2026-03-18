@@ -177,23 +177,21 @@ class AUTOMLP_Ai_Wizard {
 			return;
 		}
 		$asset_path = AUTOMLP_AI_PLUGIN_DIR . 'admin/assets/frontend/setup/setup.asset.php';
-		if ( ! file_exists( $asset_path ) ) {
-			wp_enqueue_style(
-				'automlp-ai-wizard',
-				AUTOMLP_AI_PLUGIN_URL . 'includes/modules/wizard/assets/wizard.css',
-				array(),
-				AUTOMLP_AI_VERSION
-			);
-			return;
-		}
 		$asset   = require $asset_path;
 		$script  = AUTOMLP_AI_PLUGIN_URL . 'admin/assets/frontend/setup/setup.js';
+		$style  = AUTOMLP_AI_PLUGIN_URL . 'includes/modules/wizard/src/wizard.css';
 		wp_enqueue_script(
 			'automlp_ai_setup',
 			$script,
 			$asset['dependencies'],
 			$asset['version'],
 			true
+		);
+		wp_enqueue_style(
+			'automlp-ai-wizard',
+			$style,
+			array(),
+			AUTOMLP_AI_VERSION
 		);
 		$wpml_languages = array();
 		if ( class_exists( 'WPML_AT_Helper' ) ) {
@@ -253,11 +251,6 @@ class AUTOMLP_Ai_Wizard {
 				'connectors_url'              => admin_url( 'options-connectors.php' ),
             )
         );
-		wp_enqueue_style(
-			'automlp-ai-wizard',
-			AUTOMLP_AI_PLUGIN_URL . 'includes/modules/wizard/assets/wizard.css',
-			array(),
-			AUTOMLP_AI_VERSION
-		);
+
 	}
 }

@@ -1,5 +1,6 @@
 import React from "react";
 import { __ } from "@wordpress/i18n";
+import WizardHelpFooter from "./WizardHelpFooter";
 import apiFetch from "@wordpress/api-fetch";
 import SetupContinueButton, { SetupBackButton } from "./SetupContinueButton";
 import { getNonce } from "../utils";
@@ -587,12 +588,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
         </div>
       </div>
 
-      <div className="automlp-ai-wizard-card-footer">
-			{ __( 'Need help? Visit our', 'wpml-translation-check' ) }{ ' ' }
-			<a href={ 'https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup' } target="_blank" rel="noopener noreferrer">
-				{ __( 'Documentation', 'wpml-translation-check' ) }
-			</a>
-		</div>
+      <WizardHelpFooter />
     </>
   );
 };

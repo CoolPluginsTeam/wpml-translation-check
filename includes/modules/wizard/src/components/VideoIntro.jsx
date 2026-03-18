@@ -1,10 +1,11 @@
 import React from 'react';
+import WizardHelpFooter from './WizardHelpFooter';
 import { __ } from '@wordpress/i18n';
 
 const VideoIntro = ({ onGetStarted }) => {
 	const data = window.automlp_ai_setup || {};
 	const videoUrl = data.video_url || 'https://www.youtube.com/embed/dst_bf7uiTc';
-
+	const templateImage = data.template_image;
 	return (
 		<>
 		<div className="automlp-ai-wizard-card" style={{ maxWidth: '600px', padding: '0 40px' }}>
@@ -22,7 +23,7 @@ const VideoIntro = ({ onGetStarted }) => {
 				<iframe
 					title={ __( 'AutoMLP Setup Guide', 'wpml-translation-check' ) }
 					style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', borderRadius: 8 }}
-					src={ videoUrl }
+					src={ templateImage }
 					frameBorder="0"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 					allowFullScreen
@@ -34,12 +35,7 @@ const VideoIntro = ({ onGetStarted }) => {
 				</button>
 			</div>
 		</div>
-		<div className="automlp-ai-wizard-card-footer">
-			{ __( 'Need help? Visit our', 'wpml-translation-check' ) }{ ' ' }
-			<a href={ 'https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup' } target="_blank" rel="noopener noreferrer">
-				{ __( 'Documentation', 'wpml-translation-check' ) }
-			</a>
-		</div>
+		<WizardHelpFooter />
 		</>
 	);
 };

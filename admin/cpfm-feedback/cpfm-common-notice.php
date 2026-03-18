@@ -201,7 +201,6 @@ class CPFM_Feedback_Notice {
             $output .= '<p>' . esc_html__('Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We\'ll collect:', 'wpml-translation-check') . '</p>';
             $output .= '<ul>';
             $output .= '<li>' . esc_html__('Your website home URL and WordPress admin email.', 'wpml-translation-check') . '</li>';
-            $output .= '<li>' . esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'wpml-translation-check') . '</li>';
             $output .= '<li>' . esc_html__( 'To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'wpml-translation-check' ) . ' <a href="https://my.coolplugins.net/terms/usage-tracking/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=terms&utm_content=dashboard" target="_blank">' . esc_html__( 'Click Here', 'wpml-translation-check' ) . '</a></li>';
             $output .= '</ul>';
             
