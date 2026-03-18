@@ -395,7 +395,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
               </p>
             )}
             <a
-              href="https://docs.coolplugins.net/doc/generate-openai-api-key/?utm_source=automlp_plugin&utm_medium=setup&utm_campaign=docs&utm_content=wizard_api_key"
+              href="https://docs.coolplugins.net/doc/generate-openai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup_api_key"
               target="_blank"
             >
               {__("Click here", "wpml-translation-check")}
@@ -483,7 +483,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
               </p>
             )}
             <a
-              href="https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/?utm_source=automlp_plugin&utm_medium=setup&utm_campaign=docs&utm_content=wizard_api_key"
+              href="https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup_api_key"
               target="_blank"
             >
               {__("Click here", "wpml-translation-check")}
@@ -522,7 +522,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                 )}
               </p>
               <a
-                href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=setup&utm_campaign=product_page&utm_content=wizard_upgrade_notice"
+                href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=setup"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="automlp-ai-wizard-card-language-footer-link"
@@ -589,7 +589,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
 
       <div className="automlp-ai-wizard-card-footer">
 			{ __( 'Need help? Visit our', 'wpml-translation-check' ) }{ ' ' }
-			<a href={ 'https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=setup&utm_campaign=docs&utm_content=wizard_footer' } target="_blank" rel="noopener noreferrer">
+			<a href={ 'https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup' } target="_blank" rel="noopener noreferrer">
 				{ __( 'Documentation', 'wpml-translation-check' ) }
 			</a>
 		</div>

@@ -129,7 +129,7 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 					</div>
 					<div class="automlp_header-right">
 						<span>AI translator for WPML</span>
-						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=product_page&utm_content=dashboard_header" class="automlp_btn primary" target="_blank" aria-label="premium">
+						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=dashboard_header" class="automlp_btn primary" target="_blank" aria-label="premium">
 							✦ Unlock More Features
 						</a>
 						<a href="https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_header" class="automlp_btn" target="_blank" aria-label="document">

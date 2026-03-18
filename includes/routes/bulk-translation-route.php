@@ -451,7 +451,9 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	public function wizard_save_credentials( $request ) {
 		$openai_key   = $request->get_param( 'openai_key' );
 		$google_key   = $request->get_param( 'google_key' );
+		$is_reset     = $request->get_param( 'is_reset' );  // Flag for reset operations
 		// Basic format validation 
+		if(! $is_reset){
 		if ( $openai_key !== null ) {
 			$key_trimmed =  $openai_key;
 			if ( strlen( $key_trimmed ) < 10 ) {
@@ -493,10 +495,10 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 				);
 			}
 		}
+	}
 		$openai_model = $request->get_param( 'openai_model' );
 		$google_model = $request->get_param( 'google_model' );
 		$is_wizard    = $request->get_param( 'is_wizard' ); // Explicit flag from frontend
-		$is_reset     = $request->get_param( 'is_reset' );  // Flag for reset operations
 		$automlp_feedback_opt_in = $request->get_param( 'automlp_feedback_opt_in' );
 		if (get_option('cpfm_opt_in_choice_cool_automlp_translations')) {
 			update_option('automlp_feedback_opt_in', $automlp_feedback_opt_in);
