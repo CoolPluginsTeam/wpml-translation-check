@@ -182,9 +182,9 @@ class AIService {
             this.processCompleteHandler(timeStart);
             if (error.name === 'AbortError') {
                 const errorMessage = this.errorMessage && this.errorMessage.includes('You exceeded your current quota') ? __('You have exceeded you current plan limit. that\'s why the request is aborted.', 'wpml-translation-check') : error;
-                console.warn(errorMessage);
+                console.log(errorMessage);
             } else {
-                console.error('An error occurred during the AJAX processing:', error);
+                console.log('An error occurred during the AJAX processing:', error);
             }
         }
 
@@ -305,9 +305,9 @@ class AIService {
             });
         } catch (error) {
             if (error.name === 'AbortError') {
-                console.warn('Request aborted');
+                console.log('Request aborted');
             } else {
-                console.error('An error occurred during the AJAX processing:', error);
+                console.log('An error occurred during the AJAX processing:', error);
             }
             return;
         }
