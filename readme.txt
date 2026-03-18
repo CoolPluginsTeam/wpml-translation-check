@@ -93,6 +93,8 @@ All automatic translations are powered by third-party auto-translate providers (
 - **Google Gemini API Terms:**
 [https://ai.google.dev/gemini-api/terms](https://ai.google.dev/gemini-api/terms)
 
+[AutoMLP – AI Translation for WPML on GitHub.](https://github.com/CoolPluginsTeam/wpml-translation-check)
+
 == Screenshots == 
 1. AutoMLP Page Translation
 2. AutoMLP String Translation
