@@ -179,7 +179,7 @@ class AUTOMLP_Ai_Wizard {
 		$asset_path = AUTOMLP_AI_PLUGIN_DIR . 'admin/assets/frontend/setup/setup.asset.php';
 		$asset   = require $asset_path;
 		$script  = AUTOMLP_AI_PLUGIN_URL . 'admin/assets/frontend/setup/setup.js';
-		$style  = AUTOMLP_AI_PLUGIN_URL . 'includes/modules/wizard/src/wizard.css';
+		$style  = AUTOMLP_AI_PLUGIN_URL . 'admin/assets/frontend/setup/setup.css';
 		wp_enqueue_script(
 			'automlp_ai_setup',
 			$script,

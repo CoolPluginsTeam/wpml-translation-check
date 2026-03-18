@@ -368,7 +368,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 			'includes/routes/bulk-translation-route.php',
 			'admin/class-automlp_ai_dashboard.php',
 			'admin/cpt_dashboard/cpt_dashboard.php',
-			'includes/modules/wizard/load.php',
+			'includes/wizard/load.php',
 		);
 
 		foreach ( $files as $file ) {
