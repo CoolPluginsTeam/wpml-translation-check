@@ -14,19 +14,6 @@ export default (props) => {
     const errorIcon = assetsUrl + 'error-icon.svg';
 
     const Services = {
-        localAiTranslator: {
-            Provider: localAiTranslator,
-            title: "Chrome Built-in AI",
-            SettingBtnText: "Translate",
-            serviceLabel: "Chrome AI Translator",
-            heading: sprintf(__("Translate Using %s", "automlp-ai-translation-for-wpml"), "Chrome built-in API"),
-            Docs: "https://docs.coolplugins.net/doc/chrome-ai-translation-polylang/?utm_source=automlp_wpml_plugin&utm_medium=inside&utm_campaign=docs&utm_content=bulk_translate_chrome",
-            BetaEnabled: true,
-            ButtonDisabled: props.localAiTranslatorButtonDisabled,
-            ErrorMessage: props.localAiTranslatorButtonDisabled ? <div className={`${prefix}-provider-error`} onClick={() => openErrorModalHandler(props.localAiTranslatorButtonDisabled)}> {__('View Error', 'wpml-translation-check')}</div> : <></>,
-            Logo: 'chrome.png',
-            filterHtmlContent: true
-        },
         openai_ai: {
             Provider: AIService,
             title: "OpenAI Model",
