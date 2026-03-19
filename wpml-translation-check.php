@@ -4,7 +4,7 @@
  * Description: AutoMLP – AI translation addon for WPML that helps translate WordPress pages and posts content faster and more accurately.
  * Version: 1.2.0
  * Author: Cool Plugins
- * Author URI: https://coolplugins.net/
+ * Author URI: https://coolplugins.net/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=plugins_list
  * Text Domain: wpml-translation-check
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html

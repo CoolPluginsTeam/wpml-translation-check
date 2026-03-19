@@ -56,7 +56,7 @@ const VideoIntro = ({ onGetStarted }) => {
     alt={__("AutoMLP Setup Guide", "wpml-translation-check")}
     width={600}
     height={337}
-    style={{ borderRadius: 8, display: "block" }}
+    style={{ borderRadius: 8}}
   />
 </a>
         </div>

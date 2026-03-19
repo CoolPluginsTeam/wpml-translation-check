@@ -21,7 +21,7 @@ export default (props) => {
             Docs: "https://docs.coolplugins.net/doc/chrome-ai-translation-polylang/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=bulk_translate_chrome",
             BetaEnabled: true,
             ButtonDisabled: true,
-            ErrorMessage: <a className='atfp-provider-error' href='https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=bulk_translate_chrome' target="_blank">{__('Buy Pro', 'automlp-ai-translation-for-wpml')}</a>,
+            ErrorMessage: <a className='atfp-provider-error' href='https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=string_translate_chrome' target="_blank">{__('Buy Pro', 'automlp-ai-translation-for-wpml')}</a>,
             Logo: 'chrome.png',
             filterHtmlContent: true
         },
@@ -31,7 +31,7 @@ export default (props) => {
             SettingBtnText: "Translate",
             serviceLabel: "OpenAI",
             heading: sprintf(__("Translate Using %s Model", "automlp-ai-translation-for-wpml"), "OpenAI"),
-            Docs: "https://docs.coolplugins.net/doc/translate-via-open-ai-polylang/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=bulk_translate_openai",
+            Docs: "https://docs.coolplugins.net/doc/translate-via-open-ai-polylang/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=string_translate_openai",
             BetaEnabled: true,
             ButtonDisabled: props.openai_aiButtonDisabled,
             ErrorMessage: props.openai_aiButtonDisabled ? <a className={`${prefix}-provider-error`} href={adminUrl + 'admin.php?page=automlp_ai_dashboard&tab=settings'} target="_blank">{__('Add API Key', 'wpml-translation-check')}</a> : <></>,

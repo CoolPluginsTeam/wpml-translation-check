@@ -165,20 +165,62 @@ window.wpmlStringFilters = stringFilters;
 
   window.addEventListener("load", async () => {
     const prefix = "automlp-wpml-bulk-translate";
-
+  
     // Move bulk translate button to correct position on string translation page
     const bulkTranslateBtn = document.querySelector(`.${prefix}-btn`);
-    bulkTranslateBtn.style.display = "block";
-    const stringFilterDiv = document.querySelector(
-      ".wpml-string-translation-filter",
-    );
+    if (bulkTranslateBtn) {
+      bulkTranslateBtn.style.display = "block";
+    }
+  
+    const stringFilterDiv = document.querySelector(".wpml-string-translation-filter");
     const filterButton = document.querySelector("#icl_st_filter_search_sb");
-
+  
     if (bulkTranslateBtn && stringFilterDiv && filterButton) {
       // Insert the button after the filter button
       filterButton.insertAdjacentElement("afterend", bulkTranslateBtn);
     }
-
+  
+    const applyAnimation = () => {
+      const oldStyle = document.getElementById("ai-pro-btn-style");
+      if (oldStyle) oldStyle.remove();
+  
+      const style = document.createElement("style");
+      style.id = "ai-pro-btn-style";
+      style.innerHTML = `
+        .pro-attention-btn {
+          position: relative;
+          transition: all 0.3s ease !important;
+          animation: cleanPulse 2s infinite;
+          border: 1px solid #2271b1 !important;
+          z-index: 1;
+        }
+        @keyframes cleanPulse {
+          0%   { box-shadow: 0 0 0 0 rgba(34, 113, 177, 0.7); transform: scale(1); }
+          70%  { box-shadow: 0 0 0 10px rgba(34, 113, 177, 0); transform: scale(1.02); }
+          100% { box-shadow: 0 0 0 0 rgba(34, 113, 177, 0); transform: scale(1); }
+        }
+        .pro-attention-btn:hover {
+          animation: none;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.2) !important;
+          transform: translateY(-1px);
+        }
+        .pro-attention-btn:active {
+          transform: translateY(0);
+        }
+      `;
+      document.head.appendChild(style);
+  
+      document
+        .querySelectorAll(".automlp-wpml-bulk-translate-btn")
+        .forEach((el) => el.classList.add("pro-attention-btn"));
+    };
+  
+    // Apply animation only if user came from the settings button
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("automlp_translation")) {
+      applyAnimation();
+    }
+  
     ReactDOM.createRoot(document.getElementById(`${prefix}-wrapper`)).render(
       <Provider store={store}>
         <BulkTranslate prefix={prefix} />

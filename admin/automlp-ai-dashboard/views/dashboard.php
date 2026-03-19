@@ -10,6 +10,45 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h3><?php echo esc_html__( 'Automate the Translation Process', 'wpml-translation-check' ); ?></h3>
 
 			<div class="automlp_ai_dashboard-get-started-grid">
+			<div class="automlp_ai_dashboard-get-started-grid-content">
+    <h2><?php esc_html_e( 'Translate Pages/Posts', 'wpml-translation-check' ); ?></h2>
+    <p>
+        <?php
+        echo sprintf(
+            // translators: %1$s: strong tag, %2$s: strong tag.
+            esc_html__(
+                'Go to Pages or Posts, select items using checkboxes, and click %1$sAI Translate%2$s. Choose the language and AI provider (Gemini or OpenAI), then click %1$sTranslate%2$s. Your content will be translated shortly.',
+                'wpml-translation-check'
+            ),
+            '<strong>',
+            '</strong>'
+        );
+        ?>
+    </p>
+
+    <h2><?php esc_html_e( 'String Translation', 'wpml-translation-check' ); ?></h2>
+    <p>
+        <?php
+        echo sprintf(
+            // translators: %1$s: strong tag, %2$s: strong tag, %3$s: strong tag, %4$s: strong tag.
+            esc_html__(
+                'Go to %1$sWPML → String Translation%2$s, select the strings, and click %1$sAI Translate%2$s. Choose the language and AI provider, then click %1$sTranslate%2$s to complete the process.',
+                'wpml-translation-check'
+            ),
+            '<strong>',
+            '</strong>'
+        );
+        ?>
+    </p>
+ <div class="automlp_ai_dashboard-get-started-grid-buttons">
+  <button class="automlp_btn secondary" onclick="window.location.href='<?php echo esc_url( admin_url( 'admin.php?page=wpml-string-translation/menu/string-translation.php&automlp_translation' ) ); ?>'">
+    <?php esc_html_e( 'String Translation', 'wpml-translation-check' ); ?>
+  </button>
+  <button class="automlp_btn primary" onclick="window.location.href='<?php echo esc_url( admin_url( 'edit.php?post_type=page&automlp_translation' ) ); ?>'">
+    <?php esc_html_e( 'Page Translation', 'wpml-translation-check' ); ?>
+  </button>
+  </div>
+</div>
 				<div class="automlp_ai_dashboard-get-started-grid-content">
 					<!-- <iframe
 						title="Automate the Translation Process with AUTOMLP Ai Translate Addon"
@@ -25,94 +64,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						alt="<?php esc_attr_e( 'Translate Pages/Posts', 'wpml-translation-check' ); ?>"
 						width="100%"
 						height="337"
-						style="border-radius: 8px; display: block;"
+						style="border-radius: 8px;"
 					/>
 				</a>
-					<h2><?php echo esc_html__( 'Translate Pages/Posts :-', 'wpml-translation-check' ); ?></h2>
-					<p><?php esc_html_e( 'Follow the steps below to automatically translate your webpage content using Gemini AI or OpenAI:', 'wpml-translation-check' ); ?></p>
-					<ul>
-						<li><?php esc_html_e( 'Navigate to the Pages or Posts section from your WordPress dashboard.', 'wpml-translation-check' ); ?></li>
-						<li><?php esc_html_e( 'Use the checkboxes to select one or multiple pages/posts you want to translate.', 'wpml-translation-check' ); ?></li>
-						<li>
-							<?php
-							echo sprintf(
-								// translators: %1$s: strong tag, %2$s: strong tag.
-								esc_html__(
-									'Once selected, click the %1$sAI Translate%2$s button.',
-									'wpml-translation-check'
-								),
-								'<strong>',
-								'</strong>'
-							);
-							?>
-						</li>
-						<li><?php esc_html_e( 'Pop-up will open, select the language for translation.', 'wpml-translation-check' ); ?></li>
-						<li><?php esc_html_e( 'Next, choose your preferred AI translation provider (Gemini AI or OpenAI).', 'wpml-translation-check' ); ?></li>
-						<li>
-							<?php
-							echo sprintf(
-								// translators: %1$s: strong tag, %2$s: strong tag.
-								esc_html__(
-									'Click the %1$sTranslate%2$s button.',
-									'wpml-translation-check'
-								),
-								'<strong>',
-								'</strong>'
-							);
-							?>
-						</li>
-						<li><?php esc_html_e( 'The translation process will begin.', 'wpml-translation-check' ); ?></li>
-						<li><?php esc_html_e( 'That\'s it, after a few minutes your pages will be translated into the selected language.', 'wpml-translation-check' ); ?></li>
-					</ul>
-
-<h2><?php esc_html_e( 'String Translation', 'wpml-translation-check' ); ?></h2>
-<p><?php esc_html_e( 'Follow the steps below to automatically translate your theme or plugin strings via AI:', 'wpml-translation-check' ); ?></p>
-<ul>
-    <li>
-        <?php
-        echo sprintf(
-            // translators: %1$s: strong tag, %2$s: strong tag.
-            esc_html__(
-                'From your WordPress dashboard, navigate to %1$sWPML > String Translation%2$s.',
-                'wpml-translation-check'
-            ),
-            '<strong>',
-            '</strong>'
-        );
-        ?>
-    </li>
-    <li><?php esc_html_e( 'Select one or more strings you want to translate using checkboxes.', 'wpml-translation-check' ); ?></li>
-    <li>
-        <?php
-        echo sprintf(
-            // translators: %1$s: strong tag, %2$s: strong tag.
-            esc_html__(
-                'Next, click the %1$sAI Translate%2$s button at the top.',
-                'wpml-translation-check'
-            ),
-            '<strong>',
-            '</strong>'
-        );
-        ?>
-    </li>
-    <li><?php esc_html_e( 'The pop-up window will open, select the language for translation.', 'wpml-translation-check' ); ?></li>
-    <li><?php esc_html_e( 'Choose your preferred AI provider (Gemini AI or OpenAI).', 'wpml-translation-check' ); ?></li>
-    <li>
-        <?php
-        echo sprintf(
-            // translators: %1$s: strong tag, %2$s: strong tag.
-            esc_html__(
-                'Click the %1$sTranslate%2$s button, the translation process will begin.',
-                'wpml-translation-check'
-            ),
-            '<strong>',
-            '</strong>'
-        );
-        ?>
-    </li>
-    <li><?php esc_html_e( 'That\'s it, after a few minutes your strings will be translated automatically into the selected language.', 'wpml-translation-check' ); ?></li>
-</ul>
-				</div>
+</div>
 			</div>
 		</div>
 	</div>

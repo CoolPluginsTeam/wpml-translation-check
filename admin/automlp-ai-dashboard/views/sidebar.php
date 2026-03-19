@@ -135,7 +135,7 @@ endif;
 				$automlp_wpml_all_translation_data['automlp_ai'] = array();
 			}
 
-			$automlp_valid_providers = array('openai'=>'OpenAI Characters', 'google_ai'=>'Google Characters');
+			$automlp_valid_providers = array('openai'=>'OpenAI Characters', 'google_ai'=>'Google Gemini Characters');
 			$totals = array_reduce(
 				$automlp_wpml_all_translation_data['automlp_ai'],
 				function ( $carry, $translation ) {
