@@ -41,7 +41,8 @@ node_modules/           export-ignore
 *.sql                   export-ignore
 *.tar.gz                export-ignore
 *.zip                   export-ignore
-includes/src/   export-ignore
+includes/wizard/src/   export-ignore
+assets/src/            export-ignore
 postcss.config.js       export-ignore
 *.map                   export-ignore
 *.scss                  export-ignore

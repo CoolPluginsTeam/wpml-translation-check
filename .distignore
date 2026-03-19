@@ -50,4 +50,4 @@ tsconfig.json
 *js.LICENSE.txt
 *.scss
 assets/src
-includes/modules/wizard/src
+includes/wizard/src

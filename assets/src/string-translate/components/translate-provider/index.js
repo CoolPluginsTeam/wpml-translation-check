@@ -44,7 +44,7 @@ export default (props) => {
             SettingBtnText: "Translate",
             serviceLabel: "Gemini",
             heading: sprintf(__("Translate Using %s Model", "automlp-ai-translation-for-wpml"), "Gemini"),
-            Docs: "https://docs.coolplugins.net/doc/translate-via-gemini-ai-polylang/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=bulk_translate_gemini",
+            Docs: "https://docs.coolplugins.net/doc/translate-via-gemini-ai-polylang/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=string_translate_gemini",
             BetaEnabled: true,
             ButtonDisabled: props.google_aiButtonDisabled,
             ErrorMessage: props.google_aiButtonDisabled ? <a className={`${prefix}-provider-error`} href={adminUrl + 'admin.php?page=automlp_ai_dashboard&tab=settings'} target="_blank"> {__('Add API Key', 'wpml-translation-check')}</a> : <></>,
