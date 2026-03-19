@@ -222,7 +222,7 @@ class AIService {
         this.APIcontroller.push(controller);
 
         const keys=Object.keys(batch);
-        const strings=Object.values(batch);
+        const strings=Object.assign({}, Object.values(batch));
 
         if(Object.values(batch).length === 0){
             return;

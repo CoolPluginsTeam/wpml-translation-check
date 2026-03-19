@@ -307,6 +307,11 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             }
         
             $strings_raw = $params['strings'] ?? '';
+
+			if ( strpos( $strings_raw, '&lt;' ) !== false && strpos( $strings_raw, '&gt;' ) !== false ) {
+				$strings_raw = html_entity_decode( $strings_raw );
+			}
+
             $target_language = isset( $params['target_language'] ) ? sanitize_text_field( $params['target_language'] ) : '';
             $source_language = isset( $params['source_language'] ) ? sanitize_text_field( $params['source_language'] ) : 'en';
         
@@ -316,12 +321,6 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 			$wizard_lang = WPML_AT_Helper::get_wizard_allowed_language_code();
             if ( $wizard_lang !== null && strtolower( $target_language ) !== strtolower( $wizard_lang ) ) {
                 wp_send_json_error( __( 'This target language is not allowed. Only the language selected in the setup wizard can be used.', 'wpml-translation-check' ) );
-            }
-        
-            // Decode numeric-key => text map, e.g. {"0":"text","1":"text"}
-            $strings = is_string( $strings_raw ) ? json_decode( $strings_raw, true ) : $strings_raw;
-            if ( ! is_array( $strings ) ) {
-                $strings = array();
             }
         
                        // Get selected model for this provider from our option, or fallback to defaults.
@@ -374,7 +373,8 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             }
 
             // Build one prompt with JSON instructions (your existing $content template).
-            $strings_for_prompt = json_encode( $strings );
+            $strings_for_prompt = json_encode( $strings_raw );
+
             $content = sprintf(
                 'Instruction 1: Translate visible text content semantically into %s language. Provide a proper meaning-based translation.
         Instruction 2: Do not translate or modify any content inside square brackets []. These are shortcodes or dynamic placeholders and must remain exactly as they are.
@@ -423,6 +423,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 					__( 'Invalid AI response received.', 'wpml-translation-check' )
 				);
 			}
+
            	// Clean the text
 			$cleanText = preg_replace( '/(^```json\n|```$)/', '', $raw );
 
@@ -430,6 +431,17 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 			$final_text = preg_replace( '/\\\\{2,}([\'"n])/', '\\\$1', $cleanText );
 
 			$translated_text = json_decode( $final_text, true );
+
+			if ( is_array( $translated_text ) && count( $translated_text ) === 1 ) {
+				$key            = array_keys( $translated_text )[0];
+				$orignal_string = json_decode( $translated_text[ $key ], true );
+				if ( isset( $translated_text[ $key ] ) && json_decode( $translated_text[ $key ] ) !== null && isset( $orignal_string[ $key ] ) && json_decode( $orignal_string[ $key ] ) === null ) {
+					$translated_text[ $key ] = json_decode( $translated_text[ $key ], true )[ $key ];
+
+					$final_text = json_encode( $translated_text );
+				}
+			}
+
             if ( ! is_array( $translated_text ) ) {
                 wp_send_json_error( __( 'AI response is not valid JSON.', 'wpml-translation-check' ) );
             }
@@ -437,7 +449,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             // Frontend expects: { success: true, data: { translate_data: { "0": "...", "1": "..." } } }
             wp_send_json_success(
                 array(
-                    'translate_data' => $translated_text,
+                    'translate_data' => json_decode($final_text),
                 )
             );
         }
