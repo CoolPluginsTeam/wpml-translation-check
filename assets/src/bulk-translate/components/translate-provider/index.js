@@ -1,5 +1,4 @@
 // import YandexTranslater from "./yandex";
-import localAiTranslator from "./local-ai";
 import AIService from "./ai-services";
 import { sprintf, __ } from "@wordpress/i18n";
 
@@ -14,19 +13,6 @@ export default (props) => {
     const errorIcon = assetsUrl + 'error-icon.svg';
 
     const Services = {
-        localAiTranslator: {
-            Provider: localAiTranslator,
-            title: "Chrome Built-in AI",
-            SettingBtnText: "Translate",
-            serviceLabel: "Chrome AI Translator",
-            heading: sprintf(__("Translate Using %s", "automlp-ai-translation-for-wpml"), "Chrome built-in API"),
-            Docs: "https://docs.coolplugins.net/doc/chrome-ai-translation-polylang/?utm_source=automlp_wpml_plugin&utm_medium=inside&utm_campaign=docs&utm_content=bulk_translate_chrome",
-            BetaEnabled: true,
-            ButtonDisabled: props.localAiTranslatorButtonDisabled,
-            ErrorMessage: props.localAiTranslatorButtonDisabled ? <div className={`${prefix}-provider-error`} onClick={() => openErrorModalHandler(props.localAiTranslatorButtonDisabled)}>{__('View Error', 'wpml-translation-check')}</div> : <></>,
-            Logo: 'chrome.png',
-            filterHtmlContent: true
-        },
         openai_ai: {
             Provider: AIService,
             title: "OpenAI Model",
@@ -52,7 +38,19 @@ export default (props) => {
             ErrorMessage: props.google_aiButtonDisabled ? <a className={`${prefix}-provider-error`} href={adminUrl + 'admin.php?page=automlp_ai_dashboard&tab=settings'} target="_blank">{__('Add API Key', 'wpml-translation-check')}</a> : <></>,
             Logo: 'gemini.png',
             filterHtmlContent: true
-        }
+        },
+        localAiTranslator: {
+            title: "Chrome Built-in AI",
+            SettingBtnText: "Translate",
+            serviceLabel: "Chrome AI Translator",
+            heading: sprintf(__("Translate Using %s", "automlp-ai-translation-for-wpml"), "Chrome built-in API"),
+            Docs: "https://docs.coolplugins.net/doc/chrome-ai-translation-polylang/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome",
+            BetaEnabled: true,
+            ButtonDisabled: true,
+            ErrorMessage: <a className='atfp-provider-error' href='https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome' target="_blank">{__('Buy Pro', 'automlp-ai-translation-for-wpml')}</a>,
+            Logo: 'chrome.png',
+            filterHtmlContent: true
+        },
     };
 
     if (!Service) {

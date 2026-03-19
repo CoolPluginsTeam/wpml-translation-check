@@ -6,7 +6,6 @@ import { store } from "./redux-store/store";
 import { Provider } from "react-redux";
 import { __ } from "@wordpress/i18n";
 import LoopCallback from "./components/loop-callback";
-import LocalAITranslate from "./components/translate-provider/local-ai/local-ai-translate";
 
 (() => {
   const BulkTranslate = (props) => {
@@ -14,7 +13,6 @@ import LocalAITranslate from "./components/translate-provider/local-ai/local-ai-
     const [postIds, setPostIds] = useState([]);
     const prefix = props.prefix;
     const wrapper = document.getElementById(`${prefix}-wrapper`);
-    let localAiCheckInProgres = false;
 
     const handleModalVisibility = (e) => {
       e.preventDefault();
@@ -35,91 +33,6 @@ import LocalAITranslate from "./components/translate-provider/local-ai/local-ai-
         "automlp_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
       );
       sessionStorage.setItem(loadKey, "1");
-    };
-
-    // 2️⃣ Language pack availability check (gesture-based)
-    const checkLanguagePackAvailability = async () => {
-      const languagesObj = {
-        ...automlp_wpml_bulk_translate_object.languageObject,
-      };
-      const supportedLanguages = LocalAITranslate.supportedLanguages || [];
-
-      delete languagesObj.en;
-
-      let savedLanguages = [];
-      try {
-        savedLanguages =
-          JSON.parse(
-            localStorage.getItem(
-              "automlp_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
-            ),
-          ) || [];
-      } catch {
-        savedLanguages = [];
-      }
-
-      savedLanguages.forEach((lang) => delete languagesObj[lang]);
-
-      if (!Object.keys(languagesObj).length) return;
-
-      const processNextLanguage = async () => {
-        if (localAiCheckInProgres || Object.keys(languagesObj).length === 0)
-          return;
-
-        localAiCheckInProgres = true;
-        const targetLang = Object.keys(languagesObj)[0];
-
-        if (supportedLanguages.includes(targetLang)) {
-          try {
-            const status = await LocalAITranslate.languagePairAvality(
-              "en",
-              targetLang,
-            );
-
-            if (["available", "readily"].includes(status)) {
-              delete languagesObj[targetLang];
-              savedLanguages.push(targetLang);
-              localStorage.setItem(
-                "automlp_wpml_AVAILABLE_LOCAL_AI_TRANSLATOR_LANGUAGES",
-                JSON.stringify(savedLanguages),
-              );
-            }
-          } catch (err) {
-            console.error(
-              "Language availability check failed:",
-              targetLang,
-              err,
-            );
-          }
-        } else {
-          delete languagesObj[targetLang];
-        }
-
-        localAiCheckInProgres = false;
-
-        if (Object.keys(languagesObj).length === 0) {
-          document.removeEventListener("mousemove", onMouseMove);
-
-          const doActionsBtn = document.querySelectorAll(`.${prefix}-btn`);
-          doActionsBtn.forEach((btn) => {
-            btn.removeEventListener("mousemove", checkLanguagePackAvailability);
-            btn.removeEventListener(
-              "mouseleave",
-              checkLanguagePackAvailability,
-            );
-            btn.removeEventListener(
-              "mouseenter",
-              checkLanguagePackAvailability,
-            );
-          });
-        }
-      };
-
-      const onMouseMove = () => {
-        processNextLanguage();
-      };
-
-      document.addEventListener("mousemove", onMouseMove);
     };
 
     const bulkTranslationHandler = (e) => {
@@ -202,10 +115,7 @@ window.wpmlStringFilters = stringFilters;
       
           // For strings, we don't need postIds
           postIds = [];
-        }
-      
-        checkLanguagePackAvailability();
-      
+        }      
         setPostIds(postIds);
         handleModalVisibility(e);
       };
@@ -233,9 +143,6 @@ window.wpmlStringFilters = stringFilters;
         clearOldTranslatorCacheOnLoad();
         doActionsBtn.forEach((btn) => {
           btn.addEventListener("click", bulkTranslationHandler);
-          btn.addEventListener("mousemove", checkLanguagePackAvailability);
-          btn.addEventListener("mouseleave", checkLanguagePackAvailability);
-          btn.addEventListener("mouseenter", checkLanguagePackAvailability);
         });
       }
     }, []);

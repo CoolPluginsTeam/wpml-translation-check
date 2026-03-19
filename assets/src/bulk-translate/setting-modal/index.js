@@ -42,7 +42,6 @@ const SettingModal = (props) => {
                     <SettingModalBody
                         imgFolder={imgFolder}
                         prefix={prefix}
-                        localAiModalError={props.localAiModalError}
                         errorModalHandler={errorModalHandler}
                         selectedProvider={selectedProvider}
                         onSelectProvider={onSelectProvider}

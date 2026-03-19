@@ -1,5 +1,4 @@
 import { AITranslationRequest } from "./helper";
-import ChromeAiTranslator from "./components/translate-provider/local-ai/local-ai-translate";
 import {
   updatePendingPosts,
   unsetPendingPost,
@@ -130,57 +129,6 @@ const bulkTranslateStrings = async ({
     nonce,
   };
 };
-/**
- * Translate an array of plain strings using Chrome built-in AI (client-side).
- * Returns Promise<string[]> with same order as input, or rejects on error.
- */
-const translateStringsWithChromeAI = (strings, sourceLang, targetLang) => {
-  const languageObject =
-    automlp_wpml_bulk_translate_object?.languageObject || {};
-  const textContentObject = strings.reduce((acc, text, i) => {
-    acc[i] = text || "";
-    return acc;
-  }, {});
-
-  return new Promise((resolve, reject) => {
-    const translations = [];
-    ChromeAiTranslator.Object({
-      sourceLanguage: sourceLang,
-      targetLanguage: targetLang,
-      sourceLanguageLabel: languageObject[sourceLang]?.name || sourceLang,
-      targetLanguageLabel: languageObject[targetLang]?.name || targetLang,
-      onAfterTranslate: (key, translated) => {
-        const index = parseInt(key, 10);
-        if (!Number.isNaN(index)) {
-          translations[index] = translated || "";
-        }
-      },
-      onComplete: () => resolve(translations),
-      onLanguageError: (err) =>
-        reject(
-          err?.message
-            ? new Error(err.message)
-            : new Error("Chrome AI translation failed"),
-        ),
-    })
-      .then((translatorObj) => {
-        if (!translatorObj?.init || !translatorObj?.startTranslation) {
-          reject(
-            new Error(
-              __(
-                "Chrome AI is not available. Use Chrome and enable the Translation API.",
-                "automlp-ai-translation-for-wpml",
-              ),
-            ),
-          );
-          return;
-        }
-        translatorObj.init(textContentObject);
-        translatorObj.startTranslation();
-      })
-      .catch(reject);
-  });
-};
 
 /**
  * Initialize bulk translation for strings.
@@ -234,23 +182,13 @@ const initBulkTranslateStrings = async (
           field_key: str.field_key,
         }));
 
-        let translationResponse;
-        if (activeProvider === "localAiTranslator") {
-          const translations = await translateStringsWithChromeAI(
-            stringsToTranslate.map((s) => s.text),
-            sourceLang,
-            lang,
-          );
-          translationResponse = { success: true, data: { translations } };
-        } else {
-          translationResponse = await AITranslationRequest({
+        let translationResponse = await AITranslationRequest({
             controller,
             Strings: stringsToTranslate.map((s) => s.text),
             slug: serviceSlug,
             source_language: sourceLang,
             target_language: lang,
           });
-        }
         if (translationResponse?.success && translationResponse.data) {
           let translations = [];
 

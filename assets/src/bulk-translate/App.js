@@ -4,7 +4,6 @@ import StatusModal from './status-modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { resetStore, updateServiceProvider, updateCountInfo } from './redux-store/features/actions';
 import { selectCountInfo } from './redux-store/features/selectors';
-import ChromeAiTranslator from './components/translate-provider/local-ai/local-ai-translate';
 import ErrorModalBox from './components/error-modal-box';
 import SettingModal from './setting-modal';
 import DOMPurify from 'dompurify';
@@ -25,7 +24,6 @@ const App = ({ onDestory, prefix, postIds }) => {
     const translatePostsCount = useSelector(selectCountInfo).totalPosts;
     const [isLoading, setIsLoading] = useState(true);
     const [errorModal, setErrorModal] = useState(false);
-    const [localAiModalError, setLocalAiModalError] = useState(false);
     const targetLanguages = JSON.parse(JSON.stringify(languageObject));
     delete targetLanguages[automlp_wpml_bulk_translate_object.default_language_slug];
 
@@ -36,14 +34,7 @@ const App = ({ onDestory, prefix, postIds }) => {
     };
 
     useEffect(() => {
-        const checkStatus = async () => {
-            const status = await ChromeAiTranslator.languageSupportedStatus('en', 'hi', 'English', 'Hindi');
-            if (status.type === 'browser-not-supported' || status.type === 'translation-api-not-available' || status.type === 'browser-not-supported') {
-                setLocalAiModalError(__(status.html[0].outerHTML, 'wpml-translation-check'));
-            }
-            setIsLoading(false);
-        };
-        checkStatus();
+        setIsLoading(false);
     }, [statusModalVisibility]);
 
     useEffect(() => {
@@ -122,7 +113,6 @@ const App = ({ onDestory, prefix, postIds }) => {
                     onDestory={destroyApp}
                     onCloseHandler={settingModalVisibilityHandler}
                     updateProviderHandler={updateProviderHandler}
-                    localAiModalError={localAiModalError}
                 />
             )}
 

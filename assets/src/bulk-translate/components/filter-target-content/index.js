@@ -472,23 +472,12 @@ const FilterTargetContent = (props, storeUpdateContent) => {
 
     /**
      * The content to be filtered based on the service type.
-     * If the service is 'localAiTranslator' the content is filtered using filterSourceData function, otherwise, the content remains unchanged.
      */
-    const content = ['localAiTranslator'].includes(props.service) ? filterSourceData(props.content) : props.content;
+    const content = props.content;
 
     return (
         <>
-            {
-            ['localAiTranslator'].includes(props.service) ? content.map((data, index) => {
-                const notTranslate = notTranslatePattern.test(data);
-                if (notTranslate) {
-                    return <span key={index} className="notranslate automlp-wpml-notraslate-tag" translate="no">{filterContent(data)}</span>;
-                } else {
-                    return data;
-                }
-            }) :
-            content
-            }
+            {content}
         </>
     );
 }

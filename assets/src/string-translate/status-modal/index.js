@@ -240,25 +240,6 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     });
   };
 
-  const getServiceProviderLabel = () => {
-    switch (serviceProvider) {
-      case "google":
-        return "Google Translate";
-      case "localAiTranslator":
-        return "Chrome AI Translator";
-      case "openai_ai":
-        return "OpenAI";
-      case "google_ai":
-        return "Gemini";
-      case "openrouter_ai":
-        return "OpenRouter";
-      case "deepl_ai":
-        return "DeepL";
-      default:
-        return "AI Translator";
-    }
-  };
-
   // When any string-aggregate row is completed, hide the header skeleton
   const hasCompletedStringAggregate =
     translatePostInfo &&

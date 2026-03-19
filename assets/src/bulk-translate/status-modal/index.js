@@ -49,7 +49,6 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                         storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'error', messageClass: 'error', errorHtml: response.message } }));
                     });
                     setEmptyPostMessage(response.message);
-
                     if(index === Object.keys(pendingPostsInfo).length - 1 && progressStatus <= 0) {
                         setProgressBarVisibility(false);
                     }
@@ -253,19 +252,6 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
             return window.location.href;
         }
 
-    }
-
-    const getServiceProviderLabel = () => {
-        switch (serviceProvider) {
-            case 'localAiTranslator':
-                return 'Chrome AI Translator';
-            case 'openai_ai':
-                return 'OpenAI';
-            case 'google_ai':
-                return 'Gemini';
-            default:
-                return 'AI Translator';
-        }
     }
 
     const allPostStatus = (postId) => {
