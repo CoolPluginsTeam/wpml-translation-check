@@ -241,6 +241,7 @@ class AUTOMLP_Ai_Wizard {
                 'home_url'       => $base_home_url,
                 'wpml_languages' => $wpml_languages,
                 'default_language' => $default_language,
+				'template_image' => AUTOMLP_AI_PLUGIN_URL . 'assets/images/Install & Setup AutoMLP.png',
                 'saved_language' => get_option( 'automlp_ai_wizard_selected_language', array() ),
                 'saved_credentials' => array(
 					'openai_key' => isset( $saved_credentials['openai'] ) ? \WPML_AT_Helper::mask_api_key( $saved_credentials['openai'] ) : '',

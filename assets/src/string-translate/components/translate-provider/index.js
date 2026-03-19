@@ -21,7 +21,7 @@ export default (props) => {
             Docs: "https://docs.coolplugins.net/doc/chrome-ai-translation-polylang/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=bulk_translate_chrome",
             BetaEnabled: true,
             ButtonDisabled: true,
-            ErrorMessage: <a className='atfp-provider-error' href='https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=popup_chrome' target="_blank">{__('Buy Pro', 'automlp-ai-translation-for-wpml')}</a>,
+            ErrorMessage: <a className='atfp-provider-error' href='https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=bulk_translate_chrome' target="_blank">{__('Buy Pro', 'automlp-ai-translation-for-wpml')}</a>,
             Logo: 'chrome.png',
             filterHtmlContent: true
         },

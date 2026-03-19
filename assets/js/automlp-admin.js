@@ -21,6 +21,39 @@
             }
         }
     
+        const applyAnimation = () => {
+            const oldStyle = document.getElementById('ai-pro-btn-style');
+            if (oldStyle) oldStyle.remove();
+
+            const style = document.createElement('style');
+            style.id = 'ai-pro-btn-style';
+            style.innerHTML = `
+                .pro-attention-btn {
+                    position: relative;
+                    transition: all 0.3s ease !important;
+                    animation: cleanPulse 2s infinite;
+                    border: 1px solid #2271b1 !important;
+                    z-index: 1;
+                }
+                @keyframes cleanPulse {
+                    0%   { box-shadow: 0 0 0 0 rgba(34, 113, 177, 0.7); transform: scale(1); }
+                    70%  { box-shadow: 0 0 0 10px rgba(34, 113, 177, 0); transform: scale(1.02); }
+                    100% { box-shadow: 0 0 0 0 rgba(34, 113, 177, 0); transform: scale(1); }
+                }
+                .pro-attention-btn:hover {
+                    animation: none;
+                    box-shadow: 0 3px 6px rgba(0,0,0,0.2) !important;
+                    transform: translateY(-1px);
+                }
+                .pro-attention-btn:active {
+                    transform: translateY(0);
+                }
+            `;
+            document.head.appendChild(style);
+
+            jQuery('.automlp-wpml-bulk-translate-btn').addClass('pro-attention-btn');
+        };
+
         const appendButton=(btn)=>{
             if(!btn.length || btn.length < 0){
                 return;
@@ -47,6 +80,12 @@
         }
     
         appendButton(AutoMlBulkTranslateBtn);
+
+        // Apply animation only if user came from the settings button
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.has('automlp_translation')){
+            applyAnimation();
+        }
     }
     
     window.addEventListener('load', () => {
