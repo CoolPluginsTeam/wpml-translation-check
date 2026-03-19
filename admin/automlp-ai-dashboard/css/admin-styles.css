@@ -1,0 +1,1011 @@
+/*
+=======================================================
+WPML Auto Dashboard - Admin Panel Styles
+=======================================================
+*/
+
+:root {
+    --primary-color: #36899f;
+    --secondary-color: #3a7283;
+    --primary-light-color: #e5f9ff;
+    --background-color: #ffffff;
+    --border-color: #ddd;
+    --text-color: #222;
+    --text-color-light: #666;
+    --shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    --font-size-base: 16px;
+    --line-height-base: 1.5;
+}
+
+/* General Wrapper */
+.automlp_ai_dashboard-wrapper {
+    margin: 0 0 0 -20px;
+    padding: 0;
+    width: calc(100% + 20px);
+    box-sizing: border-box;
+}
+
+.automlp_ai_dashboard-wrapper * {
+    box-sizing: border-box;
+    font-family: Inter, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.automlp_ai_dashboard-wrapper h3 {
+    margin: 0 0 20px;
+    padding: 0;
+}
+
+/* Adjust WP admin body margins for this page */
+:is(.wpml_page_automlp_ai_dashboard) #wpbody #wpbody-content {
+    margin-top: 80px !important;
+    margin-block-start: 80px !important;
+}
+
+/* ================================================
+   Buttons & Links
+================================================ */
+.automlp_btns-row {
+    display: flex;
+    gap: 10px;
+}
+
+.automlp_btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.3s ease-in-out;
+    border: 1px solid #c6ced0;
+    background: var(--background-color);
+    color: var(--text-color);
+    box-shadow: inset 1px 1px 2px #00000010;
+    cursor: pointer;
+}
+
+.automlp_btn:focus {
+   box-shadow: none;
+   border-radius: 6px;
+   background: var(--primary-light-color);
+   color: var(--primary-color);
+   border-color: var(--secondary-color);
+   box-shadow: 0 0 0px 3px var(--primary-light-color);
+}
+
+.automlp_btn.primary {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--secondary-color);
+}
+
+.automlp_btn:hover {
+    background: var(--primary-light-color);
+    color: var(--primary-color);
+    border-color: var(--secondary-color);
+}
+
+.automlp_btn.primary:hover {
+    background: var(--secondary-color);
+    color: #fff;
+}
+
+.automlp_btn img {
+    max-height: 18px;
+    width: auto;
+}
+
+/* ================================================
+   Header Section
+================================================ */
+.automlp_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--background-color);
+    padding: 5px 30px;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 6px 6px 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% + 20px);
+    margin: 0 0 0 -20px;
+    box-shadow: var(--shadow);
+    height: 68px;
+}
+
+.automlp_header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.automlp_header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.automlp_header-logo-link:focus,
+.automlp_header-logo-link:hover {
+    box-shadow: none;
+    text-decoration: none;;
+}
+
+.automlp_header-logo-link img {
+    width: 42px;
+    max-width: 42px;
+    margin: 0;
+    display: block;
+}
+
+.automlp_header-logo-text{
+    font-size: 18px;
+    font-weight: 700;
+    color: #000;
+}
+
+.automlp_header-title {
+    display: flex;
+    gap: 5px;
+    font-size: 14px;
+}
+
+
+
+/* ================================================
+   Dashboard Layout
+================================================ */
+.automlp_ai_dashboard-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 25px;
+    flex: 2;
+}
+
+@media (min-width: 768px) {
+    .automlp_ai_dashboard-dashboard {
+        flex-direction: row;
+        gap: 40px;
+    }
+}
+
+.automlp_ai_dashboard-left-section {
+    width: auto;
+    flex: 2;
+    margin-top: 30px;
+}
+
+/* ================================================
+   Get Started / Welcome Section
+================================================ */
+.automlp_ai_dashboard-welcome {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    gap: 5px;
+}
+
+.automlp_ai_dashboard-get-started {
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.automlp_ai_dashboard-get-started-grid {
+    display: flex;
+    justify-content: center;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 13px 15px 15px 15px;
+}
+
+.automlp_ai_dashboard-get-started-grid-content{
+    width: 70%;
+    padding: 0 0 0 15px;
+}
+
+.automlp_ai_dashboard-get-started-grid-buttons{
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+.automlp_ai_dashboard-get-started-grid-content p{
+    line-height: 1.95;
+}
+
+.automlp_ai_dashboard-get-started-grid div ul {
+    list-style: disc;
+    padding-left: 30px;
+}
+
+.automlp_ai_dashboard-get-started-grid iframe {
+    max-width: 100%;
+    width: 100%;
+    aspect-ratio: 2/1;
+}
+
+.automlp_ai_dashboard-get-started-grid:nth-child(3) {
+    margin-block: 24px;
+}
+
+.automlp_ai_dashboard-translation-providers {
+    margin-top: 24px;
+}
+
+.automlp_ai_dashboard-welcome-text {
+    width: calc(100% - 45px);
+    flex-direction: column;
+}
+
+.automlp_ai_dashboard-welcome-text h2 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 10px 0;
+    line-height: 25px;
+}
+
+.automlp_ai_dashboard-welcome p {
+    font-size: 0.875rem;
+    color: var(--text-color-light);
+    margin: 10px 0 20px;
+}
+
+.automlp_ai_dashboard-welcome-video {
+    width: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.automlp_ai_dashboard-welcome-video .play-icon {
+    width: 54px;
+    height: 54px;
+    position: absolute;
+    left: calc(50% - 27px);
+    top: calc(50% - 27px);
+    animation: play-icon 1s ease-in-out infinite;
+}
+
+.automlp_ai_dashboard-welcome-video img.loco-video {
+    width: 100%;
+    height: auto;
+}
+
+a.automlp_ai_dashboard-docs {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 30px;
+    font-size: 14px;
+    color: var(--text-color);
+    font-weight: 500;
+    text-decoration: underline;
+}
+
+a.automlp_ai_dashboard-docs:hover {
+    color: var(--primary-color);
+}
+
+/* ================================================
+   Translation Providers (generic)
+================================================ */
+.automlp_ai_dashboard-providers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 20px;
+}
+
+.automlp_ai_dashboard-provider-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.automlp_ai_dashboard-provider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 15px;
+}
+
+.automlp_ai_dashboard-provider-header img {
+    height: 25px;
+}
+
+.automlp_ai_dashboard-badge {
+    background: #131413;
+    color: #fff;
+    padding: 2px 8px;
+    font-size: 12px;
+    border-radius: 12px;
+}
+
+.automlp_ai_dashboard-badge.free {
+    background: var(--primary-color);
+}
+
+.automlp_ai_dashboard-provider-buttons {
+    display: flex;
+    gap: 10px;
+    font-size: 11px;
+}
+
+/* ================================================
+   Sidebar
+================================================ */
+.automlp_ai_dashboard-sidebar {
+    width: 450px;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 30px;
+    flex: 1;
+}
+
+.automlp_sidebar-box {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.automlp_sidebar-box h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.7em;
+}
+
+.automlp_sidebar-box p {
+    font-size: 14px;
+    line-height: 1.6em;
+    padding: 0;
+    margin: 0 0 10px;
+}
+
+/* Translation Status */
+.automlp_ai_dashboard-sidebar .automlp_ai_dashboard-status {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px 20px 10px;
+    background: #fff;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    flex-direction: column;
+}
+
+.automlp_ai_dashboard-sts-top {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #c3c4c7;
+    gap: 12px;
+    font-size: 15px;
+}
+
+.automlp_ai_dashboard-sts-top span:first-child {
+    font-weight: 800;
+    font-size: 24px;
+}
+
+ul.automlp_ai_dashboard-sts-btm {
+    padding: 0;
+    margin: 9px 0;
+}
+
+ul.automlp_ai_dashboard-sts-btm li {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 0;
+}
+
+ul.automlp_ai_dashboard-sts-btm li span:first-child {
+    font-weight: 600;
+}
+
+/* Full Website Translate */
+.automlp_ai_dashboard-translate-full .automlp_ai_dashboard-addon {
+    border-bottom: 1px solid #c3c4c7;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    display: flex;
+    gap: 15px;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.automlp_ai_dashboard-addon.first {
+    border-top: 1px solid #c3c4c7;
+    padding-top: 15px;
+}
+
+.automlp_ai_dashboard-addon-l {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.automlp_ai_dashboard-addon-r img {
+    width: 72px;
+}
+
+.automlp_ai_dashboard-translate-full .installed {
+    background: #cfd5d1;
+    color: #7f7f7f;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.automlp_ai_dashboard-translate-full .addon-desc {
+    font-size: 12px;
+    color: #838389;
+    margin-bottom: 5px;
+}
+
+/* ================================================
+   Rate Us Section
+================================================ */
+.automlp_ai_dashboard-rate-us {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+}
+
+.automlp_ai_dashboard-rate-us h3 {
+    line-height: 25px;
+}
+
+.automlp_ai_dashboard-rate-us .review-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007cba;
+    font-weight: bold;
+}
+
+/* ================================================
+   Animations
+================================================ */
+@keyframes play-icon {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/*===============================================
+    Tab Content
+================================================ */
+.automlp_ai_dashboard-wrapper .tab-content {
+    display: flex;
+    gap: 30px !important;
+    padding: 0 30px;
+}
+
+.automlp_ai_dashboard-wrapper .nav-tab:first-child {
+    margin-left: 30px;
+}
+
+.automlp_ai_dashboard-wrapper .nav-tab-wrapper a {
+    padding: 10px 12px;
+    border-radius: 6px 6px 0 0;
+}
+
+.automlp_ai_dashboard-free-vs-pro .header,
+.automlp_ai_dashboard-ai-translations .header,
+.automlp_ai_dashboard-license .header,
+.automlp_ai_dashboard-settings .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+:where(.automlp_ai_dashboard-free-vs-pro,
+       .automlp_ai_dashboard-ai-translations,
+       .automlp_ai_dashboard-license,
+       .automlp_ai_dashboard-settings)
+       .automlp_ai_dashboard-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+:where(.automlp_ai_dashboard-free-vs-pro,
+       .automlp_ai_dashboard-ai-translations,
+       .automlp_ai_dashboard-license,
+       .automlp_ai_dashboard-settings)
+       .automlp_ai_dashboard-status span {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* ================================================
+   Free vs Other Solutions
+================================================ */
+.automlp_ai_dashboard-free-vs-pro {
+    width: 100%;
+    margin-top: 25px;
+    flex: 2;
+}
+
+.automlp_ai_dashboard-free-vs-pro-container {
+    background: white;
+    padding: 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.automlp_ai_dashboard-free-vs-pro p {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.automlp_ai_dashboard-free-vs-pro table {
+    width: 100%;
+    border-collapse: collapse;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.automlp_ai_dashboard-free-vs-pro th {
+    background-color: #e7e7e7;
+    text-align: left;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 12px;
+}
+
+.automlp_ai_dashboard-free-vs-pro td {
+    padding: 12px;
+    font-size: 14px;
+    border-bottom: 1px solid #eee;
+}
+
+.automlp_ai_dashboard-free-vs-pro .check {
+    color: green;
+    font-size: 16px;
+}
+
+.automlp_ai_dashboard-free-vs-pro .cross {
+    color: red;
+    font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .automlp_ai_dashboard-free-vs-pro {
+        width: 100%;
+        padding: 16px;
+    }
+}
+
+/* ================================================
+   AI Translations
+================================================ */
+.automlp_ai_dashboard-ai-translations {
+    width: auto;
+    flex: 2;
+    margin-top: 25px;
+}
+
+.automlp_ai_dashboard-ai-translations-container {
+    background: white;
+    padding: 24px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.automlp_ai_dashboard-ai-translations .description {
+    font-size: 14px;
+    color: #666;
+    margin: 10px 0;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card {
+    margin-top: 35px;
+    position: relative;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 13px 15px 15px 15px;
+    text-align: start;
+    width: 31.5%;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card h3 {
+    margin-top: 12px;
+    font-size: 1.0rem;
+    margin-bottom: 10px;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card p {
+    padding-right: 4px;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card .logo {
+    background-color: white;
+    left: 20px;
+    position: absolute;
+    top: -14px;
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    padding: 4px 10px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card .logo img {
+    width: 100%;
+    height: 20px;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card .play-btn-container img {
+    width: 100%;
+    height: 100%;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translation-card .play-btn-container a:focus {
+    box-shadow: none;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-play-btn {
+    background: #00cc66;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-ai-translations-container .header h1 {
+    line-height: 25px;
+}
+
+/* ================================================
+   License
+================================================ */
+.automlp_ai_dashboard-license {
+    width: 100%;
+    margin-top: 25px;
+    flex: 2;
+}
+
+.automlp_ai_dashboard-license-container {
+    background: white;
+    font-family: Arial, sans-serif;
+    color: #333;
+    border: 1px solid #ddd;
+    padding: 24px;
+    border-radius: 5px;
+}
+
+.automlp_ai_dashboard-license h1 {
+    font-weight: 600;
+    color: #000;
+    margin: 14px 0px 22px 0px;
+    font-size: 22px;
+}
+
+.automlp_ai_dashboard-license p {
+    margin: 5px 0;
+    font-size: 14px;
+}
+
+.automlp_ai_dashboard-upgrade-box {
+    background-color: #f3fcf3;
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    border-left: 4px solid #30b230;
+}
+
+.automlp_ai_dashboard-upgrade-box a {
+    color: #0073aa;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.automlp_ai_dashboard-upgrade-box a:hover {
+    text-decoration: underline;
+}
+
+.automlp_ai_dashboard-upgrade-box em {
+    display: block;
+    margin-top: 5px;
+    font-size: 13px;
+    color: #555;
+}
+
+/* ================================================
+   Settings Section
+================================================ */
+.automlp_ai_dashboard-settings {
+    width: 100%;
+    margin-top: 25px;
+    flex: 2;
+}
+
+.automlp_ai_dashboard-api-note p {
+    margin: 0;
+    font-size: 13px;
+    color: #646970;
+    font-style: italic;
+    line-height: 1.5;
+    text-align: left;
+}
+
+.automlp-ai-dashboard-feedback-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.automlp_ai_dashboard-settings-container {
+    padding: 24px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+.automlp_ai_dashboard-settings h1 {
+    margin: 14px 0px 22px 0px;
+    font-size: 22px;
+    line-height: 25px;
+}
+
+.automlp_ai_dashboard-feedback-container {
+    margin: 25px 0px 18px 0px;
+}
+
+
+.automlp_ai_dashboard-api-settings {
+    width: 100%;
+}
+
+.automlp_ai_dashboard-api-settings label {
+    display: block;
+    font-weight: bold;
+    margin: 30px 0px 10px 0px;
+}
+
+.automlp_ai_dashboard-api-settings .input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 60%;
+}
+
+.automlp_ai_dashboard-api-settings .input-group input {
+    width: calc(100% - 70px);
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin: 0;
+    letter-spacing: 0.05em;
+}
+
+.automlp_ai_dashboard-api-settings input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    letter-spacing: 0.05em;
+}
+
+.automlp_ai_dashboard-feedback-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.automlp_ai_dashboard-api-settings textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 8px 12px;
+    border: 1px solid(var(--border-color));
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin: 0;
+    font-family: inherit;
+    resize: vertical;
+}
+
+.automlp_ai_dashboard-api-settings a {
+    margin: 10px 0px 10px 0px;
+    display: inline-block;
+    font-size: 14px;
+    color: #0073aa;
+    text-decoration: none;
+}
+
+.automlp_ai_dashboard-ai-request-container > div[class^="automlp_ai_dashboard-ai-"] {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.automlp_ai_dashboard-ai-request-container label {
+    margin: 0;
+    white-space: nowrap;
+    min-width: 150px;
+}
+
+.automlp_ai_dashboard-ai-request-container h2 {
+    margin: 0px 0 10px;
+}
+
+.automlp_ai_dashboard-ai-request-container p {
+    padding: 0;
+    margin: 3px 0 0;
+}
+
+.wpml-auto-bulk-translation-post-status-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.wpml-auto-bulk-translation-post-status-options input {
+    margin-right: 10px;
+    width: 10px;
+}
+
+.wpml-auto-bulk-translation-post-status-options label {
+    margin-right: 10px;
+    margin-block: 0px;
+}
+
+.automlp_ai_dashboard-api-settings .automlp_ai_dashboard-save-btn-container {
+    margin-top: 20px;
+}
+
+/* ================================================
+   Info / Footer
+================================================ */
+.automlp_ai_dashboard-footer {
+    display: flex;
+    margin: 20px 0 50px;
+    padding: 0 30px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #666;
+    font-weight: 300;
+}
+.automlp_footer-logo img {
+    width: 120px;
+    height: auto;
+    display: block;
+}
+
+/* Responsive tweaks */
+@media (max-width: 488px) and (min-width: 100px) {
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-ai-translations-container .header,
+    .automlp_ai_dashboard-free-vs-pro-container .header,
+    .automlp_ai_dashboard-settings-container .header,
+    .automlp_ai_dashboard-license-container .header {
+        flex-direction: column;
+        align-items: start;
+        padding-bottom: 10px;
+    }
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 767px) {
+    .automlp_ai_dashboard-wrapper .tab-content {
+        flex-direction: column;
+        gap: 0px;
+    }
+    .automlp_ai_dashboard-sidebar {
+        width: auto;
+    }
+    .automlp_header {
+        padding: 0px 11px 11px 20px;
+        height: auto;
+        min-height: 110px;
+        flex-direction: column;
+        gap: 15px;
+        top: 0;
+    }
+    .automlp_ai_dashboard-welcome {
+        flex-direction: column;
+    }
+    .automlp_ai_dashboard-welcome-text {
+        width: 100%;
+    }
+    .automlp_ai_dashboard-welcome-video {
+        width: 100%;
+    }
+    .automlp_ai_dashboard-wrapper {
+        padding: 60px 12px 0px 0px;
+    }
+    .automlp_header-right {
+        gap: 6px;
+    }
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-ai-translations-container .header,
+    .automlp_ai_dashboard-free-vs-pro-container .header,
+    .automlp_ai_dashboard-settings-container .header,
+    .automlp_ai_dashboard-license-container .header {
+        flex-direction: column;
+        align-items: start;
+        padding-bottom: 10px;
+    }
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 766px) and (min-width: 601px) {
+    .automlp_header {
+        top: 0px;
+    }
+}
+
+@media (max-width: 767px) and (min-width: 375px) {
+    .automlp_header {
+        height: 110px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .automlp_header-left svg {
+        max-width: 120px;
+    }
+    .automlp_header {
+        gap: 15px;
+    }
+    .automlp_header-left img {
+        max-width: 56px;
+    }
+    .automlp_ai_dashboard-btn {
+        padding: 8px 6px;
+    }
+    .automlp_header-right {
+        gap: 13px;
+    }
+    .automlp_ai_dashboard-ai-translations .automlp_ai_dashboard-translations {
+        gap: 7px;
+    }
+}

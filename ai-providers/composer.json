@@ -1,0 +1,13 @@
+{
+    "name": "cool-plugins/automlp-ai-providers",
+    "description": "Vendored AI provider packages for AutoMLP plugin",
+    "type": "library",
+    "require": {
+        "wordpress/ai-provider-for-openai": "^1.0.2",
+        "wordpress/ai-provider-for-google": "^1.0.2"
+    },
+    "config": {
+        "vendor-dir": "vendor",
+        "optimize-autoloader": true
+    }
+}

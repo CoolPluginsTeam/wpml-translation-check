@@ -1,0 +1,47 @@
+{
+    "name": "automlp-ai-translation-for-wpml",
+    "version": "1.0.0",
+    "main": "./assets/src/bulk-translate/index.js",
+    "scripts": {
+        "build": "wp-scripts build ./assets/src/bulk-translate/index.js --output-path=./assets/bulk-translate/",
+        "start": "wp-scripts start ./assets/src/bulk-translate/index.js --output-path=./assets/bulk-translate/",
+        "build:string": "wp-scripts build ./assets/src/string-translate/index.js --output-path=./assets/bulk-string-translate/",
+        "start:string": "wp-scripts start ./assets/src/string-translate/index.js --output-path=./assets/bulk-string-translate/ --watch",
+        "build:wizard": "wp-scripts build ./includes/wizard/src/setup.js --output-path=admin/assets/frontend/setup",
+        "start:wizard": "wp-scripts start ./includes/wizard/src/setup.js --output-path=admin/assets/frontend/setup --watch"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/coolplugins/automlp-ai-translation-for-wpml.git"
+    },
+    "keywords": [
+        "WPML",
+        "Bulk Translation",
+        "WPML addon"
+    ],
+    "author": "coolplugins",
+    "license": "ISC",
+    "dependencies": {
+        "@reduxjs/toolkit": "^2.9.0",
+        "@wordpress/data": "^10.0.0",
+        "@wordpress/element": "^6.31.0",
+        "@wordpress/i18n": "^6.4.0",
+        "@wordpress/icons": "^11.7.0",
+        "dompurify": "^3.2.7",
+        "react": "18.3.1",
+        "react-dom": "18.3.1",
+        "react-redux": "^9.2.0"
+    },
+    "devDependencies": {
+        "@babel/preset-react": "^7.27.1",
+        "@wordpress/browserslist-config": "^6.31.0",
+        "@wordpress/scripts": "^30.24.0",
+        "autoprefixer": "^10.4.21",
+        "browserslist": "^4.26.2",
+        "postcss": "^8.5.6",
+        "postcss-loader": "^8.2.0",
+        "postcss-nested": "^7.0.2",
+        "postcss-preset-env": "^10.3.1",
+        "style-loader": "^4.0.0"
+    }
+}

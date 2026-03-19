@@ -1,0 +1,430 @@
+{
+    
+    "kadence/form": {
+        "attributes": {
+            "submitLabel": "Submit",
+            "fields": [
+				{
+					"label": "Name",
+					"showLabel": true,
+					"placeholder": "",
+					"default": "",
+					"description": "",
+					"rows": 4,
+					"options": [
+						{
+							"value": "",
+							"label": ""
+						}
+					],
+					"multiSelect": false,
+					"inline": false,
+					"showLink": false,
+					"min": "",
+					"max": "",
+					"type": "text",
+					"required": false,
+					"width": ["100", "", ""],
+					"auto": "",
+					"errorMessage": "",
+					"requiredMessage": "",
+					"slug": "",
+					"ariaLabel": ""
+				},
+				{
+					"label": "Email",
+					"showLabel": true,
+					"placeholder": "",
+					"default": "",
+					"description": "",
+					"rows": 4,
+					"options": [
+						{
+							"value": "",
+							"label": ""
+						}
+					],
+					"multiSelect": false,
+					"inline": false,
+					"showLink": false,
+					"min": "",
+					"max": "",
+					"type": "email",
+					"required": true,
+					"width": ["100", "", ""],
+					"auto": "",
+					"errorMessage": "",
+					"requiredMessage": "",
+					"slug": "",
+					"ariaLabel": ""
+				},
+				{
+					"label": "Message",
+					"showLabel": true,
+					"placeholder": "",
+					"default": "",
+					"description": "",
+					"rows": 4,
+					"options": [
+						{
+							"value": "",
+							"label": ""
+						}
+					],
+					"multiSelect": false,
+					"inline": false,
+					"showLink": false,
+					"min": "",
+					"max": "",
+					"type": "textarea",
+					"required": true,
+					"width": ["100", "", ""],
+					"auto": "",
+					"errorMessage": "",
+					"requiredMessage": "",
+					"slug": "",
+					"ariaLabel": ""
+				}
+			]
+        }
+    },
+    "kadence/tabs": {
+        "attributes": {
+            "titles": [
+				{
+					"text": "Tab 1",
+					"icon": "",
+					"iconSide": "right",
+					"onlyIcon": false,
+					"subText": "",
+					"anchor": ""
+				},
+				{
+					"text": "Tab 2",
+					"icon": "",
+					"iconSide": "right",
+					"onlyIcon": false,
+					"subText": "",
+					"anchor": ""
+				},
+				{
+					"text": "Tab 3",
+					"icon": "",
+					"iconSide": "right",
+					"onlyIcon": false,
+					"subText": "",
+					"anchor": ""
+				}
+			]
+        }
+    },
+    "uagb/buttons-child": {
+        "attributes": {
+            "label": "Click Here"
+        }
+    },
+    "uagb/countdown": {
+        "attributes": {
+            "labelDays": "DAYS",
+            "labelHours": "HOURS",
+            "labelMinutes": "MINUTES",
+            "labelSeconds": "SECONDS"
+        }
+    },
+    "uagb/info-box": {
+        "attributes": {
+            "ctaText": "Read More",
+            "headingDesc": "Click here to change this text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
+            "infoBoxTitle": "Info Box",
+            "prefixTitle": "Prefix",
+            "tempHeadingDesc": "Click here to change this text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo."
+        }
+    },
+    "uagb/call-to-action": {
+        "attributes": {
+            "ctaTitle": "Call To Action",
+            "description": "Click here to change this text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
+            "tempDesc": "Click here to change this text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
+            "ctaText": "Read More"
+        }
+    },
+    "uagb/blockquote": {
+        "attributes": {
+            "author": "Author Name",
+            "descriptionText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo."
+        }
+    },
+    "uagb/counter": {
+        "attributes": {
+            "heading": "Add Your Title Here…"
+        }
+    },
+    "uagb/icon-list-child": {
+        "attributes": {
+            "label": "List item"
+        }
+    },
+    "uagb/restaurant-menu-child": {
+        "attributes": {
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "title": "Menu Item"
+        }
+    },
+    "uagb/container": {
+        "attributes": {
+            "description": "Price List-Child"
+        }
+    },
+    "uagb/team": {
+        "attributes": {
+            "description_text": "Click here to change this text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
+            "prefix": "Designation",
+            "title": "John Doe"
+        }
+    },
+    "uagb/testimonial": {
+        "attributes": {
+            "test_block": [
+                {
+                    "company": "Company Name",
+                    "description": "I have been working with these guys for years now! With lots of hard work and timely communication, they made sure they delivered the best to me. Highly recommended!",
+                    "name": "John Doe "
+                },
+                {
+                    "company": "Company Name",
+                    "description": "I have been working with these guys for years now! With lots of hard work and timely communication, they made sure they delivered the best to me. Highly recommended!",
+                    "name": "John Doe "
+                },
+                {
+                    "company": "Company Name",
+                    "description": "I have been working with these guys for years now! With lots of hard work and timely communication, they made sure they delivered the best to me. Highly recommended!",
+                    "name": "John Doe "
+                }
+            ]
+        }
+    },
+    "uagb/review": {
+        "attributes": {
+            "summaryDescription": "Whether you’re a beginner, marketer, web designer or developer, Spectra includes all the tools and resources you can trust to succeed online.",
+            "summaryTitle": "Summary",
+            "rAuthor": "– Brainstorm Force",
+            "rContent": "Whether you’re a beginner, marketer, web designer or developer, Spectra includes all the tools and resources you can trust to succeed online.",
+            "rTitle": "Spectra: Gutenberg Blocks",
+            "parts": [
+                {
+                    "label": "Feature #1"
+                },
+                {
+                    "label": "Feature #2"
+                },
+                {
+                    "label": "Feature #3"
+                }
+            ]
+        }
+    },
+    "uagb/how-to-step": {
+        "attributes": {
+            "description": "Click here to change this text. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.",
+            "name": "Step"
+        }
+    },
+    "uagb/how-to": {
+        "attributes": {
+            "currencyType": " USD",
+            "headingDesc": "So to get started, you will just need to drag-n-drop the How-to Schema block in the Gutenberg editor. The How-to Schema block can be used on pages that contain a How-to in their title and describe steps to achieve certain requirements.",
+            "headingTitle": "How To Configure How-To Schema In Spectra?",
+            "timeNeeded": "Total Time Needed :",
+            "estCost": "Total Cost:",
+            "stepsTitle": "Steps to configure the How-to Schema:",
+            "materialTitle": "Things Needed?",
+            "toolsTitle": "Required Tools:",
+            "timeIn": " Minutes"
+        }
+    },
+    "stackable/table-of-contents": {
+        "attributes": {
+            "heading": "Table of Contents",
+            "description": "Table of Contents",
+            "items": [
+                {
+                    "label": "Item 1",
+                    "url": "#item-1"
+                }
+            ]
+        }
+    },
+    "stackable/posts": {
+        "attributes": {
+            "readmoreText": "!#readmoreText!#"
+        }
+    },
+    "stackable/progress-bar":{
+        "attributes": {
+            "text": "Design"
+        }
+    },
+    "themeisle-blocks/circle-counter": {
+        "attributes": {
+            "title": "Skill"
+        }
+    },
+    "themeisle-blocks/progress-bar": {
+        "attributes": {
+            "title": "Skill"
+        }
+    },
+    "gutenverse/advanced-heading": {
+        "attributes": {
+            "text": "Heading ",
+            "subText": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt",
+            "focusText": "Focused"
+        }
+    },
+    "gutenverse/animated-text": {
+        "attributes": {
+            "beforeTextAnimated": "Before ",
+            "text": "Placeholder Text",
+            "afterTextAnimated": " After"
+        }
+    },
+    "gutenverse/chart": {
+        "attributes": {
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "title": "Chart Title"
+        }
+    },
+    "gutenverse/countdown": {
+        "attributes": {
+            "labelDays": "days",
+            "labelHours": "hours",
+            "labelMinutes": "minutes",
+            "labelSeconds": "seconds"
+        }
+    },
+    "gutenverse/feature-list": {
+        "attributes": {
+            "featureList": [
+                {
+					"title": "One",
+					"type": "icon",
+					"icon": "fas fa-check",
+					"content": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&#039;s standard dummy text ever since the 1500s."
+				},
+				{
+					"title": "Two",
+					"type": "icon",
+					"icon": "fas fa-check",
+					"content": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&#039;s standard dummy text ever since the 1500s."
+				},
+				{
+					"title": "Three",
+					"type": "icon",
+					"icon": "fas fa-check",
+					"content": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry&#039;s standard dummy text ever since the 1500s."
+				}
+            ]
+        }
+    },
+    "gutenverse/fun-fact": {
+        "attributes": {
+            "suffix": "M",
+            "title": "Fun Fact"
+        }
+    },
+    "gutenverse/icon-box": {
+        "attributes": {
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+            "title": "Icon Box"
+        }
+    },
+    "gutenverse/gallery": {
+        "attributes": {
+            "images": [
+                {
+                    "title": "One"
+                },
+                {
+                    "title": "Two"
+                },
+                {
+                    "title": "Three"
+                },
+                {
+                    "title": "Four"
+                }
+            ]
+        }
+    },
+    "gutenverse/portfolio-gallery": {
+        "attributes": {
+            "linkText": "View More",
+            "images": [
+                {
+					"id": "One",
+					"title": "One",
+					"subtitle": "Sub Title",
+					"current": true,
+					"link": "#"
+				},
+				{
+					"id": "Two",
+					"title": "Two",
+					"subtitle": "Sub Title",
+					"current": false,
+					"link": "#"
+				},
+				{
+					"id": "Three",
+					"title": "Three",
+					"subtitle": "Sub Title",
+					"current": false,
+					"link": "#"
+				},
+				{
+					"id": "Four",
+					"title": "Four",
+					"subtitle": "Sub Title",
+					"current": false,
+					"link": "#"
+				}
+            ]
+        }
+    },
+    "gutenverse/progress-bar": {
+        "attributes": {
+            "title": "Progress Bar"
+        }
+    },
+    "gutenverse/star-rating": {
+        "attributes": {
+            "title": "Lorem Ipsum"
+        }
+    },
+    "gutenverse/testimonials": {
+        "attributes": {
+            "testimonialData": [
+                {
+                    "description": "Lorem Ipsum",
+                    "name": "John Doe",
+                    "comment": "Lorem Ipsum Donor Mannor"
+                },
+                {
+                    "description": "Lorem Ipsum",
+                    "name": "John Doe",
+                    "comment": "Lorem Ipsum Donor Mannor"
+                },
+                {
+                    "description": "Lorem Ipsum",
+                    "name": "John Doe",
+                    "comment": "Lorem Ipsum Donor Mannor"
+                },
+                {
+                    "description": "Lorem Ipsum",
+                    "name": "John Doe",
+                    "comment": "Lorem Ipsum Donor Mannor"
+                }
+            ]
+        }
+    }
+}
