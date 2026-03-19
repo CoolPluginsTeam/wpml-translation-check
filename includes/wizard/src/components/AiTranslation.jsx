@@ -1,5 +1,6 @@
 import React from "react";
 import { __ } from "@wordpress/i18n";
+import WizardHelpFooter from "./WizardHelpFooter";
 import apiFetch from "@wordpress/api-fetch";
 import SetupContinueButton, { SetupBackButton } from "./SetupContinueButton";
 import { getNonce } from "../utils";
@@ -395,7 +396,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
               </p>
             )}
             <a
-              href="https://docs.coolplugins.net/doc/generate-openai-api-key/"
+              href="https://docs.coolplugins.net/doc/generate-openai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup_api_key"
               target="_blank"
             >
               {__("Click here", "wpml-translation-check")}
@@ -483,7 +484,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
               </p>
             )}
             <a
-              href="https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/"
+              href="https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup_api_key"
               target="_blank"
             >
               {__("Click here", "wpml-translation-check")}
@@ -522,7 +523,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
                 )}
               </p>
               <a
-                href={data.upgrade_url || "#"}
+                href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=setup"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="automlp-ai-wizard-card-language-footer-link"
@@ -587,12 +588,7 @@ const AiTranslation = ({ onBack, onContinue }) => {
         </div>
       </div>
 
-      <div className="automlp-ai-wizard-card-footer">
-        {__("Need help? Visit our", "wpml-translation-check")}{" "}
-        <a href={data.doc_url || "#"} target="_blank" rel="noopener noreferrer">
-          {__("Documentation", "wpml-translation-check")}
-        </a>
-      </div>
+      <WizardHelpFooter />
     </>
   );
 };

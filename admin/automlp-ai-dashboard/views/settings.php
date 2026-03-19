@@ -49,21 +49,21 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 				<form id="automlp-ai-settings-credentials-form" method="post" action="#">
 					<?php
 
-					$get_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
+					$automlp_get_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
 
 					$automlp_wpml_ai_credentials = array();
 
-					if(isset($get_providers_key['openai']) && !empty($get_providers_key['openai'])){
-						$automlp_wpml_ai_credentials['openai']=$get_providers_key['openai'];
+					if(isset($automlp_get_providers_key['openai']) && !empty($automlp_get_providers_key['openai'])){
+						$automlp_wpml_ai_credentials['openai']=$automlp_get_providers_key['openai'];
 					}
 
-					if(isset($get_providers_key['google']) && !empty($get_providers_key['google'])){
-						$automlp_wpml_ai_credentials['google']=$get_providers_key['google'];
+					if(isset($automlp_get_providers_key['google']) && !empty($automlp_get_providers_key['google'])){
+						$automlp_wpml_ai_credentials['google']=$automlp_get_providers_key['google'];
 					}
 					// Current AI SDK credentials.
-					$is_ConnectorsAi             = function_exists('_wp_register_default_connector_settings');
-					$is_openai_provider_installed = $is_ConnectorsAi && class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' ) ? true : false;
-					$is_google_provider_installed = $is_ConnectorsAi && class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' ) ? true : false;
+					$automlp_is_ConnectorsAi             = function_exists('_wp_register_default_connector_settings');
+					$automlp_iis_openai_provider_installed = $automlp_is_ConnectorsAi && class_exists( 'WordPress\OpenAiAiProvider\Provider\OpenAiProvider' ) ? true : false;
+					$automlp_is_google_provider_installed  = $automlp_is_ConnectorsAi && class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' ) ? true : false;
 
 					// Current selected models (saved by the addon).
 					$automlp_wpml_current_models       = get_option( 'automlp_ai_translation_models', array() );
@@ -231,12 +231,12 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 						$automlp_wpml_api_settings = array(
 							'openai' => array(
 								'name'        => 'OpenAI',
-								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-openai-api-key/',
+								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-openai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_api_key',
 								'placeholder' => 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 							),
 							'google' => array(
 								'name'        => 'Google Gemini',
-								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/',
+								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_api_key',
 								'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 							),
 						);
@@ -274,8 +274,8 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 									/>
 									<?php
 $automlp_provider_installed = ( 'openai' === $automlp_wpml_api_key )
-    ? $is_openai_provider_installed
-    : $is_google_provider_installed;
+    ? $automlp_iis_openai_provider_installed
+    : $automlp_is_google_provider_installed ;
 $automlp_connectors_url = admin_url( 'options-connectors.php' );
  if ( $automlp_wpml_has_existing_key ) : ?>
     <span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
@@ -416,15 +416,15 @@ $automlp_connectors_url = admin_url( 'options-connectors.php' );
 						<hr>
 						<?php
 						 // Handle feedback checkbox
-    $feedback_opt_in = null;
+    $automlp_feedback_opt_in = null;
 
 
         // If user opted out, remove the cron job
-        if ($feedback_opt_in === 'no' && wp_next_scheduled('automlp-ai_extra_data_update')) {
+        if ($automlp_feedback_opt_in === 'no' && wp_next_scheduled('automlp-ai_extra_data_update')) {
             wp_clear_scheduled_hook('automlp-ai_extra_data_update');
         }
 
-    if ($feedback_opt_in === 'yes' && !wp_next_scheduled('automlp-ai_extra_data_update')) {
+    if ($automlp_feedback_opt_in === 'yes' && !wp_next_scheduled('automlp-ai_extra_data_update')) {
 
             wp_schedule_event(time(), 'every_30_days', 'automlp-ai_extra_data_update');   
 
@@ -440,10 +440,10 @@ $automlp_connectors_url = admin_url( 'options-connectors.php' );
                                     <a href="#" class="cpfm-see-terms">[See terms]</a>
                                 </div>
                                 <div id="termsBox" style="display: none;padding-left: 20px; margin-top: 10px; font-size: 12px; color: #999;">
-                                        <p><?php echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect:", 'wpml-translation-check'); ?> <a href="https://my.coolplugins.net/terms/usage-tracking/?utm_source=automlp-ai_plugin&utm_medium=inside&utm_campaign=terms&utm_content=dashboard" target="_blank"><?php echo esc_html__('Click Here', 'wpml-translation-check'); ?></a></p>
+                                        <p><?php echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect:", 'wpml-translation-check'); ?> <a href="https://my.coolplugins.net/terms/usage-tracking/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=terms&utm_content=dashboard" target="_blank"><?php echo esc_html__('Click Here', 'wpml-translation-check'); ?></a></p>
                                         <ul style="list-style-type:auto;">
-                                            <li><?php echo esc_html__('Your website home URL and WordPress admin email.', 'ccpw'); ?></li>
-                                            <li><?php echo esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'ccpw'); ?></li>
+                                            <li><?php echo esc_html__('Your website home URL and WordPress admin email.', 'wpml-translation-check'); ?></li>
+                                            <li><?php echo esc_html__('To check plugin compatibility, we will collect the following: list of active plugins and themes, server type, MySQL version, WordPress version, memory limit, site language and database prefix.', 'wpml-translation-check'); ?></li>
                                         </ul>
                                 </div>
                             </div>

@@ -1,10 +1,11 @@
 import React from 'react';
+import WizardHelpFooter from './WizardHelpFooter';
 import { __ } from '@wordpress/i18n';
 
 const VideoIntro = ({ onGetStarted }) => {
 	const data = window.automlp_ai_setup || {};
 	const videoUrl = data.video_url || 'https://www.youtube.com/embed/dst_bf7uiTc';
-
+	const templateImage = data.template_image;
 	return (
 		<>
 		<div className="automlp-ai-wizard-card" style={{ maxWidth: '600px', padding: '0 40px' }}>
@@ -34,12 +35,7 @@ const VideoIntro = ({ onGetStarted }) => {
 				</button>
 			</div>
 		</div>
-		<div className="automlp-ai-wizard-card-footer">
-			{ __( 'Need help? Visit our', 'wpml-translation-check' ) }{ ' ' }
-			<a href={ '#' } target="_blank" rel="noopener noreferrer">
-				{ __( 'Documentation', 'wpml-translation-check' ) }
-			</a>
-		</div>
+		<WizardHelpFooter />
 		</>
 	);
 };

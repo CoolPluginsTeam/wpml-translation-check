@@ -307,6 +307,11 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             }
         
             $strings_raw = $params['strings'] ?? '';
+
+			if ( strpos( $strings_raw, '&lt;' ) !== false && strpos( $strings_raw, '&gt;' ) !== false ) {
+				$strings_raw = html_entity_decode( $strings_raw );
+			}
+
             $target_language = isset( $params['target_language'] ) ? sanitize_text_field( $params['target_language'] ) : '';
             $source_language = isset( $params['source_language'] ) ? sanitize_text_field( $params['source_language'] ) : 'en';
         
@@ -316,12 +321,6 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 			$wizard_lang = WPML_AT_Helper::get_wizard_allowed_language_code();
             if ( $wizard_lang !== null && strtolower( $target_language ) !== strtolower( $wizard_lang ) ) {
                 wp_send_json_error( __( 'This target language is not allowed. Only the language selected in the setup wizard can be used.', 'wpml-translation-check' ) );
-            }
-        
-            // Decode numeric-key => text map, e.g. {"0":"text","1":"text"}
-            $strings = is_string( $strings_raw ) ? json_decode( $strings_raw, true ) : $strings_raw;
-            if ( ! is_array( $strings ) ) {
-                $strings = array();
             }
         
                        // Get selected model for this provider from our option, or fallback to defaults.
@@ -374,7 +373,8 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
             }
 
             // Build one prompt with JSON instructions (your existing $content template).
-            $strings_for_prompt = json_encode( $strings );
+            $strings_for_prompt = json_encode( $strings_raw );
+
             $content = sprintf(
                 'Instruction 1: Translate visible text content semantically into %s language. Provide a proper meaning-based translation.
         Instruction 2: Do not translate or modify any content inside square brackets []. These are shortcodes or dynamic placeholders and must remain exactly as they are.
@@ -415,8 +415,15 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
                     ->with_text( $content )
                     ->generate_text();
             } catch ( \Throwable $e ) {
-                wp_send_json_error( 'Error during text generation: ' . $e->getMessage() );
+                wp_send_json_error( __( 'Error during text generation.', 'wpml-translation-check' ) . ' ' . $e->getMessage() );
             }
+
+			if ( ! is_string( $raw ) || $raw === '' ) {
+				wp_send_json_error(
+					__( 'Invalid AI response received.', 'wpml-translation-check' )
+				);
+			}
+
            	// Clean the text
 			$cleanText = preg_replace( '/(^```json\n|```$)/', '', $raw );
 
@@ -424,14 +431,25 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 			$final_text = preg_replace( '/\\\\{2,}([\'"n])/', '\\\$1', $cleanText );
 
 			$translated_text = json_decode( $final_text, true );
+
+			if ( is_array( $translated_text ) && count( $translated_text ) === 1 ) {
+				$key            = array_keys( $translated_text )[0];
+				$orignal_string = json_decode( $translated_text[ $key ], true );
+				if ( isset( $translated_text[ $key ] ) && json_decode( $translated_text[ $key ] ) !== null && isset( $orignal_string[ $key ] ) && json_decode( $orignal_string[ $key ] ) === null ) {
+					$translated_text[ $key ] = json_decode( $translated_text[ $key ], true )[ $key ];
+
+					$final_text = json_encode( $translated_text );
+				}
+			}
+
             if ( ! is_array( $translated_text ) ) {
-                wp_send_json_error( 'AI response is not valid JSON.' );
+                wp_send_json_error( __( 'AI response is not valid JSON.', 'wpml-translation-check' ) );
             }
         
             // Frontend expects: { success: true, data: { translate_data: { "0": "...", "1": "..." } } }
             wp_send_json_success(
                 array(
-                    'translate_data' => $translated_text,
+                    'translate_data' => json_decode($final_text),
                 )
             );
         }
@@ -445,14 +463,71 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	public function wizard_save_credentials( $request ) {
 		$openai_key   = $request->get_param( 'openai_key' );
 		$google_key   = $request->get_param( 'google_key' );
+		$is_reset     = $request->get_param( 'is_reset' );  // Flag for reset operations
+		// Basic format validation 
+		if(! $is_reset){
+		if ( $openai_key !== null ) {
+			$key_trimmed =  $openai_key;
+			if ( strlen( $key_trimmed ) < 10 ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid OpenAI API key.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+			if ( preg_match( '/[<>"\']/', $key_trimmed ) ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid OpenAI API key format. Please check your credentials.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+			if ( ! preg_match( '/^sk-[a-zA-Z0-9_-]{20,}$/', $key_trimmed ) ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid OpenAI API key format.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+		}
+		if ( $google_key !== null ) {
+			$key_trimmed =  $google_key;
+			if ( strlen( $key_trimmed ) < 10 ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid Google API key.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+			if ( preg_match( '/[<>"\']/', $key_trimmed ) ) {
+				return new \WP_Error(
+					'automlp_invalid_api_key',
+					__( 'Invalid Google API key format. Please check your credentials.', 'wpml-translation-check' ),
+					array( 'status' => 400 )
+				);
+			}
+		}
+	}
 		$openai_model = $request->get_param( 'openai_model' );
 		$google_model = $request->get_param( 'google_model' );
 		$is_wizard    = $request->get_param( 'is_wizard' ); // Explicit flag from frontend
-		$is_reset     = $request->get_param( 'is_reset' );  // Flag for reset operations
 		$automlp_feedback_opt_in = $request->get_param( 'automlp_feedback_opt_in' );
 		if (get_option('cpfm_opt_in_choice_cool_automlp_translations')) {
 			update_option('automlp_feedback_opt_in', $automlp_feedback_opt_in);
 		}
+		// If user opted out, clear the scheduled cron.
+      $normalized_opt_in = is_string( $automlp_feedback_opt_in ) ? strtolower( $automlp_feedback_opt_in ) : $automlp_feedback_opt_in;
+
+	  if ( $normalized_opt_in === 'yes' || $normalized_opt_in === '1' || $normalized_opt_in === 1 || $normalized_opt_in === true ) {
+		if ( ! wp_next_scheduled( 'automlp_extra_data_update' ) ) {
+			wp_schedule_event( time(), 'every_30_days', 'automlp_extra_data_update' );
+		}
+	} else {
+		// Any other value ("no", empty, etc.) → clear scheduled cron.
+		if ( wp_next_scheduled( 'automlp_extra_data_update' ) ) {
+			wp_clear_scheduled_hook( 'automlp_extra_data_update' );
+		}
+	}
 		// Flags: what the user is actually enabling in THIS request.
 		$has_openai = ( $openai_key !== null && trim( $openai_key ) !== '' );
 		$has_google = ( $google_key !== null && trim( $google_key ) !== '' );
@@ -597,6 +672,19 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
     if ( ! $provider_id || ! $api_key ) {
         return array( 'message' => __( 'Provider and API key are required.', 'wpml-translation-check' ) );
     }
+	// Basic format validation - reject obviously invalid keys before API call.
+$key_trimmed = trim( $api_key );
+if ( strlen( $key_trimmed ) < 10 ) {
+    return array( 'message' => __( 'API key appears to be invalid or too short.', 'wpml-translation-check' ) );
+}
+// Reject keys with HTML/script characters or obvious junk.
+if ( preg_match( '/[<>"\']/', $key_trimmed ) ) {
+    return array( 'message' => __( 'Invalid API key format. Please check your credentials.', 'wpml-translation-check' ) );
+}
+// OpenAI keys must start with sk-
+if ( 'openai' === strtolower( $provider_id ) && ! preg_match( '/^sk-[a-zA-Z0-9_-]{20,}$/', $key_trimmed ) ) {
+    return array( 'message' => __( 'OpenAI API keys must start with sk- and be in the correct format.', 'wpml-translation-check' ) );
+}
 
     if ( ! class_exists( 'WordPress\AiClient\AiClient' ) ) {
         return array( 'message' => __( 'AI client is not available.', 'wpml-translation-check' ) );
@@ -897,7 +985,7 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 
 			$post_link      = html_entity_decode( get_the_permalink( $translated_post_id ) );
 			$post_title     = html_entity_decode( get_the_title( $translated_post_id ) );
-			$post_edit_link = html_entity_decode( get_edit_post_link( $translated_post_id ) );
+			$post_edit_link = $editor_type === 'Elementor' ?$this->get_elementor_editor_link( $translated_post_id ) :html_entity_decode( get_edit_post_link( $translated_post_id ) );
 				
 			wp_send_json_success(
 				array(
@@ -909,6 +997,18 @@ private function validate_provider_api_key( $provider_id, $api_key ) {
 					'update_translate_data_nonce' => wp_create_nonce( 'automlp_wpml_update_translate_data' ),
 				)
 			);
+		}
+
+		private function get_elementor_editor_link( int $post_id ): string {
+			$editor_link = add_query_arg(
+				[
+					'post' => absint( $post_id ),
+					'action' => 'elementor',
+				],
+				admin_url( 'post.php' )
+			);
+
+			return html_entity_decode( esc_url( $editor_link ) );
 		}
 
 		public function get_editor_type( int $post_id, $default = 'block' ): string {

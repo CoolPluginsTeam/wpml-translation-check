@@ -1,22 +1,34 @@
-jQuery(document).ready(function($){
-    $('.cpt-dashboard-tab').click(function(){
+jQuery(document).ready(function ($) {
+    $('.cpt-dashboard-tab').click(function () {
         var tab = $(this).data('tab');
         $('.cpt-dashboard-table').hide();
-        $('#cpt-'+tab+'-table').show();
+        $('#cpt-' + tab + '-table').show();
 
         $('.cpt-dashboard-tab').removeClass('cpt-active');
         $(this).addClass('cpt-active');
 
         $('.cpt-dashboard-tables').find('table').hide();
-        $('#cpt-'+tab+'-table').show();
+        $('#cpt-' + tab + '-table').show();
     });
 
-    $('.atfpp-review-notice-dismiss button').click(function(){
-        var prefix = $(this).closest('.atfpp-review-notice-dismiss').data('prefix');
-        var nonce = $(this).closest('.atfpp-review-notice-dismiss').data('nonce');
+    // Dismiss review notice (Already Reviewed / Not Interested)
+    $(document).on('click', '.automlp-wpml-review-notice-dismiss button', function (e) {
+        e.preventDefault();
 
-        $.post(ajaxurl, {action: 'atfpp_hide_review_notice', prefix: prefix, nonce: nonce}, (response)=>{
-            $(this).closest('.cpt-review-notice').slideUp();
-        });
+        var $wrap = $(this).closest('.automlp-wpml-review-notice-dismiss');
+        var prefix = $wrap.data('prefix');
+        var nonce = $wrap.data('nonce');
+
+        $.post(
+            ajaxurl,
+            {
+                action: 'automlp_ai_hide_review_notice',
+                prefix: prefix,
+                nonce: nonce
+            },
+            function () {
+                $wrap.closest('.cpt-review-notice').slideUp();
+            }
+        );
     });
 });

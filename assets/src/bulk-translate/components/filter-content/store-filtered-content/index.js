@@ -59,7 +59,7 @@ const storeFilteredContent = async ({content, service, postId, storeDispatch, fi
 
             if(childNode && childNode.innerHTML){
                 const trimmedHTML=childNode.innerHTML.trim();
-                const innerText=childNode.innerText.trim();
+                const innerText=childNode.innerText ? childNode.innerText.trim() : '';
     
                 // Check if the HTML are start and end with html tags
                 if(new RegExp(/^\s*(?!<)[\s\S]*\p{L}[\s\S]*$/u).test(trimmedHTML) && innerText !== ''){

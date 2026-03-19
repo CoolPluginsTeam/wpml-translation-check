@@ -4,10 +4,8 @@
  * Description: AutoMLP – AI translation addon for WPML that helps translate WordPress pages and posts content faster and more accurately.
  * Version: 1.2.0
  * Author: Cool Plugins
+ * Author URI: https://coolplugins.net/
  * Text Domain: wpml-translation-check
- * Domain Path: /languages
- * Requires at least: 5.0
- * Requires PHP: 7.2
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  *
@@ -197,7 +195,9 @@ final class AUTOMLP_Ai_Translate_Addon {
 		public static function automlp_get_user_info() {
 			global $wpdb;
 			$server_info = [
-			'server_software'        => sanitize_text_field($_SERVER['SERVER_SOFTWARE'] ?? 'N/A'),
+			'server_software' => isset( $_SERVER['SERVER_SOFTWARE'] )
+			? sanitize_text_field( wp_unslash( $_SERVER['SERVER_SOFTWARE'] ) )
+			: 'N/A',
 			'mysql_version'          => sanitize_text_field($wpdb->get_var("SELECT VERSION()")),
 			'php_version'            => sanitize_text_field(phpversion()),
 			'wp_version'             => sanitize_text_field(get_bloginfo('version')),
@@ -351,7 +351,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 	private function load_dependencies() {
 		$files = array(
 			'helper/helper.php',
-			'helper/sanitized-content.php',
+			'includes/helper/sanitized-content.php',
 			'includes/wpml/builder/gutenberg/update-block-config.php',
 			'includes/wpml/get-package-content.php',
 			'includes/wpml/builder/content-update-base.php',
@@ -368,7 +368,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 			'includes/routes/bulk-translation-route.php',
 			'admin/class-automlp_ai_dashboard.php',
 			'admin/cpt_dashboard/cpt_dashboard.php',
-			'modules/wizard/load.php',
+			'includes/wizard/load.php',
 		);
 
 		foreach ( $files as $file ) {
@@ -400,7 +400,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 		add_action( 'admin_init', array( $this, 'register_ai_model_setting' ) );
 		add_action( 'admin_menu', array( $this, 'register_automlp_ai_dashboard_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'hide_wp_ai_client_menu' ), 99 );
-		add_action( 'plugin_loaded', array( $this, 'automlp_feedback_form' ) );
+		add_action( 'admin_init', array( $this, 'automlp_feedback_form' ) );
 
 		// Initialize AJAX handlers.
 		if ( class_exists( AUTOMLP_AI_Strings_Ajax::class ) ) {
@@ -463,7 +463,11 @@ private function is_wpml_active() {
 public function automlp_feedback_form() {
 	if(is_admin()){
 		require_once __DIR__ . '/admin/feedback/admin-feedback-form.php';
-		require_once __DIR__ . '/admin/class-admin-notice.php';
+		AUTOMLP_Ai_Cpt_Dashboard::review_notice(
+			'automlp_ai',
+			'AutoMLP – AI Translation for WPML',
+			'https://wordpress.org/support/plugin/wpml-translation-check/reviews/#new-post'
+		);
 	}
 
 	if(class_exists('automlp_admin_notices')){
@@ -508,19 +512,19 @@ public function wpml_missing_notice() {
             <strong><?php esc_html_e( 'AutoMLP – AI Translation for WPML:', 'wpml-translation-check' ); ?></strong>
             <?php
             if ( count( $links ) === 2 ) {
-                printf(
-                    /* translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link */
-                    esc_html__( 'This plugin requires both %1$s and %2$s to be installed and activated.', 'wpml-translation-check' ),
-                    $links[0],
-                    $links[1]
-                );
-            } elseif ( count( $links ) === 1 ) {
-                printf(
-                    /* translators: %s: Missing plugin link */
-                    esc_html__( 'This plugin requires %s to be installed and activated.', 'wpml-translation-check' ),
-                    $links[0]
-                );
-            }
+				printf(
+					/* translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link */
+					esc_html__( 'This plugin requires both %1$s and %2$s to be installed and activated.', 'wpml-translation-check' ),
+					wp_kses_post( $links[0] ),
+					wp_kses_post( $links[1] )
+				);
+			} elseif ( count( $links ) === 1 ) {
+				printf(
+					/* translators: %s: Missing plugin link */
+					esc_html__( 'This plugin requires %s to be installed and activated.', 'wpml-translation-check' ),
+					wp_kses_post( $links[0] )
+				);
+			}
             ?>
         </p>
     </div>

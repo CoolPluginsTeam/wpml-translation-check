@@ -2,7 +2,7 @@ import { AITranslationRequest } from "../../../helper";
 import storeTranslateString from "../../store-translate-strings";
 import Provider from '..';
 import { updateProgressStatus, updateTranslatePostInfo } from "../../../redux-store/features/actions";
-import { updateContent as updateContentBulkTranslate } from "../../../bulk-translate";
+
 
 import { sprintf, __ } from "@wordpress/i18n";
 import { selectServiceProvider, selectTargetContent, selectPendingPosts, selectProgressStatus, selectTranslatePostInfo, availableContentTypes } from "../../../redux-store/features/selectors";
@@ -11,7 +11,7 @@ import { store } from "../../../redux-store/store";
 import {translateFieldNameSort} from "../../../helper/index";
 
 class AIService {
-    constructor({ postId = '', sourceLang = '', targetLangs = [], totalPosts = 0, prefix = '', createTranslatePostNonce = '', updateContent = () => { }, storeDispatch = () => { }, updateDestoryHandler = () => { }, previousCompletedStrings = 0 }) {
+    constructor({ postId = '', sourceLang = '', targetLangs = [], totalPosts = 0, prefix = '', createTranslatePostNonce = '', storeDispatch = () => { }, updateDestoryHandler = () => { }, previousCompletedStrings = 0 }) {
         this.CONCURRENCY_LIMIT = window?.automlp_wpml_bulk_translate_object?.AIRequestBatchSize || 5;
         this.MAX_TOKENS=window?.automlp_wpml_bulk_translate_object?.AIRequestMaxTokens || 500;
 
@@ -22,7 +22,6 @@ class AIService {
         this.totalPosts = totalPosts;
         this.prefix = prefix;
         this.storeDispatch = storeDispatch;
-        this.updateContent = updateContent;
         this.createTranslatePostNonce = createTranslatePostNonce;
         this.APIcontroller = [];
         this.stopProcess = false;
@@ -183,9 +182,9 @@ class AIService {
             this.processCompleteHandler(timeStart);
             if (error.name === 'AbortError') {
                 const errorMessage = this.errorMessage && this.errorMessage.includes('You exceeded your current quota') ? __('You have exceeded you current plan limit. that\'s why the request is aborted.', 'wpml-translation-check') : error;
-                console.warn(errorMessage);
+                console.log(errorMessage);
             } else {
-                console.error('An error occurred during the AJAX processing:', error);
+                console.log('An error occurred during the AJAX processing:', error);
             }
         }
 
@@ -212,7 +211,6 @@ class AIService {
 
         this.updateTotalProgressStatus(this.totalStrings, this.completedStrings);
 
-        this.updateContent(this.activeTargetLangs);
     }
 
     makeAjaxRequest = async (batch) => {
@@ -307,9 +305,9 @@ class AIService {
             });
         } catch (error) {
             if (error.name === 'AbortError') {
-                console.warn('Request aborted');
+                console.log('Request aborted');
             } else {
-                console.error('An error occurred during the AJAX processing:', error);
+                console.log('An error occurred during the AJAX processing:', error);
             }
             return;
         }
@@ -448,10 +446,8 @@ class AIService {
 
         const source = { title: title, content: JSON.parse(JSON.stringify(content)) };
 
-        const updateContent= async (lang)=>
-            { await updateContentBulkTranslate({source, postId, sourceLang: sourceLanguage, lang, editorType, createTranslatePostNonce: nonce, storeDispatch})};
 
-        const aiService=new AIService({postId, targetLangs:[targetLang], sourceLang: sourceLanguage, totalPosts, storeDispatch, updateContent, createTranslatePostNonce: nonce, prefix, updateDestoryHandler, totalPosts, previousCompletedStrings: completedStrings});
+        const aiService=new AIService({postId, targetLangs:[targetLang], sourceLang: sourceLanguage, totalPosts, storeDispatch, createTranslatePostNonce: nonce, prefix, updateDestoryHandler, totalPosts, previousCompletedStrings: completedStrings});
 
         const allStrings=aiService.allStringsFilter(targetLang);
 
@@ -463,7 +459,6 @@ class AIService {
         closeErrorModal();
 
         await new Promise(resolve => setTimeout(resolve, 400));
-        updateContent(targetLang);
     }
 
     static translateAgain =async ({postId, targetLang, storeDispatch, prefix, updateDestoryHandler, nonce, closeErrorModal, completedStrings, totalPosts}) => {
@@ -476,14 +471,11 @@ class AIService {
 
         const source = { title: title, content: JSON.parse(JSON.stringify(content)) };
 
-        const updateContent= async (lang)=>
-            { await updateContentBulkTranslate({source, postId, sourceLang: sourceLanguage, lang, editorType, createTranslatePostNonce: nonce, storeDispatch})};
-
         closeErrorModal();  
 
         await new Promise(resolve => setTimeout(resolve, 500));
 
-        const aiService=new AIService({postId, targetLangs:[targetLang], sourceLang: sourceLanguage, totalPosts, storeDispatch, updateContent, createTranslatePostNonce: nonce, prefix, updateDestoryHandler, totalPosts, previousCompletedStrings: completedStrings});
+        const aiService=new AIService({postId, targetLangs:[targetLang], sourceLang: sourceLanguage, totalPosts, storeDispatch, createTranslatePostNonce: nonce, prefix, updateDestoryHandler, totalPosts, previousCompletedStrings: completedStrings});
         
         await aiService.initTranslation();
     }

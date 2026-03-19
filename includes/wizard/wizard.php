@@ -177,17 +177,9 @@ class AUTOMLP_Ai_Wizard {
 			return;
 		}
 		$asset_path = AUTOMLP_AI_PLUGIN_DIR . 'admin/assets/frontend/setup/setup.asset.php';
-		if ( ! file_exists( $asset_path ) ) {
-			wp_enqueue_style(
-				'automlp-ai-wizard',
-				AUTOMLP_AI_PLUGIN_URL . 'modules/wizard/assets/wizard.css',
-				array(),
-				AUTOMLP_AI_VERSION
-			);
-			return;
-		}
 		$asset   = require $asset_path;
 		$script  = AUTOMLP_AI_PLUGIN_URL . 'admin/assets/frontend/setup/setup.js';
+		$style  = AUTOMLP_AI_PLUGIN_URL . 'admin/assets/frontend/setup/setup.css';
 		wp_enqueue_script(
 			'automlp_ai_setup',
 			$script,
@@ -195,20 +187,26 @@ class AUTOMLP_Ai_Wizard {
 			$asset['version'],
 			true
 		);
+		wp_enqueue_style(
+			'automlp-ai-wizard',
+			$style,
+			array(),
+			AUTOMLP_AI_VERSION
+		);
 		$wpml_languages = array();
 		if ( class_exists( 'WPML_AT_Helper' ) ) {
 			$wpml_languages = \WPML_AT_Helper::get_wpml_languages();
             $default_language = \WPML_AT_Helper::get_default_language();
 		}
-		$get_providers_key=\WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
+		$automlp_get_providers_key=\WPML_AT_Helper::get_providers_key(array('openai', 'google'), true);
 		$saved_credentials = array();
 
-		if(isset($get_providers_key['openai']) && !empty($get_providers_key['openai'])){
-			$saved_credentials['openai']=$get_providers_key['openai'];
+		if(isset($automlp_get_providers_key['openai']) && !empty($automlp_get_providers_key['openai'])){
+			$saved_credentials['openai']=$automlp_get_providers_key['openai'];
 		}
 
-		if(isset($get_providers_key['google']) && !empty($get_providers_key['google'])){
-			$saved_credentials['google']=$get_providers_key['google'];
+		if(isset($automlp_get_providers_key['google']) && !empty($automlp_get_providers_key['google'])){
+			$saved_credentials['google']=$automlp_get_providers_key['google'];
 		}
 
 		$home_url_with_lang = get_home_url();      // e.g. http://wpml-plugin.local/en/
@@ -253,11 +251,6 @@ class AUTOMLP_Ai_Wizard {
 				'connectors_url'              => admin_url( 'options-connectors.php' ),
             )
         );
-		wp_enqueue_style(
-			'automlp-ai-wizard',
-			AUTOMLP_AI_PLUGIN_URL . 'modules/wizard/assets/wizard.css',
-			array(),
-			AUTOMLP_AI_VERSION
-		);
+
 	}
 }

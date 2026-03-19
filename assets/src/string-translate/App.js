@@ -286,7 +286,7 @@ const App = ({ onDestory, prefix, postIds }) => {
       <div className={`${prefix}-languages-disabled-lists`}>
       <p>{__('Multiple language translation available in Pro.', 'wpml-translation-check')}
        &nbsp;
-      <a href='#' title={__('Buy Pro Version to Unlock All Languages', 'wpml-translation-check')} className={`${prefix}-buy-pro-version-link`}>{__('Upgrade now', 'wpml-translation-check')}</a>
+      <a href='https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=string_translate' target='_blank' title={__('Buy Pro Version to Unlock All Languages', 'wpml-translation-check')} className={`${prefix}-buy-pro-version-link`}>{__('Upgrade now', 'wpml-translation-check')}</a>
       </p>
       <div>
         {(() => {

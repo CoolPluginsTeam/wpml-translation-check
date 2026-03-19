@@ -255,7 +255,7 @@ if(!defined('ABSPATH')){
             
             $total_character_count = is_array($translation_data) && isset($translation_data['total_character_count']) ? $translation_data['total_character_count'] : 0;
             
-            if($total_character_count < 50000){ 
+            if($total_character_count < 5000){ 
                 return;
             }
 

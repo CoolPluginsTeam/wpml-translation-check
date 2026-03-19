@@ -1,4 +1,5 @@
 import SetupPage from './pages/setup-page.jsx';
+import './wizard.css';
 import { createRoot } from 'react-dom/client';
 
 function mount() {
