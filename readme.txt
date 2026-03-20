@@ -9,7 +9,7 @@ Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Save on WPML translation credits by using your own OpenAI or Gemini API keys to translate posts, pages, and strings. Fast, secure, and easy.
+Save on WPML translation credits by using OpenAI or Gemini API to auto translate posts, pages or strings in bulk using AutoMLP AI Translator for WPML.
 
 == Description ==
 
