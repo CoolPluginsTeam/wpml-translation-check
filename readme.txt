@@ -100,10 +100,13 @@ All automatic translations are powered by third-party auto-translate providers (
 2. AutoMLP String Translation
 
 == Installation ==
-- Go to **Plugins > Add New** in your WordPress admin area.
-- Search for **"AutoMLP"**.
-- Install & Activate plugin.
-- Now you can translate any page content or strings via AI.
+- Navigate to the Plugins section.
+- Search for the "**AutoMLP - AI Translation for WPML**"  plugin. 
+Make sure that you have installed and activated **WPML Multilingual CMS** and **WPML String Translation** plugin.
+- Install **AutoMLP**.
+- Once the plugin is installed, activate it.
+- That's it! **AutoMLP** is now installed and activated.
+Now you can start translating pages/posts or strings via **Gemini AI** and **OpenAI**.
 
 == Frequently Asked Questions ==
 
@@ -195,7 +198,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 * Add slug
 
 = Version 1.1.1 =
-Small style/usability changes
+* Small style/usability changes
 
 = Version 1.1 =
 * After first check, subsequent checks trigger a page load to retrieve latest content
@@ -207,7 +210,7 @@ Small style/usability changes
 * Fix WPML plugin detection
 
 = Version 1.0 =
-Initial version.
+* Initial version.
 
 == Upgrade Notice ==
 = 1.2.0 =
