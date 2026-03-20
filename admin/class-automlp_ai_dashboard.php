@@ -61,7 +61,9 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 			// On dashboard, keep only THIS plugin's notices.
 			if ( 'automlp_ai_dashboard' === $page ) {
 				$this->remove_third_party_admin_notices();
+				do_action('automlp_ai_admin_notices');
 			}
+
 		}
 
 		private function remove_third_party_admin_notices() {
