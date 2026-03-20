@@ -180,6 +180,7 @@ No. AutoMLP works inside the WordPress dashboard and uses the familiar WPML tran
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team helps validate, triage, and handle any security vulnerabilities [Report a security vulnerability](https://patchstack.com/database/vdp/wpml-translation-check/).
 
 == Changelog ==
+
 = Version 1.2.0 (Major Update) | 20/03/2026 =
 
 * Introduced:- AutoMLP - AI Translation For WPML.
