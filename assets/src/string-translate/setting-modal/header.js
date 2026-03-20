@@ -5,7 +5,7 @@ const SettingModalHeader = ({ setSettingVisibility, prefix }) => {
         <div className={`${prefix}-header`}>
          <div className={`${prefix}-modal-header-inner`}>
           <span className={`${prefix}-step-label`}>
-            {__("STEP 2 OF 3", "automlp-ai-translation-for-wpml")}
+            {__("STEP 2 OF 3", "wpml-translation-check")}
           </span>
           <h2>{__("Select Translation Engine", 'wpml-translation-check')}</h2>
           <p className={`${prefix}-modal-desc`}>{__("Choose the Ai provider you want to use for your this translation batch.", 'wpml-translation-check')}</p>

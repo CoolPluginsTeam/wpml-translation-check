@@ -110,7 +110,7 @@ const bulkTranslateStrings = async ({
       success: false,
       message: __(
         "No strings found to translate.",
-        "automlp-ai-translation-for-wpml",
+        "wpml-translation-check",
       ),
     };
   }
@@ -324,7 +324,7 @@ const initBulkTranslateStrings = async (
         } else {
           const fallbackMsg = __(
             "Translation failed",
-            "automlp-ai-translation-for-wpml",
+            "wpml-translation-check",
           );
 
           const raw = translationResponse?.data;
@@ -356,7 +356,7 @@ const initBulkTranslateStrings = async (
       } catch (err) {
         const fallbackMsg = __(
           "Translation failed",
-          "automlp-ai-translation-for-wpml",
+          "wpml-translation-check",
         );
 
         let errorHtml = err?.message || "";

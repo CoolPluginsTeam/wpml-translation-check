@@ -3,8 +3,8 @@ import TranslateService from "../components/translate-provider";
 import { __ } from "@wordpress/i18n";
 
 const providerDescriptions = {
-    openai_ai: __("Best for creative and localized content.", "automlp-ai-translation-for-wpml"),
-    google_ai: __("Reliable, fast translation across 130+ languages.", "automlp-ai-translation-for-wpml"),
+    openai_ai: __("Best for creative and localized content.", "wpml-translation-check"),
+    google_ai: __("Reliable, fast translation across 130+ languages.", "wpml-translation-check"),
 };
 
 const SettingModalBody = (props) => {

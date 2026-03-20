@@ -296,11 +296,11 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 <div className={`${prefix}-header`}>
                     <div className={`${prefix}-modal-header-inner`}>
                         <span className={`${prefix}-step-label`}>
-                            {__("STEP 3 OF 3", "automlp-ai-translation-for-wpml")}
+                            {__("STEP 3 OF 3", "wpml-translation-check")}
                         </span>
                         <h2 className={`${prefix}-bulk-status-heading ${bulkStatus}`}>
                             {sprintf(
-                                __("Bulk Translation %s", "automlp-ai-translation-for-wpml"),
+                                __("Bulk Translation %s", "wpml-translation-check"),
                                 getBulkStatus(),
                             )}
                             {bulkStatus === "running" && (

@@ -20,7 +20,7 @@ const App = ({ onDestory, prefix, postIds }) => {
   const emptyPostIdsErrorMessage = sprintf(
     __(
       "Please select at least one %s for translation.",
-      "automlp-ai-translation-for-wpml",
+      "wpml-translation-check",
     ),
     automlp_wpml_bulk_translate_object.post_label,
   );
@@ -65,7 +65,7 @@ const App = ({ onDestory, prefix, postIds }) => {
       setErrorMessage(
         __(
           "Please select at least one language",
-          "automlp-ai-translation-for-wpml",
+          "wpml-translation-check",
         ),
       );
       setErrorModal(true);
@@ -167,16 +167,16 @@ const App = ({ onDestory, prefix, postIds }) => {
         <div className={`${prefix}-header`}>
             <div className={`${prefix}-modal-header-inner`}>
               <span className={`${prefix}-step-label`}>
-                {__("STEP 1 OF 3", "automlp-ai-translation-for-wpml")}
+                {__("STEP 1 OF 3", "wpml-translation-check")}
               </span>
-              <h2>{__("Select Languages", "automlp-ai-translation-for-wpml")}</h2>
+              <h2>{__("Select Languages", "wpml-translation-check")}</h2>
             </div>
             <button
               type="button"
               className={`${prefix}-modal-close`}
               onClick={destroyApp}
-              title={__("Close", "automlp-ai-translation-for-wpml")}
-              aria-label={__("Close", "automlp-ai-translation-for-wpml")}
+              title={__("Close", "wpml-translation-check")}
+              aria-label={__("Close", "wpml-translation-check")}
             >
               &times;
             </button>
@@ -404,7 +404,7 @@ const App = ({ onDestory, prefix, postIds }) => {
                       : ""
                   }
                 >
-                  {__("Cancel", "automlp-ai-translation-for-wpml")}
+                  {__("Cancel", "wpml-translation-check")}
                 </button>
                 <button
                   className={`${prefix}-footer-button button button-primary`}
@@ -419,12 +419,12 @@ const App = ({ onDestory, prefix, postIds }) => {
                       : !selectedLanguages.length
                       ? __(
                           "Please select at least one language",
-                          "automlp-ai-translation-for-wpml",
+                          "wpml-translation-check",
                         )
                       : ""
                   }
                 >
-                                    {__("Next", "automlp-ai-translation-for-wpml")} <span className={`${prefix}-next-arrow`}>&#8594;</span>
+                                    {__("Next", "wpml-translation-check")} <span className={`${prefix}-next-arrow`}>&#8594;</span>
                 </button>
               </div>
             </>
