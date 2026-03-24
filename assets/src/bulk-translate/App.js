@@ -188,7 +188,6 @@ const App = ({ onDestory, prefix, postIds }) => {
                                 )}
                             </div>
                             <div className={`${prefix}-footer`}>
-                                <button className={`${prefix}-footer-button button button-primary`} onClick={destroyApp} title={!postIds.length && !isStringTranslationPage ? emptyPostIdsErrorMessage : ''}>{__('Cancel', 'wpml-translation-check')}</button>
                                 <button
                                     className={`${prefix}-footer-button button button-primary`}
                                     onClick={settingModalVisibilityHandler}
