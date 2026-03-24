@@ -391,6 +391,16 @@ final class AUTOMLP_Ai_Translate_Addon {
 			add_action( 'admin_notices', array( $this, 'wpml_missing_notice' ) );
 			return;
 		}
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	$pro_basename = 'wpml-translation-check-pro/wpml-translation-check-pro.php';
+	if ( is_plugin_active( $pro_basename ) ) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		wp_die(
+			esc_html__( 'AutoMLP Pro is already active. Please use only the Pro version.', 'wpml-translation-check' ),
+			esc_html__( 'Plugin not activated', 'wpml-translation-check' ),
+			array( 'back_link' => true )
+		);
+	}
 		$this->load_dependencies();
 		add_filter(
 			'plugin_action_links_' . AUTOMLP_AI_PLUGIN_BASENAME,
