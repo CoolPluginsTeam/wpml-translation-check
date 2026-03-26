@@ -14,7 +14,7 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 	<div class="automlp_ai_dashboard-settings-container">
 		<div class="header">
 			<h1><?php echo esc_html__( 'AutoMLP AI Translate Settings', 'wpml-translation-check' ); ?></h1>
-			<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=page&automlp_translation' ) ); ?>" class="button button-secondary">
+			<a href="<?php echo esc_url( admin_url( 'edit.php?post_type=page&automlp_translation' ) ); ?>" class="automlp_btn primary">
     <?php esc_html_e( 'Start Translation', 'wpml-translation-check' ); ?>
 </a>
 		</div>

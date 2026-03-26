@@ -3,7 +3,7 @@ import { __ } from "@wordpress/i18n";
 const SettingModalFooter = ({ setSettingVisibility, prefix, selectedProvider, onStartTranslation }) => {
     return (
         <div className={`${prefix}-setting-modal-footer`}>
-            <button type="button" className={`${prefix}-setting-close button`} onClick={() => setSettingVisibility(false)}>{__("Back", 'wpml-translation-check')}</button>
+            <button type="button" className={`${prefix}-setting-close button`} onClick={() => setSettingVisibility(false)}>&#8592; {__("Back", 'wpml-translation-check')}</button>
             <button
                 type="button"
                 className={`${prefix}-setting-start-translation button button-primary`}

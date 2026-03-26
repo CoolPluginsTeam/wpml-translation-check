@@ -48,8 +48,12 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 		 * Suppress WordPress admin notices on the dashboard and wizard pages only.
 		 */
 		public function suppress_admin_notices() {
+			global $pagenow;
+		
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$post_type = isset( $_GET['post_type'] ) ? sanitize_key( wp_unslash( $_GET['post_type'] ) ) : 'post';
 		
 			// Hide ALL notices on wizard.
 			if ( 'automlp_ai_wizard' === $page ) {
@@ -61,10 +65,28 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 			// On dashboard, keep only THIS plugin's notices.
 			if ( 'automlp_ai_dashboard' === $page ) {
 				$this->remove_third_party_admin_notices();
-				add_action('admin_notices',function(){
-					do_action('automlp_ai_admin_notices');
-				});
 			}
+
+			$is_plugins_screen = ( 'plugins.php' === $pagenow );
+		
+			$is_posts_or_pages = (
+				( 'edit.php' === $pagenow && in_array( $post_type, array( 'post', 'page' ), true ) ) ||
+				( in_array( $pagenow, array( 'post.php', 'post-new.php' ), true ) )
+			);
+		
+			$is_wpml_page = ( 0 === strpos( $page, WPML_PLUGIN_FOLDER ) );
+		
+			$is_our_dashboard = ( 'automlp_ai_dashboard' === $page );
+		
+			$is_allowed = $is_plugins_screen || $is_posts_or_pages || $is_wpml_page || $is_our_dashboard;
+		
+			if ( ! $is_allowed ) {
+				return;
+			}
+
+			add_action('admin_notices',function(){
+				do_action('automlp_ai_admin_notices');
+			});
 
 		}
 

@@ -5,9 +5,17 @@
     display: flex;
     align-items: center;
     border-radius: 5px;
-        max-width: 790px;
+        max-width: 767px;
       padding-left: 11px;
       padding-bottom: 11px;
+      padding-right: 5px !important;
+      border-top: 1px solid #ccd0d4;
+      border-right: 1px solid #ccd0d4;
+      border-bottom: 1px solid #ccd0d4;
+  }
+
+  .cpt-review-notice p{
+    font-size: 13px !important;
   }
   
   .cpt-review-notice .cpt-review-notice-icon{
@@ -28,19 +36,15 @@
     gap: 10px;
   }
   
-  body.rtl .cpt-review-notice .cpt-not-interested {
-    right: auto;
-    left: 5px;
-  }
-  
-  .cpt-review-notice :where(.cpt-not-interested, .cpt-already-reviewed)::before {
-    color: #cc0000;
-    content: "\f153";
-    font: normal 16px/20px dashicons;
-    display: inline-block;
-    vertical-align: middle;
-    margin-right: 4px;
-    height: 22px;
+  .cpt-not-interested{
+    background: none !important;
+    border: none !important;
+    align-self: end;
+    cursor: pointer;
+    color: #72777c;
+    padding: 4px;
+    font-size: 11px;
+    white-space: nowrap;
   }
   
   .cpt-dashboard {
