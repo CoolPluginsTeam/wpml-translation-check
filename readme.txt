@@ -66,7 +66,7 @@ Built for **Stability** & **Performance** developers trust **WPML** with their m
 ### ### Pro Version 
  * **Unlimited Languages Support:** Translate your website into unlimited languages and reach global audience without any usage restrictions.
 
-* **Chrome built-in AI Integration:** Instantly translate content directly inside browser using Chrome’s built-in AI translator without any API key or external cost.
+ * **Chrome built-in AI Integration:** Instantly translate content directly inside browser using Chrome’s built-in AI translator without any API key or external cost.
 
 [Upgrade to Pro!](https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=upgrade_to_pro)
 
