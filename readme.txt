@@ -13,6 +13,8 @@ Save on WPML translation credits by using OpenAI or Gemini API to auto translate
 
 == Description ==
 
+https://youtu.be/ZcSbNup4efw
+
 **AutoMLP - AI Translation for WPML** is WPML automatic translation addon. It allows you to translate your WordPress website using different AI services  like **OpenAI** and **Google Gemini**, at low cost.
 
 As a **WPML** user, you may already know that its automatic translation feature works using translation credits. Typically, around **$0.86 per 1,000 credits**. Each time content is translated automatically, credits are used based on the number of characters being translated.
