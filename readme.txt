@@ -19,11 +19,7 @@ As a **WPML** user, you may already know that its automatic translation feature 
 
 However, **AutoMLP** provides a different approach. Instead of using translation credits, it allows you to connect your own AI service API keys such as **OpenAI** or **Google Gemini**. This means translations are generated using your own API. The usage limits depend only on the limits of the API service you are using.
 
-[View Live Demo](https://automlp-ai-translation.instawp.co/wp-admin)
-
-You can use the following demo credentials to explore the plugin:
-- Username: demo
-- Password: demo@123
+[View Live Demo](https://automlp-ai-translation.instawp.xyz/wp-admin)
 
 ### Key Features
 
