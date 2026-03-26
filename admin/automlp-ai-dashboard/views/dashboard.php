@@ -50,23 +50,14 @@ if ( ! defined( 'ABSPATH' ) ) {
   </div>
 </div>
 				<div class="automlp_ai_dashboard-get-started-grid-content">
-					<!-- <iframe
+					<iframe
 						title="Automate the Translation Process with AUTOMLP Ai Translate Addon"
-						src="https://www.youtube.com/embed/ecHsOyIL_J4?feature=oembed"
+						src="https://www.youtube.com/embed/ZcSbNup4efw"
 						frameborder="0"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 						referrerpolicy="strict-origin-when-cross-origin"
 						allowfullscreen>
-					</iframe> -->
-					<a href="https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup" target="_blank" rel="noopener noreferrer">
-					<img
-						src="<?php echo esc_url( AUTOMLP_AI_PLUGIN_URL . '/assets/images/Install & Setup AutoMLP.png' ); ?>"
-						alt="<?php esc_attr_e( 'Translate Pages/Posts', 'wpml-translation-check' ); ?>"
-						width="100%"
-						height="337"
-						style="border-radius: 8px;"
-					/>
-				</a>
+					</iframe>
 </div>
 			</div>
 		</div>

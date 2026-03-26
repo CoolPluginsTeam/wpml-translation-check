@@ -4,9 +4,7 @@ import { __ } from "@wordpress/i18n";
 
 const VideoIntro = ({ onGetStarted }) => {
   const data = window.automlp_ai_setup || {};
-  const videoUrl =
-    data.video_url || "https://www.youtube.com/embed/dst_bf7uiTc";
-  const templateImage = data.template_image;
+  const videoUrl = "https://www.youtube.com/embed/ZcSbNup4efw";
   return (
     <>
       <div
@@ -31,35 +29,16 @@ const VideoIntro = ({ onGetStarted }) => {
             {__("automatically using AI.", "wpml-translation-check")}
           </p>
         </div>
-        <div
-          style={{
-            position: "relative",
-            width: "100%",
-            // paddingBottom: "56.25%",
-          }}
-        >
-          {/* <iframe
+        <div style={{ position: 'relative', width: '100%', paddingBottom: '56.25%' }}>
+				<iframe
 					title={ __( 'AutoMLP Setup Guide', 'wpml-translation-check' ) }
 					style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', borderRadius: 8 }}
 					src={ videoUrl }
 					frameBorder="0"
 					allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 					allowFullScreen
-				/> */}
-
-			<a href="https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=setup"
-  target="_blank"
-  rel="noopener noreferrer"
->
-  <img
-    src={templateImage}
-    alt={__("AutoMLP Setup Guide", "wpml-translation-check")}
-    width={600}
-    height={337}
-    style={{ borderRadius: 8}}
-  />
-</a>
-        </div>
+				/>
+			</div>
         <div
           style={{
             display: "flex",

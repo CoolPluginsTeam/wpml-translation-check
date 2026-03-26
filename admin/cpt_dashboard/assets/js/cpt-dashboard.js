@@ -12,13 +12,19 @@ jQuery(document).ready(function ($) {
     });
 
     // Dismiss review notice (Already Reviewed / Not Interested)
-    $(document).on('click', '.automlp-wpml-review-notice-dismiss button', function (e) {
+    $(document).on('click', '.cpt-not-interested', function (e) {
         e.preventDefault();
-
-        var $wrap = $(this).closest('.automlp-wpml-review-notice-dismiss');
+        hideReviewNotice($(this).closest('.cpt-review-notice'));
+    });
+    $(document).on('click', '.cpt-review-notice .button-primary', function () {
+        hideReviewNotice($(this).closest('.cpt-review-notice'));
+    });
+    
+    // Shared function to fire AJAX and slide up
+    function hideReviewNotice($wrap) {
         var prefix = $wrap.data('prefix');
-        var nonce = $wrap.data('nonce');
-
+        var nonce  = $wrap.data('nonce');
+    
         $.post(
             ajaxurl,
             {
@@ -27,8 +33,8 @@ jQuery(document).ready(function ($) {
                 nonce: nonce
             },
             function () {
-                $wrap.closest('.cpt-review-notice').slideUp();
+                $wrap.slideUp();
             }
         );
-    });
+    }
 });

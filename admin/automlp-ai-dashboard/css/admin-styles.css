@@ -233,6 +233,7 @@ WPML Auto Dashboard - Admin Panel Styles
 .automlp_ai_dashboard-get-started-grid iframe {
     max-width: 100%;
     width: 100%;
+    height: 63%;
     aspect-ratio: 2/1;
 }
 

@@ -290,17 +290,9 @@ if(!defined('ABSPATH')){
 
             $message = wp_kses($message, $allowed);
 
-            add_action('admin_notices', function() use ($message, $prefix, $url, $allowed){
-                $html= '<div class="notice notice-info is-dismissible cpt-review-notice">';
-                
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="automlp-wpml-review-notice-dismiss" data-prefix="'.esc_attr($prefix).'" data-nonce="'.esc_attr(wp_create_nonce('automlp_wpml_hide_review_notice')).'"><a href="'.esc_url($url).'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-already-reviewed">'.esc_html__('Already Reviewed', 'wpml-translation-check').'</button><button class="button cpt-not-interested">'.esc_html__('Not Interested', 'wpml-translation-check').'</button></div></div></div>';
-                
-                echo wp_kses($html, $allowed);
-            });
-
-            add_action('automlp-wpml_display_admin_notices', function() use ($message, $prefix, $url, $allowed){
-                $html= '<div class="notice notice-info is-dismissible cpt-review-notice">';
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="automlp-wpml-review-notice-dismiss" data-prefix="'.$prefix.'" data-nonce="'.wp_create_nonce('automlp_wpml_hide_review_notice').'"><a href="'. $url .'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a><button class="button cpt-not-interested">'.__('Not Interested', 'wpml-translation-check').'</button><button class="button cpt-already-reviewed">'.__('Already Reviewed', 'wpml-translation-check').'</button></div></div></div>';
+            add_action('automlp_ai_admin_notices', function() use ($message, $prefix, $url, $allowed){
+                $html= '<div class="notice notice-info is-dismissible cpt-review-notice" data-prefix="'.$prefix.'" data-nonce="'.wp_create_nonce('automlp_wpml_hide_review_notice').'">';
+                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="automlp-wpml-review-notice-dismiss"><a href="'. $url .'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a></div></div><button class="cpt-not-interested">'.__('Not Interested', 'wpml-translation-check').'</button></div>';
                 
                 echo wp_kses($html, $allowed);
             });
