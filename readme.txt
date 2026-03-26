@@ -196,9 +196,8 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = Version 1.2.1 | 26/03/2026 =
-
-* Improved:- Review notice Design.
-* Improved:- Translation Popup box Design.
+* Improved:- Review notice styling.
+* Improved:- Translation Popup styling.
 
 = Version 1.2.0 (Major Update) | 20/03/2026 =
 * Introduced:- AutoMLP - AI Translation For WPML.
