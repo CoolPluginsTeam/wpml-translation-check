@@ -40,6 +40,17 @@ const App = ({ onDestory, prefix, postIds }) => {
   const targetLanguages=JSON.parse(JSON.stringify(languageObject));
   delete targetLanguages[automlp_wpml_bulk_translate_object.default_language_slug];
 
+  useEffect(() => {
+    if(!Object.keys(targetLanguages).length){
+      setErrorMessage(
+        <>
+        {__( 'Languages are not configured in WPML. ', 'wpml-translation-check-pro' )}
+        <a href={`${automlp_wpml_bulk_translate_object?.admin_url}admin.php?page=sitepress-multilingual-cms/menu/languages.php`}>{__( 'Configure here ', 'wpml-translation-check-pro' )}</a>
+        </>
+      );
+    }
+  }, [targetLanguages]);
+
   const destroyApp = (e) => {
     setStatusModalVisibility(false);
     setSettingModalVisibility(false);
@@ -164,6 +175,7 @@ const App = ({ onDestory, prefix, postIds }) => {
         ))}
       {!statusModalVisibility && !settingModalVisibility && (
         <div className={`${prefix}-language-container`}>
+        {!errorMessage && (
         <div className={`${prefix}-header`}>
             <div className={`${prefix}-modal-header-inner`}>
               <span className={`${prefix}-step-label`}>
@@ -181,22 +193,39 @@ const App = ({ onDestory, prefix, postIds }) => {
               &times;
             </button>
           </div>
-          {errorMessage && errorMessage !== "" ? (
-            errorModal ? (
-              <ErrorModalBox message={errorMessage} onClose={closeErrorModal} />
-            ) : (
+          )}
+          {errorMessage && errorMessage !== '' ? (errorModal ? <ErrorModalBox message={errorMessage} onClose={closeErrorModal} /> : (
+              <>
+              <div className={`${prefix}-header-error`}>
+              <button
+              type="button"
+              className={`${prefix}-modal-close`}
+              onClick={destroyApp}
+              title={__("Close", "wpml-translation-check-pro")}
+              aria-label={__("Close", "wpml-translation-check-pro")}
+            >
+              &times;
+            </button>
+            </div>
+            {!Object.keys(targetLanguages).length && (
+              <div className={`${prefix}-error-message`}>
+                  {errorMessage}
+                </div>
+            )}
+            {Object.keys(targetLanguages).length > 0 && (
               <div
                 className={`${prefix}-error-message`}
                 dangerouslySetInnerHTML={{
                   __html: DOMPurify.sanitize(errorMessage),
                 }}
               />
-            )
-          ) : (
+              )}
+              </>
+            )) : (
             <>
             <div className={`${prefix}-body`}>
   <SelectLanguageNotice />
-  {wizardSelectedCode ? (
+  {wizardSelectedCode && Object.keys(targetLanguages).length > 0 ? (
     <div className={`${prefix}-languages`}>
       <div className={`${prefix}-languages-enabled-list`}>
         {(() => {

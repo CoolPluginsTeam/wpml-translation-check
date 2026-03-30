@@ -17,7 +17,6 @@ const Languages = ({ onBack, onContinue }) => {
         (lang) => (lang.code || "").toLowerCase() !== defaultCode,
       )
     : allLanguages;
-
     const savedCode =
     data.saved_language && data.saved_language.code
       ? data.saved_language.code
@@ -110,7 +109,8 @@ const Languages = ({ onBack, onContinue }) => {
               "wpml-translation-check",
             )}
           </p>
-
+          {wpmlLanguages.length !== 0 && (
+            <>
           <label
             htmlFor="automlp-ai-wizard-language-select"
             style={{
@@ -140,7 +140,8 @@ const Languages = ({ onBack, onContinue }) => {
               </option>
             ))}
           </select>
-
+          </>
+          )}
           {wpmlLanguages.length === 0 && (
             <p
               style={{
@@ -150,9 +151,11 @@ const Languages = ({ onBack, onContinue }) => {
               }}
             >
               {__(
-                "No languages found. Add languages in WPML → Languages first.",
-                "wpml-translation-check",
+                "Languages are not configured in WPML.",
+                "wpml-translation-check ",
               )}
+              <a href={`${data.admin_url}?page=sitepress-multilingual-cms/menu/languages.php`} target="_blank" rel="noopener noreferrer">{__( ' Configure here ', 'wpml-translation-check-pro' )}</a>
+
             </p>
           )}
 

@@ -144,6 +144,7 @@
 
 #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-language-container {
   max-width: 500px;
+  min-height: 110px;
 }
 
 #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-setting-modal-container {
@@ -932,6 +933,15 @@
   border-bottom: 2px solid #00000012;
 }
 
+.automlp-wpml-bulk-translate-header-error{
+  align-items: flex-end;
+
+display: flex;
+justify-content: flex-end;
+gap: 16px;
+padding: 10px 8px 8px;
+}
+
 #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-header + .automlp-wpml-bulk-translate-progress-skeleton {
   margin-inline: 24px;
   width: calc(100% - 48px);
@@ -960,11 +970,11 @@
 
 #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message {
   color: #1d2327;
-  padding: 15px 22px;
-  font-weight: 600;
-  font-size: 16px;
-  text-align: center;
-  height: unset !important;
+    font-size: 16px;
+    font-weight: 500;
+    height: unset !important;
+    padding: 0 22px 26px;
+    text-align: center;
 }
 
 #automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container .automlp-wpml-bulk-translate-error-message span {
