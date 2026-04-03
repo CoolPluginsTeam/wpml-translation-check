@@ -171,7 +171,8 @@ class Create_Translated_Post {
 		$post_data = get_post( $this->post_id, ARRAY_A );
 
 		unset( $post_data['ID'] ); // remove ID to duplicate
-		$post_data['post_status'] = 'draft';
+		$post_data['post_status'] = get_option( 'automlp_bulk_post_status', 'draft' );
+
 
 		if ( isset( $this->translated_title ) && ! empty( $this->translated_title ) ) {
 			$post_data['post_title'] = $this->translated_title;

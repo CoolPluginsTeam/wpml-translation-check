@@ -701,6 +701,23 @@ ul.automlp_ai_dashboard-sts-btm li span:first-child {
     line-height: 25px;
 }
 
+.automlp-bulk-post-status-options{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.automlp-bulk-post-status-options input[type="radio"]{
+    margin-right: 10px;
+    width: 10px;
+}
+
+.automlp-bulk-post-status-options label[for="automlp_bulk_post_status_publish"],
+.automlp-bulk-post-status-options label[for="automlp_bulk_post_status_draft"]{
+    margin-right: 10px;
+    margin-block: 0px;
+}
+
 /* ================================================
    License
 ================================================ */

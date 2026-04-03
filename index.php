@@ -459,8 +459,26 @@ private function is_wpml_active() {
 
     // WPML String Translation.
     $has_wpml_st = defined( 'WPML_ST_VERSION' ) || class_exists( 'WPML_String_Translation' );
+	$wpml_setup_complete = $this->is_wpml_setup_complete();
 
-    return $has_wpml_core && $has_wpml_st;
+	return $has_wpml_core && $has_wpml_st && $wpml_setup_complete;
+}
+private function is_wpml_setup_complete() {
+	// Prefer WPML's recovery-aware option getter when available.
+	if ( class_exists( '\WPML\LIB\WP\Option' ) ) {
+		$settings = \WPML\LIB\WP\Option::getOrAttemptRecovery( 'icl_sitepress_settings', [] );
+
+		// Prefer WPML's Obj helper when available; otherwise fall back to array access.
+		if ( class_exists( '\WPML\FP\Obj' ) ) {
+			return is_array( $settings ) && (bool) \WPML\FP\Obj::prop( 'setup_complete', $settings );
+		}
+
+		return is_array( $settings ) && ! empty( $settings['setup_complete'] );
+	}
+
+	// Fallback if WPML libs aren't available.
+	$settings = get_option( 'icl_sitepress_settings', [] );
+	return is_array( $settings ) && ! empty( $settings['setup_complete'] );
 }
 
 public function automlp_feedback_form() {
@@ -490,6 +508,26 @@ public function wpml_missing_notice() {
 
     $has_wpml_core = defined( 'ICL_SITEPRESS_VERSION' ) || class_exists( 'SitePress' );
     $has_wpml_st   = defined( 'WPML_ST_VERSION' ) || class_exists( 'WPML_String_Translation' );
+	$wpml_setup_complete = $this->is_wpml_setup_complete();
+
+	  // Case: plugins are active but WPML setup is not complete.
+	  if ( $has_wpml_core && $has_wpml_st && ! $wpml_setup_complete ) {
+        ?>
+        <div class="notice notice-error">
+            <p>
+                <strong><?php esc_html_e( 'AutoMLP – AI Translation for WPML Pro:', 'wpml-translation-check-pro' ); ?></strong>
+                <?php
+                printf(
+                    /* translators: 1: WPML setup link */
+                    esc_html__( 'WPML is active but setup is not complete. Please %1$s to finish configuring WPML before using this plugin.', 'wpml-translation-check-pro' ),
+                    '<a href="' . esc_url( admin_url( 'admin.php?page=' . rawurlencode( 'sitepress-multilingual-cms/menu/setup.php' ) ) ) . '">' . esc_html__( 'complete the WPML setup', 'wpml-translation-check-pro' ) . '</a>'
+                );
+                ?>
+            </p>
+        </div>
+        <?php
+        return;
+    }
 
     $links = array();
 

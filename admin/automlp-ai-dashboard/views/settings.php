@@ -70,6 +70,7 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 
 					// Current selected models (saved by the addon).
 					$automlp_wpml_current_models       = get_option( 'automlp_ai_translation_models', array() );
+					$automlp_wpml_bulk_post_status   = get_option( 'automlp_bulk_post_status', 'draft' );
 					$automlp_wpml_current_openai_model = isset( $automlp_wpml_current_models['openai'] ) ? $automlp_wpml_current_models['openai'] : 'gpt-4o-mini';
 					$automlp_wpml_current_google_model = isset( $automlp_wpml_current_models['google'] ) ? $automlp_wpml_current_models['google'] : 'gemini-2.5-flash';
 					$automlp_wpml_openai_api_key       = isset( $automlp_wpml_ai_credentials['openai'] ) ? $automlp_wpml_ai_credentials['openai'] : '';
@@ -276,22 +277,22 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 										<?php echo $automlp_wpml_has_existing_key ? 'disabled="disabled"' : ''; ?>
 									/>
 									<?php
-$automlp_provider_installed = ( 'openai' === $automlp_wpml_api_key )
-    ? $automlp_iis_openai_provider_installed
-    : $automlp_is_google_provider_installed ;
-$automlp_connectors_url = admin_url( 'options-connectors.php' );
- if ( $automlp_wpml_has_existing_key ) : ?>
-    <span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
-    <button
-        type="button"
-        class="button button-primary automlp-reset-key-btn"
-        data-provider="<?php echo esc_attr( $automlp_wpml_api_key ); ?>"
-        title="<?php esc_attr_e( 'Reset API key', 'wpml-translation-check' ); ?>"
-        <?php echo $automlp_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
-    >
-        <?php esc_html_e( 'Reset', 'wpml-translation-check' ); ?>
-    </button>
-<?php endif; ?>
+									$automlp_provider_installed = ( 'openai' === $automlp_wpml_api_key )
+										? $automlp_iis_openai_provider_installed
+										: $automlp_is_google_provider_installed ;
+									$automlp_connectors_url = admin_url( 'options-connectors.php' );
+									if ( $automlp_wpml_has_existing_key ) : ?>
+										<span style="color: #46b450; font-size: 14px; margin-right: 4px;">✓</span>
+										<button
+											type="button"
+											class="button button-primary automlp-reset-key-btn"
+											data-provider="<?php echo esc_attr( $automlp_wpml_api_key ); ?>"
+											title="<?php esc_attr_e( 'Reset API key', 'wpml-translation-check' ); ?>"
+											<?php echo $automlp_wpml_wizard_language_set ? '' : ' disabled="disabled"'; ?>
+										>
+											<?php esc_html_e( 'Reset', 'wpml-translation-check' ); ?>
+										</button>
+									<?php endif; ?>
 								</div>
 							</div>
 							<div id="automlp-ai-settings-message-<?php echo esc_attr( $automlp_wpml_api_key ); ?>" class="automlp_ai_dashboard-settings-message" style="margin-top: 4px; margin-bottom: 12px; display: none; color: #b32d2e; font-size: 13px;" role="alert"></div>
@@ -416,6 +417,15 @@ $automlp_connectors_url = admin_url( 'options-connectors.php' );
 								</p>
 							</div>
 						<?php endif; ?>
+						<label for="automlp_bulk_post_status-input" class="api-settings-label">
+									<?php esc_html_e( 'Bulk Translation Default Post Status', 'wpml-translation-check-pro' ); ?>
+								</label>
+								<div class="automlp-bulk-post-status-options">
+								<input type="radio" name="automlp_bulk_post_status" id="automlp_bulk_post_status_publish" value="publish" <?php checked( $automlp_wpml_bulk_post_status, 'publish' ); ?>>
+									<label for="automlp_bulk_post_status_publish"><?php esc_html_e( 'Published', 'wpml-translation-check-pro' ); ?></label>
+									<input type="radio" name="automlp_bulk_post_status" id="automlp_bulk_post_status_draft" value="draft" <?php checked( $automlp_wpml_bulk_post_status, 'draft' ); ?>>
+									<label for="automlp_bulk_post_status_draft"><?php esc_html_e( 'Draft', 'wpml-translation-check-pro' ); ?></label>
+								</div>
 						<hr>
 						<?php
 						 // Handle feedback checkbox
@@ -612,11 +622,14 @@ if ( $automlp_wpml_wizard_language_set ) :
 		var googleModel = document.getElementById('automlp_ai_selected_google_model') ? document.getElementById('automlp_ai_selected_google_model').value : '';
 		var feedbackCheckbox = document.getElementById('automlp_ai_dashboard_feedback_checkbox');
        var feedbackOptIn = feedbackCheckbox && feedbackCheckbox.checked ? 'yes' : 'no';
+	   var bulkPostStatusRadio = document.querySelector('input[name="automlp_bulk_post_status"]:checked');
+		var bulkPostStatus = bulkPostStatusRadio ? bulkPostStatusRadio.value : 'draft';
 		// Build request data - only include keys that should be updated
 		var requestData = {
 			openai_model: openaiModel || null,
 			google_model: googleModel || null,
-			automlp_feedback_opt_in: feedbackOptIn
+			automlp_feedback_opt_in: feedbackOptIn,
+			automlp_bulk_post_status: bulkPostStatus || 'draft'
 		};
 		
 		if (openaiInput && (openaiKey !== '' || (openaiInput.getAttribute('data-has-key') === '1' && openaiInput.value.trim() === ''))) {

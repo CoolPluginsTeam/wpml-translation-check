@@ -205,6 +205,11 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 							'required'          => false,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
+						'automlp_bulk_post_status'  => array(
+							'type'              => 'string',
+							'required'          => false,
+							'sanitize_callback' => 'sanitize_text_field',
+						),
 					),
 				)
 			);
@@ -512,8 +517,12 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		$google_model = $request->get_param( 'google_model' );
 		$is_wizard    = $request->get_param( 'is_wizard' ); // Explicit flag from frontend
 		$automlp_feedback_opt_in = $request->get_param( 'automlp_feedback_opt_in' );
+		$automlp_bulk_post_status = $request->get_param( 'automlp_bulk_post_status' );
 		if (get_option('cpfm_opt_in_choice_cool_automlp_translations')) {
 			update_option('automlp_feedback_opt_in', $automlp_feedback_opt_in);
+		}
+		if ( $automlp_bulk_post_status !== null ) {
+			update_option( 'automlp_bulk_post_status', sanitize_text_field( $automlp_bulk_post_status ) );
 		}
 		// If user opted out, clear the scheduled cron.
       $normalized_opt_in = is_string( $automlp_feedback_opt_in ) ? strtolower( $automlp_feedback_opt_in ) : $automlp_feedback_opt_in;
