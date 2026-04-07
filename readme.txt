@@ -195,6 +195,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= Version 1.2.3 | 06/04/2026 =
+* Added:- Introduced a Post Status configuration setting.
+
 = Version 1.2.2 | 30/03/2026 =
 * Added:- Wpml language configuration check.
 
