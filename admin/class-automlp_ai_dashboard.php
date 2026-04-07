@@ -42,6 +42,7 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 		private function __construct() {
 			add_action( 'admin_enqueue_scripts', array( $this, 'wpml_auto_enqueue_dashboard_assets' ) );
 			add_action( 'admin_init', array( $this, 'suppress_admin_notices' ), 9999 );
+			add_action( 'wp_ajax_automlp_update_enabled_providers', array( $this, 'update_enabled_providers' ) );
 		}
 
 		/**
@@ -132,6 +133,42 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 			}
 		}
 
+		public function update_enabled_providers() {
+
+            if ( ! check_ajax_referer( 'automlp_update_enabled_providers', 'update_providers_key', false ) ) {
+                wp_send_json_error( __( 'Invalid security token sent.', 'wpml-translation-check' ) );
+                wp_die( '0', 400 );
+                exit();
+            }
+
+			$enabled_providers = isset($_POST['enabled_providers']) ? sanitize_text_field(wp_unslash($_POST['enabled_providers'])) : '';
+			if(json_last_error() !== JSON_ERROR_NONE){
+				wp_send_json_error( __( 'Invalid JSON.', 'wpml-translation-check' ) );
+				wp_die( '0', 400 );
+				exit();
+			}
+			$enabled_providers = json_decode($enabled_providers, true);
+			if(!is_array($enabled_providers)){
+				wp_send_json_error( __( 'Invalid enabled providers.', 'wpml-translation-check' ) );
+				wp_die( '0', 400 );
+				exit();
+			}
+			
+			$valid_providers = array('openai', 'google');
+
+			$updated_providers = array();
+
+			foreach($enabled_providers as $provider_key => $status){
+				if(in_array($provider_key, $valid_providers) && $status === true){
+					$updated_providers[] = sanitize_text_field($provider_key);
+				}
+			}
+
+			update_option('automlp_enabled_providers', $updated_providers);
+			wp_send_json_success( array( 'providers' => $updated_providers, 'message' => __( 'Enabled providers updated successfully.', 'wpml-translation-check' ) ) );
+			exit;
+        }
+
 		/**
 		 * Enqueue dashboard CSS/JS only on our page.
 		 *
@@ -140,7 +177,8 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 		public function wpml_auto_enqueue_dashboard_assets( $hook ) {
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
-
+			$active_tab = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+			$buy_pro_url = 'https://coolplugins.net/product/automlp-ai-translation-for-wpml/';
 			if ( 'automlp_ai_dashboard' !== $page ) {
 				return;
 			}
@@ -160,6 +198,16 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 				AUTOMLP_AI_VERSION,
 				true
 			);
+			if(empty($active_tab) || $active_tab === 'dashboard'){
+				$dashboard_data=array(
+					'ajax_url' => admin_url('admin-ajax.php'),
+					'nonce' => wp_create_nonce('automlp_update_enabled_providers'),
+					'buy_pro_url' => $buy_pro_url,
+					'dashboard_url' => admin_url('admin.php?page=automlp_ai_dashboard&tab=dashboard')
+				);
+				
+				wp_localize_script('automlp_ai_dashboard-script', 'automlpSettingsScriptData', $dashboard_data);
+			}
 		}
 
 		/**
@@ -169,7 +217,6 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 			// Folder for view files (you will create these files next).
 			// Expected:
 			// - admin/automlp-ai-dashboard/views/dashboard.php
-			// - admin/automlp-ai-dashboard/views/ai-translations.php
 			// - admin/automlp-ai-dashboard/views/settings.php
 			// - admin/automlp-ai-dashboard/views/license.php
 			// - admin/automlp-ai-dashboard/views/free-vs-pro.php
@@ -179,8 +226,9 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 
 			$valid_tabs = array(
 				'dashboard'       => __( 'Dashboard', 'wpml-translation-check' ),
-				'ai-translations' => __( 'AI Translations', 'wpml-translation-check' ),
 				'settings'        => __( 'Settings', 'wpml-translation-check' ),
+				'license'         => __( 'License', 'wpml-translation-check' ),
+				'free-vs-pro'     => __( 'Free vs Pro', 'wpml-translation-check' ),
 			);
 
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -199,15 +247,10 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 						</div>
 					</div>
 					<div class="automlp_header-right">
-						<span>AI translator for WPML</span>
-						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=dashboard_header" class="automlp_btn primary" target="_blank" aria-label="premium">
-							✦ Unlock More Features
-						</a>
-						<a href="https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_header" class="automlp_btn" target="_blank" aria-label="document">
-							✎ Docs
-						</a>
-						<a href="https://wordpress.org/support/plugin/wpml-translation-check/" class="automlp_btn" target="_blank" aria-label="contact">
-							🗨 Support
+						<span>AutoMLP – AI Translation for WPML</span>
+						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=dashboard_header" class="automlp_btn" target="_blank" aria-label="premium">
+							 <img src="<?php echo esc_url( AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/upgrade-now.svg' ); ?>" alt="<?php esc_attr_e( 'Premium Icon', 'wpml-translation-check' ); ?>">
+							 Unlock More Features
 						</a>
 					</div>
 				</div>

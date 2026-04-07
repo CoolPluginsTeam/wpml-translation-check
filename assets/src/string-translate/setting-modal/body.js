@@ -6,6 +6,7 @@ import { __ } from "@wordpress/i18n";
 const SettingModalBody = (props) => {
     const { prefix } = props;
     const ServiceProviders = TranslateService();
+    const automlp_active_providers = automlp_wpml_bulk_translate_object?.automlp_active_providers;
     const openai_aiDisabled = !automlp_wpml_bulk_translate_object?.AIServices?.includes('openai');
     const google_aiDisabled = !automlp_wpml_bulk_translate_object?.AIServices?.includes('google');
 
@@ -15,7 +16,29 @@ const SettingModalBody = (props) => {
         localAiTranslator: true,
     };
 
-    const orderedProviderKeys = Object.keys(ServiceProviders).sort((a, b) => {
+    const UI_KEY_TO_BACKEND = {
+        openai_ai: "openai",
+        google_ai: "google",
+    };
+    
+    const active = Array.isArray(automlp_active_providers) ? automlp_active_providers : null;
+    
+    const visibleKeys = Object.keys(ServiceProviders).filter((uiKey) => {
+        if (uiKey === "localAiTranslator") {
+            return true;
+        }
+        const backend = UI_KEY_TO_BACKEND[uiKey];
+        if (!backend) {
+            return false;
+        }
+        // Missing option on old cached pages: keep previous behavior (show both AI cards).
+        if (active === null) {
+            return true;
+        }
+        return active.includes(backend);
+    });
+    
+    const orderedProviderKeys = visibleKeys.sort((a, b) => {
         const aSetup = !providerDisabled[a];
         const bSetup = !providerDisabled[b];
         if (aSetup === bSetup) return 0;

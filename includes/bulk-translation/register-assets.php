@@ -121,6 +121,7 @@ class Register_Assets {
 		}
 
 		$available_ai_services = array();
+		$automlp_active_providers = get_option('automlp_enabled_providers', array('google', 'openai'));
 
 		$automlp_get_providers_key=WPML_AT_Helper::get_providers_key(array('openai', 'google'));
 		$credentials = array();
@@ -160,6 +161,7 @@ class Register_Assets {
 					'pendingPostsIdsKey'         => wp_create_nonce( 'automlp_wpml_pending_posts_ids_nonce' ),
 					'automlp_wpml_url'            => esc_url( AUTOMLP_AI_PLUGIN_URL ),
 					'AIServices'                 => $available_ai_services,
+					'automlp_active_providers'   => $automlp_active_providers,
 					'admin_url'                  => admin_url(),
 					'ai_translate_route_nonce'   => wp_create_nonce( 'wp_rest' ),
 					'ai_translate_nonce'         => wp_create_nonce( 'automlp_wpml_ai_translate_nonce' ),

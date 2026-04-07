@@ -29,6 +29,7 @@ class Register_Assets {
 		$is_string_translation     = ! empty($page) && strpos($page, 'wpml-string-translation/menu/string-translation.php') !== false;
 		$needs_ai_services         = $is_string_translation;
 		$available_ai_services     = array();
+		$automlp_active_providers = get_option('automlp_enabled_providers', array('google', 'openai'));
 
 		// Enqueue translation dashboard/post list scripts.
 			if ( $needs_ai_services ) {
@@ -126,6 +127,7 @@ class Register_Assets {
 						'bulkTranslatePrivateKey' => wp_create_nonce('automlp_wpml_bulk_translate_entries_nonce'),
 						'automlp_wpml_url'           => esc_url(AUTOMLP_AI_PLUGIN_URL),
 						'AIServices' => $available_ai_services,
+						'automlp_active_providers' => $automlp_active_providers,
 						'admin_url' => admin_url(),
 						'ai_translate_route_url' => get_rest_url(null, 'automlp-bulk-translate'),
 						'ai_translate_route_nonce' => wp_create_nonce('wp_rest'),
