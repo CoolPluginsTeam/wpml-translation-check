@@ -15,7 +15,6 @@ jQuery(function ($) {
 	$('.automlp-provider-toggle').on('change', function() {	
         const checkedProviders = $('.automlp-provider-toggle:checked');
         const enabledProviders={};
-        console.log(checkedProviders);
         checkedProviders.each(function() {
             enabledProviders[$(this).data('provider')] = true;
         });
