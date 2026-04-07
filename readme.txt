@@ -195,6 +195,9 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
+= Version 1.2.4 | 07/04/2026 =
+* Improved:- Admin dashboard ui.
+
 = Version 1.2.3 | 06/04/2026 =
 * Added:- Introduced a Post Status configuration setting.
 
