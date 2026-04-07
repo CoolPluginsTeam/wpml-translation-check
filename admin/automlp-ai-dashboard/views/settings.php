@@ -44,6 +44,9 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 		<div id="automlp-ai-settings-validation-notice" class="notice notice-error" style="margin: 1rem 0; display: none;" role="alert">
 			<p></p>
 		</div>
+		<div id="automlp-ai-settings-success-notice" class="notice notice-success is-dismissible" style="margin: 1rem 0; display: none;" role="status">
+			<p></p>
+		</div>
 
 		<?php if ( ! $automlp_wpml_wizard_language_set ) : ?>
 			<div class="notice notice-warning" style="margin: 1rem 0;">
@@ -251,7 +254,7 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 								'placeholder' => 'sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 							),
 							'google' => array(
-								'name'        => 'Google Gemini',
+								'name'        => 'Gemini',
 								'doc_url'     => 'https://docs.coolplugins.net/doc/generate-gemini-ai-api-key/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard_api_key',
 								'placeholder' => 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
 							),
@@ -490,8 +493,52 @@ if ( $automlp_wpml_wizard_language_set ) :
 	var msgOpenai = document.getElementById('automlp-ai-settings-message-openai');
 	var msgGoogle = document.getElementById('automlp-ai-settings-message-google');
 	var validationNotice = document.getElementById('automlp-ai-settings-validation-notice');
+	var successNotice = document.getElementById('automlp-ai-settings-success-notice');
 	if ( ! form || ! msgOpenai || ! msgGoogle ) {
 		return;
+	}
+	function showNotice(type, message) {
+		if ( ! message ) {
+			return;
+		}
+		var target = type === 'success' ? successNotice : validationNotice;
+		if ( ! target ) {
+			return;
+		}
+		target.classList.remove('notice-success', 'notice-error');
+		target.classList.add(type === 'success' ? 'notice-success' : 'notice-error');
+		var targetP = target.querySelector( 'p' );
+		if ( targetP ) {
+			targetP.textContent = message;
+		}
+		target.style.display = 'block';
+	}
+	function setFlashNotice(type, message) {
+		if ( ! message || ! window.sessionStorage ) {
+			return;
+		}
+		try {
+			window.sessionStorage.setItem(
+				'automlp_ai_settings_notice',
+				JSON.stringify( { type: type, message: message } )
+			);
+		} catch (e) {}
+	}
+	function consumeFlashNotice() {
+		if ( ! window.sessionStorage ) {
+			return;
+		}
+		try {
+			var saved = window.sessionStorage.getItem('automlp_ai_settings_notice');
+			if ( ! saved ) {
+				return;
+			}
+			window.sessionStorage.removeItem('automlp_ai_settings_notice');
+			var parsed = JSON.parse(saved);
+			if ( parsed && parsed.type && parsed.message ) {
+				showNotice(parsed.type, parsed.message);
+			}
+		} catch (e) {}
 	}
 	function clearMessages() {
 		msgOpenai.textContent = '';
@@ -503,6 +550,13 @@ if ( $automlp_wpml_wizard_language_set ) :
 			var noticeP = validationNotice.querySelector( 'p' );
 			if ( noticeP ) {
 				noticeP.textContent = '';
+			}
+		}
+		if ( successNotice ) {
+			successNotice.style.display = 'none';
+			var successP = successNotice.querySelector( 'p' );
+			if ( successP ) {
+				successP.textContent = '';
 			}
 		}
 	}
@@ -568,11 +622,13 @@ if ( $automlp_wpml_wizard_language_set ) :
 			.then(function(result) {
 				if (result.ok && result.data && result.data.success) {
 					// Success - reload page to show updated state
+				setFlashNotice('success', '<?php echo esc_js( __( 'API key removed successfully.', 'wpml-translation-check' ) ); ?>');
 					window.location.reload();
 				} else {
 					// Error - show error message
 					var err = result.data || {};
 					var errorMsg = (err.message) ? err.message : '<?php echo esc_js( __( 'Failed to delete API key. Please try again.', 'wpml-translation-check' ) ); ?>';
+					showNotice('error', errorMsg);
 					var msgElement = document.getElementById('automlp-ai-settings-message-' + provider);
 					if (msgElement) {
 						msgElement.textContent = errorMsg;
@@ -665,18 +721,15 @@ if ( $automlp_wpml_wizard_language_set ) :
 		.then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }, function() { return { ok: res.ok, data: {} }; }); })
 		.then(function(result) {
 			if (result.ok && result.data && result.data.success) {
+				setFlashNotice('success', '<?php echo esc_js( __( 'Settings saved successfully.', 'wpml-translation-check' ) ); ?>');
 				window.location.reload();
 				return;
 			}
 			var err = result.data || {};
 			var errors = (err.data && err.data.errors) ? err.data.errors : {};
 			// Show REST API error message (e.g. automlp_no_api_key) in the top notice area.
-			if ( err.message !== 'One of the API keys is invalid.' && validationNotice ) {
-				var noticeP = validationNotice.querySelector( 'p' );
-				if ( noticeP ) {
-					noticeP.textContent = err.message;
-				}
-				validationNotice.style.display = 'block';
+			if ( err.message !== 'One of the API keys is invalid.' ) {
+				showNotice('error', err.message);
 			}
 			if (errors.openai) {
 				msgOpenai.textContent = errors.openai;
@@ -690,11 +743,7 @@ if ( $automlp_wpml_wizard_language_set ) :
 		.catch(function() {
 			var fallback = '<?php echo esc_js( __( 'Request failed. Please try again.', 'wpml-translation-check' ) ); ?>';
 			if ( validationNotice ) {
-				var noticeP = validationNotice.querySelector( 'p' );
-				if ( noticeP ) {
-					noticeP.textContent = fallback;
-				}
-				validationNotice.style.display = 'block';
+				showNotice('error', fallback);
 			} else {
 			msgOpenai.textContent = fallback;
 			msgOpenai.style.display = 'block';
@@ -704,6 +753,7 @@ if ( $automlp_wpml_wizard_language_set ) :
 			if (submitBtn) submitBtn.disabled = false;
 		});
 	});
+	consumeFlashNotice();
 })();
 </script>
 <?php endif; ?>

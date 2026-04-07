@@ -13,7 +13,7 @@ $automlp_active_providers = get_option('automlp_enabled_providers', array('googl
 			<h1><?php echo esc_html__( 'Automate the Translation Process', 'wpml-translation-check' ); ?></h1>
 			<div class="automlp-dashboard-status">
                         <span><?php echo esc_html__('Free', 'wpml-translation-check'); ?></span>
-                        <a href="<?php echo esc_url('https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=dashboard'); ?>" class='automlp-dashboard-btn' target="_blank">
+                        <a href="<?php echo esc_url('https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=dashboard'); ?>" class='automlp_btn' target="_blank">
                             <img src="<?php echo esc_url(AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/upgrade-now.svg'); ?>" alt="<?php esc_attr_e('Upgrade Now', 'wpml-translation-check'); ?>">
                             <?php echo esc_html__('Upgrade Now', 'wpml-translation-check'); ?>
                         </a>
@@ -58,7 +58,7 @@ $automlp_active_providers = get_option('automlp_enabled_providers', array('googl
     <?php esc_html_e( 'Page Translation', 'wpml-translation-check' ); ?>
   </button>
   </div>
-  <a class="automlp-dashboard-docs" href="<?php echo esc_url('https://docs.coolplugins.net/plugin/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard'); ?>" target="_blank"><img src="<?php echo esc_url(AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/document.svg'); ?>" alt="document"> <span><?php echo esc_html__('Read Plugin Docs', 'wpml-translation-check'); ?></span></a>
+  <a class="automlp-dashboard-docs" href="<?php echo esc_url('https://docs.coolplugins.net/plugin/ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=docs&utm_content=dashboard'); ?>" target="_blank"><img src="<?php echo esc_url(AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/document.svg'); ?>" alt="document"> <span><?php echo esc_html__('Read Plugin Docs', 'wpml-translation-check'); ?></span></a>
 </div>
 <div class="automlp_ai_dashboard-get-started-grid-content">
 					<iframe
@@ -96,7 +96,8 @@ $automlp_active_providers = get_option('automlp_enabled_providers', array('googl
 						<li>✅ <?php echo esc_html__('Bulk Translation', 'wpml-translation-check'); ?></li>
 					</ul>
 					<div class="automlp-dashboard-provider-buttons">
-						<a href="<?php echo esc_url('https://docs.coolplugins.net/doc/openai-translation-wpml/?utm_source=automlp_plugin&amp;utm_medium=inside&amp;utm_campaign=docs&amp;utm_content=dashboard_openai'); ?>" class="automlp-dashboard-btn" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Docs', 'wpml-translation-check'); ?></a>
+						<a href="<?php echo esc_url('https://docs.coolplugins.net/doc/openai-translation-wpml/?utm_source=automlp_plugin&amp;utm_medium=inside&amp;utm_campaign=docs&amp;utm_content=dashboard_openai'); ?>" class="automlp_btn" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Docs', 'wpml-translation-check'); ?></a>
+						 <a href="<?php echo esc_url(admin_url('admin.php?page=automlp_ai_dashboard&tab=settings')); ?>" class="automlp_btn"><?php esc_html_e('Settings', 'wpml-translation-check'); ?></a>
 					</div>
 				</div>
 
@@ -119,7 +120,8 @@ $automlp_active_providers = get_option('automlp_enabled_providers', array('googl
 						<li>✅ <?php echo esc_html__('Bulk Translation', 'wpml-translation-check'); ?></li>
 					</ul>
 					<div class="automlp-dashboard-provider-buttons">
-						<a href="<?php echo esc_url('https://docs.coolplugins.net/doc/gemini-ai-translation-wpml/?utm_source=automlp_plugin&amp;utm_medium=inside&amp;utm_campaign=docs&amp;utm_content=dashboard_gemini'); ?>" class="automlp-dashboard-btn" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Docs', 'wpml-translation-check'); ?></a>
+						<a href="<?php echo esc_url('https://docs.coolplugins.net/doc/gemini-ai-translation-wpml/?utm_source=automlp_plugin&amp;utm_medium=inside&amp;utm_campaign=docs&amp;utm_content=dashboard_gemini'); ?>" class="automlp_btn" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Docs', 'wpml-translation-check'); ?></a>
+						 <a href="<?php echo esc_url(admin_url('admin.php?page=automlp_ai_dashboard&tab=settings')); ?>" class="automlp_btn"><?php esc_html_e('Settings', 'wpml-translation-check'); ?></a>
 					</div>
 				</div>
 
@@ -142,8 +144,8 @@ $automlp_active_providers = get_option('automlp_enabled_providers', array('googl
 						<li>✅ <?php echo esc_html__('Bulk Translation (Pro)', 'wpml-translation-check'); ?></li>
 					</ul>
 					<div class="automlp-dashboard-provider-buttons">
-						<a href="<?php echo esc_url('https://docs.coolplugins.net/doc/chrome-ai-translation-wpml/?utm_source=automlp_plugin&amp;utm_medium=inside&amp;utm_campaign=docs&amp;utm_content=dashboard_chrome'); ?>" class="automlp-dashboard-btn" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Docs', 'wpml-translation-check'); ?></a>
-						<a class="automlp-chrome-configure-button automlp-dashboard-btn primary" href="<?php echo esc_url(admin_url('admin.php?page=polylang-automlp-dashboard&tab=settings')); ?>" style="display: none;"><?php esc_html_e('Configure', 'wpml-translation-check'); ?></a>
+						<a href="<?php echo esc_url('https://docs.coolplugins.net/doc/chrome-ai-translation-wpml/?utm_source=automlp_plugin&amp;utm_medium=inside&amp;utm_campaign=docs&amp;utm_content=dashboard_chrome'); ?>" class="automlp_btn" target="_blank" rel="noopener noreferrer"><?php esc_html_e('Docs', 'wpml-translation-check'); ?></a>
+						<a class="automlp-chrome-configure-button automlp_btn primary" href="<?php echo esc_url(admin_url('admin.php?page=polylang-automlp-dashboard&tab=settings')); ?>" style="display: none;"><?php esc_html_e('Configure', 'wpml-translation-check'); ?></a>
 					</div>
 				</div>
 

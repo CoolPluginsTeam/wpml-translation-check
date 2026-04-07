@@ -248,7 +248,7 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 					</div>
 					<div class="automlp_header-right">
 						<span>AutoMLP – AI Translation for WPML</span>
-						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=dashboard_header" class="automlp-dashboard-btn" target="_blank" aria-label="premium">
+						<a href="https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=dashboard_header" class="automlp_btn" target="_blank" aria-label="premium">
 							 <img src="<?php echo esc_url( AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/upgrade-now.svg' ); ?>" alt="<?php esc_attr_e( 'Premium Icon', 'wpml-translation-check' ); ?>">
 							 Unlock More Features
 						</a>

@@ -9,7 +9,7 @@ if(!defined('ABSPATH')){
         <h1><?php esc_html_e('Free VS Pro', 'wpml-translation-check'); ?></h1>
         <div class="automlp_ai_dashboard-status">
             <span class="status"><?php esc_html_e('Inactive', 'wpml-translation-check'); ?></span>
-            <a href="<?php echo esc_url('https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=freevspro'); ?>" class='automlp-dashboard-btn' target="_blank">
+            <a href="<?php echo esc_url('https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=get_pro&utm_content=freevspro'); ?>" class='automlp_btn' target="_blank">
               <img src="<?php echo esc_url( AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/images/upgrade-now.svg'); ?>" alt="<?php echo esc_attr_e('Upgrade Now', 'wpml-translation-check'); ?>">
                 <?php echo esc_html_e('Upgrade Now', 'wpml-translation-check'); ?>
             </a>
