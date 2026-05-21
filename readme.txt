@@ -2,7 +2,7 @@
 Contributors: coolplugins, narinder-singh, satindersingh
 Donate link: https://donate.stripe.com/5kQdR92iBevO75WbPm6c00i
 Tags: WPML, Automatic Translation, WPML Addon, Block Translation
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 1.2.4
 Requires at least: 6.9
 Requires PHP: 7.4
