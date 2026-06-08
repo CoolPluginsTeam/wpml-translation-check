@@ -135,6 +135,10 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 
 		public function update_enabled_providers() {
 
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( __( 'Unauthorized', 'wpml-translation-check' ), 403 );
+			}
+
             if ( ! check_ajax_referer( 'automlp_update_enabled_providers', 'update_providers_key', false ) ) {
                 wp_send_json_error( __( 'Invalid security token sent.', 'wpml-translation-check' ) );
                 wp_die( '0', 400 );
