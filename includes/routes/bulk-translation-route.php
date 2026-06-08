@@ -183,7 +183,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 				array(
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'wizard_save_credentials' ),
-					'permission_callback' => array( $this, 'permission_only_admins' ),
+					'permission_callback' => array( $this, 'permission_manage_options' ),
 					'args'                => array(
 						'openai_key'  => array(
 							'type'              => 'string',
@@ -219,7 +219,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 				array(
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'wizard_save_language' ),
-					'permission_callback' => array( $this, 'permission_only_admins' ),
+					'permission_callback' => array( $this, 'permission_manage_options' ),
 					'args'                => array(
 						'selected_language' => array(
 							'type'              => 'object',
@@ -239,7 +239,7 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 				array(
 					'methods'             => 'POST',
 					'callback'            => array( $this, 'wizard_complete' ),
-					'permission_callback' => array( $this, 'permission_only_admins' ),
+					'permission_callback' => array( $this, 'permission_manage_options' ),
 				)
 			);
 		}
@@ -255,18 +255,28 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	}
 
 		public function permission_only_admins( $request ) {
+			return $this->check_rest_permission( $request, 'edit_posts' );
+		}
+
+		public function permission_manage_options( $request ) {
+			return $this->check_rest_permission( $request, 'manage_options' );
+		}
+
+		private function check_rest_permission( $request, $capability ) {
 			$nonce = $request->get_header( 'X-WP-Nonce' );
 
 			if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-				return new WP_Error( 'rest_forbidden', __( 'Invalid nonce.', 'wpml-translation-check' ), array( 'status' => 403 ) );
+				return new \WP_Error( 'rest_forbidden', __( 'Invalid nonce.', 'wpml-translation-check' ), array( 'status' => 403 ) );
 			}
 
 			if ( ! is_user_logged_in() ) {
 				return new \WP_Error( 'rest_forbidden', __( 'You are not authorized to perform this action.', 'wpml-translation-check' ), array( 'status' => 401 ) );
 			}
-			if ( ! current_user_can( 'edit_posts' ) ) {
+
+			if ( ! current_user_can( $capability ) ) {
 				return new \WP_Error( 'rest_forbidden', __( 'You are not authorized to perform this action.', 'wpml-translation-check' ), array( 'status' => 403 ) );
 			}
+
 			return true;
 		}
 
