@@ -536,7 +536,8 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 			update_option('automlp_feedback_opt_in', $automlp_feedback_opt_in);
 		}
 		if ( $automlp_bulk_post_status !== null ) {
-			update_option( 'automlp_bulk_post_status', sanitize_text_field( $automlp_bulk_post_status ) );
+			$status = in_array( $automlp_bulk_post_status, array( 'draft', 'publish' ), true ) ? $automlp_bulk_post_status : 'draft';
+			update_option( 'automlp_bulk_post_status', $status );
 		}
 		// If user opted out, clear the scheduled cron.
       $normalized_opt_in = is_string( $automlp_feedback_opt_in ) ? strtolower( $automlp_feedback_opt_in ) : $automlp_feedback_opt_in;
@@ -812,7 +813,10 @@ if ( 'openai' === strtolower( $provider_id ) && ! preg_match( '/^sk-[a-zA-Z0-9_-
 				wp_send_json_error( 'Empty post IDs Select at least one post to translate' );
 			}
 
-			$post_ids        = json_decode( $params['ids'] );
+			$post_ids = json_decode( $params['ids'], true );
+			if ( ! is_array( $post_ids ) ) {
+				return new \WP_Error( 'rest_invalid_param', __( 'Invalid IDs.', 'wpml-translation-check' ), array( 'status' => 400 ) );
+			}
 			$post_ids        = array_map( 'absint', $post_ids );
 			$target_language = json_decode( $params['lang'] );
 			$target_language = array_map( 'sanitize_text_field', $target_language );
@@ -830,6 +834,9 @@ if ( 'openai' === strtolower( $provider_id ) && ! preg_match( '/^sk-[a-zA-Z0-9_-
 			$pending_posts_ids = array();
 
 			foreach ( $post_ids as $post_id ) {
+				if ( ! current_user_can( 'edit_post', $post_id ) ) { 
+					continue; 
+				}
 				$automlp_wpml_post_element_type = apply_filters( 'wpml_element_type', get_post_type( $post_id ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 				$automlp_wpml_trid = apply_filters( 'wpml_element_trid', null, $post_id); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
@@ -900,6 +907,10 @@ if ( 'openai' === strtolower( $provider_id ) && ! preg_match( '/^sk-[a-zA-Z0-9_-
 			}
 
 			foreach ( $post_ids as $post_id ) {
+				if ( ! current_user_can( 'edit_post', $post_id ) ) {
+					continue;
+				}
+
 				$post_data = get_post( $post_id );
 
 				if ( ! $post_data ) {
