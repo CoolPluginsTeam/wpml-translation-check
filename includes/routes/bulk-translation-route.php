@@ -476,6 +476,10 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	 * @return \WP_REST_Response|\WP_Error
 	 */
 	public function wizard_save_credentials( $request ) {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new \WP_Error( 'rest_forbidden', __( 'Unauthorized.', 'wpml-translation-check' ), array( 'status' => 403 ) );
+		}
+
 		$openai_key   = $request->get_param( 'openai_key' );
 		$google_key   = $request->get_param( 'google_key' );
 		$is_reset     = $request->get_param( 'is_reset' );  // Flag for reset operations
@@ -779,6 +783,11 @@ if ( 'openai' === strtolower( $provider_id ) && ! preg_match( '/^sk-[a-zA-Z0-9_-
 		} elseif ( is_string( $param ) && $param !== '' ) {
 			$stored = array( 'code' => sanitize_text_field( $param ), 'name' => '', 'flag_url' => '' );
 		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new \WP_Error( 'rest_forbidden', __( 'Unauthorized.', 'wpml-translation-check' ), array( 'status' => 403 ) );
+		}
+
 		update_option( 'automlp_ai_wizard_selected_language', $stored );
 		return new \WP_REST_Response( array( 'success' => true ), 200 );
 	}
