@@ -46,3 +46,5 @@ assets/src/            export-ignore
 postcss.config.js       export-ignore
 *.map                   export-ignore
 *.scss                  export-ignore
+.claude/                export-ignore
+.codex/                 export-ignore

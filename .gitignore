@@ -69,3 +69,5 @@ coverage/
 *.exe
 *.o
 *.so
+fix-issues-files.txt
+fix-issues.csv
