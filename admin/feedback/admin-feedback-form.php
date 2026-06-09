@@ -177,8 +177,13 @@ class automlp_feedback {
 	function submit_deactivation_response() {
 		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), '_cool-plugins_deactivate_feedback_nonce' ) ) {
 			wp_send_json_error();
-		} else {
-			$deactivate_reasons = array(
+		}
+
+		if ( ! current_user_can( 'activate_plugins' ) ) {
+			wp_send_json_error();
+		}
+
+		$deactivate_reasons = array(
 				'didnt_work_as_expected'         => array(
 					'title'             => __( 'The plugin didn\'t work as expected', 'wpml-translation-check' ),
 					'input_placeholder' => 'What did you expect?',
@@ -245,8 +250,7 @@ class automlp_feedback {
 				)
 			);
 
-			die( wp_json_encode( array( 'response' => $response ) ) );
-		}
+		die( wp_json_encode( array( 'response' => $response ) ) );
 	}
 }
 new automlp_feedback();
