@@ -35,6 +35,10 @@ class AUTOMLP_AI_Strings_Ajax
 	 */
 	public static function save_string_translations()
 	{
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'msg' => esc_html__( 'Insufficient permissions.', 'wpml-translation-check' ) ) );
+		}
+
 		global $wpdb;
 
 		// Read JSON data from request body to avoid max_input_vars limit
@@ -71,10 +75,6 @@ class AUTOMLP_AI_Strings_Ajax
 			$target_lang = isset($_POST['target_lang']) ? sanitize_text_field(wp_unslash($_POST['target_lang'])) : '';
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized per item
 			$translated_strings = isset($_POST['translated_strings']) ? json_decode(sanitize_text_field(wp_unslash($_POST['translated_strings'])), true) : array();
-		}
-
-		if (! current_user_can('manage_options')) {
-			wp_send_json_error(array('msg' => esc_html__('Insufficient permissions.', 'wpml-translation-check')));
 		}
 
 		if (! function_exists('icl_add_string_translation')) {
@@ -139,32 +139,28 @@ class AUTOMLP_AI_Strings_Ajax
 			return;
 		}
 
-		// Build the bulk INSERT query with ON DUPLICATE KEY UPDATE
-// This handles both new inserts and updates to existing translations
-$values_sql = array();
-foreach ($rows_data as $row_data) {
-    $values_sql[] = $wpdb->prepare(
-        '(%d, %s, %s, %d, %d, %s)',
-        $row_data['string_id'],
-        $row_data['language'],
-        $row_data['value'],
-        $row_data['status'],
-        $row_data['translator_id'],
-        $row_data['translation_date']
-    );
-}
+		// Bulk INSERT with ON DUPLICATE KEY UPDATE. Each row is escaped via $wpdb->prepare().
+		$values_sql = array();
+		foreach ( $rows_data as $row_data ) {
+			$values_sql[] = $wpdb->prepare(
+				'(%d, %s, %s, %d, %d, %s)',
+				$row_data['string_id'],
+				$row_data['language'],
+				$row_data['value'],
+				$row_data['status'],
+				$row_data['translator_id'],
+				$row_data['translation_date']
+			);
+		}
 
-// Build complete query in one statement with escaped table name
-$query = sprintf(
-    "INSERT INTO %s (string_id, language, value, status, translator_id, translation_date) VALUES %s ON DUPLICATE KEY UPDATE value = VALUES(value), status = VALUES(status), translator_id = VALUES(translator_id), translation_date = VALUES(translation_date)",
-    esc_sql($table_name),
-    implode(', ', $values_sql)
-);
+		$query = sprintf(
+			'INSERT INTO %s (string_id, language, value, status, translator_id, translation_date) VALUES %s ON DUPLICATE KEY UPDATE value = VALUES(value), status = VALUES(status), translator_id = VALUES(translator_id), translation_date = VALUES(translation_date)',
+			esc_sql( $table_name ),
+			implode( ', ', $values_sql )
+		);
 
-// Execute the bulk insert/update
-
-$result = $wpdb->query($query); // phpcs:ignore
-		$saved = count($string_ids);
+		$result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- row tuples pre-prepared above.
+		$saved  = count( $string_ids );
 
 		// Clear WPML cache to ensure translations are immediately available
 		if (function_exists('icl_update_string_translation_cache')) {
