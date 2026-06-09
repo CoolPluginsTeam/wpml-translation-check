@@ -177,13 +177,13 @@ class automlp_feedback {
 	function submit_deactivation_response() {
 		if ( ! isset( $_POST['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wpnonce'] ) ), '_cool-plugins_deactivate_feedback_nonce' ) ) {
 			wp_send_json_error();
-		}
+		} else {
+			if ( ! current_user_can( 'activate_plugins' ) ) {
+				wp_send_json_error();
+			}
 
-		if ( ! current_user_can( 'activate_plugins' ) ) {
-			wp_send_json_error();
-		}
-
-		$deactivate_reasons = array(
+			$reason             = isset( $_POST['reason'] ) ? sanitize_text_field( wp_unslash( $_POST['reason'] ) ) : '';
+			$deactivate_reasons = array(
 				'didnt_work_as_expected'         => array(
 					'title'             => __( 'The plugin didn\'t work as expected', 'wpml-translation-check' ),
 					'input_placeholder' => 'What did you expect?',
@@ -206,25 +206,10 @@ class automlp_feedback {
 				),
 			);
 
-			$reason = '';
-			if ( isset( $_POST['reason_key'] ) ) {
-				$reason = sanitize_key( wp_unslash( $_POST['reason_key'] ) );
-			} elseif ( isset( $_POST['reason'] ) ) {
-				$reason = sanitize_key( wp_unslash( $_POST['reason'] ) );
-			}
-
-			$plugin_initial     = get_option( 'automlp_ai_initial_save_version' );
-			$deativation_reason = array_key_exists( $reason, $deactivate_reasons ) ? $reason : 'other';
-
-			$sanitized_message = 'N/A';
-			if ( isset( $_POST['message'] ) && '' !== sanitize_text_field( wp_unslash( $_POST['message'] ) ) ) {
-				$sanitized_message = sanitize_text_field( wp_unslash( $_POST['message'] ) );
-			} else {
-				$message_field = 'reason_' . $deativation_reason;
-				if ( isset( $_POST[ $message_field ] ) && '' !== sanitize_text_field( wp_unslash( $_POST[ $message_field ] ) ) ) {
-					$sanitized_message = sanitize_text_field( wp_unslash( $_POST[ $message_field ] ) );
-				}
-			}
+			$plugin_initial      = get_option( 'automlp_ai_initial_save_version' );
+			$reason               = isset( $reason ) ? sanitize_key( $reason ) : '';
+			$deativation_reason   = array_key_exists( $reason, $deactivate_reasons ) ? $reason : 'other';
+			$sanitized_message    = isset( $_POST['message'] ) && sanitize_text_field( wp_unslash( $_POST['message'] ) ) === '' ? 'N/A' : sanitize_text_field( wp_unslash( $_POST['message'] ) );
 			$admin_email          = sanitize_email( get_option( 'admin_email' ) );
 			$site_url             = esc_url( site_url() );
 			$install_date         = get_option( 'automlp_ai_install_date' );
@@ -250,7 +235,8 @@ class automlp_feedback {
 				)
 			);
 
-		die( wp_json_encode( array( 'response' => $response ) ) );
+			die( wp_json_encode( array( 'response' => $response ) ) );
+		}
 	}
 }
 new automlp_feedback();
