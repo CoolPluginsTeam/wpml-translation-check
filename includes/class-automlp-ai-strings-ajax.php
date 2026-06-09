@@ -139,32 +139,28 @@ class AUTOMLP_AI_Strings_Ajax
 			return;
 		}
 
-		// Build the bulk INSERT query with ON DUPLICATE KEY UPDATE
-// This handles both new inserts and updates to existing translations
-$values_sql = array();
-foreach ($rows_data as $row_data) {
-    $values_sql[] = $wpdb->prepare(
-        '(%d, %s, %s, %d, %d, %s)',
-        $row_data['string_id'],
-        $row_data['language'],
-        $row_data['value'],
-        $row_data['status'],
-        $row_data['translator_id'],
-        $row_data['translation_date']
-    );
-}
+		// Bulk INSERT with ON DUPLICATE KEY UPDATE. Each row is escaped via $wpdb->prepare().
+		$values_sql = array();
+		foreach ( $rows_data as $row_data ) {
+			$values_sql[] = $wpdb->prepare(
+				'(%d, %s, %s, %d, %d, %s)',
+				$row_data['string_id'],
+				$row_data['language'],
+				$row_data['value'],
+				$row_data['status'],
+				$row_data['translator_id'],
+				$row_data['translation_date']
+			);
+		}
 
-// Build complete query in one statement with escaped table name
-$query = sprintf(
-    "INSERT INTO %s (string_id, language, value, status, translator_id, translation_date) VALUES %s ON DUPLICATE KEY UPDATE value = VALUES(value), status = VALUES(status), translator_id = VALUES(translator_id), translation_date = VALUES(translation_date)",
-    esc_sql($table_name),
-    implode(', ', $values_sql)
-);
+		$query = sprintf(
+			'INSERT INTO %s (string_id, language, value, status, translator_id, translation_date) VALUES %s ON DUPLICATE KEY UPDATE value = VALUES(value), status = VALUES(status), translator_id = VALUES(translator_id), translation_date = VALUES(translation_date)',
+			esc_sql( $table_name ),
+			implode( ', ', $values_sql )
+		);
 
-// Execute the bulk insert/update
-
-$result = $wpdb->query($query); // phpcs:ignore
-		$saved = count($string_ids);
+		$result = $wpdb->query( $query ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- row tuples pre-prepared above.
+		$saved  = count( $string_ids );
 
 		// Clear WPML cache to ensure translations are immediately available
 		if (function_exists('icl_update_string_translation_cache')) {
