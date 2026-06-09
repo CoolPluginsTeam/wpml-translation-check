@@ -72,7 +72,7 @@ class Sanitized_Content {
 	 */
 	private function extract_allowed_html_from_string( string $html ): array {
 
-		$allowed_html = array();
+		$allowed_html = wp_kses_allowed_html( 'post' );
 
 		if ( empty( $html ) ) {
 			return $allowed_html;
@@ -90,7 +90,7 @@ class Sanitized_Content {
 			$tag = strtolower( $tag_match[1] );
 
 			if ( ! isset( $allowed_html[ $tag ] ) ) {
-				$allowed_html[ $tag ] = array();
+				continue;
 			}
 
 			if ( empty( $tag_match[2] ) ) {
@@ -114,22 +114,20 @@ class Sanitized_Content {
 					continue;
 				}
 
-				// Block unsafe attributes.
-				if ( in_array(
-					$attr,
-					array( 'onclick', 'onload', 'onerror', 'onmouseover' ),
-					true
-				) ) {
+				// Block all inline event handlers.
+				if ( 0 === strpos( $attr, 'on' ) ) {
 					continue;
 				}
 
-				$allowed_html[ $tag ][ $attr ] = true;
-			}
-		}
+				if ( isset( $allowed_html[ $tag ][ $attr ] ) ) {
+					continue;
+				}
 
-		// Safety fallback.
-		if ( empty( $allowed_html ) ) {
-			$allowed_html = wp_kses_allowed_html( 'post' );
+				// Extend post allow-list only with data-* / aria-* attrs found in source.
+				if ( 0 === strpos( $attr, 'data-' ) || 0 === strpos( $attr, 'aria-' ) ) {
+					$allowed_html[ $tag ][ $attr ] = true;
+				}
+			}
 		}
 
 		return $allowed_html;

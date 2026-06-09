@@ -35,6 +35,10 @@ class AUTOMLP_AI_Strings_Ajax
 	 */
 	public static function save_string_translations()
 	{
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( array( 'msg' => esc_html__( 'Insufficient permissions.', 'wpml-translation-check' ) ) );
+		}
+
 		global $wpdb;
 
 		// Read JSON data from request body to avoid max_input_vars limit
@@ -71,10 +75,6 @@ class AUTOMLP_AI_Strings_Ajax
 			$target_lang = isset($_POST['target_lang']) ? sanitize_text_field(wp_unslash($_POST['target_lang'])) : '';
 			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash,WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- sanitized per item
 			$translated_strings = isset($_POST['translated_strings']) ? json_decode(sanitize_text_field(wp_unslash($_POST['translated_strings'])), true) : array();
-		}
-
-		if (! current_user_can('manage_options')) {
-			wp_send_json_error(array('msg' => esc_html__('Insufficient permissions.', 'wpml-translation-check')));
 		}
 
 		if (! function_exists('icl_add_string_translation')) {
