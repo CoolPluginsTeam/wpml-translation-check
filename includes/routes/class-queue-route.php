@@ -60,6 +60,11 @@ class Queue_Route {
 						'type'     => 'array',
 						'items'    => array( 'type' => 'string' ),
 					),
+					'provider'  => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_key',
+					),
 				),
 			)
 		);
@@ -81,6 +86,11 @@ class Queue_Route {
 						'required'          => true,
 						'type'              => 'string',
 						'sanitize_callback' => 'sanitize_text_field',
+					),
+					'provider'   => array(
+						'required'          => false,
+						'type'              => 'string',
+						'sanitize_callback' => 'sanitize_key',
 					),
 				),
 			)
@@ -108,6 +118,23 @@ class Queue_Route {
 						'required' => false,
 						'type'     => 'integer',
 						'default'  => 20,
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			self::NAMESPACE_ROOT,
+			'/queue/retry',
+			array(
+				'methods'             => \WP_REST_Server::CREATABLE,
+				'callback'            => array( __CLASS__, 'retry' ),
+				'permission_callback' => array( __CLASS__, 'can_edit_posts' ),
+				'args'                => array(
+					'job_id' => array(
+						'required'          => true,
+						'type'              => 'integer',
+						'sanitize_callback' => 'absint',
 					),
 				),
 			)
@@ -186,7 +213,9 @@ class Queue_Route {
 			);
 		}
 
-		$result = Job_Sender::send_posts( $post_ids, $langs );
+		$provider = self::clean_provider( $request->get_param( 'provider' ) );
+
+		$result = Job_Sender::send_posts( $post_ids, $langs, $provider );
 
 		if ( 0 === $result['queued'] && $result['skipped'] > 0 ) {
 			return new \WP_REST_Response(
@@ -249,7 +278,9 @@ class Queue_Route {
 			);
 		}
 
-		$sent = Job_Sender::send_strings( $string_ids, $language );
+		$provider = self::clean_provider( $request->get_param( 'provider' ) );
+
+		$sent = Job_Sender::send_strings( $string_ids, $language, '', $provider );
 
 		if ( is_wp_error( $sent ) ) {
 			return $sent;
@@ -322,6 +353,79 @@ class Queue_Route {
 	}
 
 	/**
+	 * Send a failed job back to the queue.
+	 *
+	 * Retry is only possible while the source map survives. It is cleared on
+	 * completion and by pruning, so an old failure has to be re-queued from
+	 * the post list instead.
+	 *
+	 * @param \WP_REST_Request $request Request.
+	 * @return \WP_REST_Response|\WP_Error
+	 */
+	public static function retry( $request ) {
+		$job_id = absint( $request->get_param( 'job_id' ) );
+		$row    = Queue_Table::get( $job_id );
+
+		if ( ! $row ) {
+			return new \WP_Error(
+				'automlp_job_missing',
+				__( 'That job no longer exists.', 'wpml-translation-check' ),
+				array( 'status' => 404 )
+			);
+		}
+
+		if ( Queue_Table::STATE_FAILED !== $row['state'] ) {
+			return new \WP_Error(
+				'automlp_job_not_failed',
+				__( 'Only failed jobs can be retried.', 'wpml-translation-check' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		if ( 'post' === $row['kind'] && (int) $row['source_id'] && ! current_user_can( 'edit_post', (int) $row['source_id'] ) ) {
+			return new \WP_Error(
+				'automlp_forbidden',
+				__( 'You are not allowed to translate that content.', 'wpml-translation-check' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
+		if ( empty( $row['source_map'] ) ) {
+			return new \WP_Error(
+				'automlp_source_cleared',
+				__( 'This job can no longer be retried because its source content is no longer stored. Start the translation again from the content list.', 'wpml-translation-check' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		$done = Queue_Table::edit(
+			$job_id,
+			array(
+				'state'      => Queue_Table::STATE_WAITING,
+				'attempts'   => 0,
+				'last_error' => null,
+				'closed_at'  => null,
+			)
+		);
+
+		if ( ! $done ) {
+			return new \WP_Error(
+				'automlp_retry_failed',
+				__( 'That job could not be added back to the queue.', 'wpml-translation-check' ),
+				array( 'status' => 500 )
+			);
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'retried' => true,
+				'job'     => self::shape( Queue_Table::get( $job_id ) ),
+			),
+			200
+		);
+	}
+
+	/**
 	 * Drain the queue immediately.
 	 *
 	 * Useful when WP-Cron is disabled or a site owner is impatient.
@@ -338,6 +442,25 @@ class Queue_Route {
 			),
 			200
 		);
+	}
+
+	/**
+	 * Normalise a provider slug from the request.
+	 *
+	 * The picker sends keys like 'openai_ai'; the gateway wants 'openai'.
+	 * Anything unrecognised falls back to empty, which lets the gateway pick.
+	 *
+	 * @param mixed $provider Raw value.
+	 * @return string
+	 */
+	private static function clean_provider( $provider ) {
+		if ( ! is_string( $provider ) || '' === $provider ) {
+			return '';
+		}
+
+		$slug = sanitize_key( str_replace( '_ai', '', $provider ) );
+
+		return in_array( $slug, array( 'openai', 'google' ), true ) ? $slug : '';
 	}
 
 	/**
