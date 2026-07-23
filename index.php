@@ -369,6 +369,10 @@ final class AUTOMLP_Ai_Translate_Addon {
 			'admin/class-automlp_ai_dashboard.php',
 			'admin/cpt_dashboard/cpt_dashboard.php',
 			'includes/wizard/load.php',
+			'includes/queue/class-queue-table.php',
+			'includes/queue/class-dispatcher.php',
+			'includes/providers/class-prompt-builder.php',
+			'includes/providers/class-ai-gateway.php',
 		);
 
 		foreach ( $files as $file ) {
