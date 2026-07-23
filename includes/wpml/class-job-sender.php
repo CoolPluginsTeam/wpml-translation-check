@@ -37,9 +37,10 @@ class Job_Sender {
 	 * @param int    $post_id   Source post id.
 	 * @param string $to_lang   Target language code.
 	 * @param string $from_lang Source language code. Detected when empty.
+	 * @param string $provider  Provider slug. Empty lets the gateway choose.
 	 * @return true|\WP_Error
 	 */
-	public static function send_post( $post_id, $to_lang, $from_lang = '' ) {
+	public static function send_post( $post_id, $to_lang, $from_lang = '', $provider = '' ) {
 		$post_id = absint( $post_id );
 		$to_lang = sanitize_text_field( $to_lang );
 
@@ -76,6 +77,7 @@ class Job_Sender {
 		}
 
 		self::flag_build();
+		self::remember_provider( $provider );
 
 		try {
 			$element = new \WPML_TM_Translation_Batch_Element(
@@ -104,10 +106,11 @@ class Job_Sender {
 	 * Queue several posts across several languages.
 	 *
 	 * @param array $post_ids Source post ids.
-	 * @param array $langs    Target language codes.
+	 * @param array  $langs    Target language codes.
+	 * @param string $provider Provider slug. Empty lets the gateway choose.
 	 * @return array{queued:int,skipped:int,errors:array<string,string>}
 	 */
-	public static function send_posts( array $post_ids, array $langs ) {
+	public static function send_posts( array $post_ids, array $langs, $provider = '' ) {
 		$queued  = 0;
 		$skipped = 0;
 		$errors  = array();
@@ -126,7 +129,7 @@ class Job_Sender {
 					continue;
 				}
 
-				$sent = self::send_post( $post_id, $to_lang, $from_lang );
+				$sent = self::send_post( $post_id, $to_lang, $from_lang, $provider );
 
 				if ( is_wp_error( $sent ) ) {
 					$errors[ $post_id . '_' . $to_lang ] = $sent->get_error_message();
@@ -153,9 +156,10 @@ class Job_Sender {
 	 * @param array  $string_ids String ids.
 	 * @param string $to_lang    Target language code.
 	 * @param string $from_lang  Source language code.
+	 * @param string $provider   Provider slug. Empty lets the gateway choose.
 	 * @return true|\WP_Error
 	 */
-	public static function send_strings( array $string_ids, $to_lang, $from_lang = '' ) {
+	public static function send_strings( array $string_ids, $to_lang, $from_lang = '', $provider = '' ) {
 		$string_ids = array_values( array_filter( array_map( 'absint', $string_ids ) ) );
 		$to_lang    = sanitize_text_field( $to_lang );
 
@@ -182,6 +186,7 @@ class Job_Sender {
 		}
 
 		self::flag_build();
+		self::remember_provider( $provider );
 
 		try {
 			$elements = array();
@@ -215,6 +220,37 @@ class Job_Sender {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Record the requested provider for the jobs about to be created.
+	 *
+	 * Job_Listener reads this while capturing, so the user's choice in the
+	 * picker survives into the queue row.
+	 *
+	 * @param string $provider Provider slug.
+	 * @return void
+	 */
+	private static function remember_provider( $provider ) {
+		$slug = is_string( $provider ) ? sanitize_key( $provider ) : '';
+
+		if ( '' === $slug ) {
+			delete_transient( 'automlp_pending_provider' );
+			return;
+		}
+
+		set_transient( 'automlp_pending_provider', $slug, 5 * MINUTE_IN_SECONDS );
+	}
+
+	/**
+	 * Provider requested for the batch currently being created.
+	 *
+	 * @return string
+	 */
+	public static function requested_provider() {
+		$slug = get_transient( 'automlp_pending_provider' );
+
+		return is_string( $slug ) ? $slug : '';
 	}
 
 	/**
