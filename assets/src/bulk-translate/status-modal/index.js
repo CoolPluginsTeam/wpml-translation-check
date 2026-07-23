@@ -1,47 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { bulkTranslateEntries, initBulkTranslate } from '../bulk-translate';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectTranslatePostInfo, selectProgressStatus, selectCountInfo, selectPendingPosts, selectServiceProvider, selectErrorPostsInfo, selectTargetLanguages } from '../redux-store/features/selectors';
 import { __, sprintf } from '@wordpress/i18n';
 import ErrorModalBox from '../components/error-modal-box';
-import AIService from '../components/translate-provider/ai-services';
 import { store } from '../redux-store/store';
 import DOMPurify from 'dompurify';
-import LoopCallback from '../components/loop-callback';
-import { updatePendingPosts, updateCountInfo, updateTranslatePostInfo, unsetPendingPost } from '../redux-store/features/actions';
+import { updatePendingPosts, updateCountInfo, updateTranslatePostInfo, unsetPendingPost, updateProgressStatus } from '../redux-store/features/actions';
 
-import { queuePosts, pollUntilDone, summarise } from '../../shared/queue-client';
-
-const { queued, skipped, errors, jobs } = await queuePosts(postIds, selectedLanguages);
-
-if (!queued) {
-	setMessage(skipped ? alreadyTranslatedMessage : firstError(errors));
-	return;
-}
-
-const jobIds = jobs.map((job) => job.job_id);
-
-await pollUntilDone({
-	jobIds,
-	shouldStop: () => modalClosed,
-	onUpdate: (status) => {
-		const { percent } = summarise(status);
-		storeDispatch(updateProgressStatus(percent));
-		status.jobs.forEach((job) => {
-			storeDispatch(updateTranslatePostInfo({
-				[`${job.source_id}_${job.to_lang}`]: {
-					status: job.state,
-					messageClass: stateClass(job.state),
-					targetPostId: job.result_id,
-					targetPostTitle: job.result_title,
-					postLink: job.view_link,
-					postEditLink: job.edit_link,
-					errorMessage: job.error,
-				},
-			}));
-		});
-	},
-});
+import { queuePosts, pollUntilDone, summarise, retryJob } from '../../shared/queue-client';
 
 const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
@@ -50,7 +16,6 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     const [errorModal, setErrorModal] = useState(false);
     const [errorModalData, setErrorModalData] = useState(false);
     const translatePostInfo = useSelector(selectTranslatePostInfo);
-    const [destroyHandlers, setDestroyHandlers] = useState([]);
     const errorPostsInfo = useSelector(selectErrorPostsInfo);
     const pendingPosts = useSelector(selectPendingPosts);
     const serviceProvider = useSelector(selectServiceProvider);
@@ -62,91 +27,149 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     progressStatus = progressStatus.toFixed(1);
     progressStatus = Math.min(progressStatus, 100);
 
+    /**
+     * Map a server job state onto the status strings the JSX already renders.
+     */
+    const mapState = (state) => ({
+        waiting: 'in-queue',
+        claimed: 'running',
+        sent: 'running',
+        writing: 'in-progress',
+        done: 'completed',
+        failed: 'error',
+        stopped: 'error',
+    }[state] || 'pending');
+
+    const mapClass = (state) => ({
+        done: 'success',
+        failed: 'error',
+        stopped: 'error',
+        waiting: 'warning',
+    }[state] || 'in-progress');
+
+    /**
+     * Push one poll payload into the store.
+     *
+     * Reads progress from the store rather than the render-scoped variable so
+     * repeated polls do not compound a stale value.
+     */
+    const applyStatus = (status) => {
+        if (!status || !Array.isArray(status.jobs)) {
+            return;
+        }
+
+        let translated = 0;
+
+        status.jobs.forEach(job => {
+            const key = `${job.source_id}_${job.to_lang}`;
+
+            const update = {
+                status: mapState(job.state),
+                messageClass: mapClass(job.state),
+            };
+
+            if (job.state === 'done') {
+                translated++;
+                update.targetPostId = job.result_id;
+                update.targetPostTitle = job.result_title || __('N/A', 'wpml-translation-check');
+                update.postLink = job.view_link;
+                update.postEditLink = job.edit_link;
+            }
+
+            if (job.state === 'failed' || job.state === 'stopped') {
+                update.errorMessage = __('Translation failed.', 'wpml-translation-check');
+                update.errorHtml = `<div class="automlp-wpml-error-html">${job.error || ''}</div>`;
+                update.jobId = job.job_id;
+                update.aiError = job.state === 'failed';
+                update.parentPostId = job.source_id;
+                update.targetLanguage = job.to_lang;
+            }
+
+            if (job.closed) {
+                storeDispatch(unsetPendingPost(key));
+            }
+
+            storeDispatch(updateTranslatePostInfo({ [key]: update }));
+        });
+
+        const { percent } = summarise(status);
+        const current = store.getState().progressStatus || 0;
+
+        storeDispatch(updateProgressStatus(percent - current));
+        storeDispatch(updateCountInfo({ postsTranslated: translated }));
+    };
+
     useEffect(() => {
-        let postFound = false;
-        const postIdExist = new Array();
-
-        const translatePosts = async (pendingPostsInfo) => {
-
-            const processPostIds = async (postId, index) => {
-
-                if(!pendingPostsInfo[postId]?.languages || pendingPostsInfo[postId]?.languages?.length < 1) {
-                    return;
-                }
-
-                const response = await bulkTranslateEntries({ ids: [postId], langs: pendingPostsInfo[postId].languages, storeDispatch });
-
-                if (!response.success && response.message && !postFound) {
-                    pendingPostsInfo[postId].languages.forEach(lang => {
-                        storeDispatch(unsetPendingPost(postId + '_' + lang));
-                        storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { status: 'error', messageClass: 'error', errorHtml: response.message } }));
-                    });
-                    setEmptyPostMessage(response.message);
-                    if(index === Object.keys(pendingPostsInfo).length - 1 && progressStatus <= 0) {
-                        setProgressBarVisibility(false);
-                    }
-                    return;
-                }
-
-                postFound = true;
-                await initBulkTranslate(response.postKeys, response.nonce, storeDispatch, prefix, updateDestoryHandler);
-            }
-
-            await LoopCallback({ callback: processPostIds, loop: Object.keys(pendingPostsInfo), index: 0 });
-        }
-
-        const initBulkTranslation = async () => {
-            const sendRequest = async () => {
-                const response = await fetch(automlp_wpml_bulk_translate_object.bulkTranslateRouteUrl + '/automlp_wpmlp/pending-posts-ids', {
-                    method: 'POST',
-                    body: new URLSearchParams({ ids: JSON.stringify(postIds), lang: JSON.stringify(selectedLanguages), privateKey: automlp_wpml_bulk_translate_object.pendingPostsIdsKey }),
-                    headers: {
-                        'X-WP-Nonce': automlp_wpml_bulk_translate_object.nonce,
-                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                const responseData = await response.json();
-
-                if (responseData && responseData.success && responseData.data) {
-
-                    Object.keys(responseData.data).forEach(postId => {
-                        const langauges = responseData.data[postId].languages;
-                        const parentPostTitle = responseData.data[postId].title;
-
-                        if (langauges && langauges.length > 0) {
-                            langauges.forEach(lang => {
-                                const flagUrl = automlp_wpml_bulk_translate_object.languageObject[lang].flag;
-                                const languageName = automlp_wpml_bulk_translate_object.languageObject[lang].name;
-
-                                let firstPostLanguage = false;
-                                if (!postIdExist.includes(postId)) {
-                                    postIdExist.push(postId);
-                                    firstPostLanguage = true;
-                                }
-
-                                storeDispatch(updatePendingPosts([postId + '_' + lang]));
-                                storeDispatch(updateTranslatePostInfo({ [postId + '_' + lang]: { parentPostId: postId, targetPostId: null, targetLanguage: lang, postLink: null, status: 'in-queue', parentPostTitle, firstPostLanguage, flagUrl, languageName, messageClass: 'warning' } }));
-                            });
-
-                            storeDispatch(updateCountInfo({ totalPosts: store.getState().countInfo.totalPosts + langauges.length }));
-                        }
-
-                    });
-
+        let cancelled = false;
+    
+        const run = async () => {
+            try {
+                const { queued, skipped, errors, jobs } = await queuePosts(postIds, selectedLanguages, serviceProvider);
+    
+                if (!queued) {
+                    setEmptyPostMessage(
+                        skipped
+                            ? sprintf(
+                                  __('Translations already exist for all selected %s in the chosen languages.', 'wpml-translation-check'),
+                                  automlp_wpml_bulk_translate_object.post_label
+                              )
+                            : Object.values(errors)[0] || __('Nothing could be queued.', 'wpml-translation-check')
+                    );
                     setIsLoading(false);
-                    await translatePosts(responseData.data);
-
-                    storeDispatch(updateCountInfo({ endTime: new Date().getTime() }));
-                } else {
-                    setEmptyPostMessage(response.message);
+                    setProgressBarVisibility(false);
+                    return;
                 }
+    
+                // Seed the store so rows appear immediately, before the first poll.
+                const seen = [];
+    
+                jobs.forEach(job => {
+                    const key = `${job.source_id}_${job.to_lang}`;
+                    const lang = automlp_wpml_bulk_translate_object.languageObject[job.to_lang] || {};
+    
+                    const firstPostLanguage = !seen.includes(job.source_id);
+                    if (firstPostLanguage) seen.push(job.source_id);
+    
+                    storeDispatch(updatePendingPosts([key]));
+                    storeDispatch(updateTranslatePostInfo({
+                        [key]: {
+                            jobId: job.job_id,
+                            parentPostId: job.source_id,
+                            parentPostTitle: job.source_title,
+                            targetPostId: null,
+                            targetLanguage: job.to_lang,
+                            postLink: null,
+                            status: 'in-queue',
+                            messageClass: 'warning',
+                            firstPostLanguage,
+                            flagUrl: lang.flag,
+                            languageName: lang.name,
+                        },
+                    }));
+                });
+    
+                storeDispatch(updateCountInfo({ totalPosts: jobs.length }));
+                setIsLoading(false);
+    
+                await pollUntilDone({
+                    jobIds: jobs.map(job => job.job_id),
+                    shouldStop: () => cancelled,
+                    onUpdate: applyStatus,
+                });
+    
+                storeDispatch(updateCountInfo({ endTime: new Date().getTime() }));
+            } catch (error) {
+                setEmptyPostMessage(error.message);
+                setIsLoading(false);
+                setProgressBarVisibility(false);
             }
-            await sendRequest();
-        }
-
-        initBulkTranslation();
+        };
+    
+        run();
+    
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     const handleErrorModal = (data) => {
@@ -159,15 +182,12 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         setErrorModalData(false);
     }
 
-    const updateDestoryHandler = (callback) => {
-        setDestroyHandlers(prev => [...prev, callback]);
-    }
-
     const onModalClose = (e) => {
-        destroyHandlers.forEach(callback => typeof callback === 'function' && callback());
+        // Closing stops polling only. Queued translations keep running on the
+        // server, so there is nothing to abort here.
         onDestory(e);
 
-        if (countInfo.postsTranslated > 0 && !pendingPosts.length && !progressBarVisibility) {
+        if (countInfo.postsTranslated > 0 && !pendingPosts.length) {
             const reloadUrl = getTranslatedPostLink();
             window.location.href = reloadUrl;
         }
@@ -253,14 +273,48 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         }
     }, [pendingPosts]);
 
-    const AIErrorBtnHandler = (e) => {
-        const type = {
-            'translateAgain': AIService.translateAgain,
-            'continue': AIService.translateComplete
+    const AIErrorBtnHandler = async (e) => {
+        const btnType = e.target.dataset.status;
+
+        // "Continue" no longer skips anything: whatever succeeded was already
+        // saved, so the only action left is to close the dialog.
+        if (btnType !== 'translateAgain') {
+            closeErrorModal();
+            return;
         }
 
-        const btnType = e.target.dataset.status;
-        type[btnType]({ postId: errorModalData.parentPostId, targetLang: errorModalData.targetLanguage, storeDispatch, prefix, updateDestoryHandler, nonce: errorModalData.nonce, closeErrorModal, completedStrings: errorModalData.completedStrings, totalPosts: errorModalData.totalPosts });
+        const jobId = errorModalData.jobId;
+
+        closeErrorModal();
+
+        if (!jobId) {
+            return;
+        }
+
+        const key = `${errorModalData.parentPostId}_${errorModalData.targetLanguage}`;
+
+        storeDispatch(updatePendingPosts([key]));
+        storeDispatch(updateTranslatePostInfo({
+            [key]: { status: 'in-queue', messageClass: 'warning', errorHtml: '', errorMessage: '' },
+        }));
+
+        try {
+            await retryJob(jobId);
+
+            await pollUntilDone({
+                jobIds: [jobId],
+                onUpdate: applyStatus,
+            });
+        } catch (error) {
+            storeDispatch(updateTranslatePostInfo({
+                [key]: {
+                    status: 'error',
+                    messageClass: 'error',
+                    errorMessage: __('Translation failed.', 'wpml-translation-check'),
+                    errorHtml: `<div class="automlp-wpml-error-html">${error.message}</div>`,
+                },
+            }));
+        }
     }
 
     const getTranslatedPostLink = () => {

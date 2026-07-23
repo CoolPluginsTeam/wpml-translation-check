@@ -59,12 +59,14 @@ const request = async (path, body = null, method = 'POST') => {
  *
  * @param {number[]} postIds   Post ids.
  * @param {string[]} languages Target language codes.
+ * @param {string}   provider  Provider slug, e.g. 'openai'. Optional.
  * @return {Promise<Object>} { queued, skipped, errors, jobs }
  */
-export const queuePosts = async (postIds, languages) =>
+export const queuePosts = async (postIds, languages, provider = '') =>
 	request('/queue/posts', {
 		post_ids: postIds,
 		languages,
+		provider,
 	});
 
 /**
@@ -72,12 +74,14 @@ export const queuePosts = async (postIds, languages) =>
  *
  * @param {number[]} stringIds String ids.
  * @param {string}   language  Target language code.
+ * @param {string}   provider  Provider slug. Optional.
  * @return {Promise<Object>} { queued, jobs }
  */
-export const queueStrings = async (stringIds, language) =>
+export const queueStrings = async (stringIds, language, provider = '') =>
 	request('/queue/strings', {
 		string_ids: stringIds,
 		language,
+		provider,
 	});
 
 /**
@@ -102,6 +106,18 @@ export const fetchStatus = async (jobIds = []) => {
  * @return {Promise<Object>} { ran, counts }
  */
 export const runQueueNow = async () => request('/queue/run', {});
+
+/**
+ * Send a failed job back to the queue.
+ *
+ * Only works while the job's source content is still stored: it is cleared on
+ * completion and by pruning, so very old failures cannot be retried.
+ *
+ * @param {number} jobId Job id.
+ * @return {Promise<Object>} { retried, job }
+ */
+export const retryJob = async (jobId) =>
+	request('/queue/retry', { job_id: jobId });
 
 /**
  * Poll until every job closes.
@@ -211,6 +227,7 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export default {
 	queuePosts,
+	retryJob,
 	queueStrings,
 	fetchStatus,
 	runQueueNow,
