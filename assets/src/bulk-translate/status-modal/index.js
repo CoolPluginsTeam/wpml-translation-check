@@ -10,6 +10,39 @@ import DOMPurify from 'dompurify';
 import LoopCallback from '../components/loop-callback';
 import { updatePendingPosts, updateCountInfo, updateTranslatePostInfo, unsetPendingPost } from '../redux-store/features/actions';
 
+import { queuePosts, pollUntilDone, summarise } from '../../shared/queue-client';
+
+const { queued, skipped, errors, jobs } = await queuePosts(postIds, selectedLanguages);
+
+if (!queued) {
+	setMessage(skipped ? alreadyTranslatedMessage : firstError(errors));
+	return;
+}
+
+const jobIds = jobs.map((job) => job.job_id);
+
+await pollUntilDone({
+	jobIds,
+	shouldStop: () => modalClosed,
+	onUpdate: (status) => {
+		const { percent } = summarise(status);
+		storeDispatch(updateProgressStatus(percent));
+		status.jobs.forEach((job) => {
+			storeDispatch(updateTranslatePostInfo({
+				[`${job.source_id}_${job.to_lang}`]: {
+					status: job.state,
+					messageClass: stateClass(job.state),
+					targetPostId: job.result_id,
+					targetPostTitle: job.result_title,
+					postLink: job.view_link,
+					postEditLink: job.edit_link,
+					errorMessage: job.error,
+				},
+			}));
+		});
+	},
+});
+
 const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
     const storeDispatch = useDispatch();

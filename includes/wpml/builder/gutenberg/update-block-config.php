@@ -542,29 +542,4 @@ class Update_Block_Config {
 			$append_data[ $key ] = $value;
 		}
 	}
-
-	final public function get_custom_attributes_translations( int $post_id, array $translation_package, array $translated_strings_texts ): array {
-		$attr_translations = array();
-
-		$custom_blocks_config = self::get_instance()->get_custom_blocks_config();
-
-		$source_post    = get_post( $post_id );
-		$source_content = $source_post->post_content;
-		$parse_blocks   = parse_blocks( $source_content );
-
-		foreach ( $parse_blocks as &$block ) {
-			$block_name = $block['blockName'];
-			if ( isset( $custom_blocks_config[ $block_name ] ) ) {
-				$this->set_block_translatables_attributes( $block, $custom_blocks_config, $translation_package, $attr_translations, $translated_strings_texts );
-			}
-
-			if ( isset( $block['innerBlocks'] ) && ! empty( $block['innerBlocks'] ) ) {
-				foreach ( $block['innerBlocks'] as &$inner_block ) {
-					$this->set_block_translatables_attributes( $inner_block, $custom_blocks_config, $translation_package, $attr_translations, $translated_strings_texts );
-				}
-			}
-		}
-
-		return $attr_translations;
-	}
 }

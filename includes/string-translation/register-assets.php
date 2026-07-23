@@ -31,6 +31,7 @@ class Register_Assets {
 		$available_ai_services     = array();
 		$automlp_active_providers = get_option('automlp_enabled_providers', array('google', 'openai'));
 
+
 		// Enqueue translation dashboard/post list scripts.
 			if ( $needs_ai_services ) {
 				// Build from saved credentials so button shows "Add API Key" when key is missing/empty.
@@ -119,7 +120,7 @@ class Register_Assets {
 						'languageObject'         => $lang_object,
 						'selected_language_object' => $selected_lang_object,
 						'ajax_url'               => esc_url( admin_url( 'admin-ajax.php' ) ),  
-						'nonce'                  => wp_create_nonce('automlp_wpml_auto_translate_nonce'),
+						'nonce'                  => wp_create_nonce('wp_rest'),
 						'default_language_slug'  => $default_language,
 						'update_translate_data'   => 'automlp_wpml_update_translate_data',     
 						'update_translate_data_nonce' => wp_create_nonce( 'automlp_wpml_update_translate_data' ), 
@@ -133,6 +134,8 @@ class Register_Assets {
 						'ai_translate_route_nonce' => wp_create_nonce('wp_rest'),
 						'ai_translate_nonce' => wp_create_nonce('automlp_wpml_ai_translate_nonce'),
 						'get_glossary_validate' => wp_create_nonce('automlp_wpml_get_glossary_private'),
+						'queueRouteUrl'    => get_rest_url( null, 'automlp/v1' ),
+						'backgroundFlow'   => \AUTOMLP_WPML\Includes\Wpml\Background_Flow::enabled(),
 					)
 				);
 			}

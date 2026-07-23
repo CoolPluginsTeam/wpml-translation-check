@@ -83,6 +83,10 @@ final class AUTOMLP_Ai_Translate_Addon {
 			}
 
 	public function register_ai_client() {
+		if ( version_compare( get_option( 'AUTOMLP_AI_VERSION', '0' ), '1.3.0', '<' ) ) {
+			\AUTOMLP_WPML\Includes\Wpml\Legacy_Bridge::purge_legacy_meta();
+		}
+
 		$is_wp70 = function_exists( 'wp_ai_client_prompt' );
 		if ( ! $is_wp70 ) {
 			$sdk_autoload = AUTOMLP_AI_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
@@ -351,13 +355,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 	private function load_dependencies() {
 		$files = array(
 			'helper/helper.php',
-			'includes/helper/sanitized-content.php',
 			'includes/wpml/builder/gutenberg/update-block-config.php',
-			'includes/wpml/get-package-content.php',
-			'includes/wpml/builder/content-update-base.php',
-			'includes/wpml/builder/elementor/elementor-update.php',
-			'includes/wpml/builder/gutenberg/gutenberg-update.php',
-			'includes/wpml/create-translated-post.php',
 			'includes/bulk-translation/bulk-translation.php',
 			'includes/string-translation/string-translation.php',
 			'includes/bulk-translation/register-assets.php',
@@ -377,7 +375,9 @@ final class AUTOMLP_Ai_Translate_Addon {
 			'includes/wpml/class-writer.php',
 			'includes/wpml/class-job-listener.php',
 			'includes/wpml/class-job-sender.php',
-			'includes/wpml/class-background-flow.php'
+			'includes/wpml/class-background-flow.php',
+			'includes/routes/class-queue-route.php',
+			'includes/wpml/class-legacy-bridge.php',
 		);
 
 		foreach ( $files as $file ) {
@@ -407,6 +407,8 @@ final class AUTOMLP_Ai_Translate_Addon {
 
 		\AUTOMLP_WPML\Includes\Queue\Dispatcher::boot();
 		\AUTOMLP_WPML\Includes\Wpml\Background_Flow::boot();
+		\AUTOMLP_WPML\Includes\Routes\Queue_Route::boot();
+		\AUTOMLP_WPML\Includes\Wpml\Legacy_Bridge::boot();
 		add_action( 'init', array( '\AUTOMLP_WPML\Includes\Queue\Queue_Table', 'maybe_upgrade' ), 5 );
 
 

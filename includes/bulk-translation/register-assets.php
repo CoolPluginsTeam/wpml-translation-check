@@ -175,6 +175,8 @@ class Register_Assets {
 					'AIRequestBatchSize'         => $ai_batch_size,
 					'automlp_wpml_glossary_nonce' => wp_create_nonce( 'automlp_wpml_glossary_nonce' ),
 					'default_language_slug'      => $default_language_slug,
+					'queueRouteUrl'    => get_rest_url( null, 'automlp/v1' ),
+					'backgroundFlow'   => \AUTOMLP_WPML\Includes\Wpml\Background_Flow::enabled(),
 				),
 				$extra_data
 			)
