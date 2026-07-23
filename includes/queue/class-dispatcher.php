@@ -140,7 +140,7 @@ class Dispatcher {
 			return;
 		}
 
-		$gateway = new AI_Gateway();
+		$gateways = array();
 
 		foreach ( $jobs as $job ) {
 			// Another process may have taken this row between the read and now.
@@ -148,7 +148,15 @@ class Dispatcher {
 				continue;
 			}
 
-			self::handle_job( $job, $gateway );
+			// Honour the provider chosen when the job was queued, falling back
+			// to whichever provider is configured.
+			$slug = isset( $job['provider'] ) ? (string) $job['provider'] : '';
+
+			if ( ! isset( $gateways[ $slug ] ) ) {
+				$gateways[ $slug ] = new AI_Gateway( $slug );
+			}
+
+			self::handle_job( $job, $gateways[ $slug ] );
 		}
 	}
 
