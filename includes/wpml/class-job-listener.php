@@ -144,6 +144,7 @@ class Job_Listener {
 				'to_lang'     => $to_lang,
 				'field_count' => count( $source_map ),
 				'char_count'  => $chars,
+				'provider'    => Job_Sender::requested_provider(),
 				'source_map'  => $source_map,
 			)
 		);
