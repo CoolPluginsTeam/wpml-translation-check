@@ -7,8 +7,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use WPML_AT_Helper;
-use AUTOMLP_WPML\Includes\Wpml\Get_Package_Content;
-use AUTOMLP_WPML\Includes\Wpml\Create_Translated_Post;
 
 if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 	/**
