@@ -373,6 +373,11 @@ final class AUTOMLP_Ai_Translate_Addon {
 			'includes/queue/class-dispatcher.php',
 			'includes/providers/class-prompt-builder.php',
 			'includes/providers/class-ai-gateway.php',
+			'includes/wpml/class-bot-translator.php',
+			'includes/wpml/class-writer.php',
+			'includes/wpml/class-job-listener.php',
+			'includes/wpml/class-job-sender.php',
+			'includes/wpml/class-background-flow.php'
 		);
 
 		foreach ( $files as $file ) {
@@ -399,6 +404,12 @@ final class AUTOMLP_Ai_Translate_Addon {
 			return;
 		}
 		$this->load_dependencies();
+
+		\AUTOMLP_WPML\Includes\Queue\Dispatcher::boot();
+		\AUTOMLP_WPML\Includes\Wpml\Background_Flow::boot();
+		add_action( 'init', array( '\AUTOMLP_WPML\Includes\Queue\Queue_Table', 'maybe_upgrade' ), 5 );
+
+
 		add_filter(
 			'plugin_action_links_' . AUTOMLP_AI_PLUGIN_BASENAME,
 			array( $this, 'add_settings_action_link' )
@@ -589,6 +600,11 @@ register_activation_hook( __FILE__, 'automlp_ai_on_activation' );
 register_deactivation_hook( __FILE__, 'automlp_ai_on_deactivation' );
 
 function automlp_ai_on_activation() {
+	if ( ! class_exists( '\AUTOMLP_WPML\Includes\Queue\Queue_Table' ) ) {
+		require_once AUTOMLP_AI_PLUGIN_DIR . 'includes/queue/class-queue-table.php';
+	}
+	\AUTOMLP_WPML\Includes\Queue\Queue_Table::install();
+
     // 1) Run the existing wizard activation.
 	if ( class_exists( '\AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard' ) ) {
 		\AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard::start_wizard( false );
@@ -605,6 +621,9 @@ function automlp_ai_on_activation() {
 
 function automlp_ai_on_deactivation() {
     wp_clear_scheduled_hook('automlp_extra_data_update');
+	if ( class_exists( '\AUTOMLP_WPML\Includes\Queue\Dispatcher' ) ) {
+    	\AUTOMLP_WPML\Includes\Queue\Dispatcher::unschedule();
+	}
 }
 
 

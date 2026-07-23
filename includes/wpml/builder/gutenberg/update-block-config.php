@@ -322,7 +322,9 @@ class Update_Block_Config {
 	}
 
 	public function is_content_update() {
-		return ( defined( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) ) || ( defined( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) );
+		return ( defined( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) )
+			|| ( defined( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) )
+			|| ( defined( 'DOING_AUTOMLP_WPML_JOB_BUILD' ) && true === constant( 'DOING_AUTOMLP_WPML_JOB_BUILD' ) );
 	}
 
 	public function get_update_block_config() {
