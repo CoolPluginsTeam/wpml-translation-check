@@ -1,0 +1,281 @@
+/**
+ * Queue history screen.
+ *
+ * Deliberately built on WordPress admin conventions rather than a separate
+ * visual identity: this screen sits inside wp-admin and its job is to make job
+ * state readable at a glance. The only strong signal is the status colour.
+ */
+
+.automlp-queue {
+    width: 100%;
+    margin-top: 25px;
+    flex: 2;
+}
+
+/* Summary cards -------------------------------------------------------- */
+
+.automlp-queue__stats {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.automlp-queue__stat {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 16px 18px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-left-width: 4px;
+	border-radius: 4px;
+	text-decoration: none;
+	color: inherit;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.automlp-queue__stat:hover,
+.automlp-queue__stat:focus {
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+	color: inherit;
+}
+
+.automlp-queue__stat:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 1px;
+}
+
+.automlp-queue__stat.is-running {
+	border-left-color: #2271b1;
+}
+
+.automlp-queue__stat.is-done {
+	border-left-color: #00a32a;
+}
+
+.automlp-queue__stat.is-failed {
+	border-left-color: #d63638;
+}
+
+.automlp-queue__stat.is-stopped {
+	border-left-color: #8c8f94;
+}
+
+.automlp-queue__stat-value {
+	font-size: 26px;
+	font-weight: 600;
+	line-height: 1.1;
+	font-variant-numeric: tabular-nums;
+}
+
+.automlp-queue__stat-label {
+	font-size: 12px;
+	color: #50575e;
+}
+
+/* Toolbar -------------------------------------------------------------- */
+
+.automlp-queue__toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 12px;
+}
+
+.automlp-queue__filters {
+	display: flex;
+	gap: 4px;
+}
+
+.automlp-queue__filters a {
+	padding: 5px 12px;
+	border-radius: 3px;
+	text-decoration: none;
+	color: #2271b1;
+	font-size: 13px;
+}
+
+.automlp-queue__filters a:hover {
+	background: #f0f0f1;
+}
+
+.automlp-queue__filters a.is-active {
+	background: #2271b1;
+	color: #fff;
+}
+
+.automlp-queue__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+
+.automlp-queue__actions form {
+	margin: 0;
+}
+
+/* Table ---------------------------------------------------------------- */
+
+.automlp-queue__table {
+	margin-top: 0;
+}
+
+.automlp-queue__table .col-language {
+	width: 140px;
+}
+
+.automlp-queue__table .col-status {
+	width: 160px;
+}
+
+.automlp-queue__table .col-queued {
+	width: 130px;
+}
+
+.automlp-queue__table .col-actions {
+	width: 160px;
+}
+
+.automlp-queue__table td {
+	vertical-align: middle;
+}
+
+.automlp-queue__kind {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 1px 6px;
+	background: #f0f0f1;
+	border-radius: 2px;
+	font-size: 11px;
+	color: #50575e;
+}
+
+.automlp-queue__error {
+	margin-top: 6px;
+	padding: 6px 8px;
+	background: #fcf0f1;
+	border-left: 3px solid #d63638;
+	font-size: 12px;
+	line-height: 1.5;
+	color: #50575e;
+	word-break: break-word;
+}
+
+/* Status pills --------------------------------------------------------- */
+
+.automlp-queue__pill {
+	display: inline-block;
+	padding: 3px 10px;
+	border-radius: 11px;
+	font-size: 12px;
+	font-weight: 500;
+	line-height: 1.5;
+	white-space: nowrap;
+}
+
+.automlp-queue__pill.is-waiting {
+	background: #f0f0f1;
+	color: #50575e;
+}
+
+.automlp-queue__pill.is-running {
+	background: #e5f1f8;
+	color: #0a4b78;
+}
+
+.automlp-queue__pill.is-done {
+	background: #edfaef;
+	color: #005c1f;
+}
+
+.automlp-queue__pill.is-failed {
+	background: #fcf0f1;
+	color: #8a2424;
+}
+
+.automlp-queue__pill.is-stopped {
+	background: #f0f0f1;
+	color: #646970;
+}
+
+.automlp-queue__attempts {
+	display: block;
+	margin-top: 3px;
+	font-size: 11px;
+	color: #646970;
+}
+
+/* Actions column ------------------------------------------------------- */
+
+.automlp-queue__inline-form {
+	display: inline-block;
+	margin: 0 0 0 4px;
+}
+
+/* Empty state ---------------------------------------------------------- */
+
+.automlp-queue__empty {
+	padding: 40px 24px;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	text-align: center;
+}
+
+.automlp-queue__empty p {
+	margin: 0 0 6px;
+	color: #50575e;
+}
+
+.automlp-queue__empty p:last-child {
+	margin-bottom: 0;
+}
+
+/* Footer note ---------------------------------------------------------- */
+
+.automlp-queue__refresh-note {
+	margin-top: 14px;
+	font-size: 12px;
+	color: #646970;
+	font-style: italic;
+}
+
+/* Tab badge ------------------------------------------------------------ */
+
+.automlp-queue-badge {
+	display: inline-block;
+	min-width: 17px;
+	margin-left: 5px;
+	padding: 1px 6px;
+	background: #d63638;
+	border-radius: 9px;
+	color: #fff;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.6;
+	text-align: center;
+}
+
+/* Narrow screens ------------------------------------------------------- */
+
+@media screen and (max-width: 782px) {
+	.automlp-queue__toolbar {
+		flex-direction: column;
+		align-items: stretch;
+	}
+
+	.automlp-queue__table .col-language,
+	.automlp-queue__table .col-queued {
+		display: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.automlp-queue__stat {
+		transition: none;
+	}
+}

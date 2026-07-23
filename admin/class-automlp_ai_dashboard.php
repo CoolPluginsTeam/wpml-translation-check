@@ -228,11 +228,14 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 			// - admin/automlp-ai-dashboard/views/footer.php
 			$file_prefix = 'admin/automlp-ai-dashboard/views/';
 
-			$valid_tabs = array(
-				'dashboard'       => __( 'Dashboard', 'wpml-translation-check' ),
-				'settings'        => __( 'Settings', 'wpml-translation-check' ),
-				'license'         => __( 'License', 'wpml-translation-check' ),
-				'free-vs-pro'     => __( 'Free vs Pro', 'wpml-translation-check' ),
+			$valid_tabs = apply_filters(
+				'automlp_dashboard_tabs',
+				array(
+					'dashboard'   => __( 'Dashboard', 'wpml-translation-check' ),
+					'settings'    => __( 'Settings', 'wpml-translation-check' ),
+					'license'     => __( 'License', 'wpml-translation-check' ),
+					'free-vs-pro' => __( 'Free vs Pro', 'wpml-translation-check' ),
+				)
 			);
 
 			// phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -272,6 +275,11 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 					<?php
 					// Main tab content.
 					$view_file = AUTOMLP_AI_PLUGIN_DIR . $file_prefix . $current_tab . '.php';
+
+					if ( 'queue' === $current_tab ) {
+						$view_file = AUTOMLP_AI_PLUGIN_DIR . 'admin/queue/view-queue.php';
+					}
+
 					if ( file_exists( $view_file ) ) {
 						require $view_file;
 					} else {

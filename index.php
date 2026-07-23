@@ -87,6 +87,10 @@ final class AUTOMLP_Ai_Translate_Addon {
 			\AUTOMLP_WPML\Includes\Wpml\Legacy_Bridge::purge_legacy_meta();
 		}
 
+		if(is_admin()){
+			\AUTOMLP_WPML\Admin\Queue_Screen::boot();
+		}
+
 		$is_wp70 = function_exists( 'wp_ai_client_prompt' );
 		if ( ! $is_wp70 ) {
 			$sdk_autoload = AUTOMLP_AI_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
@@ -378,6 +382,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 			'includes/wpml/class-background-flow.php',
 			'includes/routes/class-queue-route.php',
 			'includes/wpml/class-legacy-bridge.php',
+			'admin/queue/class-queue-screen.php'
 		);
 
 		foreach ( $files as $file ) {
@@ -409,8 +414,8 @@ final class AUTOMLP_Ai_Translate_Addon {
 		\AUTOMLP_WPML\Includes\Wpml\Background_Flow::boot();
 		\AUTOMLP_WPML\Includes\Routes\Queue_Route::boot();
 		\AUTOMLP_WPML\Includes\Wpml\Legacy_Bridge::boot();
-		add_action( 'init', array( '\AUTOMLP_WPML\Includes\Queue\Queue_Table', 'maybe_upgrade' ), 5 );
 
+		add_action( 'init', array( '\AUTOMLP_WPML\Includes\Queue\Queue_Table', 'maybe_upgrade' ), 5 );
 
 		add_filter(
 			'plugin_action_links_' . AUTOMLP_AI_PLUGIN_BASENAME,
