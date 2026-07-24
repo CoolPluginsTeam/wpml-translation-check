@@ -104,16 +104,18 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     
         const run = async () => {
             try {
-                const { queued, skipped, errors, jobs } = await queuePosts(postIds, selectedLanguages, serviceProvider);
+                const { queued, skipped, errors, jobs, message } = await queuePosts(postIds, selectedLanguages, serviceProvider);
     
                 if (!queued) {
                     setEmptyPostMessage(
-                        skipped
+                        message
+                            ? message
+                            : skipped
                             ? sprintf(
                                   __('Translations already exist for all selected %s in the chosen languages.', 'wpml-translation-check'),
                                   automlp_wpml_bulk_translate_object.post_label
                               )
-                            : Object.values(errors)[0] || __('Nothing could be queued.', 'wpml-translation-check')
+                            : Object.values(errors || {})[0] || __('Nothing could be queued.', 'wpml-translation-check')
                     );
                     setIsLoading(false);
                     setProgressBarVisibility(false);

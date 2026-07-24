@@ -226,12 +226,26 @@ class Queue_Route {
 		$skipped = Job_Listener::skipped();
 
 		if ( 0 === $result['queued'] && $result['skipped'] > 0 ) {
+			$skip_reasons = isset( $result['skip_reasons'] ) ? $result['skip_reasons'] : array();
+			$ate_skipped  = ! empty( $skip_reasons['ate_active'] ) ? (int) $skip_reasons['ate_active'] : 0;
+			$done_skipped = ! empty( $skip_reasons['already_translated'] ) ? (int) $skip_reasons['already_translated'] : 0;
+
+			if ( $ate_skipped > 0 && 0 === $done_skipped ) {
+				$message = __( 'Skipped: WPML Advanced Translation Editor already has an active job for the selected page(s) and language(s). Finish or cancel those ATE jobs first.', 'wpml-translation-check' );
+			} elseif ( $ate_skipped > 0 ) {
+				$message = __( 'Nothing was queued. Some items are already translated; others already have an active WPML Advanced Translation Editor job.', 'wpml-translation-check' );
+			} else {
+				$message = __( 'Everything selected is already translated into the chosen languages.', 'wpml-translation-check' );
+			}
+
 			return new \WP_REST_Response(
 				array(
-					'queued'  => 0,
-					'skipped' => $result['skipped'],
-					'jobs'    => array(),
-					'message' => __( 'Everything selected is already translated into the chosen languages.', 'wpml-translation-check' ),
+					'queued'       => 0,
+					'skipped'      => $result['skipped'],
+					'skip_reasons' => $skip_reasons,
+					'errors'       => isset( $result['errors'] ) ? $result['errors'] : array(),
+					'jobs'         => array(),
+					'message'      => $message,
 				),
 				200
 			);

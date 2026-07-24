@@ -72,6 +72,13 @@ class Job_Sender {
 			return new \WP_Error( 'automlp_same_language', __( 'Source and target languages are the same.', 'wpml-translation-check' ) );
 		}
 
+		if ( WPML_AT_Helper::has_open_ate_job( $post_id, $post->post_type, $to_lang ) ) {
+			return new \WP_Error(
+				'automlp_ate_in_progress',
+				__( 'WPML Advanced Translation Editor already has an active job for this page and language. Finish or cancel that job first.', 'wpml-translation-check' )
+			);
+		}
+
 		if ( ! self::classes_available() ) {
 			return new \WP_Error( 'automlp_no_wpml_tm', __( 'WPML Translation Management is not available.', 'wpml-translation-check' ) );
 		}
@@ -105,33 +112,51 @@ class Job_Sender {
 	/**
 	 * Queue several posts across several languages.
 	 *
-	 * @param array $post_ids Source post ids.
+	 * @param array  $post_ids Source post ids.
 	 * @param array  $langs    Target language codes.
 	 * @param string $provider Provider slug. Empty lets the gateway choose.
-	 * @return array{queued:int,skipped:int,errors:array<string,string>}
+	 * @return array{queued:int,skipped:int,errors:array<string,string>,skip_reasons:array<string,int>}
 	 */
 	public static function send_posts( array $post_ids, array $langs, $provider = '' ) {
-		$queued  = 0;
-		$skipped = 0;
-		$errors  = array();
+		$queued       = 0;
+		$skipped      = 0;
+		$errors       = array();
+		$skip_reasons = array(
+			'already_translated' => 0,
+			'ate_active'         => 0,
+		);
 
 		foreach ( array_map( 'absint', $post_ids ) as $post_id ) {
 			if ( ! $post_id ) {
 				continue;
 			}
 
-			$from_lang = WPML_AT_Helper::get_post_source_language( $post_id, get_post_type( $post_id ) );
+			$post_type = get_post_type( $post_id );
+			$from_lang = WPML_AT_Helper::get_post_source_language( $post_id, $post_type );
 
 			foreach ( array_map( 'sanitize_text_field', $langs ) as $to_lang ) {
 				// Already translated: nothing to do.
-				if ( WPML_AT_Helper::get_existing_translation_id( $post_id, get_post_type( $post_id ), $to_lang ) ) {
+				if ( WPML_AT_Helper::get_existing_translation_id( $post_id, $post_type, $to_lang ) ) {
 					++$skipped;
+					++$skip_reasons['already_translated'];
+					continue;
+				}
+
+				// ATE already owns this language (e.g. "+" opened ATE, gear icon, no post yet).
+				if ( WPML_AT_Helper::has_open_ate_job( $post_id, $post_type, $to_lang ) ) {
+					++$skipped;
+					++$skip_reasons['ate_active'];
+					$errors[ $post_id . '_' . $to_lang ] = __( 'Skipped: WPML Advanced Translation Editor is already active for this page and language.', 'wpml-translation-check' );
 					continue;
 				}
 
 				$sent = self::send_post( $post_id, $to_lang, $from_lang, $provider );
 
 				if ( is_wp_error( $sent ) ) {
+					if ( 'automlp_ate_in_progress' === $sent->get_error_code() ) {
+						++$skipped;
+						++$skip_reasons['ate_active'];
+					}
 					$errors[ $post_id . '_' . $to_lang ] = $sent->get_error_message();
 					continue;
 				}
@@ -141,9 +166,10 @@ class Job_Sender {
 		}
 
 		return array(
-			'queued'  => $queued,
-			'skipped' => $skipped,
-			'errors'  => $errors,
+			'queued'       => $queued,
+			'skipped'      => $skipped,
+			'errors'       => $errors,
+			'skip_reasons' => $skip_reasons,
 		);
 	}
 

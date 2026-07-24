@@ -176,6 +176,62 @@ public static function mask_api_key( $api_key ) {
 	}
 
 	/**
+	 * Whether WPML Advanced Translation Editor already owns an open job
+	 * for this source post and target language.
+	 *
+	 * Clicking "+" in the language column can create an ATE job (gear icon)
+	 * before any translated post exists. AutoMLP must not queue those.
+	 *
+	 * @param int    $post_id     Source post ID.
+	 * @param string $post_type   Post type.
+	 * @param string $target_lang Target language code.
+	 * @return bool
+	 */
+	public static function has_open_ate_job( $post_id, $post_type, $target_lang ) {
+		global $wpdb;
+
+		$post_id     = absint( $post_id );
+		$target_lang = sanitize_text_field( (string) $target_lang );
+		$post_type   = sanitize_key( (string) $post_type );
+
+		if ( ! $post_id || '' === $target_lang || '' === $post_type ) {
+			return false;
+		}
+
+		if ( ! defined( 'ICL_TM_WAITING_FOR_TRANSLATOR' ) || ! defined( 'ICL_TM_IN_PROGRESS' ) ) {
+			return false;
+		}
+
+		$element_type = apply_filters( 'wpml_element_type', $post_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$trid         = apply_filters( 'wpml_element_trid', false, $post_id, $element_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		if ( ! $trid ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$editor = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT j.editor
+				FROM {$wpdb->prefix}icl_translate_job j
+				INNER JOIN {$wpdb->prefix}icl_translation_status ts ON ts.rid = j.rid
+				INNER JOIN {$wpdb->prefix}icl_translations t ON t.translation_id = ts.translation_id
+				WHERE t.trid = %d
+					AND t.language_code = %s
+					AND ts.status IN (%d, %d)
+				ORDER BY j.job_id DESC
+				LIMIT 1",
+				(int) $trid,
+				$target_lang,
+				ICL_TM_WAITING_FOR_TRANSLATOR,
+				ICL_TM_IN_PROGRESS
+			)
+		);
+
+		return 'ate' === $editor;
+	}
+
+	/**
 	 * Bulk translation supported
 	 *
 	 * @param object $current_screen The current screen object.
