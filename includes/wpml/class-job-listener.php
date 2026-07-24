@@ -25,11 +25,29 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Job_Listener {
 
 	/**
+	 * Queue row ids created during this request.
+	 *
+	 * send_posts() reports that a WPML batch dispatched, which is not the
+	 * same as a queue row existing. Recording ids here lets the REST layer
+	 * return exactly the jobs that were created.
+	 *
+	 * @var array<int,int>
+	 */
+	private static $created = array();
+
+	/**
 	 * Field names WPML includes for bookkeeping rather than translation.
 	 *
 	 * @var array<int,string>
 	 */
 	private static $skip_suffixes = array( '-name', '-type', '-link', '-format' );
+
+	/**
+	 * Reasons jobs were skipped during this request.
+	 *
+	 * @var array<int,array{lang:string,reason:string}>
+	 */
+	private static $skipped = array();
 
 	/**
 	 * Attach hooks.
@@ -43,6 +61,48 @@ class Job_Listener {
 		add_action( 'wpml_translation_job_saved', array( __CLASS__, 'on_saved' ), 10, 2 );
 		add_action( 'wpml_tm_job_cancelled', array( __CLASS__, 'on_cancelled' ), 10, 1 );
 		add_action( 'wpml_tm_jobs_cancelled', array( __CLASS__, 'on_cancelled_many' ), 10, 1 );
+	}
+
+	/**
+	 * Forget any ids recorded earlier in this request.
+	 *
+	 * @return void
+	 */
+	public static function reset_created() {
+		self::$created = array();
+		self::$skipped = array();
+	}
+
+	/**
+	 * Record why a job was not queued.
+	 *
+	 * @param string $to_lang Target language.
+	 * @param string $reason  Human-readable reason.
+	 * @return void
+	 */
+	private static function note_skip( $to_lang, $reason ) {
+		self::$skipped[] = array(
+			'lang'   => (string) $to_lang,
+			'reason' => (string) $reason,
+		);
+	}
+
+	/**
+	 * Skips recorded since the last reset.
+	 *
+	 * @return array<int,array{lang:string,reason:string}>
+	 */
+	public static function skipped() {
+		return self::$skipped;
+	}
+
+	/**
+	 * Queue row ids created since the last reset.
+	 *
+	 * @return array<int,int>
+	 */
+	public static function created_ids() {
+		return self::$created;
 	}
 
 	/**
@@ -115,12 +175,20 @@ class Job_Listener {
 		// not just our UI.
 		if ( ! self::language_allowed( $to_lang ) ) {
 			self::cancel_wpml_job( $wpml_job_id );
+			self::note_skip(
+				$to_lang,
+				__( 'This language is not available on your plan.', 'wpml-translation-check' )
+			);
 			return;
 		}
 
 		$source_map = self::build_source_map( $job );
 
 		if ( empty( $source_map ) ) {
+			self::note_skip(
+				$to_lang,
+				__( 'WPML did not return any translatable content for this item.', 'wpml-translation-check' )
+			);
 			return;
 		}
 
@@ -134,7 +202,7 @@ class Job_Listener {
 			$chars += mb_strlen( (string) $entry['text'] );
 		}
 
-		Queue_Table::add(
+		$job_id = Queue_Table::add(
 			array(
 				'wpml_job_id' => $wpml_job_id,
 				'wpml_rid'    => isset( $job->rid ) ? (int) $job->rid : null,
@@ -148,6 +216,10 @@ class Job_Listener {
 				'source_map'  => $source_map,
 			)
 		);
+
+		if ( $job_id ) {
+			self::$created[] = (int) $job_id;
+		}
 	}
 
 	/**

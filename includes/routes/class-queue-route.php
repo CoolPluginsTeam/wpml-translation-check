@@ -14,6 +14,7 @@ namespace AUTOMLP_WPML\Includes\Routes;
 use AUTOMLP_WPML\Includes\Queue\Dispatcher;
 use AUTOMLP_WPML\Includes\Queue\Queue_Table;
 use AUTOMLP_WPML\Includes\Wpml\Job_Sender;
+use AUTOMLP_WPML\Includes\Wpml\Job_Listener;
 use WPML_AT_Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -215,13 +216,21 @@ class Queue_Route {
 
 		$provider = self::clean_provider( $request->get_param( 'provider' ) );
 
+		$provider = self::clean_provider( $request->get_param( 'provider' ) );
+
+		Job_Listener::reset_created();
+
 		$result = Job_Sender::send_posts( $post_ids, $langs, $provider );
+
+		$created = Job_Listener::created_ids();
+		$skipped = Job_Listener::skipped();
 
 		if ( 0 === $result['queued'] && $result['skipped'] > 0 ) {
 			return new \WP_REST_Response(
 				array(
 					'queued'  => 0,
 					'skipped' => $result['skipped'],
+					'jobs'    => array(),
 					'message' => __( 'Everything selected is already translated into the chosen languages.', 'wpml-translation-check' ),
 				),
 				200
@@ -239,12 +248,29 @@ class Queue_Route {
 			);
 		}
 
+		// WPML dispatched the batch but nothing reached the queue. Report the
+		// reason rather than a success the caller cannot act on.
+		if ( empty( $created ) ) {
+			$reason = ! empty( $skipped )
+				? $skipped[0]['reason']
+				: __( 'Translation jobs were created in WPML but none reached the queue. Check that the AutoMLP translator is registered under WPML, Translation Management, Translators.', 'wpml-translation-check' );
+
+			return new \WP_Error(
+				'automlp_nothing_queued',
+				$reason,
+				array(
+					'status'  => 409,
+					'skipped' => $skipped,
+				)
+			);
+		}
+
 		return new \WP_REST_Response(
 			array(
-				'queued'  => $result['queued'],
+				'queued'  => count( $created ),
 				'skipped' => $result['skipped'],
 				'errors'  => $result['errors'],
-				'jobs'    => self::recent_jobs( $result['queued'] ),
+				'jobs'    => self::jobs_by_id( $created ),
 			),
 			200
 		);
@@ -280,16 +306,32 @@ class Queue_Route {
 
 		$provider = self::clean_provider( $request->get_param( 'provider' ) );
 
+		Job_Listener::reset_created();
+
 		$sent = Job_Sender::send_strings( $string_ids, $language, '', $provider );
 
 		if ( is_wp_error( $sent ) ) {
 			return $sent;
 		}
 
+		$created = Job_Listener::created_ids();
+
+		if ( empty( $created ) ) {
+			$skipped = Job_Listener::skipped();
+
+			return new \WP_Error(
+				'automlp_nothing_queued',
+				! empty( $skipped )
+					? $skipped[0]['reason']
+					: __( 'The string batch was created in WPML but did not reach the queue.', 'wpml-translation-check' ),
+				array( 'status' => 409 )
+			);
+		}
+
 		return new \WP_REST_Response(
 			array(
-				'queued' => 1,
-				'jobs'   => self::recent_jobs( 1 ),
+				'queued' => count( $created ),
+				'jobs'   => self::jobs_by_id( $created ),
 			),
 			200
 		);
@@ -497,24 +539,30 @@ class Queue_Route {
 	}
 
 	/**
-	 * Newest N jobs, for echoing back after a queue call.
+	 * Fetch specific jobs by id, in the order given.
 	 *
-	 * @param int $count How many.
+	 * Replaces the previous "newest N rows" approach, which could return
+	 * unrelated rows or nothing at all depending on cache state.
+	 *
+	 * @param array $job_ids Queue row ids.
 	 * @return array
 	 */
-	private static function recent_jobs( $count ) {
-		if ( $count < 1 ) {
-			return array();
+	private static function jobs_by_id( array $job_ids ) {
+		$out = array();
+
+		foreach ( array_map( 'absint', $job_ids ) as $job_id ) {
+			if ( ! $job_id ) {
+				continue;
+			}
+
+			$row = Queue_Table::get( $job_id );
+
+			if ( $row ) {
+				$out[] = self::shape( $row );
+			}
 		}
 
-		$browse = Queue_Table::browse(
-			array(
-				'page'     => 1,
-				'per_page' => min( 100, $count ),
-			)
-		);
-
-		return array_map( array( __CLASS__, 'shape' ), $browse['rows'] );
+		return $out;
 	}
 
 	/**
