@@ -168,7 +168,8 @@ class Dispatcher {
 	 * @return void
 	 */
 	private static function handle_job( array $job, AI_Gateway $gateway ) {
-		$job_id = (int) $job['job_id'];
+		$job_id  = (int) $job['job_id'];
+		$started = microtime( true );
 
 		try {
 			$source_map = Queue_Table::read_source_map( $job );
@@ -226,8 +227,6 @@ class Dispatcher {
 			/**
 			 * Hand translated fields back to whatever writes them.
 			 *
-			 * Phase 2 attaches the WPML Translation Service writer here.
-			 *
 			 * @param array $translated field_name => translated text.
 			 * @param array $job        Job row.
 			 * @param array $source_map field_name => array{tid:int,text:string}.
@@ -253,13 +252,28 @@ class Dispatcher {
 
 			Queue_Table::finish( $job_id, $stats );
 
+			$job['provider'] = $gateway->provider();
+			$job['model']    = $gateway->model();
+
 			/**
 			 * Fires after a job is written successfully.
 			 *
 			 * @param int   $job_id Job id.
 			 * @param array $job    Job row.
+			 * @param array $ctx    Completion context (translated, source_map, written, time_taken, provider).
 			 */
-			do_action( 'automlp_job_completed', $job_id, $job );
+			do_action(
+				'automlp_job_completed',
+				$job_id,
+				$job,
+				array(
+					'translated' => $translated,
+					'source_map' => $source_map,
+					'written'    => is_array( $written ) ? $written : array(),
+					'time_taken' => (int) max( 0, round( microtime( true ) - $started ) ),
+					'provider'   => $gateway->provider(),
+				)
+			);
 
 		} catch ( \Throwable $e ) {
 			Queue_Table::fail( $job_id, $e->getMessage(), self::MAX_RETRIES );
