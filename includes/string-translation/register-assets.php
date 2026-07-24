@@ -70,27 +70,6 @@ class Register_Assets {
 					'flag' => isset( $selected_language['flag_url'] ) ? $selected_language['flag_url'] : '',
 				);
 			}
-			wp_localize_script(
-				'automlp-wpml-auto-translate-admin',
-				'AUTOMLP_WPML_AUTO_TRANSLATE',
-				array(
-					'ajax'      => esc_url(admin_url('admin-ajax.php')),
-					'nonce'     => wp_create_nonce('automlp_wpml_auto_translate_nonce'),
-					'languages' => $selected_language,
-					'admin_url' => esc_url(admin_url()),
-					'i18n'      => array(
-						'errorPageId'      => esc_html__('Could not detect page ID for this row.', 'wpml-translation-check'),
-						'errorNoSelection' => esc_html__('Please select at least one post to translate.', 'wpml-translation-check'),
-						'errorNoLanguage'  => esc_html__('Please select a target language.', 'wpml-translation-check'),
-						'errorInvalidData' => esc_html__('Invalid post ID or language.', 'wpml-translation-check'),
-						'errorNoStrings'   => esc_html__('No translation strings found.', 'wpml-translation-check'),
-						'errorAjax'        => esc_html__('AJAX error while loading content.', 'wpml-translation-check'),
-						'errorAjaxSave'    => esc_html__('AJAX error while saving.', 'wpml-translation-check'),
-						'errorUnknown'     => esc_html__('Unknown error occurred.', 'wpml-translation-check'),
-					),
-				)
-			);
-
 			// Enqueue bulk translate build files on string translation page.
 			if ($is_string_translation) {
 

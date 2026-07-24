@@ -114,10 +114,6 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 		return new \WP_REST_Response( array( 'success' => true ), 200 );
 	}
 
-		public function permission_only_admins( $request ) {
-			return $this->check_rest_permission( $request, 'edit_posts' );
-		}
-
 		public function permission_manage_options( $request ) {
 			return $this->check_rest_permission( $request, 'manage_options' );
 		}

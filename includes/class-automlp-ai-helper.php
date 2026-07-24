@@ -202,11 +202,7 @@ public static function mask_api_key( $api_key ) {
 		return true;
 	}
 
-	public static function supported_editors(): array {
-		return array( 'Gutenberg', 'Elementor' );
-	}
-
-		/**
+	/**
 	 * Get the single target language code allowed by the setup wizard, if any.
 	 * When the wizard has been completed with a language selection, only that language
 	 * is allowed for string/bulk translation; backend must reject other languages.

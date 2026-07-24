@@ -358,7 +358,6 @@ final class AUTOMLP_Ai_Translate_Addon {
 	 */
 	private function load_dependencies() {
 		$files = array(
-			'helper/helper.php',
 			'includes/wpml/builder/gutenberg/update-block-config.php',
 			'includes/bulk-translation/bulk-translation.php',
 			'includes/string-translation/string-translation.php',

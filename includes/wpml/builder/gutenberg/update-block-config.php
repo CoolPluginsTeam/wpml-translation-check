@@ -322,9 +322,7 @@ class Update_Block_Config {
 	}
 
 	public function is_content_update() {
-		return ( defined( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) && true === constant( 'DOING_AUTOMLP_WPML_GUTENBERG_CONTENT_UPDATE' ) )
-			|| ( defined( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) )
-			|| ( defined( 'DOING_AUTOMLP_WPML_JOB_BUILD' ) && true === constant( 'DOING_AUTOMLP_WPML_JOB_BUILD' ) );
+		return defined( 'DOING_AUTOMLP_WPML_JOB_BUILD' ) && true === constant( 'DOING_AUTOMLP_WPML_JOB_BUILD' );
 	}
 
 	public function get_update_block_config() {
@@ -523,18 +521,13 @@ class Update_Block_Config {
 	}
 
 	private function update_package_strings( array &$append_data, $html, $field_key, $field_name, $text, $type, $format, $translate ): void {
-		if ( defined( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) && true === constant( 'DOING_AUTOMLP_WPML_BULK_POST_TRANSLATION' ) ) {
-			$this->set_content_data( $append_data, 'html', $html );
-			$this->set_content_data( $append_data, 'text', $text );
-		} else {
-			$this->set_content_data( $append_data, 'html', $html );
-			$this->set_content_data( $append_data, 'field_key', $field_key );
-			$this->set_content_data( $append_data, 'field_name', $field_name );
-			$this->set_content_data( $append_data, 'text', $text );
-			$this->set_content_data( $append_data, 'type', $type );
-			$this->set_content_data( $append_data, 'format', $format );
-			$this->set_content_data( $append_data, 'translate', $translate );
-		}
+		$this->set_content_data( $append_data, 'html', $html );
+		$this->set_content_data( $append_data, 'field_key', $field_key );
+		$this->set_content_data( $append_data, 'field_name', $field_name );
+		$this->set_content_data( $append_data, 'text', $text );
+		$this->set_content_data( $append_data, 'type', $type );
+		$this->set_content_data( $append_data, 'format', $format );
+		$this->set_content_data( $append_data, 'translate', $translate );
 	}
 
 	private function set_content_data( &$append_data, $key, $value ) {
@@ -543,3 +536,5 @@ class Update_Block_Config {
 		}
 	}
 }
+
+Update_Block_Config::get_instance();

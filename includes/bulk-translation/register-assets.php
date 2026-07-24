@@ -88,8 +88,6 @@ class Register_Assets {
 			}
 		}
 
-		$slug_translation_option = get_option( 'automlp_wpml_slug_translation_option', 'title_translate' );
-
 		$editor_script_asset = include AUTOMLP_AI_PLUGIN_DIR . 'assets/bulk-translate/index.asset.php';
 
 		$rtl      = function_exists( 'is_rtl' ) ? is_rtl() : false;
@@ -142,43 +140,23 @@ class Register_Assets {
 			}
 		}
 
-		$extra_data = array();
-
-		$ai_max_tokens = get_option( 'automlp_wpml_ai_request_token_per_request', 500 );
-		$ai_batch_size = get_option( 'automlp_wpml_ai_request_batch_size', 5 );
-
 		wp_localize_script(
 			'automlp-wpml-bulk-translate',
 			'automlp_wpml_bulk_translate_object',
-			array_merge(
-				array(
-					'ajax_url'                   => admin_url( 'admin-ajax.php' ),
-					'languageObject'             => $lang_object,
-					'selected_language_object'   => $selected_lang_object,
-					'nonce'                      => wp_create_nonce( 'wp_rest' ),
-					'bulkTranslateRouteUrl'      => get_rest_url( null, 'automlp-bulk-translate' ),
-					'bulkTranslatePrivateKey'    => wp_create_nonce( 'automlp_wpml_bulk_translate_entries_nonce' ),
-					'pendingPostsIdsKey'         => wp_create_nonce( 'automlp_wpml_pending_posts_ids_nonce' ),
-					'automlp_wpml_url'            => esc_url( AUTOMLP_AI_PLUGIN_URL ),
-					'AIServices'                 => $available_ai_services,
-					'automlp_active_providers'   => $automlp_active_providers,
-					'admin_url'                  => admin_url(),
-					'ai_translate_route_nonce'   => wp_create_nonce( 'wp_rest' ),
-					'ai_translate_nonce'         => wp_create_nonce( 'automlp_wpml_ai_translate_nonce' ),
-					'get_glossary_validate'      => wp_create_nonce( 'automlp_wpml_get_glossary_private' ),
-					'post_label'                 => $post_label,
-					'post_singular_label'        => $post_singular_label && !empty($post_singular_label) ? $post_singular_label : $post_label,
-					'update_translate_data'      => 'automlp_wpml_update_translate_data',
-					'slug_translation_option'    => $slug_translation_option,
-					'taxonomy_page'              => $taxonomy_page,
-					'AIRequestMaxTokens'         => $ai_max_tokens,
-					'AIRequestBatchSize'         => $ai_batch_size,
-					'automlp_wpml_glossary_nonce' => wp_create_nonce( 'automlp_wpml_glossary_nonce' ),
-					'default_language_slug'      => $default_language_slug,
-					'queueRouteUrl'    => get_rest_url( null, 'automlp/v1' ),
-					'backgroundFlow'   => \AUTOMLP_WPML\Includes\Wpml\Background_Flow::enabled(),
-				),
-				$extra_data
+			array(
+				'languageObject'           => $lang_object,
+				'selected_language_object' => $selected_lang_object,
+				'nonce'                    => wp_create_nonce( 'wp_rest' ),
+				'automlp_wpml_url'         => esc_url( AUTOMLP_AI_PLUGIN_URL ),
+				'AIServices'               => $available_ai_services,
+				'automlp_active_providers' => $automlp_active_providers,
+				'admin_url'                => admin_url(),
+				'post_label'               => $post_label,
+				'post_singular_label'      => $post_singular_label && ! empty( $post_singular_label ) ? $post_singular_label : $post_label,
+				'taxonomy_page'            => $taxonomy_page,
+				'default_language_slug'    => $default_language_slug,
+				'queueRouteUrl'            => get_rest_url( null, 'automlp/v1' ),
+				'backgroundFlow'           => \AUTOMLP_WPML\Includes\Wpml\Background_Flow::enabled(),
 			)
 		);
 	}

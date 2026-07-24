@@ -48,11 +48,6 @@ class Legacy_Bridge {
 
 		add_filter( 'rest_pre_dispatch', array( __CLASS__, 'block_legacy_routes' ), 10, 3 );
 		add_filter( 'rest_endpoints', array( __CLASS__, 'unregister_legacy_routes' ) );
-
-		// The old flow needed these to stop WPML complaining about posts it
-		// had not created. The queue writes through WPML, so they now hide
-		// legitimate warnings.
-		add_action( 'init', array( __CLASS__, 'drop_editor_workarounds' ), 20 );
 	}
 
 	/**
@@ -108,27 +103,6 @@ class Legacy_Bridge {
 		}
 
 		return $endpoints;
-	}
-
-	/**
-	 * Remove the WPML editor workarounds the old flow depended on.
-	 *
-	 * @return void
-	 */
-	public static function drop_editor_workarounds() {
-		if ( ! class_exists( '\AUTOMLP_WPML\Includes\Bulk_Translation\Bulk_Translation' ) ) {
-			return;
-		}
-
-		$instance = \AUTOMLP_WPML\Includes\Bulk_Translation\Bulk_Translation::get_instance();
-
-		remove_filter(
-			'wpml_tm_show_page_builders_translation_editor_warning',
-			array( $instance, 'hide_page_builders_translation_editor_warning' ),
-			10
-		);
-
-		remove_filter( 'wpml_tm_editor_exclude_posts', array( $instance, 'editor_exclude_posts' ), 10 );
 	}
 
 	/**

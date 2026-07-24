@@ -4,8 +4,6 @@ namespace AUTOMLP_WPML\Includes\String_Translation;
 
 if ( ! defined( 'ABSPATH' ) ) exit;
 
-use AUTOMLP_WPML\Helper\Helper;
-
 /**
  * String_Translation
  *
