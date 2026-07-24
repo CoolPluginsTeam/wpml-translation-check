@@ -119,6 +119,18 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                     setProgressBarVisibility(false);
                     return;
                 }
+
+                // Queued, but the server returned nothing to watch. Do not
+                // fall through to the empty-state message, which would show
+                // the misleading "already translated" default.
+                if (!Array.isArray(jobs) || jobs.length === 0) {
+                    setEmptyPostMessage(
+                        __('Translation was queued but no jobs came back. Open the Translation Queue screen to check status.', 'wpml-translation-check')
+                    );
+                    setIsLoading(false);
+                    setProgressBarVisibility(false);
+                    return;
+                }
     
                 // Seed the store so rows appear immediately, before the first poll.
                 const seen = [];
@@ -159,7 +171,11 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     
                 storeDispatch(updateCountInfo({ endTime: new Date().getTime() }));
             } catch (error) {
-                setEmptyPostMessage(error.message);
+                setEmptyPostMessage(
+                    error && error.message
+                        ? error.message
+                        : __('Translation could not be started.', 'wpml-translation-check')
+                );
                 setIsLoading(false);
                 setProgressBarVisibility(false);
             }
