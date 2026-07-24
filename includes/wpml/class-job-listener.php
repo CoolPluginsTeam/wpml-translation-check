@@ -62,7 +62,9 @@ class Job_Listener {
 	 * @return void
 	 */
 	public static function boot() {
-		add_action( 'wpml_added_translation_jobs', array( __CLASS__, 'capture' ), 10, 1 );
+		// Priority 20: after WPML ATE's handler (priority 10), which otherwise
+		// overwrites editor=wpml back to editor=ate on the same hook.
+		add_action( 'wpml_added_translation_jobs', array( __CLASS__, 'capture' ), 20, 1 );
 
 		// Mirror state when a job is resolved outside our queue.
 		add_action( 'wpml_translation_job_saved', array( __CLASS__, 'on_saved' ), 10, 2 );
@@ -199,9 +201,9 @@ class Job_Listener {
 			return;
 		}
 
-		// Keep translations in WPML's own editor rather than handing the job
+		// Keep translations in WPML's classic editor rather than handing the job
 		// to ATE, which would try to translate it a second time.
-		self::force_native_editor( $wpml_job_id );
+		self::force_native_editor( $wpml_job_id, $job );
 
 		$chars = 0;
 
@@ -417,25 +419,58 @@ class Job_Listener {
 	}
 
 	/**
-	 * Pin the job to WPML's own editor.
+	 * Pin the job to WPML's classic Translation Editor (CTE), not ATE.
 	 *
-	 * @param int $wpml_job_id Job id.
+	 * Setting icl_translate_job.editor alone is not enough:
+	 * - ATE's wpml_added_translation_jobs handler (priority 10) sets editor=ate
+	 *   and stores editor_job_id; we must clear that after it runs.
+	 * - Post meta _wpml_post_translation_editor_native controls the post-edit
+	 *   "which editor" choice: 'no' = WPML classic TM editor, 'yes' = WP native.
+	 *
+	 * @param int         $wpml_job_id Job id.
+	 * @param object|null $job         Loaded job (for source post + kind).
 	 * @return void
 	 */
-	private static function force_native_editor( $wpml_job_id ) {
-		$factory = self::get_wpml_job_factory();
+	private static function force_native_editor( $wpml_job_id, $job = null ) {
+		$wpml_job_id = (int) $wpml_job_id;
 
-		if ( ! $factory ) {
+		if ( ! $wpml_job_id ) {
 			return;
 		}
 
+		// String batches have no post meta path; skip the post-editor switch.
+		$is_string_batch = $job && 'string' === self::job_kind( $job );
+
 		try {
-			if ( method_exists( $factory, 'update_job_data' ) ) {
-				$factory->update_job_data( $wpml_job_id, array( 'editor' => 'wpml' ) );
+			if ( function_exists( 'wpml_tm_load_old_jobs_editor' ) ) {
+				// Also nulls editor_job_id when leaving ATE — required so CTE opens.
+				wpml_tm_load_old_jobs_editor()->set( $wpml_job_id, 'wpml' );
+			} else {
+				$factory = self::get_wpml_job_factory();
+
+				if ( $factory && method_exists( $factory, 'update_job_data' ) ) {
+					$factory->update_job_data(
+						$wpml_job_id,
+						array(
+							'editor'        => 'wpml',
+						)
+					);
+				}
 			}
 		} catch ( \Throwable $e ) {
 			// Non-fatal: the job still translates, WPML may just offer ATE.
 			return;
+		}
+
+		if ( $is_string_batch ) {
+			return;
+		}
+
+		$source_post_id = $job ? self::source_id( $job ) : 0;
+
+		if ( $source_post_id ) {
+			// 'no' => use WPML classic Translation Editor inside WordPress.
+			update_post_meta( $source_post_id, '_wpml_post_translation_editor_native', 'no' );
 		}
 	}
 
