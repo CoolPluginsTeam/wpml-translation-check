@@ -50,6 +50,13 @@ class Job_Listener {
 	private static $skipped = array();
 
 	/**
+	 * WPML job factory instance.
+	 *
+	 * @var \WPML_TM_Job_Factory|null
+	 */
+	private static $wpml_job_factory = null;
+
+	/**
 	 * Attach hooks.
 	 *
 	 * @return void
@@ -222,6 +229,15 @@ class Job_Listener {
 		}
 	}
 
+	private static function get_wpml_job_factory() {
+		if ( self::$wpml_job_factory || ! function_exists( 'wpml_tm_load_job_factory' ) ) {
+			return self::$wpml_job_factory;
+		}
+
+		self::$wpml_job_factory = wpml_tm_load_job_factory();
+		return self::$wpml_job_factory;
+	}
+
 	/**
 	 * Load a job with its elements.
 	 *
@@ -229,9 +245,12 @@ class Job_Listener {
 	 * @return object|null
 	 */
 	private static function load_job( $wpml_job_id ) {
-		$job = apply_filters( 'wpml_get_translation_job', null, $wpml_job_id, true );
+		// WPML's filter signature is ( $job_id, $include_non_translatable, $revisions ).
+		// Passing null as the first arg makes WPML look up job 0 and return false.
+		$factory = self::get_wpml_job_factory();
+		$job = $factory->get_translation_job((int) $wpml_job_id, false, 0, false);
 
-		if ( ! is_object( $job ) || empty( $job->elements ) ) {
+		if ( ! $job || !is_object( $job ) ) {
 			return null;
 		}
 
@@ -404,13 +423,13 @@ class Job_Listener {
 	 * @return void
 	 */
 	private static function force_native_editor( $wpml_job_id ) {
-		if ( ! function_exists( 'wpml_tm_load_job_factory' ) ) {
+		$factory = self::get_wpml_job_factory();
+
+		if ( ! $factory ) {
 			return;
 		}
 
 		try {
-			$factory = wpml_tm_load_job_factory();
-
 			if ( method_exists( $factory, 'update_job_data' ) ) {
 				$factory->update_job_data( $wpml_job_id, array( 'editor' => 'wpml' ) );
 			}
