@@ -621,7 +621,13 @@ class Queue_Route {
 		if ( $result_id ) {
 			$out['result_title'] = html_entity_decode( get_the_title( $result_id ) );
 			$out['view_link']    = get_permalink( $result_id );
-			$out['edit_link']    = html_entity_decode( (string) get_edit_post_link( $result_id, 'raw' ) );
+
+			$wpml_job_id = isset( $row['wpml_job_id'] ) ? (int) $row['wpml_job_id'] : 0;
+			$editor_url  = \WPML_AT_Helper::get_translation_editor_url( $wpml_job_id );
+
+			$out['edit_link'] = $editor_url
+				? html_entity_decode( $editor_url )
+				: html_entity_decode( (string) get_edit_post_link( $result_id, 'raw' ) );
 		}
 
 		return $out;

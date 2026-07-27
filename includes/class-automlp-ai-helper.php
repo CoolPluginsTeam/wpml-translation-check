@@ -232,6 +232,48 @@ public static function mask_api_key( $api_key ) {
 	}
 
 	/**
+	 * Admin URL for WPML's classic Translation Editor (CTE) for a job.
+	 *
+	 * @param int    $wpml_job_id icl_translate_job.job_id.
+	 * @param string $return_url  Optional admin URL to return to after editing.
+	 * @return string Empty when WPML is unavailable or the job id is invalid.
+	 */
+	public static function get_translation_editor_url( $wpml_job_id, $return_url = '' ) {
+		$wpml_job_id = absint( $wpml_job_id );
+
+		if ( ! $wpml_job_id ) {
+			return '';
+		}
+
+		if ( class_exists( '\WPML\TM\API\Jobs' ) && is_callable( array( '\WPML\TM\API\Jobs', 'getEditUrl' ) ) ) {
+			$back = $return_url ? $return_url : admin_url();
+			$url  = \WPML\TM\API\Jobs::getEditUrl( $back, $wpml_job_id );
+
+			return is_string( $url ) ? $url : '';
+		}
+
+		if ( ! defined( 'WPML_TM_FOLDER' ) ) {
+			return '';
+		}
+
+		$url = admin_url(
+			'admin.php?page=' . WPML_TM_FOLDER . '/menu/translations-queue.php&job_id=' . $wpml_job_id
+		);
+
+		if ( $return_url ) {
+			$url .= '&return_url=' . rawurlencode( $return_url );
+		}
+
+		/**
+		 * Filter the translation editor URL, same hook WPML uses internally.
+		 *
+		 * @param string $url         Editor URL.
+		 * @param int    $wpml_job_id Job id.
+		 */
+		return apply_filters( 'icl_job_edit_url', $url, $wpml_job_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	}
+
+	/**
 	 * Bulk translation supported
 	 *
 	 * @param object $current_screen The current screen object.

@@ -359,7 +359,17 @@ class Queue_Screen {
 			);
 		}
 
-		$row['result_link'] = $result_id ? (string) get_edit_post_link( $result_id, 'raw' ) : '';
+		$wpml_job_id = isset( $row['wpml_job_id'] ) ? (int) $row['wpml_job_id'] : 0;
+		$row['result_link'] = '';
+
+		if ( Queue_Table::STATE_DONE === $row['state'] && ( $wpml_job_id || $result_id ) ) {
+			$return_url = admin_url( 'admin.php?page=automlp_ai_dashboard&tab=queue' );
+			$editor_url = \WPML_AT_Helper::get_translation_editor_url( $wpml_job_id, $return_url );
+
+			$row['result_link'] = $editor_url
+				? $editor_url
+				: ( $result_id ? (string) get_edit_post_link( $result_id, 'raw' ) : '' );
+		}
 		$row['language']    = self::language_label( $row['to_lang'] );
 		$row['queued_ago']  = self::ago( $row['queued_at'] );
 
