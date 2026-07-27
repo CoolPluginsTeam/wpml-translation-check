@@ -103,9 +103,12 @@ export const fetchStatus = async (jobIds = []) => {
  *
  * Needed on sites where WP-Cron is disabled or throttled.
  *
+ * @param {number} limit Optional max jobs for this run. Use 1 while polling so
+ *                       status can update between jobs.
  * @return {Promise<Object>} { ran, counts }
  */
-export const runQueueNow = async () => request('/queue/run', {});
+export const runQueueNow = async (limit = 0) =>
+	request('/queue/run', limit > 0 ? { limit } : {});
 
 /**
  * Send a failed job back to the queue.
@@ -122,8 +125,10 @@ export const retryJob = async (jobId) =>
 /**
  * Poll until every job closes.
  *
- * Backs off from 2s to 10s so a long batch does not hammer the server, and
- * nudges the dispatcher on the first tick in case cron is asleep.
+ * Kicks the dispatcher in the background (one job at a time) without awaiting
+ * it, so /queue/status keeps returning while translation runs. Awaiting
+ * /queue/run would block for the full AI call and make the first status look
+ * like an instant 100% jump.
  *
  * @param {Object}   options            Options.
  * @param {number[]} options.jobIds     Jobs to watch.
@@ -140,9 +145,25 @@ export const pollUntilDone = async ({
 }) => {
 	const startedAt = Date.now();
 
-	let interval = 2000;
-	let nudged = false;
+	let interval = 1000;
 	let last = null;
+	let runInFlight = false;
+
+	const kickOne = () => {
+		if (runInFlight) {
+			return;
+		}
+
+		runInFlight = true;
+		runQueueNow(1)
+			.catch(() => {})
+			.finally(() => {
+				runInFlight = false;
+			});
+	};
+
+	// Start the first waiting job immediately so we do not wait on cron.
+	kickOne();
 
 	// eslint-disable-next-line no-constant-condition
 	while (true) {
@@ -161,9 +182,7 @@ export const pollUntilDone = async ({
 		try {
 			status = await fetchStatus(jobIds);
 		} catch (error) {
-			// A transient failure should not kill the whole run: back off and
-			// try again on the next tick.
-			interval = Math.min(interval * 2, 10000);
+			interval = Math.min(interval * 2, 5000);
 			await wait(interval);
 			continue;
 		}
@@ -175,21 +194,48 @@ export const pollUntilDone = async ({
 			return status;
 		}
 
-		// Cron may be disabled or overdue. Nudge once, then let it be.
-		if (!nudged && status.health && status.health.state !== 'ok') {
-			nudged = true;
+		const jobs = Array.isArray(status.jobs) ? status.jobs : [];
+		const hasWaiting = jobs.some((job) => job.state === 'waiting');
+		const hasActive = jobs.some((job) =>
+			['claimed', 'sent', 'writing'].includes(job.state)
+		);
 
-			try {
-				await runQueueNow();
-			} catch (error) {
-				// Non-fatal: the queue still drains when cron next fires.
-			}
+		// Next waiting job when the previous one finished, or when cron is unhealthy.
+		if ((hasWaiting && !hasActive) || (status.health && status.health.state !== 'ok')) {
+			kickOne();
 		}
 
 		await wait(interval);
 
-		interval = Math.min(interval + 1000, 10000);
+		interval = hasActive ? 1000 : Math.min(interval + 500, 3000);
 	}
+};
+
+/**
+ * How far along a single job is, for a smooth progress bar.
+ *
+ * Closed jobs alone would jump 0 → 100 when two short jobs finish between
+ * polls. Weighting in-flight states keeps the bar moving.
+ */
+export const STATE_WEIGHT = {
+	waiting: 0,
+	claimed: 0.15,
+	sent: 0.55,
+	writing: 0.85,
+	done: 1,
+	failed: 1,
+	stopped: 1,
+};
+
+/**
+ * Percent complete for one job state (0–100).
+ *
+ * @param {string} state Queue job state.
+ * @return {number}
+ */
+export const jobProgressPercent = (state) => {
+	const weight = STATE_WEIGHT[state];
+	return Math.round((weight !== undefined ? weight : 0) * 100);
 };
 
 /**
@@ -209,11 +255,16 @@ export const summarise = (status) => {
 	const closed = jobs.filter((job) => CLOSED_STATES.includes(job.state)).length;
 	const failed = jobs.filter((job) => job.state === 'failed').length;
 
+	const weight = jobs.reduce((sum, job) => {
+		const state = job && job.state ? job.state : 'waiting';
+		return sum + (STATE_WEIGHT[state] !== undefined ? STATE_WEIGHT[state] : 0);
+	}, 0);
+
 	return {
 		total,
 		closed,
 		failed,
-		percent: Math.round((closed / total) * 100),
+		percent: Math.round((weight / total) * 100),
 	};
 };
 

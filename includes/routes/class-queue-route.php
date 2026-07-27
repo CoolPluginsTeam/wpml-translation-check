@@ -148,6 +148,14 @@ class Queue_Route {
 				'methods'             => \WP_REST_Server::CREATABLE,
 				'callback'            => array( __CLASS__, 'run_now' ),
 				'permission_callback' => array( __CLASS__, 'can_manage' ),
+				'args'                => array(
+					'limit' => array(
+						'required'          => false,
+						'type'              => 'integer',
+						'default'           => 0,
+						'sanitize_callback' => 'absint',
+					),
+				),
 			)
 		);
 	}
@@ -486,11 +494,24 @@ class Queue_Route {
 	 * Drain the queue immediately.
 	 *
 	 * Useful when WP-Cron is disabled or a site owner is impatient.
+	 * Pass limit=1 from the status poller so one job runs while polls continue.
 	 *
+	 * @param \WP_REST_Request $request Request.
 	 * @return \WP_REST_Response
 	 */
-	public static function run_now() {
-		Dispatcher::run_now();
+	public static function run_now( $request = null ) {
+		$limit = $request instanceof \WP_REST_Request
+			? absint( $request->get_param( 'limit' ) )
+			: 0;
+
+		// Poller kicks use limit=1 and must not clear an active lock (that would
+		// allow overlapping AI runs). Admin "Process now" still forces a start.
+		$from_poller = $limit > 0;
+
+		Dispatcher::run_now(
+			$from_poller ? $limit : null,
+			! $from_poller
+		);
 
 		return new \WP_REST_Response(
 			array(

@@ -89,9 +89,10 @@ class Dispatcher {
 	/**
 	 * Cron entry point.
 	 *
+	 * @param int|null $limit Optional cap on jobs for this run. Null uses JOBS_PER_RUN.
 	 * @return void
 	 */
-	public static function run() {
+	public static function run( $limit = null ) {
 		update_option( self::HEARTBEAT, time(), false );
 
 		// Cheap check first: on an idle site this is the only query we run.
@@ -108,7 +109,7 @@ class Dispatcher {
 
 		try {
 			Queue_Table::recover_stale( 15 );
-			self::process_batch();
+			self::process_batch( $limit );
 		} catch ( \Throwable $e ) {
 			self::log( 'Queue run aborted: ' . $e->getMessage() );
 		} finally {
@@ -121,20 +122,27 @@ class Dispatcher {
 	/**
 	 * Force a run outside cron, for the "process now" admin button.
 	 *
+	 * @param int|null $limit Optional cap on jobs for this run.
+	 * @param bool     $force Clear an existing lock before starting.
 	 * @return void
 	 */
-	public static function run_now() {
-		delete_transient( self::LOCK );
-		self::run();
+	public static function run_now( $limit = null, $force = true ) {
+		if ( $force ) {
+			delete_transient( self::LOCK );
+		}
+
+		self::run( $limit );
 	}
 
 	/**
-	 * Claim and process up to JOBS_PER_RUN jobs.
+	 * Claim and process up to $limit (or JOBS_PER_RUN) jobs.
 	 *
+	 * @param int|null $limit Optional cap.
 	 * @return void
 	 */
-	private static function process_batch() {
-		$jobs = Queue_Table::waiting( self::JOBS_PER_RUN );
+	private static function process_batch( $limit = null ) {
+		$max  = null === $limit ? self::JOBS_PER_RUN : max( 1, (int) $limit );
+		$jobs = Queue_Table::waiting( $max );
 
 		if ( empty( $jobs ) ) {
 			return;

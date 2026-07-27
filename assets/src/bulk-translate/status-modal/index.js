@@ -7,7 +7,7 @@ import { store } from '../redux-store/store';
 import DOMPurify from 'dompurify';
 import { updatePendingPosts, updateCountInfo, updateTranslatePostInfo, unsetPendingPost, updateProgressStatus } from '../redux-store/features/actions';
 
-import { queuePosts, pollUntilDone, summarise, retryJob } from '../../shared/queue-client';
+import { queuePosts, pollUntilDone, summarise, retryJob, jobProgressPercent } from '../../shared/queue-client';
 
 const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
@@ -50,27 +50,66 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     /**
      * Push one poll payload into the store.
      *
-     * Reads progress from the store rather than the render-scoped variable so
-     * repeated polls do not compound a stale value.
+     * While jobs are still running, only the progress bar moves — individual
+     * rows stay in an active state so completions do not flash one-by-one.
+     * When the batch finishes, every row and the 100% bar update together.
      */
     const applyStatus = (status) => {
         if (!status || !Array.isArray(status.jobs)) {
             return;
         }
 
+        const current = store.getState().progressStatus || 0;
+        const { percent } = summarise(status);
+
+        // Still running: move the bar from weighted job states, and keep every
+        // row in an active UI state. Server-side "done" rows stay in-progress
+        // here so Completed only appears when the whole batch finishes.
+        if (!status.finished) {
+            const displayPercent = Math.min(percent, 99);
+            storeDispatch(updateProgressStatus(displayPercent - current));
+
+            status.jobs.forEach((job) => {
+                const key = `${job.source_id}_${job.to_lang}`;
+                const progress = jobProgressPercent(job.state);
+
+                if (job.closed) {
+                    storeDispatch(updateTranslatePostInfo({
+                        [key]: {
+                            status: 'in-progress',
+                            messageClass: 'in-progress',
+                            jobId: job.job_id,
+                            progress: 100,
+                        },
+                    }));
+                    return;
+                }
+
+                storeDispatch(updateTranslatePostInfo({
+                    [key]: {
+                        status: mapState(job.state),
+                        messageClass: mapClass(job.state),
+                        jobId: job.job_id,
+                        progress,
+                    },
+                }));
+            });
+
+            return;
+        }
+
+        // Batch finished — paint every row and jump to 100% in one pass.
         let translated = 0;
         let stringsTranslated = 0;
         let charactersTranslated = 0;
 
-        // Prefer server totals when present so the summary stays in sync with
-        // field_count / char_count written on job completion.
         if (status.totals) {
             translated = Number(status.totals.done) || 0;
             stringsTranslated = Number(status.totals.strings) || 0;
             charactersTranslated = Number(status.totals.characters) || 0;
         }
 
-        status.jobs.forEach(job => {
+        status.jobs.forEach((job) => {
             const key = `${job.source_id}_${job.to_lang}`;
             const stringCount = Number(job.string_count ?? job.field_count) || 0;
             const charCount = Number(job.char_count) || 0;
@@ -81,6 +120,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 stringCount,
                 charCount,
                 jobId: job.job_id,
+                progress: jobProgressPercent(job.state),
             };
 
             if (job.state === 'done') {
@@ -110,10 +150,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
             storeDispatch(updateTranslatePostInfo({ [key]: update }));
         });
 
-        const { percent } = summarise(status);
-        const current = store.getState().progressStatus || 0;
-
-        storeDispatch(updateProgressStatus(percent - current));
+        storeDispatch(updateProgressStatus(100 - current));
         storeDispatch(updateCountInfo({
             postsTranslated: translated,
             stringsTranslated,
@@ -180,6 +217,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                             firstPostLanguage,
                             flagUrl: lang.flag,
                             languageName: lang.name,
+                            progress: 0,
                         },
                     }));
                 });
@@ -555,7 +593,8 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
                                 {!isLoading && Object.keys(translatePostInfo).map((key, index) => {
                                     const info = translatePostInfo[key];
-                                    const workingStatus = info.status === 'running' || info.status === 'in-progress' ? true : false;
+                                    const workingStatus = ['running', 'in-progress'].includes(info.status);
+                                    const rowProgress = Math.min(100, Math.max(0, Number(info.progress) || 0));
                                     return (
                                         <div className={`${prefix}-status-inner-item`} key={`group-title-${info.parentPostId || key}`}>
                                             <div className={`${prefix}-status-parent-post-title`}>{info.parentPostTitle || __('Untitled', 'wpml-translation-check')}</div>
@@ -584,12 +623,12 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                             a 15.9155 15.9155 0 0 1 0 31.831
                                                             a 15.9155 15.9155 0 0 1 0 -31.831" />
                                                                     <path className={`${prefix}-progress`}
-                                                                        strokeDasharray="0, 100"
+                                                                        strokeDasharray={`${rowProgress}, 100`}
                                                                         d="M18 2.0845
                                                             a 15.9155 15.9155 0 0 1 0 31.831
                                                             a 15.9155 15.9155 0 0 1 0 -31.831" />
                                                                 </svg>
-                                                                <div className={`${prefix}-percentage`}>0%</div>
+                                                                <div className={`${prefix}-percentage`}>{rowProgress}%</div>
                                                             </div>}
                                                         </div>
                                                         <div className={`${prefix}-status-target-post-title`} style={{ gridColumn: 'span 2' }}>
