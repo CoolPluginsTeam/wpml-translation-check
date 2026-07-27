@@ -59,17 +59,36 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         }
 
         let translated = 0;
+        let stringsTranslated = 0;
+        let charactersTranslated = 0;
+
+        // Prefer server totals when present so the summary stays in sync with
+        // field_count / char_count written on job completion.
+        if (status.totals) {
+            translated = Number(status.totals.done) || 0;
+            stringsTranslated = Number(status.totals.strings) || 0;
+            charactersTranslated = Number(status.totals.characters) || 0;
+        }
 
         status.jobs.forEach(job => {
             const key = `${job.source_id}_${job.to_lang}`;
+            const stringCount = Number(job.string_count ?? job.field_count) || 0;
+            const charCount = Number(job.char_count) || 0;
 
             const update = {
                 status: mapState(job.state),
                 messageClass: mapClass(job.state),
+                stringCount,
+                charCount,
+                jobId: job.job_id,
             };
 
             if (job.state === 'done') {
-                translated++;
+                if (!status.totals) {
+                    translated++;
+                    stringsTranslated += stringCount;
+                    charactersTranslated += charCount;
+                }
                 update.targetPostId = job.result_id;
                 update.targetPostTitle = job.result_title || __('N/A', 'wpml-translation-check');
                 update.postLink = job.view_link;
@@ -79,7 +98,6 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
             if (job.state === 'failed' || job.state === 'stopped') {
                 update.errorMessage = __('Translation failed.', 'wpml-translation-check');
                 update.errorHtml = `<div class="automlp-wpml-error-html">${job.error || ''}</div>`;
-                update.jobId = job.job_id;
                 update.aiError = job.state === 'failed';
                 update.parentPostId = job.source_id;
                 update.targetLanguage = job.to_lang;
@@ -96,7 +114,11 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         const current = store.getState().progressStatus || 0;
 
         storeDispatch(updateProgressStatus(percent - current));
-        storeDispatch(updateCountInfo({ postsTranslated: translated }));
+        storeDispatch(updateCountInfo({
+            postsTranslated: translated,
+            stringsTranslated,
+            charactersTranslated,
+        }));
     };
 
     useEffect(() => {
@@ -162,7 +184,10 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                     }));
                 });
     
-                storeDispatch(updateCountInfo({ totalPosts: jobs.length }));
+                storeDispatch(updateCountInfo({
+                    totalPosts: jobs.length,
+                    startTime: new Date().getTime(),
+                }));
                 setIsLoading(false);
     
                 await pollUntilDone({
@@ -172,6 +197,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 });
     
                 storeDispatch(updateCountInfo({ endTime: new Date().getTime() }));
+                setProgressBarVisibility(false);
             } catch (error) {
                 setEmptyPostMessage(
                     error && error.message
@@ -283,13 +309,11 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 return;
             }
 
-            if (countInfo.stringsTranslated > 0) {
-                setTimeout(() => {
-                    setProgressBarVisibility(false);
-                }, 2000);
-            }
+            setTimeout(() => {
+                setProgressBarVisibility(false);
+            }, 2000);
         }
-    }, [pendingPosts]);
+    }, [pendingPosts, progressStatus, countInfo.postsTranslated]);
 
     const AIErrorBtnHandler = async (e) => {
         const btnType = e.target.dataset.status;
@@ -415,7 +439,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                         {bulkStatus === "completed" &&
                             countInfo.errorPosts < 1 &&
                             !(translatePostInfo && Object.values(translatePostInfo).some((info) => info?.status === "error")) &&
-                            countInfo.stringsTranslated > 0 && (
+                            countInfo.postsTranslated > 0 && (
                                 <p className={`${prefix}-modal-desc`}>{__("Your content has been translated successfully.", 'wpml-translation-check')}</p>
                             )}
                     </div>
@@ -442,7 +466,9 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                     </div>
                                     <div className={`${prefix}-char-count`}>
                                         <span className={`${prefix}-count-text-heading`}>{__('Time Taken', 'wpml-translation-check')} </span><br />
-                                        <span className={`${prefix}-char-number`}>{Math.round((countInfo.endTime - countInfo.startTime) / 1000)} {__('seconds', 'wpml-translation-check')}</span>
+                                        <span className={`${prefix}-char-number`}>
+                                            {Math.max(0, Math.round(((countInfo.endTime || Date.now()) - (countInfo.startTime || Date.now())) / 1000))} {__('seconds', 'wpml-translation-check')}
+                                        </span>
                                     </div>
                                 </div>
                             )

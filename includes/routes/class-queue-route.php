@@ -379,6 +379,7 @@ class Queue_Route {
 				array(
 					'jobs'     => $rows,
 					'counts'   => $counts,
+					'totals'   => self::job_totals( $rows ),
 					'finished' => self::all_closed( $rows ),
 					'health'   => Dispatcher::health(),
 				),
@@ -590,25 +591,27 @@ class Queue_Route {
 		$result_id = isset( $row['result_id'] ) ? (int) $row['result_id'] : 0;
 
 		$out = array(
-			'job_id'      => (int) $row['job_id'],
-			'source_id'   => $source_id,
-			'result_id'   => $result_id,
-			'kind'        => $row['kind'],
-			'from_lang'   => $row['from_lang'],
-			'to_lang'     => $row['to_lang'],
-			'state'       => $row['state'],
-			'label'       => self::state_label( $row['state'] ),
-			'closed'      => in_array(
+			'job_id'        => (int) $row['job_id'],
+			'source_id'     => $source_id,
+			'result_id'     => $result_id,
+			'kind'          => $row['kind'],
+			'from_lang'     => $row['from_lang'],
+			'to_lang'       => $row['to_lang'],
+			'state'         => $row['state'],
+			'label'         => self::state_label( $row['state'] ),
+			'closed'        => in_array(
 				$row['state'],
 				array( Queue_Table::STATE_DONE, Queue_Table::STATE_FAILED, Queue_Table::STATE_STOPPED ),
 				true
 			),
-			'attempts'    => (int) $row['attempts'],
-			'error'       => ! empty( $row['last_error'] ) ? (string) $row['last_error'] : '',
-			'field_count' => (int) $row['field_count'],
-			'char_count'  => (int) $row['char_count'],
-			'provider'    => isset( $row['provider'] ) ? (string) $row['provider'] : '',
-			'queued_at'   => $row['queued_at'],
+			'attempts'      => (int) $row['attempts'],
+			'error'         => ! empty( $row['last_error'] ) ? (string) $row['last_error'] : '',
+			'field_count'   => (int) $row['field_count'],
+			'string_count'  => (int) $row['field_count'],
+			'char_count'    => (int) $row['char_count'],
+			'provider'      => isset( $row['provider'] ) ? (string) $row['provider'] : '',
+			'queued_at'     => $row['queued_at'],
+			'closed_at'     => ! empty( $row['closed_at'] ) ? $row['closed_at'] : '',
 		);
 
 		if ( 'post' === $row['kind'] && $source_id ) {
@@ -622,6 +625,38 @@ class Queue_Route {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Aggregate stats for the jobs currently being polled.
+	 *
+	 * @param array $jobs Shaped jobs.
+	 * @return array{done:int,failed:int,strings:int,characters:int}
+	 */
+	private static function job_totals( array $jobs ) {
+		$done       = 0;
+		$failed     = 0;
+		$strings    = 0;
+		$characters = 0;
+
+		foreach ( $jobs as $job ) {
+			$state = isset( $job['state'] ) ? (string) $job['state'] : '';
+
+			if ( Queue_Table::STATE_DONE === $state ) {
+				++$done;
+				$strings    += isset( $job['string_count'] ) ? (int) $job['string_count'] : (int) $job['field_count'];
+				$characters += isset( $job['char_count'] ) ? (int) $job['char_count'] : 0;
+			} elseif ( in_array( $state, array( Queue_Table::STATE_FAILED, Queue_Table::STATE_STOPPED ), true ) ) {
+				++$failed;
+			}
+		}
+
+		return array(
+			'done'       => $done,
+			'failed'     => $failed,
+			'strings'    => $strings,
+			'characters' => $characters,
+		);
 	}
 
 	/**
