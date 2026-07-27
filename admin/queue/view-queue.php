@@ -21,7 +21,13 @@ $automlp_active = (int) $automlp_counts['waiting']
 	+ (int) $automlp_counts['sent']
 	+ (int) $automlp_counts['writing'];
 
-$automlp_base_url = admin_url( 'admin.php?page=automlp_ai_dashboard&tab=queue' );
+// Preserve the active state filter so pagination does not reset it.
+// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$automlp_state_filter = isset( $_GET['state'] ) ? sanitize_key( wp_unslash( $_GET['state'] ) ) : '';
+$automlp_base_url     = add_query_arg(
+	array_filter( array( 'state' => $automlp_state_filter ) ),
+	admin_url( 'admin.php?page=automlp_ai_dashboard&tab=queue' )
+);
 ?>
 
 <div class="automlp-queue">

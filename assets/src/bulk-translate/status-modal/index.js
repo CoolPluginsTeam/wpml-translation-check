@@ -245,7 +245,13 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
         if (translatePostInfo && Object.keys(translatePostInfo).length > 0) {
             if (pendingPosts.length < 1) {
-                updateBulkStatus('completed');
+                // Only mark completed if at least one job succeeded; otherwise
+                // stay at 'pending' so the heading does not say Completed when
+                // every job failed.
+                const anyDone = Object.values(translatePostInfo).some(
+                    (info) => info.status === 'completed'
+                );
+                updateBulkStatus(anyDone ? 'completed' : 'pending');
                 return;
             }
 
@@ -383,22 +389,22 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
     }
 
+    // Returns true only when every job that shares this source post has
+    // reached a terminal state. Derived directly from translatePostInfo so
+    // the queue-based flow (which never populates targetLanguages) works too.
     const allPostStatus = (postId) => {
-        const targetLangsArr = selectTargetLanguages(store.getState(), postId);
-        let allPostStatus = true;
+        const siblingKeys = Object.keys(translatePostInfo).filter(
+            (k) => translatePostInfo[k].parentPostId === postId
+        );
 
-        if (!targetLangsArr || !targetLangsArr.length) {
+        if (!siblingKeys.length) {
             return true;
         }
 
-        for (let i = 0; i < targetLangsArr.length; i++) {
-            if (!translatePostInfo[postId + '_' + targetLangsArr[i]] || ['pending', 'in-progress', 'running', 'in-queue'].includes(translatePostInfo[postId + '_' + targetLangsArr[i]].status)) {
-                allPostStatus = false;
-                break;
-            }
-        };
-
-        return allPostStatus;
+        const ACTIVE = ['pending', 'in-progress', 'running', 'in-queue'];
+        return siblingKeys.every(
+            (k) => !ACTIVE.includes(translatePostInfo[k].status)
+        );
     };
 
     const getPostStatus = (type) => {

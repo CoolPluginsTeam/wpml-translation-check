@@ -112,17 +112,6 @@ class Queue_Screen {
 	}
 
 	/**
-	 * Jobs still to run.
-	 *
-	 * @return int
-	 */
-	private static function waiting_count() {
-		$counts = Queue_Table::summary();
-
-		return (int) $counts[ Queue_Table::STATE_WAITING ];
-	}
-
-	/**
 	 * Jobs in any non-terminal state.
 	 *
 	 * @return int
@@ -342,7 +331,10 @@ class Queue_Screen {
 
 		$row['state_label'] = self::state_label( $row['state'] );
 		$row['state_class'] = self::state_class( $row['state'] );
-		$row['can_retry']   = Queue_Table::STATE_FAILED === $row['state'];
+		// can_retry requires both the failed state AND a stored source_map;
+		// the REST retry endpoint rejects jobs whose source has been cleared.
+		$row['can_retry']   = Queue_Table::STATE_FAILED === $row['state']
+			&& ! empty( $row['source_map'] );
 
 		$row['source_title'] = '';
 		$row['source_link']  = '';
