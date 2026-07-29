@@ -70,7 +70,6 @@ final class AUTOMLP_Ai_Translate_Addon {
 		$this->init_cron();
 	}
 
-
 	/**
 		 * Initialize the cron job for the plugin.
 		 */

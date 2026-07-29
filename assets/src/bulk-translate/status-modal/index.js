@@ -62,26 +62,46 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         const current = store.getState().progressStatus || 0;
         const { percent } = summarise(status);
 
-        // Still running: move the bar from weighted job states, and keep every
-        // row in an active UI state. Server-side "done" rows stay in-progress
-        // here so Completed only appears when the whole batch finishes.
         if (!status.finished) {
             const displayPercent = Math.min(percent, 99);
             storeDispatch(updateProgressStatus(displayPercent - current));
 
+            const TERMINAL = ['done', 'failed', 'stopped'];
+
             status.jobs.forEach((job) => {
                 const key = `${job.source_id}_${job.to_lang}`;
-                const progress = jobProgressPercent(job.state);
+                const progress = jobProgressPercent(job);
 
-                if (job.closed) {
-                    storeDispatch(updateTranslatePostInfo({
-                        [key]: {
-                            status: 'in-progress',
-                            messageClass: 'in-progress',
-                            jobId: job.job_id,
-                            progress: 100,
-                        },
-                    }));
+                if (job.closed && TERMINAL.includes(job.state)) {
+                    const stringCount = Number(job.string_count ?? job.field_count) || 0;
+                    const charCount = Number(job.char_count) || 0;
+
+                    const update = {
+                        status: mapState(job.state),
+                        messageClass: mapClass(job.state),
+                        stringCount,
+                        charCount,
+                        jobId: job.job_id,
+                        progress,
+                    };
+
+                    if (job.state === 'done') {
+                        update.targetPostId = job.result_id;
+                        update.targetPostTitle = job.result_title || __('N/A', 'wpml-translation-check');
+                        update.postLink = job.view_link;
+                        update.postEditLink = job.edit_link;
+                    }
+
+                    if (job.state === 'failed' || job.state === 'stopped') {
+                        update.errorMessage = __('Translation failed.', 'wpml-translation-check');
+                        update.errorHtml = `<div class="automlp-wpml-error-html">${job.error || ''}</div>`;
+                        update.aiError = job.state === 'failed';
+                        update.parentPostId = job.source_id;
+                        update.targetLanguage = job.to_lang;
+                    }
+
+                    storeDispatch(unsetPendingPost(key));
+                    storeDispatch(updateTranslatePostInfo({ [key]: update }));
                     return;
                 }
 
@@ -120,7 +140,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 stringCount,
                 charCount,
                 jobId: job.job_id,
-                progress: jobProgressPercent(job.state),
+                progress: jobProgressPercent(job),
             };
 
             if (job.state === 'done') {

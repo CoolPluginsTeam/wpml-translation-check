@@ -212,30 +212,32 @@ export const pollUntilDone = async ({
 };
 
 /**
- * How far along a single job is, for a smooth progress bar.
+ * Percent complete for one job (0–100) from fields_translated / field_count.
  *
- * Closed jobs alone would jump 0 → 100 when two short jobs finish between
- * polls. Weighting in-flight states keeps the bar moving.
- */
-export const STATE_WEIGHT = {
-	waiting: 0,
-	claimed: 0.15,
-	sent: 0.55,
-	writing: 0.85,
-	done: 1,
-	failed: 1,
-	stopped: 1,
-};
-
-/**
- * Percent complete for one job state (0–100).
- *
- * @param {string} state Queue job state.
+ * @param {Object} job Job row from /queue/status.
  * @return {number}
  */
-export const jobProgressPercent = (state) => {
-	const weight = STATE_WEIGHT[state];
-	return Math.round((weight !== undefined ? weight : 0) * 100);
+export const jobProgressPercent = (job) => {
+	if (!job || typeof job !== 'object') {
+		return 0;
+	}
+
+	if (typeof job.progress_percent === 'number' && !Number.isNaN(job.progress_percent)) {
+		return Math.min(100, Math.max(0, Math.round(job.progress_percent)));
+	}
+
+	if (job.state === 'done') {
+		return 100;
+	}
+
+	const total = Number(job.field_count) || 0;
+	const done = Number(job.fields_translated) || 0;
+
+	if (total < 1 || done < 1) {
+		return 0;
+	}
+
+	return Math.min(100, Math.max(0, Math.round((done / total) * 100)));
 };
 
 /**
@@ -255,16 +257,15 @@ export const summarise = (status) => {
 	const closed = jobs.filter((job) => CLOSED_STATES.includes(job.state)).length;
 	const failed = jobs.filter((job) => job.state === 'failed').length;
 
-	const weight = jobs.reduce((sum, job) => {
-		const state = job && job.state ? job.state : 'waiting';
-		return sum + (STATE_WEIGHT[state] !== undefined ? STATE_WEIGHT[state] : 0);
-	}, 0);
+	const percent = Math.round(
+		jobs.reduce((sum, job) => sum + jobProgressPercent(job), 0) / total
+	);
 
 	return {
 		total,
 		closed,
 		failed,
-		percent: Math.round((weight / total) * 100),
+		percent: Math.min(100, Math.max(0, percent)),
 	};
 };
 

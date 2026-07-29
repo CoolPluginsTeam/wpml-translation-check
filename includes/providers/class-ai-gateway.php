@@ -97,12 +97,14 @@ class AI_Gateway {
 	 * results. Keys in the returned array match the keys passed in; any field
 	 * the provider failed to return is simply absent.
 	 *
-	 * @param array  $fields    field_name => source text.
-	 * @param string $from_lang Source language code.
-	 * @param string $to_lang   Target language code.
+	 * @param array  $fields           field_name => source text.
+	 * @param string $from_lang        Source language code.
+	 * @param string $to_lang          Target language code.
+	 * @param callable|null $on_progress Called after each batch with
+	 *                                   ( fields_translated, fields_total ).
 	 * @return array|\WP_Error field_name => translated text.
 	 */
-	public function translate_fields( array $fields, $from_lang, $to_lang ) {
+	public function translate_fields( array $fields, $from_lang, $to_lang, $on_progress = null ) {
 		if ( empty( $fields ) ) {
 			return new \WP_Error( 'automlp_empty_batch', __( 'Nothing to translate.', 'wpml-translation-check' ) );
 		}
@@ -113,8 +115,10 @@ class AI_Gateway {
 			return $ready;
 		}
 
-		$translated = array();
-		$failures   = array();
+		$translated        = array();
+		$failures          = array();
+		$fields_total      = count( $fields );
+		$fields_translated = 0;
 
 		foreach ( $this->split_into_batches( $fields ) as $batch ) {
 			$result = $this->send_batch( $batch, $from_lang, $to_lang );
@@ -125,6 +129,11 @@ class AI_Gateway {
 			}
 
 			$translated = array_merge( $translated, $result );
+			$fields_translated += count( $result );
+
+			if ( is_callable( $on_progress ) ) {
+				call_user_func( $on_progress, $fields_translated, $fields_total );
+			}
 		}
 
 		// Every batch failed: surface the first error so the job can retry.

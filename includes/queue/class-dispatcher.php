@@ -203,12 +203,16 @@ class Dispatcher {
 				throw new \RuntimeException( __( 'Every field in this job was empty.', 'wpml-translation-check' ) );
 			}
 
+			$fields_total = count( $fields );
+
 			Queue_Table::edit(
 				$job_id,
 				array(
-					'state'    => Queue_Table::STATE_SENT,
-					'provider' => $gateway->provider(),
-					'model'    => $gateway->model(),
+					'state'             => Queue_Table::STATE_SENT,
+					'provider'          => $gateway->provider(),
+					'model'             => $gateway->model(),
+					'field_count'       => $fields_total,
+					'fields_translated' => 0,
 				)
 			);
 
@@ -216,7 +220,16 @@ class Dispatcher {
 				Queue_Table::edit( $job_id, array( 'request_payload' => $fields ) );
 			}
 
-			$translated = $gateway->translate_fields( $fields, $job['from_lang'], $job['to_lang'] );
+			$progress_callback = static function ( $fields_translated, $fields_total ) use ( $job_id ) {
+				Queue_Table::update_progress( $job_id, $fields_translated, $fields_total );
+			};
+
+			$translated = $gateway->translate_fields(
+				$fields,
+				$job['from_lang'],
+				$job['to_lang'],
+				$progress_callback
+			);
 
 			if ( is_wp_error( $translated ) ) {
 				throw new \RuntimeException( $translated->get_error_message() );
@@ -226,7 +239,13 @@ class Dispatcher {
 				throw new \RuntimeException( __( 'The AI provider returned no usable translations.', 'wpml-translation-check' ) );
 			}
 
-			Queue_Table::edit( $job_id, array( 'state' => Queue_Table::STATE_WRITING ) );
+			Queue_Table::edit(
+				$job_id,
+				array(
+					'state'             => Queue_Table::STATE_WRITING,
+					'fields_translated' => count( $translated ),
+				)
+			);
 
 			if ( Queue_Table::debug_enabled() ) {
 				Queue_Table::edit( $job_id, array( 'response_payload' => $translated ) );

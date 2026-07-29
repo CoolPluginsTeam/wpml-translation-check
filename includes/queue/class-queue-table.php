@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Queue_Table
  *
- * Owns the wp_automlp_jobs table: schema, migrations and all reads/writes.
+ * Owns the wp_automlp_jobs table: schema and all reads/writes.
  * Payload columns (source_map, request_payload, response_payload) are written
  * only when debug mode is on, and are cleared when a job completes.
  */
@@ -25,13 +25,13 @@ class Queue_Table {
 	const CACHE_GROUP       = 'automlp_jobs';
 
 	/* Job states. */
-	const STATE_WAITING  = 'waiting';   // Row created, not yet claimed.
-	const STATE_CLAIMED  = 'claimed';   // Dispatcher owns it this tick.
-	const STATE_SENT     = 'sent';      // Handed to the AI provider.
-	const STATE_WRITING  = 'writing';   // Handing results back to WPML.
-	const STATE_DONE     = 'done';
-	const STATE_FAILED   = 'failed';
-	const STATE_STOPPED  = 'stopped';   // Cancelled by user or by WPML.
+	const STATE_WAITING = 'waiting';
+	const STATE_CLAIMED = 'claimed';
+	const STATE_SENT    = 'sent';
+	const STATE_WRITING = 'writing';
+	const STATE_DONE    = 'done';
+	const STATE_FAILED  = 'failed';
+	const STATE_STOPPED = 'stopped';
 
 	/**
 	 * Fully qualified table name.
@@ -43,8 +43,12 @@ class Queue_Table {
 		return $wpdb->prefix . 'automlp_jobs';
 	}
 
+	/* ------------------------------------------------------------------
+	 *  Schema
+	 * ------------------------------------------------------------------ */
+
 	/**
-	 * Create or upgrade the table.
+	 * Create the table.
 	 *
 	 * @return void
 	 */
@@ -54,7 +58,7 @@ class Queue_Table {
 		$table   = self::table();
 		$collate = $wpdb->get_charset_collate();
 
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- prefix is safe.
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$sql = "CREATE TABLE {$table} (
 			job_id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			wpml_job_id bigint(20) unsigned DEFAULT NULL,
@@ -70,6 +74,7 @@ class Queue_Table {
 			attempts smallint(5) unsigned NOT NULL DEFAULT 0,
 			last_error text DEFAULT NULL,
 			field_count int(11) NOT NULL DEFAULT 0,
+			fields_translated int(11) NOT NULL DEFAULT 0,
 			char_count bigint(20) unsigned NOT NULL DEFAULT 0,
 			source_map longtext DEFAULT NULL,
 			request_payload longtext DEFAULT NULL,
@@ -114,6 +119,10 @@ class Queue_Table {
 		}
 	}
 
+	/* ------------------------------------------------------------------
+	 *  Cache helpers
+	 * ------------------------------------------------------------------ */
+
 	/**
 	 * Invalidate every cached read.
 	 *
@@ -128,7 +137,7 @@ class Queue_Table {
 	 *
 	 * @return string
 	 */
-	public static function cache_gen() {
+	private static function cache_gen() {
 		$gen = wp_cache_get( 'gen', self::CACHE_GROUP );
 		if ( false === $gen ) {
 			$gen = microtime( true );
@@ -146,6 +155,10 @@ class Queue_Table {
 		return 'yes' === get_option( 'automlp_debug_mode', 'no' );
 	}
 
+	/* ------------------------------------------------------------------
+	 *  CRUD
+	 * ------------------------------------------------------------------ */
+
 	/**
 	 * Insert a new waiting job.
 	 *
@@ -160,18 +173,19 @@ class Queue_Table {
 		$row = wp_parse_args(
 			$args,
 			array(
-				'wpml_job_id' => null,
-				'wpml_rid'    => null,
-				'source_id'   => 0,
-				'kind'        => 'post',
-				'from_lang'   => '',
-				'to_lang'     => '',
-				'state'       => self::STATE_WAITING,
-				'field_count' => 0,
-				'char_count'  => 0,
-				'source_map'  => null,
-				'queued_at'   => $now,
-				'touched_at'  => $now,
+				'wpml_job_id'       => null,
+				'wpml_rid'          => null,
+				'source_id'         => 0,
+				'kind'              => 'post',
+				'from_lang'         => '',
+				'to_lang'           => '',
+				'state'             => self::STATE_WAITING,
+				'field_count'       => 0,
+				'fields_translated' => 0,
+				'char_count'        => 0,
+				'source_map'        => null,
+				'queued_at'         => $now,
+				'touched_at'        => $now,
 			)
 		);
 
@@ -216,8 +230,7 @@ class Queue_Table {
 	}
 
 	/**
-	 * Update rows matched by WPML job id. Used when WPML changes a job
-	 * outside our UI.
+	 * Update rows matched by WPML job id.
 	 *
 	 * @param int   $wpml_job_id icl_translate_job.job_id.
 	 * @param array $args        Column values.
@@ -266,6 +279,208 @@ class Queue_Table {
 		$decoded = json_decode( $row['source_map'], true );
 		return is_array( $decoded ) ? $decoded : array();
 	}
+
+	/* ------------------------------------------------------------------
+	 *  State transitions
+	 * ------------------------------------------------------------------ */
+
+	/**
+	 * Atomically take ownership of a waiting job.
+	 *
+	 * Returns true only for the process that won the race, so parallel cron
+	 * runs cannot send the same job twice.
+	 *
+	 * @param int $job_id Job id.
+	 * @return bool
+	 */
+	public static function claim( $job_id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET state = %s, touched_at = %s WHERE job_id = %d AND state = %s',
+				self::table(),
+				self::STATE_CLAIMED,
+				current_time( 'mysql', true ),
+				(int) $job_id,
+				self::STATE_WAITING
+			)
+		);
+
+		$won = $wpdb->rows_affected > 0;
+
+		if ( $won ) {
+			self::bump_cache();
+		}
+
+		return $won;
+	}
+
+	/**
+	 * Mark a job finished and drop its payload columns.
+	 *
+	 * @param int   $job_id Job id.
+	 * @param array $extra  Additional columns to set.
+	 * @return bool
+	 */
+	public static function finish( $job_id, array $extra = array() ) {
+		$args = array_merge(
+			$extra,
+			array(
+				'state'            => self::STATE_DONE,
+				'closed_at'        => current_time( 'mysql', true ),
+				'source_map'       => null,
+				'request_payload'  => null,
+				'response_payload' => null,
+			)
+		);
+
+		return self::edit( $job_id, $args );
+	}
+
+	/**
+	 * Record a failure, retrying while attempts remain.
+	 *
+	 * @param int    $job_id      Job id.
+	 * @param string $message     Error text.
+	 * @param int    $max_retries Attempt ceiling.
+	 * @return void
+	 */
+	public static function fail( $job_id, $message, $max_retries = 3 ) {
+		$row = self::get( $job_id );
+
+		if ( ! $row ) {
+			return;
+		}
+
+		$attempts = (int) $row['attempts'] + 1;
+
+		if ( $attempts <= (int) $max_retries ) {
+			self::edit(
+				$job_id,
+				array(
+					'state'             => self::STATE_WAITING,
+					'attempts'          => $attempts,
+					'last_error'        => $message,
+					'fields_translated' => 0,
+				)
+			);
+			return;
+		}
+
+		self::edit(
+			$job_id,
+			array(
+				'state'             => self::STATE_FAILED,
+				'attempts'          => $attempts,
+				'last_error'        => $message,
+				'fields_translated' => 0,
+				'closed_at'         => current_time( 'mysql', true ),
+				'request_payload'   => null,
+				'response_payload'  => null,
+			)
+		);
+	}
+
+	/* ------------------------------------------------------------------
+	 *  Progress
+	 * ------------------------------------------------------------------ */
+
+	/**
+	 * Persist batch progress after each AI batch.
+	 *
+	 * @param int $job_id            Job id.
+	 * @param int $fields_translated Fields translated so far.
+	 * @param int $fields_total      Total fields in this job.
+	 * @return bool
+	 */
+	public static function update_progress( $job_id, $fields_translated, $fields_total ) {
+		$fields_total      = max( 1, (int) $fields_total );
+		$fields_translated = min( max( 0, (int) $fields_translated ), $fields_total );
+
+		return self::edit(
+			$job_id,
+			array(
+				'fields_translated' => $fields_translated,
+				'field_count'       => $fields_total,
+			)
+		);
+	}
+
+	/**
+	 * Percent complete for UI progress bars (0–100).
+	 *
+	 * Derived from fields_translated / field_count at read time.
+	 *
+	 * @param array $row Queue row.
+	 * @return int
+	 */
+	public static function progress_percent( array $row ) {
+		$state = isset( $row['state'] ) ? (string) $row['state'] : self::STATE_WAITING;
+
+		if ( self::STATE_DONE === $state ) {
+			return 100;
+		}
+
+		if ( in_array( $state, array( self::STATE_FAILED, self::STATE_STOPPED ), true ) ) {
+			return 0;
+		}
+
+		$total = isset( $row['field_count'] ) ? (int) $row['field_count'] : 0;
+		$done  = isset( $row['fields_translated'] ) ? (int) $row['fields_translated'] : 0;
+
+		if ( $total < 1 || $done < 1 ) {
+			return 0;
+		}
+
+		return min( 100, max( 0, (int) round( ( $done / $total ) * 100 ) ) );
+	}
+
+	/* ------------------------------------------------------------------
+	 *  Recovery
+	 * ------------------------------------------------------------------ */
+
+	/**
+	 * Return jobs stuck mid-flight back to waiting.
+	 *
+	 * A crashed cron run leaves rows in 'claimed' or 'sent' forever. Anything
+	 * untouched for longer than the timeout is assumed abandoned.
+	 *
+	 * @param int $minutes Staleness threshold.
+	 * @return int Rows recovered.
+	 */
+	public static function recover_stale( $minutes = 15 ) {
+		global $wpdb;
+
+		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( absint( $minutes ) * MINUTE_IN_SECONDS ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$wpdb->query(
+			$wpdb->prepare(
+				'UPDATE %i SET state = %s, touched_at = %s, fields_translated = 0
+				 WHERE state IN (%s, %s) AND touched_at < %s',
+				self::table(),
+				self::STATE_WAITING,
+				current_time( 'mysql', true ),
+				self::STATE_CLAIMED,
+				self::STATE_SENT,
+				$cutoff
+			)
+		);
+
+		$count = (int) $wpdb->rows_affected;
+
+		if ( $count > 0 ) {
+			self::bump_cache();
+		}
+
+		return $count;
+	}
+
+	/* ------------------------------------------------------------------
+	 *  Queries
+	 * ------------------------------------------------------------------ */
 
 	/**
 	 * Cheap existence check so the cron can bail before doing real work.
@@ -316,139 +531,6 @@ class Queue_Table {
 	}
 
 	/**
-	 * Atomically take ownership of a waiting job.
-	 *
-	 * Returns true only for the process that won the race, so parallel cron
-	 * runs cannot send the same job twice.
-	 *
-	 * @param int $job_id Job id.
-	 * @return bool
-	 */
-	public static function claim( $job_id ) {
-		global $wpdb;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$wpdb->query(
-			$wpdb->prepare(
-				'UPDATE %i SET state = %s, touched_at = %s WHERE job_id = %d AND state = %s',
-				self::table(),
-				self::STATE_CLAIMED,
-				current_time( 'mysql', true ),
-				(int) $job_id,
-				self::STATE_WAITING
-			)
-		);
-
-		$won = $wpdb->rows_affected > 0;
-
-		if ( $won ) {
-			self::bump_cache();
-		}
-
-		return $won;
-	}
-
-	/**
-	 * Return jobs stuck mid-flight back to waiting.
-	 *
-	 * A crashed cron run leaves rows in 'claimed' or 'sent' forever. Anything
-	 * untouched for longer than the timeout is assumed abandoned.
-	 *
-	 * @param int $minutes Staleness threshold.
-	 * @return int Rows recovered.
-	 */
-	public static function recover_stale( $minutes = 15 ) {
-		global $wpdb;
-
-		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( absint( $minutes ) * MINUTE_IN_SECONDS ) );
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
-		$wpdb->query(
-			$wpdb->prepare(
-				'UPDATE %i SET state = %s, touched_at = %s WHERE state IN (%s, %s) AND touched_at < %s',
-				self::table(),
-				self::STATE_WAITING,
-				current_time( 'mysql', true ),
-				self::STATE_CLAIMED,
-				self::STATE_SENT,
-				$cutoff
-			)
-		);
-
-		$count = (int) $wpdb->rows_affected;
-
-		if ( $count > 0 ) {
-			self::bump_cache();
-		}
-
-		return $count;
-	}
-
-	/**
-	 * Mark a job finished and drop its payload columns.
-	 *
-	 * @param int   $job_id Job id.
-	 * @param array $extra  Additional columns to set.
-	 * @return bool
-	 */
-	public static function finish( $job_id, array $extra = array() ) {
-		$args = array_merge(
-			$extra,
-			array(
-				'state'            => self::STATE_DONE,
-				'closed_at'        => current_time( 'mysql', true ),
-				'source_map'       => null,
-				'request_payload'  => null,
-				'response_payload' => null,
-			)
-		);
-
-		return self::edit( $job_id, $args );
-	}
-
-	/**
-	 * Record a failure, retrying while attempts remain.
-	 *
-	 * @param int    $job_id      Job id.
-	 * @param string $message     Error text.
-	 * @param int    $max_retries Attempt ceiling.
-	 * @return void
-	 */
-	public static function fail( $job_id, $message, $max_retries = 3 ) {
-		$row = self::get( $job_id );
-
-		if ( ! $row ) {
-			return;
-		}
-
-		$attempts = (int) $row['attempts'] + 1;
-
-		if ( $attempts <= (int) $max_retries ) {
-			self::edit(
-				$job_id,
-				array(
-					'state'      => self::STATE_WAITING,
-					'attempts'   => $attempts,
-					'last_error' => $message,
-				)
-			);
-			return;
-		}
-
-		self::edit(
-			$job_id,
-			array(
-				'state'            => self::STATE_FAILED,
-				'attempts'         => $attempts,
-				'last_error'       => $message,
-				'closed_at'        => current_time( 'mysql', true ),
-				'request_payload'  => null,
-				'response_payload' => null,
-			)
-		);
-	}
-
-	/**
 	 * Snapshot of queue state for the admin UI.
 	 *
 	 * @return array<string,int>
@@ -489,7 +571,7 @@ class Queue_Table {
 	}
 
 	/**
-	 * Jobs for the status view, newest first.
+	 * Jobs for the admin queue view, newest first.
 	 *
 	 * @param array $args page, per_page, states.
 	 * @return array{rows:array,total:int,pages:int}
@@ -532,8 +614,8 @@ class Queue_Table {
 			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->prepare(
 				"SELECT job_id, wpml_job_id, source_id, result_id, kind, from_lang, to_lang,
-				        state, provider, model, attempts, last_error, field_count, char_count,
-				        queued_at, closed_at
+				        state, provider, model, attempts, last_error, field_count,
+				        fields_translated, char_count, queued_at, closed_at
 				 FROM %i WHERE {$where} ORDER BY job_id DESC LIMIT %d OFFSET %d",
 				$params
 			),
@@ -593,6 +675,10 @@ class Queue_Table {
 		return $out;
 	}
 
+	/* ------------------------------------------------------------------
+	 *  Housekeeping
+	 * ------------------------------------------------------------------ */
+
 	/**
 	 * Strip payloads from old finished jobs and delete very old rows.
 	 *
@@ -633,5 +719,89 @@ class Queue_Table {
 		);
 
 		self::bump_cache();
+	}
+
+	/**
+	 * Delete all finished rows (done/failed/stopped).
+	 *
+	 * @return int Rows deleted.
+	 */
+	public static function delete_finished() {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			$wpdb->prepare(
+				'DELETE FROM %i WHERE state IN (%s, %s, %s)',
+				self::table(),
+				self::STATE_DONE,
+				self::STATE_FAILED,
+				self::STATE_STOPPED
+			)
+		);
+
+		$count = (int) $wpdb->rows_affected;
+
+		if ( $count > 0 ) {
+			self::bump_cache();
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Claimed rows that never reached the AI step (fields_translated still zero).
+	 *
+	 * @param int $seconds Minimum age before treating as orphaned.
+	 * @return array<int,array> Matching rows (job_id, wpml_job_id).
+	 */
+	public static function orphan_claimed_rows( $seconds = 60 ) {
+		global $wpdb;
+
+		$cutoff = gmdate( 'Y-m-d H:i:s', time() - max( 1, absint( $seconds ) ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				'SELECT job_id, wpml_job_id FROM %i
+				 WHERE state = %s AND fields_translated = 0 AND touched_at < %s',
+				self::table(),
+				self::STATE_CLAIMED,
+				$cutoff
+			),
+			ARRAY_A
+		);
+
+		return $rows ? $rows : array();
+	}
+
+	/**
+	 * Delete claimed rows that never reached the AI step.
+	 *
+	 * @param int $seconds Minimum age before treating as orphaned.
+	 * @return int Rows deleted.
+	 */
+	public static function delete_orphan_claimed( $seconds = 60 ) {
+		global $wpdb;
+
+		$cutoff = gmdate( 'Y-m-d H:i:s', time() - max( 1, absint( $seconds ) ) );
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$wpdb->query(
+			$wpdb->prepare(
+				'DELETE FROM %i WHERE state = %s AND fields_translated = 0 AND touched_at < %s',
+				self::table(),
+				self::STATE_CLAIMED,
+				$cutoff
+			)
+		);
+
+		$count = (int) $wpdb->rows_affected;
+
+		if ( $count > 0 ) {
+			self::bump_cache();
+		}
+
+		return $count;
 	}
 }
