@@ -47,6 +47,12 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         waiting: 'warning',
     }[state] || 'in-progress');
 
+    const displayState = (job) => {
+        const progress = jobProgressPercent(job);
+
+        return job.state === 'waiting' && progress > 0 ? 'sent' : job.state;
+    };
+
     /**
      * Push one poll payload into the store.
      *
@@ -63,7 +69,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         const { percent } = summarise(status);
 
         if (!status.finished) {
-            const displayPercent = Math.min(percent, 99);
+            const displayPercent = Math.min(Math.max(current, percent), 99);
             storeDispatch(updateProgressStatus(displayPercent - current));
 
             const TERMINAL = ['done', 'failed', 'stopped'];
@@ -71,14 +77,15 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
             status.jobs.forEach((job) => {
                 const key = `${job.source_id}_${job.to_lang}`;
                 const progress = jobProgressPercent(job);
+                const state = displayState(job);
 
                 if (job.closed && TERMINAL.includes(job.state)) {
                     const stringCount = Number(job.string_count ?? job.field_count) || 0;
                     const charCount = Number(job.char_count) || 0;
 
                     const update = {
-                        status: mapState(job.state),
-                        messageClass: mapClass(job.state),
+                        status: mapState(state),
+                        messageClass: mapClass(state),
                         stringCount,
                         charCount,
                         jobId: job.job_id,
@@ -107,8 +114,8 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
                 storeDispatch(updateTranslatePostInfo({
                     [key]: {
-                        status: mapState(job.state),
-                        messageClass: mapClass(job.state),
+                        status: mapState(state),
+                        messageClass: mapClass(state),
                         jobId: job.job_id,
                         progress,
                     },
@@ -255,7 +262,6 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 });
     
                 storeDispatch(updateCountInfo({ endTime: new Date().getTime() }));
-                setProgressBarVisibility(false);
             } catch (error) {
                 setEmptyPostMessage(
                     error && error.message
@@ -373,9 +379,11 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 return;
             }
 
-            setTimeout(() => {
+            const hideTimer = setTimeout(() => {
                 setProgressBarVisibility(false);
             }, 2000);
+
+            return () => clearTimeout(hideTimer);
         }
     }, [pendingPosts, progressStatus, countInfo.postsTranslated]);
 
@@ -473,6 +481,9 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 return __('Completed', 'wpml-translation-check');
             case 'in-queue':
                 return __('In Queue', 'wpml-translation-check');
+            case 'running':
+            case 'in-progress':
+                return __('In Progress', 'wpml-translation-check');
             default:
                 return '';
         }
@@ -655,7 +666,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                             <>
                                                                 {info.status === 'completed' ?
                                                                     <a href={info.postLink} target="_blank" rel="noopener noreferrer">{info.targetPostTitle}</a> :
-                                                                    (info.status === 'in-progress' ?
+                                                                    (workingStatus ?
                                                                         <div className={`${prefix}-${info.messageClass}-text`}>{__('In Progress', 'wpml-translation-check')}<span></span></div> :
                                                                         <div className={`${prefix}-progress-skeleton short`} style={{ marginInline: 'auto' }}></div>)
                                                                 }
@@ -685,7 +696,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                                     )}
                                                                 </span>
                                                                 :
-                                                                (info.status === 'in-progress' ?
+                                                                (workingStatus ?
                                                                     <div className={`${prefix}-${info.messageClass}-text`}>{__('In Progress', 'wpml-translation-check')}<span></span></div> :
                                                                     <div className={`${prefix}-progress-skeleton short`}></div>)
                                                             }

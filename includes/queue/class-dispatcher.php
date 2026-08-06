@@ -203,7 +203,15 @@ class Dispatcher {
 				throw new \RuntimeException( __( 'Every field in this job was empty.', 'wpml-translation-check' ) );
 			}
 
-			$fields_total = count( $fields );
+			$units = $gateway->translation_units( $fields );
+
+			if ( empty( $units ) ) {
+				throw new \RuntimeException( __( 'No translation units could be prepared for this job.', 'wpml-translation-check' ) );
+			}
+
+			$units_total      = count( $units );
+			$partial          = Queue_Table::read_response_payload( $job );
+			$units_translated = self::count_translated_units( $units, $partial );
 
 			Queue_Table::edit(
 				$job_id,
@@ -211,8 +219,8 @@ class Dispatcher {
 					'state'             => Queue_Table::STATE_SENT,
 					'provider'          => $gateway->provider(),
 					'model'             => $gateway->model(),
-					'field_count'       => $fields_total,
-					'fields_translated' => 0,
+					'field_count'       => $units_total,
+					'fields_translated' => $units_translated,
 				)
 			);
 
@@ -220,30 +228,58 @@ class Dispatcher {
 				Queue_Table::edit( $job_id, array( 'request_payload' => $fields ) );
 			}
 
-			$progress_callback = static function ( $fields_translated, $fields_total ) use ( $job_id ) {
-				Queue_Table::update_progress( $job_id, $fields_translated, $fields_total );
-			};
+			if ( $units_translated < $units_total ) {
+				$batch = $gateway->next_unit_batch( $units, $units_translated );
 
-			$translated = $gateway->translate_fields(
-				$fields,
-				$job['from_lang'],
-				$job['to_lang'],
-				$progress_callback
-			);
+				if ( empty( $batch ) ) {
+					throw new \RuntimeException( __( 'The next translation batch could not be prepared.', 'wpml-translation-check' ) );
+				}
 
-			if ( is_wp_error( $translated ) ) {
-				throw new \RuntimeException( $translated->get_error_message() );
+				$result = $gateway->translate_units(
+					$batch,
+					$job['from_lang'],
+					$job['to_lang']
+				);
+
+				if ( is_wp_error( $result ) ) {
+					throw new \RuntimeException( $result->get_error_message() );
+				}
+
+				self::merge_partial_response( $partial, $batch, $result );
+				$units_translated = self::count_translated_units( $units, $partial );
+
+				if ( $units_translated < $units_total ) {
+					Queue_Table::edit(
+						$job_id,
+						array(
+							'state'             => Queue_Table::STATE_WAITING,
+							'field_count'       => $units_total,
+							'fields_translated' => $units_translated,
+							'response_payload'  => $partial,
+							'last_error'        => null,
+						)
+					);
+					return;
+				}
 			}
+
+			$translated = $gateway->reassemble_units( $fields, $units, $partial );
 
 			if ( empty( $translated ) ) {
 				throw new \RuntimeException( __( 'The AI provider returned no usable translations.', 'wpml-translation-check' ) );
+			}
+
+			if ( count( $translated ) < count( $fields ) ) {
+				throw new \RuntimeException( __( 'The AI provider did not return every required translation chunk.', 'wpml-translation-check' ) );
 			}
 
 			Queue_Table::edit(
 				$job_id,
 				array(
 					'state'             => Queue_Table::STATE_WRITING,
-					'fields_translated' => count( $translated ),
+					'field_count'       => $units_total,
+					'fields_translated' => $units_total,
+					'response_payload'  => $partial,
 				)
 			);
 
@@ -269,8 +305,9 @@ class Dispatcher {
 			}
 
 			$stats = array(
-				'field_count' => count( $translated ),
-				'char_count'  => array_sum( array_map( 'mb_strlen', array_map( 'strval', $translated ) ) ),
+				'field_count'       => count( $translated ),
+				'fields_translated' => count( $translated ),
+				'char_count'        => array_sum( array_map( 'mb_strlen', array_map( 'strval', $translated ) ) ),
 			);
 
 			if ( is_array( $written ) && ! empty( $written['result_id'] ) ) {
@@ -306,6 +343,59 @@ class Dispatcher {
 			Queue_Table::fail( $job_id, $e->getMessage(), self::MAX_RETRIES );
 			self::log( sprintf( 'Job #%d failed: %s', $job_id, $e->getMessage() ) );
 		}
+	}
+
+	/**
+	 * Merge one translated unit batch into the persisted partial payload.
+	 *
+	 * @param array $partial Existing partial payload.
+	 * @param array $batch   Units sent to the provider.
+	 * @param array $result  field => chunk_index => translated text.
+	 * @return void
+	 */
+	private static function merge_partial_response( array &$partial, array $batch, array $result ) {
+		foreach ( $batch as $unit ) {
+			$field = isset( $unit['field'] ) ? (string) $unit['field'] : '';
+			$index = isset( $unit['index'] ) ? (int) $unit['index'] : 0;
+
+			if ( '' === $field || ! isset( $result[ $field ] ) || ! is_array( $result[ $field ] ) || ! array_key_exists( $index, $result[ $field ] ) ) {
+				throw new \RuntimeException( __( 'The AI provider skipped part of the translation response.', 'wpml-translation-check' ) );
+			}
+
+			$value = (string) $result[ $field ][ $index ];
+
+			if ( '' === trim( $value ) ) {
+				throw new \RuntimeException( __( 'The AI provider returned an empty translation chunk.', 'wpml-translation-check' ) );
+			}
+
+			if ( ! isset( $partial[ $field ] ) || ! is_array( $partial[ $field ] ) ) {
+				$partial[ $field ] = array();
+			}
+
+			$partial[ $field ][ $index ] = $value;
+		}
+	}
+
+	/**
+	 * Count completed units in a partial payload.
+	 *
+	 * @param array $units   Ordered units.
+	 * @param array $partial field => chunk_index => translated text.
+	 * @return int
+	 */
+	private static function count_translated_units( array $units, array $partial ) {
+		$count = 0;
+
+		foreach ( $units as $unit ) {
+			$field = isset( $unit['field'] ) ? (string) $unit['field'] : '';
+			$index = isset( $unit['index'] ) ? (int) $unit['index'] : 0;
+
+			if ( '' !== $field && isset( $partial[ $field ] ) && is_array( $partial[ $field ] ) && array_key_exists( $index, $partial[ $field ] ) ) {
+				++$count;
+			}
+		}
+
+		return $count;
 	}
 
 	/**

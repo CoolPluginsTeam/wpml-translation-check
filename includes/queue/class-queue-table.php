@@ -15,8 +15,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Queue_Table
  *
  * Owns the wp_automlp_jobs table: schema and all reads/writes.
- * Payload columns (source_map, request_payload, response_payload) are written
- * only when debug mode is on, and are cleared when a job completes.
+ * source_map stores WPML field metadata until completion. request_payload is
+ * debug-only. response_payload stores completed translation chunks while a
+ * large job is in progress, then is cleared when the job completes.
  */
 class Queue_Table {
 
@@ -277,6 +278,21 @@ class Queue_Table {
 			return array();
 		}
 		$decoded = json_decode( $row['source_map'], true );
+		return is_array( $decoded ) ? $decoded : array();
+	}
+
+	/**
+	 * Decode a job's stored partial translated chunks.
+	 *
+	 * @param array $row Job row.
+	 * @return array field_name => chunk_index => translated text.
+	 */
+	public static function read_response_payload( array $row ) {
+		if ( empty( $row['response_payload'] ) ) {
+			return array();
+		}
+
+		$decoded = json_decode( $row['response_payload'], true );
 		return is_array( $decoded ) ? $decoded : array();
 	}
 

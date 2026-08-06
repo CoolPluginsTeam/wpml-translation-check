@@ -34,6 +34,12 @@ class AI_Gateway {
 	const CHARS_PER_TOKEN = 4;
 
 	/**
+	 * Large WPML fields are split into smaller translation units so the queue
+	 * can report real progress between provider calls.
+	 */
+	const CHARS_PER_CHUNK = 2000;
+
+	/**
 	 * Seconds to wait for a provider response.
 	 */
 	const TIMEOUT = 120;
@@ -115,51 +121,223 @@ class AI_Gateway {
 			return $ready;
 		}
 
-		$translated        = array();
-		$failures          = array();
-		$fields_total      = count( $fields );
-		$fields_translated = 0;
+		$units = $this->translation_units( $fields );
 
-		foreach ( $this->split_into_batches( $fields ) as $batch ) {
-			$result = $this->send_batch( $batch, $from_lang, $to_lang );
+		if ( empty( $units ) ) {
+			return new \WP_Error( 'automlp_empty_batch', __( 'Nothing to translate.', 'wpml-translation-check' ) );
+		}
+
+		$partial          = array();
+		$failures         = array();
+		$units_total      = count( $units );
+		$units_translated = 0;
+
+		foreach ( $this->split_units_into_batches( $units ) as $batch ) {
+			$result = $this->translate_units( $batch, $from_lang, $to_lang );
 
 			if ( is_wp_error( $result ) ) {
 				$failures[] = $result->get_error_message();
 				continue;
 			}
 
-			$translated = array_merge( $translated, $result );
-			$fields_translated += count( $result );
+			foreach ( $result as $field => $chunks ) {
+				if ( ! isset( $partial[ $field ] ) || ! is_array( $partial[ $field ] ) ) {
+					$partial[ $field ] = array();
+				}
+
+				foreach ( (array) $chunks as $index => $value ) {
+					$partial[ $field ][ (int) $index ] = (string) $value;
+				}
+			}
+
+			$units_translated = $this->count_translated_units( $units, $partial );
 
 			if ( is_callable( $on_progress ) ) {
-				call_user_func( $on_progress, $fields_translated, $fields_total );
+				call_user_func( $on_progress, $units_translated, $units_total );
 			}
 		}
 
 		// Every batch failed: surface the first error so the job can retry.
-		if ( empty( $translated ) && ! empty( $failures ) ) {
+		if ( empty( $partial ) && ! empty( $failures ) ) {
 			return new \WP_Error( 'automlp_provider_failed', $failures[0] );
 		}
 
-		return $translated;
+		return $this->reassemble_units( $fields, $units, $partial );
 	}
 
 	/**
-	 * Group fields into batches under the token ceiling.
+	 * Build ordered translation units from a WPML field map.
 	 *
-	 * A single field longer than the ceiling gets its own batch rather than
+	 * Each unit keeps its parent field and chunk index so translated chunks can
+	 * be reassembled without relying on model-generated field names.
+	 *
+	 * @param array $fields field_name => source text.
+	 * @return array<int,array{field:string,index:int,text:string}>
+	 */
+	public function translation_units( array $fields ) {
+		$units = array();
+
+		foreach ( $fields as $field => $text ) {
+			$field  = (string) $field;
+			$chunks = $this->split_text_into_chunks( (string) $text );
+
+			foreach ( $chunks as $index => $chunk ) {
+				$units[] = array(
+					'field' => $field,
+					'index' => (int) $index,
+					'text'  => (string) $chunk,
+				);
+			}
+		}
+
+		return $units;
+	}
+
+	/**
+	 * Return the next provider-sized unit batch starting at an offset.
+	 *
+	 * @param array $units  Ordered units from translation_units().
+	 * @param int   $offset Number of units already translated.
+	 * @return array<int,array{field:string,index:int,text:string}>
+	 */
+	public function next_unit_batch( array $units, $offset = 0 ) {
+		$offset = max( 0, (int) $offset );
+		$slice  = array_slice( $units, $offset );
+
+		$batches = $this->split_units_into_batches( $slice );
+
+		return empty( $batches ) ? array() : $batches[0];
+	}
+
+	/**
+	 * Translate a single unit batch.
+	 *
+	 * @param array  $units     Units to translate.
+	 * @param string $from_lang Source language.
+	 * @param string $to_lang   Target language.
+	 * @return array|\WP_Error field => chunk_index => translated text.
+	 */
+	public function translate_units( array $units, $from_lang, $to_lang ) {
+		if ( empty( $units ) ) {
+			return array();
+		}
+
+		$ready = $this->ensure_ready();
+
+		if ( is_wp_error( $ready ) ) {
+			return $ready;
+		}
+
+		$wire = array();
+		$map  = array();
+
+		foreach ( $units as $unit_key => $unit ) {
+			if ( empty( $unit['field'] ) || ! array_key_exists( 'text', $unit ) ) {
+				continue;
+			}
+
+			$key          = (string) $unit_key;
+			$wire[ $key ] = (string) $unit['text'];
+			$map[ $key ]  = array(
+				'field' => (string) $unit['field'],
+				'index' => isset( $unit['index'] ) ? (int) $unit['index'] : 0,
+			);
+		}
+
+		if ( empty( $wire ) ) {
+			return array();
+		}
+
+		$result = $this->send_batch( $wire, $from_lang, $to_lang );
+
+		if ( is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$out = array();
+
+		foreach ( $result as $key => $value ) {
+			if ( ! isset( $map[ $key ] ) ) {
+				continue;
+			}
+
+			$field = $map[ $key ]['field'];
+			$index = $map[ $key ]['index'];
+
+			if ( ! isset( $out[ $field ] ) ) {
+				$out[ $field ] = array();
+			}
+
+			$out[ $field ][ $index ] = (string) $value;
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Rebuild field translations from completed unit chunks.
+	 *
+	 * Fields are returned only when every one of their chunks is present.
+	 *
+	 * @param array $fields  Original field map.
+	 * @param array $units   Ordered units from translation_units().
+	 * @param array $partial field => chunk_index => translated text.
+	 * @return array field_name => translated text.
+	 */
+	public function reassemble_units( array $fields, array $units, array $partial ) {
+		$out = array();
+
+		foreach ( $fields as $field => $_text ) {
+			$field_chunks = array_filter(
+				$units,
+				static function ( $unit ) use ( $field ) {
+					return isset( $unit['field'] ) && (string) $unit['field'] === (string) $field;
+				}
+			);
+
+			if ( empty( $field_chunks ) ) {
+				continue;
+			}
+
+			$text     = '';
+			$complete = true;
+
+			foreach ( $field_chunks as $unit ) {
+				$index = isset( $unit['index'] ) ? (int) $unit['index'] : 0;
+
+				if ( ! isset( $partial[ $field ] ) || ! is_array( $partial[ $field ] ) || ! array_key_exists( $index, $partial[ $field ] ) ) {
+					$complete = false;
+					break;
+				}
+
+				$text .= (string) $partial[ $field ][ $index ];
+			}
+
+			if ( $complete ) {
+				$out[ $field ] = $text;
+			}
+		}
+
+		return $out;
+	}
+
+	/**
+	 * Group units into batches under the token ceiling.
+	 *
+	 * A single unit longer than the ceiling gets its own batch rather than
 	 * being dropped.
 	 *
-	 * @param array $fields field_name => text.
-	 * @return array<int,array<string,string>>
+	 * @param array $units Ordered translation units.
+	 * @return array<int,array<int,array{field:string,index:int,text:string}>>
 	 */
-	private function split_into_batches( array $fields ) {
+	private function split_units_into_batches( array $units ) {
 		$batches = array();
 		$current = array();
 		$tokens  = 0;
 
-		foreach ( $fields as $name => $text ) {
-			$cost = (int) ceil( mb_strlen( (string) $text ) / self::CHARS_PER_TOKEN );
+		foreach ( $units as $unit ) {
+			$text = isset( $unit['text'] ) ? (string) $unit['text'] : '';
+			$cost = (int) ceil( mb_strlen( $text ) / self::CHARS_PER_TOKEN );
 
 			if ( ! empty( $current ) && ( $tokens + $cost ) > self::TOKENS_PER_BATCH ) {
 				$batches[] = $current;
@@ -167,8 +345,8 @@ class AI_Gateway {
 				$tokens    = 0;
 			}
 
-			$current[ $name ] = (string) $text;
-			$tokens          += $cost;
+			$current[] = $unit;
+			$tokens   += $cost;
 		}
 
 		if ( ! empty( $current ) ) {
@@ -176,6 +354,178 @@ class AI_Gateway {
 		}
 
 		return $batches;
+	}
+
+	/**
+	 * Count translated units present in a partial response.
+	 *
+	 * @param array $units   Ordered units.
+	 * @param array $partial field => chunk_index => translated text.
+	 * @return int
+	 */
+	private function count_translated_units( array $units, array $partial ) {
+		$count = 0;
+
+		foreach ( $units as $unit ) {
+			$field = isset( $unit['field'] ) ? (string) $unit['field'] : '';
+			$index = isset( $unit['index'] ) ? (int) $unit['index'] : 0;
+
+			if ( '' !== $field && isset( $partial[ $field ] ) && is_array( $partial[ $field ] ) && array_key_exists( $index, $partial[ $field ] ) ) {
+				++$count;
+			}
+		}
+
+		return $count;
+	}
+
+	/**
+	 * Split a large field into progress-reportable chunks.
+	 *
+	 * Structured payloads are kept atomic because splitting them could produce
+	 * invalid JSON or serialized data. Regular content is split on Gutenberg,
+	 * HTML, sentence, then whitespace boundaries.
+	 *
+	 * @param string $text Source text.
+	 * @return array<int,string>
+	 */
+	private function split_text_into_chunks( $text ) {
+		$limit = (int) apply_filters( 'automlp_translation_chunk_chars', self::CHARS_PER_CHUNK );
+		$limit = max( 500, $limit );
+
+		if ( mb_strlen( $text ) <= $limit || $this->is_atomic_text( $text ) ) {
+			return array( $text );
+		}
+
+		$segments = preg_split(
+			'/(<!--\s*\/wp:[^>]+-->\s*|<\/(?:p|div|section|article|li|h[1-6]|blockquote|tr|td|th)>\s*)/i',
+			$text,
+			-1,
+			PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY
+		);
+
+		if ( ! is_array( $segments ) || empty( $segments ) ) {
+			return $this->split_long_segment( $text, $limit );
+		}
+
+		$blocks = array();
+
+		foreach ( $segments as $segment ) {
+			if ( preg_match( '/^(?:<!--\s*\/wp:[^>]+-->|<\/(?:p|div|section|article|li|h[1-6]|blockquote|tr|td|th)>)/i', ltrim( $segment ) ) && ! empty( $blocks ) ) {
+				$blocks[ count( $blocks ) - 1 ] .= $segment;
+				continue;
+			}
+
+			$blocks[] = $segment;
+		}
+
+		return $this->pack_segments( $blocks, $limit );
+	}
+
+	/**
+	 * Keep JSON/serialized structures together.
+	 *
+	 * @param string $text Source text.
+	 * @return bool
+	 */
+	private function is_atomic_text( $text ) {
+		$trimmed = trim( $text );
+
+		if ( '' === $trimmed ) {
+			return true;
+		}
+
+		if ( ( 0 === strpos( $trimmed, '{' ) && substr( $trimmed, -1 ) === '}' ) || ( 0 === strpos( $trimmed, '[' ) && substr( $trimmed, -1 ) === ']' ) ) {
+			return true;
+		}
+
+		return 1 === preg_match( '/^(?:a|O|s|i|b|d):\d+[:;]/', $trimmed );
+	}
+
+	/**
+	 * Pack logical segments into chunks.
+	 *
+	 * @param array $segments Source segments.
+	 * @param int   $limit    Character ceiling.
+	 * @return array<int,string>
+	 */
+	private function pack_segments( array $segments, $limit ) {
+		$chunks  = array();
+		$current = '';
+
+		foreach ( $segments as $segment ) {
+			$segment = (string) $segment;
+
+			if ( mb_strlen( $segment ) > $limit ) {
+				if ( '' !== $current ) {
+					$chunks[] = $current;
+					$current  = '';
+				}
+
+				$chunks = array_merge( $chunks, $this->split_long_segment( $segment, $limit ) );
+				continue;
+			}
+
+			if ( '' !== $current && mb_strlen( $current . $segment ) > $limit ) {
+				$chunks[] = $current;
+				$current  = $segment;
+				continue;
+			}
+
+			$current .= $segment;
+		}
+
+		if ( '' !== $current ) {
+			$chunks[] = $current;
+		}
+
+		return empty( $chunks ) ? array( implode( '', $segments ) ) : $chunks;
+	}
+
+	/**
+	 * Split an oversized segment on the best available safe boundary.
+	 *
+	 * @param string $text  Source text.
+	 * @param int    $limit Character ceiling.
+	 * @return array<int,string>
+	 */
+	private function split_long_segment( $text, $limit ) {
+		$chunks = array();
+
+		while ( mb_strlen( $text ) > $limit ) {
+			$window = mb_substr( $text, 0, $limit );
+			$cut    = $this->last_boundary( $window, $limit );
+
+			$chunks[] = mb_substr( $text, 0, $cut );
+			$text     = mb_substr( $text, $cut );
+		}
+
+		if ( '' !== $text ) {
+			$chunks[] = $text;
+		}
+
+		return $chunks;
+	}
+
+	/**
+	 * Best boundary before the chunk ceiling.
+	 *
+	 * @param string $window Candidate chunk.
+	 * @param int    $limit  Character ceiling.
+	 * @return int
+	 */
+	private function last_boundary( $window, $limit ) {
+		$minimum    = (int) floor( $limit * 0.35 );
+		$boundaries = array( "\n\n", "\n", '. ', '! ', '? ', '; ', ', ', ' ' );
+
+		foreach ( $boundaries as $boundary ) {
+			$pos = mb_strrpos( $window, $boundary );
+
+			if ( false !== $pos && $pos >= $minimum ) {
+				return $pos + mb_strlen( $boundary );
+			}
+		}
+
+		return $limit;
 	}
 
 	/**
