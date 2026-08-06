@@ -2,8 +2,8 @@
 /**
  * Wires the background translation flow together.
  *
- * Everything runs behind a feature flag so the new pipeline can be enabled on
- * staging while the existing browser-driven flow stays untouched in production.
+ * Core WPML hooks are always attached because direct queue requests can create
+ * jobs even when the scheduled background flow is disabled.
  *
  * @package WPML_Auto_Translate
  */
@@ -50,13 +50,13 @@ class Background_Flow {
 	 * @return void
 	 */
 	public static function boot() {
-		if ( ! self::enabled() ) {
-			return;
-		}
-
 		Bot_Translator::boot();
 		Job_Listener::boot();
 		Writer::boot();
+
+		if ( ! self::enabled() ) {
+			return;
+		}
 
 		add_action( 'admin_init', array( __CLASS__, 'ensure_translator' ) );
 		add_action( 'admin_notices', array( __CLASS__, 'render_notices' ) );
