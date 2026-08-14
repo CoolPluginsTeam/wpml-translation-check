@@ -196,7 +196,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = Version 1.2.7 | 14/08/2026 =
-* Updated: Replaced outdated AI provider models with the latest versions.
+* Added: Added the latest AI provider models.
 
 = Version 1.2.6 | 16/06/2026 =
 * Improved: Cleaned up the notice registration logic for better readability.
