@@ -330,13 +330,13 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 									>
 									<?php
 									$automlp_preferred_models = array(
-										'gpt-5.4'             => __( 'gpt-5.4 (Best Quality)', 'wpml-translation-check' ),
-										'gpt-5.4-pro'         => __( 'gpt-5.4-pro (Highest Accuracy)', 'wpml-translation-check' ),
-										'gpt-5.3-chat-latest' => __( 'gpt-5.3-chat-latest (Recommended)', 'wpml-translation-check' ),
-										'gpt-5.2'             => __( 'gpt-5.2 (Balanced)', 'wpml-translation-check' ),
-										'gpt-5-mini'          => __( 'gpt-5-mini (Fast)', 'wpml-translation-check' ),
-										'gpt-5-nano'          => __( 'gpt-5-nano (Cheapest)', 'wpml-translation-check' ),
-										'gpt-4o-mini'         => __( 'gpt-4o-mini (Fast & Cheap)', 'wpml-translation-check' ),
+										'gpt-5.6-sol'  => __( 'gpt-5.6-sol (Best Quality)', 'wpml-translation-check' ),
+										'gpt-5.6-terra'=> __( 'gpt-5.6-terra (Recommended)', 'wpml-translation-check' ),
+										'gpt-5.5'      => __( 'gpt-5.5 (High Quality)', 'wpml-translation-check' ),
+										'gpt-5.6-luna' => __( 'gpt-5.6-luna (Very Good)', 'wpml-translation-check' ),
+										'gpt-5.4'      => __( 'gpt-5.4 (Good Quality)', 'wpml-translation-check' ),
+										'gpt-5.4-mini' => __( 'gpt-5.4-mini (Fast)', 'wpml-translation-check' ),
+										'gpt-5.4-nano' => __( 'gpt-5.4-nano (Basic)', 'wpml-translation-check' ),
 									);
 
 									$automlp_filtered_models = array_intersect_key(
@@ -374,13 +374,15 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 									>
 									<?php
 									$automlp_preferred_google_models = array(
-										'gemini-3.1-pro-preview'        => __( 'gemini-3.1-pro-preview (Best Quality)', 'wpml-translation-check' ),
-										'gemini-3.1-flash-lite-preview' => __( 'gemini-3.1-flash-lite-preview (Fast & Cheap)', 'wpml-translation-check' ),
-										'gemma-3n-e4b-it'               => __( 'gemma-3n-e4b-it (Cheapest)', 'wpml-translation-check' ),
-										'gemini-2.5-pro'                => __( 'gemini-2.5-pro (Best Overall)', 'wpml-translation-check' ),
-										'gemini-2.5-flash'              => __( 'gemini-2.5-flash (Balanced)', 'wpml-translation-check' ),
-										'gemini-3-flash-preview'        => __( 'gemini-3-flash-preview (Recommended)', 'wpml-translation-check' ),
-										'gemini-2.5-pro-preview-tts'    => __( 'gemini-2.5-pro-preview-tts (High Accuracy)', 'wpml-translation-check' ),
+										'gemini-3.7-flash'       => __( 'gemini-3.7-flash (Recommended)', 'wpml-translation-check' ),
+										'gemini-3.6-flash'       => __( 'gemini-3.6-flash (Fast & Reliable)', 'wpml-translation-check' ),
+										'gemini-3.5-flash'       => __( 'gemini-3.5-flash (High Accuracy)', 'wpml-translation-check' ),
+										'gemini-3.5-flash-lite'  => __( 'gemini-3.5-flash-lite (Fast & Cheap)', 'wpml-translation-check' ),
+										'gemini-3.1-pro-preview' => __( 'gemini-3.1-pro-preview (Best Quality)', 'wpml-translation-check' ),
+										'gemini-3-deep-think'    => __( 'gemini-3-deep-think (Advanced Reasoning)', 'wpml-translation-check' ),
+										'gemini-2.5-pro'         => __( 'gemini-2.5-pro (Best Overall)', 'wpml-translation-check' ),
+										'gemini-2.5-flash'       => __( 'gemini-2.5-flash (Balanced)', 'wpml-translation-check' ),
+										'gemma-4-26b-a4b-it'     => __( 'gemma-4-26b-a4b-it (Cheapest)', 'wpml-translation-check' ),
 									);
 
 									$automlp_filtered_google_models = array_intersect_key(
