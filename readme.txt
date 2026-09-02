@@ -15,13 +15,21 @@ Save on WPML translation credits by using OpenAI or Gemini API to auto translate
 
 https://youtu.be/ZcSbNup4efw
 
-**AutoMLP - AI Translation for WPML** is WPML automatic translation addon. It allows you to translate your WordPress website using different AI services  like **OpenAI** and **Google Gemini**, at low cost.
+**AutoMLP - AI Translation for WPML** is WPML automatic translation addon that brings context-aware AI translation helping you translate WordPress content with better quality, accuracy, and natural language. using different AI services  like **OpenAI** and **Google Gemini**, at low cost.
+
+Unlike basic **word-for-word translation**, AutoMLP is designed to  generate accurate & context aware translations at low cost.
 
 As a **WPML** user, you may already know that its automatic translation feature works using translation credits. Typically, around **$0.86 per 1,000 credits**. Each time content is translated automatically, credits are used based on the number of characters being translated [Learn More](https://coolplugins.net/wpml-translation-cost-alternative/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=credits&utm_content=learn_more).
 
 However, **AutoMLP** provides a different approach. Instead of using translation credits, it allows you to connect your own AI service API keys such as **OpenAI** or **Google Gemini**. This means translations are generated using your own API. The usage limits depend only on the limits of the API service you are using.
 
-[View Live Demo](https://automlp-ai-translation.instawp.xyz/wp-admin)
+[View Live Demo](https://automlp-ai-translation.instawp.xyz/wp-admin) | [Upgrade to Pro](https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=upgrade_to_pro_top)
+
+### Why Choose AutoMLP?
+* **Context-Aware AI Translation:** AutoMLP uses AI translation models that can understand the content before generating a translation. This helps produce translations based on the actual meaning and context of your content, rather than simply translating individual words.
+* **Better Translation Quality:** Generate translations that are more natural, readable, and appropriate for real-world website content. AI models can understand sentences, paragraphs, terminology, and the relationship between different parts of your content.
+* **Accurate & Natural Translations:** AutoMLP integrates advanced translators that are trained on large language datasets to produce more natural and accurate translations as compared to WPML automatic translation feature. 
+* **AI Translation Compatibility:** AutoMLP works with **WPML** and its AI-powered Translation is fully compatible with popular WordPress plugins, themes, and page builders, like **Advanced Custom Fields (ACF)**, **Everest Forms**, **Divi**, **Yoast SEO**, **Elementor**, **Beaver Builder**, **WPBakery**, **WooCommerce**, **RankMath**, **HubSpot**, **Astra**, etc.
 
 ### Key Features
 
@@ -62,6 +70,16 @@ Built for **Stability** & **Performance** developers trust **WPML** with their m
 * **Data Privacy:** Your API keys are encrypted and stored locally on your server. Your content is sent directly to OpenAI or Google. We never see, store, or intercept your data.
 
 * **Reliability:** Built-in error handling manages API rate limits and connection timeouts gracefully, ensuring your translation jobs don't hang.
+
+### Compatibility
+**AutoMLP – AI Translation for WPML** works with WPML compatible WordPress content and supports popular page builders, editors, SEO plugins, custom fields, eCommerce plugins, forms, and themes.
+You can continue using the tools already installed on your WordPress website while adding **AI-powered translation** through **AutoMLP**.
+* **Elementor**: Translate supported Elementor page and widget content while keeping your existing page structure.
+* **Gutenberg**: Translate supported posts and pages created with WordPress blocks.
+* **Divi**: Translate supported Divi page content and modules through your WPML workflow.
+* **Rank Math & Yoast SEO**: Translate supported SEO content such as multilingual SEO fields through WPML.
+* **Advanced Custom Fields (ACF)**: Translate supported ACF content when the required custom fields are configured for translation in WPML.
+* **WooCommerce**: Translate supported WooCommerce content for multilingual stores using the WPML translation workflow.
 
 ### ### Pro Version 
  * **Unlimited Languages Support:** Translate your website into unlimited languages and reach global audience without any usage restrictions.
@@ -141,6 +159,23 @@ AI translation is highly accurate and context-aware, but it is recommended to re
 = What type of content can I translate using WPML AI addon? =
 Using AutoMLP, you can translate pages, posts or theme's or plugin's strings automatically.
 
+= Does AutoMLP provide context-aware translations? =
+Yes. AutoMLP uses AI translation providers such as OpenAI and Gemini to generate translations with contextual understanding, helping preserve the meaning and intent of your original content.
+
+= Which WordPress plugins and builders are compatible with AutoMLP? =
+AutoMLP works with WPML-compatible WordPress content and supports popular plugins, themes, and page builders, including:
+* Advanced Custom Fields (ACF)
+* Everest Forms
+* Divi
+* Yoast SEO
+* Elementor
+* Beaver Builder
+* WPBakery
+* WooCommerce
+* Rank Math
+* HubSpot
+* Astra
+
 = Do I need API keys to use AutoMLP? =
 API keys are only required if you choose OpenAI or Gemini AI as your translation engine. If you use Chrome Built-in AI, no API key is needed.
 
@@ -148,12 +183,33 @@ API keys are only required if you choose OpenAI or Gemini AI as your translation
 If WPML translation credits are exhausted, automatic translations stop working.
 With AutoMLP, translations depend on your AI API usage limits instead of a credit system. You can also use Chrome’s built-in AI to generate translations without any API key or extra cost.
 
+= Is AutoMLP compatible with Elementor? =
+Yes. AutoMLP works with WPML-compatible Elementor content and can translate supported Elementor content using AI. You can translate supported page content without changing your existing Elementor workflow.
+
+= Is AutoMLP compatible with Gutenberg? =
+Yes. AutoMLP supports Gutenberg content through WPML and can automatically translate supported posts and pages created with Gutenberg blocks.
+
+= Is AutoMLP compatible with Divi? =
+Yes. AutoMLP is compatible with Divi and can translate supported Divi page content through the WPML translation workflow.
+
+= Is AutoMLP compatible with WooCommerce? =
+Yes. AutoMLP supports WooCommerce content through WPML. You can use AI translation for supported WooCommerce content as part of your multilingual workflow.
+
 = Can I translate multiple pages at once using AutoMLP? =
 Yes, AutoMLP allows bulk translation. You can select multiple pages from your WordPress dashboard and translate them into your desired language with just one click.
 
 = How is AutoMLP different from WPML automatic translation? =
 AutoMLP does not rely on translation credits. Instead, it lets you connect your own AI services like OpenAI, Google Gemini using your own API usage limits.
 If you want to translate without using any API key or extra cost, you can use the Pro version, which supports Chrome built-in AI.
+
+= Is AutoMLP compatible with Advanced Custom Fields (ACF)? =
+Yes. AutoMLP supports Advanced Custom Fields (ACF) through WPML. Supported ACF content can be translated using the AI translation workflow.
+
+= Is AutoMLP compatible with Rank Math? =
+Yes. AutoMLP supports Rank Math through WPML and can translate supported Rank Math SEO content as part of the multilingual translation workflow.
+
+= Is AutoMLP compatible with Yoast SEO? =
+Yes. AutoMLP is compatible with Yoast SEO through WPML and can translate supported SEO content using AI.
 
 = How fast is AI translation with AutoMLP? =
 AI translation can process thousands of characters in seconds. This allows you to translate large pages or multiple posts much faster than manual translation.
