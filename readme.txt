@@ -119,6 +119,7 @@ All automatic translations are powered by third-party auto-translate providers (
 [AutoMLP – AI Translation for WPML on GitHub.](https://github.com/CoolPluginsTeam/wpml-translation-check)
 
 == Screenshots == 
+
 1. AutoMLP Page Translation
 2. AutoMLP String Translation
 
