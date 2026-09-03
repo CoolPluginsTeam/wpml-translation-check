@@ -242,9 +242,62 @@ if ( ! class_exists( 'Bulk_Translation_Route' ) ) :
 					'permission_callback' => array( $this, 'permission_manage_options' ),
 				)
 			);
+			register_rest_route(
+				$this->base_name,
+				'/test-connection',
+				array(
+					'methods'             => 'POST',
+					'callback'            => array( $this, 'test_connection' ),
+					'permission_callback' => array( $this, 'permission_manage_options' ),
+					'args'                => array(
+						'provider' => array(
+							'type'              => 'string',
+							'required'          => true,
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+						'api_key' => array(
+							'type'              => 'string',
+							'required'          => true,
+							'sanitize_callback' => 'sanitize_text_field',
+						),
+					),
+				)
+			);
 		}
 
-			/**
+	/**
+	 * Test provider API connection.
+	 *
+	 * @param \WP_REST_Request $request Request object.
+	 * @return \WP_REST_Response
+	 */
+	public function test_connection( \WP_REST_Request $request ) {
+		$provider = $request->get_param( 'provider' );
+		$api_key  = $request->get_param( 'api_key' );
+
+		if ( empty( $provider ) || empty( $api_key ) ) {
+			return new \WP_REST_Response(
+				array( 'success' => false, 'message' => __( 'Missing provider or API key.', 'wpml-translation-check' ) ),
+				400
+			);
+		}
+
+		$validation_result = $this->validate_provider_api_key( $provider, $api_key );
+
+		if ( is_array( $validation_result ) && ! empty( $validation_result['message'] ) ) {
+			return new \WP_REST_Response(
+				array( 'success' => false, 'message' => sanitize_text_field( (string) $validation_result['message'] ) ),
+				400
+			);
+		}
+
+		return new \WP_REST_Response(
+			array( 'success' => true, 'message' => __( 'Connection successful!', 'wpml-translation-check' ) ),
+			200
+		);
+	}
+
+	/**
 	 * Mark setup wizard as complete (persists across plugin reinstall – do not delete this option in uninstall).
 	 *
 	 * @return \WP_REST_Response
