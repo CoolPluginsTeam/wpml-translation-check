@@ -45,9 +45,15 @@ class String_Translation {
 		}
 
 		// Check if we're on the string translation page.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter for conditional logic.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameters for conditional logic.
 		$page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
-		if (empty($page) || strpos($page, 'wpml-string-translation/menu/string-translation.php') === false) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameters for conditional logic.
+		$tab                        = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+		$is_string_translation_page = ! empty( $page ) && (
+			strpos( $page, 'wpml-string-translation/menu/string-translation.php' ) !== false
+			|| ( defined( 'WPML_TM_FOLDER' ) && strpos( $page, WPML_TM_FOLDER . '/menu/main.php' ) !== false && 'strings' === $tab )
+		);
+		if ( ! $is_string_translation_page ) {
 			return;
 		}
 
@@ -76,9 +82,15 @@ class String_Translation {
 	 */
 	public function render_bulk_translate_container()
 	{
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter for conditional logic.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameters for conditional logic.
 		$page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
-		if (empty($page) || strpos($page, 'wpml-string-translation/menu/string-translation.php') === false) {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameters for conditional logic.
+		$tab                        = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+		$is_string_translation_page = ! empty( $page ) && (
+			strpos( $page, 'wpml-string-translation/menu/string-translation.php' ) !== false
+			|| ( defined( 'WPML_TM_FOLDER' ) && strpos( $page, WPML_TM_FOLDER . '/menu/main.php' ) !== false && 'strings' === $tab )
+		);
+		if ( ! $is_string_translation_page ) {
 			return;
 		}
 	?>
