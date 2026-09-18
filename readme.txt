@@ -252,7 +252,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 
 == Changelog ==
 
-= = Version 1.2.8 | 18/09/2026 =
+= Version 1.2.8 | 18/09/2026 =
 * Fixed: Compatibility issues with wpml v5.0.0.
 
 = Version 1.2.7 | 14/08/2026 =
