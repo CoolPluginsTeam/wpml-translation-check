@@ -39,9 +39,13 @@ import LoopCallback from "./components/loop-callback";
         e.preventDefault();
       
         // Check if we're on the String Translation page
+        const urlParams = new URLSearchParams(window.location.search);
+        const pageParam = urlParams.get("page") || "";
+        const tabParam = urlParams.get("tab") || "";
         const isStringTranslationPage =
-          window.location.href.indexOf("wpml-string-translation") !== -1;
-      
+          pageParam.indexOf("wpml-string-translation/menu/string-translation.php") !== -1 ||
+          (pageParam.indexOf("tm/menu/main.php") !== -1 && tabParam === "strings");
+
         let postIds = [];
         let stringFilters = {};
       
@@ -170,16 +174,23 @@ window.wpmlStringFilters = stringFilters;
     const bulkTranslateBtn = document.querySelector(`.${prefix}-btn`);
     if (bulkTranslateBtn) {
       bulkTranslateBtn.style.display = "block";
+
+      const stringFilterDiv = document.querySelector(".wpml-string-translation-filter");
+      const filterButton = document.querySelector("#icl_st_filter_search_sb");
+      const tableWrap = document.querySelector("#icl_string_translations_wrap");
+      const table = document.querySelector("#icl_string_translations");
+
+      if (stringFilterDiv && filterButton) {
+        // Older WPML String Translation UI: sits next to the search/filter toolbar.
+        filterButton.insertAdjacentElement("afterend", bulkTranslateBtn);
+      } else if (tableWrap) {
+        // Newer WPML UI: toolbar markup changed, anchor to the table wrapper instead.
+        tableWrap.insertAdjacentElement("beforebegin", bulkTranslateBtn);
+      } else if (table) {
+        table.insertAdjacentElement("beforebegin", bulkTranslateBtn);
+      }
     }
-  
-    const stringFilterDiv = document.querySelector(".wpml-string-translation-filter");
-    const filterButton = document.querySelector("#icl_st_filter_search_sb");
-  
-    if (bulkTranslateBtn && stringFilterDiv && filterButton) {
-      // Insert the button after the filter button
-      filterButton.insertAdjacentElement("afterend", bulkTranslateBtn);
-    }
-  
+
     const applyAnimation = () => {
       const oldStyle = document.getElementById("ai-pro-btn-style");
       if (oldStyle) oldStyle.remove();
