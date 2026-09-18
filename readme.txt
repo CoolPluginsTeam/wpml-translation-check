@@ -3,7 +3,7 @@ Contributors: coolplugins, narinder-singh, satindersingh
 Donate link: https://donate.stripe.com/5kQdR92iBevO75WbPm6c00i
 Tags: WPML, Automatic Translation, WPML Addon, Block Translation
 Tested up to: 7.1
-Stable tag: 1.2.7
+Stable tag: 1.2.8
 Requires at least: 6.9
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -251,6 +251,9 @@ No. AutoMLP works inside the WordPress dashboard and uses the familiar WPML tran
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/90801d43-fbe7-45a2-9131-5c4fcccbc87d)
 
 == Changelog ==
+
+= = Version 1.2.8 | 18/09/2026 =
+* Fixed: Compatibility issues with wpml v5.0.0.
 
 = Version 1.2.7 | 14/08/2026 =
 * Added: Added the latest AI provider models.
