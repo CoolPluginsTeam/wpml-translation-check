@@ -23,10 +23,15 @@ class Register_Assets {
 	 */
 	public function enqueue_assets($hook)
 	{
-		// Sanitize and validate page parameter.
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameter for conditional logic, not processing form data.
+		// Sanitize and validate page/tab parameters.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameters for conditional logic, not processing form data.
 		$page = isset($_GET['page']) ? sanitize_text_field(wp_unslash($_GET['page'])) : '';
-		$is_string_translation     = ! empty($page) && strpos($page, 'wpml-string-translation/menu/string-translation.php') !== false;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Reading GET parameters for conditional logic, not processing form data.
+		$tab                      = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : '';
+		$is_string_translation    = ! empty( $page ) && (
+			strpos( $page, 'wpml-string-translation/menu/string-translation.php' ) !== false
+			|| ( defined( 'WPML_TM_FOLDER' ) && strpos( $page, WPML_TM_FOLDER . '/menu/main.php' ) !== false && 'strings' === $tab )
+		);
 		$needs_ai_services         = $is_string_translation;
 		$available_ai_services     = array();
 		$automlp_active_providers = get_option('automlp_enabled_providers', array('google', 'openai'));

@@ -291,6 +291,11 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 										style="flex: 1;"
 										<?php echo $automlp_wpml_has_existing_key ? 'disabled="disabled"' : ''; ?>
 									/>
+									<?php if ( ! $automlp_wpml_has_existing_key ) : ?>
+										<button type="button" class="button button-secondary automlp-test-connection-btn" data-provider="<?php echo esc_attr( $automlp_wpml_api_key ); ?>" disabled>
+											<?php esc_html_e( 'Test Connection', 'wpml-translation-check' ); ?>
+										</button>
+									<?php endif; ?>
 									<?php
 									$automlp_provider_installed = ( 'openai' === $automlp_wpml_api_key )
 										? $automlp_iis_openai_provider_installed
@@ -330,8 +335,14 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 									>
 									<?php
 									$automlp_preferred_models = array(
-										'gpt-5.4'             => __( 'gpt-5.4 (Best Quality)', 'wpml-translation-check' ),
+										'gpt-5.6-sol'         => __( 'gpt-5.6-sol (Best Quality)', 'wpml-translation-check' ),
+										'gpt-5.6-terra'       => __( 'gpt-5.6-terra (Recommended)', 'wpml-translation-check' ),
+										'gpt-5.5'             => __( 'gpt-5.5 (High Quality)', 'wpml-translation-check' ),
+										'gpt-5.6-luna'        => __( 'gpt-5.6-luna (Very Good)', 'wpml-translation-check' ),
+										'gpt-5.4'             => __( 'gpt-5.4 (Good Quality)', 'wpml-translation-check' ),
 										'gpt-5.4-pro'         => __( 'gpt-5.4-pro (Highest Accuracy)', 'wpml-translation-check' ),
+										'gpt-5.4-mini'        => __( 'gpt-5.4-mini (Fast)', 'wpml-translation-check' ),
+										'gpt-5.4-nano'        => __( 'gpt-5.4-nano (Basic)', 'wpml-translation-check' ),
 										'gpt-5.3-chat-latest' => __( 'gpt-5.3-chat-latest (Recommended)', 'wpml-translation-check' ),
 										'gpt-5.2'             => __( 'gpt-5.2 (Balanced)', 'wpml-translation-check' ),
 										'gpt-5-mini'          => __( 'gpt-5-mini (Fast)', 'wpml-translation-check' ),
@@ -374,13 +385,19 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 									>
 									<?php
 									$automlp_preferred_google_models = array(
+										'gemini-3.7-flash'              => __( 'gemini-3.7-flash (Recommended)', 'wpml-translation-check' ),
+										'gemini-3.6-flash'              => __( 'gemini-3.6-flash (Fast & Reliable)', 'wpml-translation-check' ),
+										'gemini-3.5-flash'              => __( 'gemini-3.5-flash (High Accuracy)', 'wpml-translation-check' ),
+										'gemini-3.5-flash-lite'         => __( 'gemini-3.5-flash-lite (Fast & Cheap)', 'wpml-translation-check' ),
 										'gemini-3.1-pro-preview'        => __( 'gemini-3.1-pro-preview (Best Quality)', 'wpml-translation-check' ),
 										'gemini-3.1-flash-lite-preview' => __( 'gemini-3.1-flash-lite-preview (Fast & Cheap)', 'wpml-translation-check' ),
-										'gemma-3n-e4b-it'               => __( 'gemma-3n-e4b-it (Cheapest)', 'wpml-translation-check' ),
+										'gemini-3-flash-preview'        => __( 'gemini-3-flash-preview (Recommended)', 'wpml-translation-check' ),
+										'gemini-3-deep-think'           => __( 'gemini-3-deep-think (Advanced Reasoning)', 'wpml-translation-check' ),
 										'gemini-2.5-pro'                => __( 'gemini-2.5-pro (Best Overall)', 'wpml-translation-check' ),
 										'gemini-2.5-flash'              => __( 'gemini-2.5-flash (Balanced)', 'wpml-translation-check' ),
-										'gemini-3-flash-preview'        => __( 'gemini-3-flash-preview (Recommended)', 'wpml-translation-check' ),
 										'gemini-2.5-pro-preview-tts'    => __( 'gemini-2.5-pro-preview-tts (High Accuracy)', 'wpml-translation-check' ),
+										'gemma-4-26b-a4b-it'            => __( 'gemma-4-26b-a4b-it (Cheapest)', 'wpml-translation-check' ),
+										'gemma-3n-e4b-it'               => __( 'gemma-3n-e4b-it (Cheapest)', 'wpml-translation-check' ),
 									);
 
 									$automlp_filtered_google_models = array_intersect_key(
@@ -753,6 +770,96 @@ if ( $automlp_wpml_wizard_language_set ) :
 			if (submitBtn) submitBtn.disabled = false;
 		});
 	});
+	// Test API Connection logic
+	var testButtons = document.querySelectorAll('.automlp-test-connection-btn');
+	testButtons.forEach(function(btn) {
+		var provider = btn.getAttribute('data-provider');
+		var input = document.getElementById(provider + '-api');
+		var errorNotice = document.getElementById('automlp-ai-settings-message-' + provider);
+		var originalText = btn.textContent.trim();
+		var buttonTimer;
+
+		if (input) {
+			input.addEventListener('input', function() {
+				btn.disabled = input.value.trim() === '';
+			});
+		}
+
+		btn.addEventListener('click', function(e) {
+			e.preventDefault();
+			if (!input || input.value.trim() === '') return;
+
+			var apiKey = input.value.trim();
+			btn.disabled = true;
+			btn.textContent = '<?php echo esc_js( __( 'Testing...', 'wpml-translation-check' ) ); ?>';
+			btn.style.color = '';
+			btn.style.borderColor = '';
+			
+			if (errorNotice) {
+				errorNotice.style.display = 'none';
+				errorNotice.textContent = '';
+			}
+			clearTimeout(buttonTimer);
+
+			fetch('<?php echo esc_js( rest_url( 'automlp-bulk-translate/' ) ); ?>test-connection', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': '<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>'
+				},
+				body: JSON.stringify({
+					provider: provider,
+					api_key: apiKey
+				})
+			})
+			.then(function(res) { return res.json().then(function(data) { return { ok: res.ok, data: data }; }, function() { return { ok: res.ok, data: {} }; }); })
+			.then(function(result) {
+				var isSuccess = result.ok && result.data && result.data.success;
+				btn.disabled = false;
+				btn.style.color = isSuccess ? '#46b450' : '#dc3232';
+				btn.style.borderColor = isSuccess ? '#46b450' : '#dc3232';
+				btn.textContent = isSuccess ? '<?php echo esc_js( __( '✓ Valid Key!', 'wpml-translation-check' ) ); ?>' : '<?php echo esc_js( __( '✗ Invalid Key!', 'wpml-translation-check' ) ); ?>';
+				
+				if (!isSuccess && errorNotice) {
+					var err = result.data || {};
+					errorNotice.textContent = err.message || '<?php echo esc_js( __( 'Connection failed.', 'wpml-translation-check' ) ); ?>';
+					errorNotice.style.display = 'block';
+				}
+
+				buttonTimer = setTimeout(function() {
+					btn.textContent = originalText;
+					btn.style.color = '';
+					btn.style.borderColor = '';
+					btn.disabled = input.value.trim() === '';
+					if (errorNotice) {
+						errorNotice.style.display = 'none';
+						errorNotice.textContent = '';
+					}
+				}, 5000);
+			})
+			.catch(function() {
+				btn.disabled = false;
+				btn.style.color = '#dc3232';
+				btn.style.borderColor = '#dc3232';
+				btn.textContent = '<?php echo esc_js( __( '✗ Error!', 'wpml-translation-check' ) ); ?>';
+				if (errorNotice) {
+					errorNotice.textContent = '<?php echo esc_js( __( 'Network error. Please try again.', 'wpml-translation-check' ) ); ?>';
+					errorNotice.style.display = 'block';
+				}
+				buttonTimer = setTimeout(function() {
+					btn.textContent = originalText;
+					btn.style.color = '';
+					btn.style.borderColor = '';
+					btn.disabled = input.value.trim() === '';
+					if (errorNotice) {
+						errorNotice.style.display = 'none';
+						errorNotice.textContent = '';
+					}
+				}, 5000);
+			});
+		});
+	});
+
 	consumeFlashNotice();
 })();
 </script>
