@@ -44,9 +44,11 @@ class Queue_Table {
 		return $wpdb->prefix . 'automlp_jobs';
 	}
 
-	/* ------------------------------------------------------------------
+	/*
+	 * ------------------------------------------------------------------
 	 *  Schema
-	 * ------------------------------------------------------------------ */
+	 * ------------------------------------------------------------------
+	 */
 
 	/**
 	 * Create the table.
@@ -120,9 +122,11 @@ class Queue_Table {
 		}
 	}
 
-	/* ------------------------------------------------------------------
+	/*
+	 * ------------------------------------------------------------------
 	 *  Cache helpers
-	 * ------------------------------------------------------------------ */
+	 * ------------------------------------------------------------------
+	 */
 
 	/**
 	 * Invalidate every cached read.
@@ -156,9 +160,11 @@ class Queue_Table {
 		return 'yes' === get_option( 'automlp_debug_mode', 'no' );
 	}
 
-	/* ------------------------------------------------------------------
+	/*
+	 * ------------------------------------------------------------------
 	 *  CRUD
-	 * ------------------------------------------------------------------ */
+	 * ------------------------------------------------------------------
+	 */
 
 	/**
 	 * Insert a new waiting job.
@@ -231,6 +237,44 @@ class Queue_Table {
 	}
 
 	/**
+	 * Update a job only while it is still in the expected state.
+	 *
+	 * Lets the worker advance a job without resurrecting one that was
+	 * cancelled or closed by another request in the meantime.
+	 *
+	 * @param int    $job_id   Job id.
+	 * @param string $expected Required current state.
+	 * @param array  $args     Column values.
+	 * @return bool True when the row was updated.
+	 */
+	public static function edit_if_state( $job_id, $expected, array $args ) {
+		global $wpdb;
+
+		$args['touched_at'] = current_time( 'mysql', true );
+
+		foreach ( array( 'source_map', 'request_payload', 'response_payload' ) as $json_col ) {
+			if ( isset( $args[ $json_col ] ) && is_array( $args[ $json_col ] ) ) {
+				$args[ $json_col ] = wp_json_encode( $args[ $json_col ] );
+			}
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$done = $wpdb->update(
+			self::table(),
+			$args,
+			array(
+				'job_id' => (int) $job_id,
+				'state'  => (string) $expected,
+			),
+			null,
+			array( '%d', '%s' )
+		);
+
+		self::bump_cache();
+		return ! empty( $done );
+	}
+
+	/**
 	 * Update rows matched by WPML job id.
 	 *
 	 * @param int   $wpml_job_id icl_translate_job.job_id.
@@ -296,9 +340,11 @@ class Queue_Table {
 		return is_array( $decoded ) ? $decoded : array();
 	}
 
-	/* ------------------------------------------------------------------
+	/*
+	 * ------------------------------------------------------------------
 	 *  State transitions
-	 * ------------------------------------------------------------------ */
+	 * ------------------------------------------------------------------
+	 */
 
 	/**
 	 * Atomically take ownership of a waiting job.
@@ -345,6 +391,7 @@ class Queue_Table {
 			$extra,
 			array(
 				'state'            => self::STATE_DONE,
+				'last_error'       => null,
 				'closed_at'        => current_time( 'mysql', true ),
 				'source_map'       => null,
 				'request_payload'  => null,
@@ -399,9 +446,11 @@ class Queue_Table {
 		);
 	}
 
-	/* ------------------------------------------------------------------
+	/*
+	 * ------------------------------------------------------------------
 	 *  Progress
-	 * ------------------------------------------------------------------ */
+	 * ------------------------------------------------------------------
+	 */
 
 	/**
 	 * Persist batch progress after each AI batch.
@@ -453,15 +502,19 @@ class Queue_Table {
 		return min( 100, max( 0, (int) round( ( $done / $total ) * 100 ) ) );
 	}
 
-	/* ------------------------------------------------------------------
+	/*
+	 * ------------------------------------------------------------------
 	 *  Recovery
-	 * ------------------------------------------------------------------ */
+	 * ------------------------------------------------------------------
+	 */
 
 	/**
 	 * Return jobs stuck mid-flight back to waiting.
 	 *
-	 * A crashed cron run leaves rows in 'claimed' or 'sent' forever. Anything
-	 * untouched for longer than the timeout is assumed abandoned.
+	 * A crashed run leaves rows in 'claimed', 'sent' or 'writing' forever.
+	 * Anything untouched for longer than the timeout is assumed abandoned.
+	 * Recovered 'writing' rows are safe to rerun: the Writer skips the save
+	 * when WPML already completed that job. Only call while holding the lock.
 	 *
 	 * @param int $minutes Staleness threshold.
 	 * @return int Rows recovered.
@@ -475,12 +528,13 @@ class Queue_Table {
 		$wpdb->query(
 			$wpdb->prepare(
 				'UPDATE %i SET state = %s, touched_at = %s, fields_translated = 0
-				 WHERE state IN (%s, %s) AND touched_at < %s',
+				 WHERE state IN (%s, %s, %s) AND touched_at < %s',
 				self::table(),
 				self::STATE_WAITING,
 				current_time( 'mysql', true ),
 				self::STATE_CLAIMED,
 				self::STATE_SENT,
+				self::STATE_WRITING,
 				$cutoff
 			)
 		);
@@ -494,9 +548,11 @@ class Queue_Table {
 		return $count;
 	}
 
-	/* ------------------------------------------------------------------
+	/*
+	 * ------------------------------------------------------------------
 	 *  Queries
-	 * ------------------------------------------------------------------ */
+	 * ------------------------------------------------------------------
+	 */
 
 	/**
 	 * Cheap existence check so the cron can bail before doing real work.
@@ -519,6 +575,28 @@ class Queue_Table {
 		);
 
 		return ! empty( $hit );
+	}
+
+	/**
+	 * Number of waiting jobs, capped at $limit. Cheap: reads ids only.
+	 *
+	 * @param int $limit Upper bound worth counting.
+	 * @return int
+	 */
+	public static function count_waiting( $limit ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Queue state must be read fresh.
+		$ids = $wpdb->get_col(
+			$wpdb->prepare(
+				'SELECT job_id FROM %i WHERE state = %s LIMIT %d',
+				self::table(),
+				self::STATE_WAITING,
+				max( 1, (int) $limit )
+			)
+		);
+
+		return count( (array) $ids );
 	}
 
 	/**
@@ -691,9 +769,11 @@ class Queue_Table {
 		return $out;
 	}
 
-	/* ------------------------------------------------------------------
+	/*
+	 * ------------------------------------------------------------------
 	 *  Housekeeping
-	 * ------------------------------------------------------------------ */
+	 * ------------------------------------------------------------------
+	 */
 
 	/**
 	 * Strip payloads from old finished jobs and delete very old rows.

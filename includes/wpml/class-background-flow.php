@@ -27,20 +27,26 @@ class Background_Flow {
 	/**
 	 * Is the background flow switched on?
 	 *
+	 * On by default for every install: the bulk modals for posts and strings
+	 * always use the queue, so the queue screen and legacy-route guard must be
+	 * active too. Site owners can still force it off by defining
+	 * AUTOMLP_BACKGROUND_FLOW as false, storing 'no' in the option, or using
+	 * the filter below.
+	 *
 	 * @return bool
 	 */
 	public static function enabled() {
+		if ( defined( 'AUTOMLP_BACKGROUND_FLOW' ) ) {
+			$enabled = (bool) constant( 'AUTOMLP_BACKGROUND_FLOW' );
+		} else {
+			$enabled = 'no' !== get_option( self::FLAG, 'yes' );
+		}
+
 		/**
 		 * Filter whether the queue-based flow is active.
 		 *
-		 * Define AUTOMLP_BACKGROUND_FLOW in wp-config.php to force it on for
-		 * testing without touching the option.
-		 *
-		 * @param bool $enabled Current state.
+		 * @param bool $enabled Current state. Defaults to true.
 		 */
-		$enabled = ( defined( 'AUTOMLP_BACKGROUND_FLOW' ) && AUTOMLP_BACKGROUND_FLOW )
-			|| 'yes' === get_option( self::FLAG, 'no' );
-
 		return (bool) apply_filters( 'automlp_background_flow_enabled', $enabled );
 	}
 

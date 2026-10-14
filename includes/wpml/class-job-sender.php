@@ -32,6 +32,17 @@ class Job_Sender {
 	const BUILD_CONSTANT = 'DOING_AUTOMLP_WPML_JOB_BUILD';
 
 	/**
+	 * Provider requested for the batch being dispatched in this request.
+	 *
+	 * WPML creates jobs synchronously inside the send action, so request
+	 * scope is enough. A shared transient let one admin's choice leak into
+	 * another admin's concurrent batch.
+	 *
+	 * @var string
+	 */
+	private static $pending_provider = '';
+
+	/**
 	 * Queue one post for one target language.
 	 *
 	 * @param int    $post_id   Source post id.
@@ -104,6 +115,8 @@ class Job_Sender {
 
 		} catch ( \Throwable $e ) {
 			return new \WP_Error( 'automlp_batch_failed', $e->getMessage() );
+		} finally {
+			self::remember_provider( '' );
 		}
 
 		return true;
@@ -239,10 +252,13 @@ class Job_Sender {
 				array( $to_lang => $bot_id )
 			);
 
+			// phpcs:ignore WordPress.NamingConventions.ValidHookName.UseUnderscores -- WPML's own hook name.
 			do_action( 'wpml_tm_send_st-batch_jobs', $batch, 'st-batch', null );
 
 		} catch ( \Throwable $e ) {
 			return new \WP_Error( 'automlp_batch_failed', $e->getMessage() );
+		} finally {
+			self::remember_provider( '' );
 		}
 
 		return true;
@@ -258,14 +274,7 @@ class Job_Sender {
 	 * @return void
 	 */
 	private static function remember_provider( $provider ) {
-		$slug = is_string( $provider ) ? sanitize_key( $provider ) : '';
-
-		if ( '' === $slug ) {
-			delete_transient( 'automlp_pending_provider' );
-			return;
-		}
-
-		set_transient( 'automlp_pending_provider', $slug, 5 * MINUTE_IN_SECONDS );
+		self::$pending_provider = is_string( $provider ) ? sanitize_key( $provider ) : '';
 	}
 
 	/**
@@ -274,9 +283,7 @@ class Job_Sender {
 	 * @return string
 	 */
 	public static function requested_provider() {
-		$slug = get_transient( 'automlp_pending_provider' );
-
-		return is_string( $slug ) ? $slug : '';
+		return self::$pending_provider;
 	}
 
 	/**

@@ -80,114 +80,42 @@ class Update_Block_Config {
 	}
 
 	private function get_block_parse_rules() {
-		$response = wp_remote_get(
-			esc_url_raw( AUTOMLP_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/blocks-config.json' ),
-			array(
-				'timeout' => 15,
-			)
-		);
-
-		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-			global $wp_filesystem;
-
-			// Initialize the WordPress filesystem
-			if ( ! function_exists( 'WP_Filesystem' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/file.php';
-			}
-
-			WP_Filesystem();
-
-			$local_path = AUTOMLP_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/blocks-config.json';
-			if ( $wp_filesystem->exists( $local_path ) && $wp_filesystem->is_readable( $local_path ) ) {
-				$block_rules = $wp_filesystem->get_contents( $local_path );
-			} else {
-				$block_rules = array();
-			}
-		} else {
-			$block_rules = wp_remote_retrieve_body( $response );
-		}
-
-		if ( empty( $block_rules ) ) {
-			return array();
-		}
-
-		$block_translation_rules = json_decode( $block_rules );
-
-		return $block_translation_rules;
+		return $this->read_bundled_config( 'blocks-config.json', false );
 	}
 
 	private function get_block_default_support_child_block(): array {
-		$response = wp_remote_get(
-			esc_url_raw( AUTOMLP_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/default-support-child-block.json' ),
-			array(
-				'timeout' => 15,
-			)
-		);
+		$data = $this->read_bundled_config( 'default-support-child-block.json', true );
 
-		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-			global $wp_filesystem;
-
-			// Initialize the WordPress filesystem
-			if ( ! function_exists( 'WP_Filesystem' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/file.php';
-			}
-
-			WP_Filesystem();
-
-			$local_path = AUTOMLP_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/default-support-child-block.json';
-			if ( $wp_filesystem->exists( $local_path ) && $wp_filesystem->is_readable( $local_path ) ) {
-				$block_default_support_child_block = $wp_filesystem->get_contents( $local_path );
-			} else {
-				$block_default_support_child_block = array();
-			}
-		} else {
-			$block_default_support_child_block = wp_remote_retrieve_body( $response );
-		}
-
-		if ( empty( $block_default_support_child_block ) ) {
-			return array();
-		}
-
-		$block_default_support_child_block = json_decode( $block_default_support_child_block, true );
-
-		return $block_default_support_child_block;
+		return is_array( $data ) ? $data : array();
 	}
 
 	private function get_block_default_attributes_value(): array {
-		$response = wp_remote_get(
-			esc_url_raw( AUTOMLP_AI_PLUGIN_URL . 'includes/wpml/builder/gutenberg/blocks-config/attr-default-value.json' ),
-			array(
-				'timeout' => 15,
-			)
-		);
+		$data = $this->read_bundled_config( 'attr-default-value.json', true );
 
-		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-			global $wp_filesystem;
+		return is_array( $data ) ? $data : array();
+	}
 
-			// Initialize the WordPress filesystem
-			if ( ! function_exists( 'WP_Filesystem' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/file.php';
-			}
+	/**
+	 * Read a block config file shipped with the plugin.
+	 *
+	 * Read from disk rather than over HTTP: a loopback request to this same
+	 * site needs a second free PHP worker, which stalls job creation (and the
+	 * whole site) on hosts with few workers while the queue is busy.
+	 *
+	 * @param string $file  File name inside blocks-config/.
+	 * @param bool   $assoc Decode objects as associative arrays.
+	 * @return mixed Decoded JSON, or an empty array when unreadable.
+	 */
+	private function read_bundled_config( $file, $assoc ) {
+		$path = AUTOMLP_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/' . basename( $file );
 
-			WP_Filesystem();
-
-			$local_path = AUTOMLP_AI_PLUGIN_DIR . 'includes/wpml/builder/gutenberg/blocks-config/attr-default-value.json';
-			if ( $wp_filesystem->exists( $local_path ) && $wp_filesystem->is_readable( $local_path ) ) {
-				$block_default_attributes_value = $wp_filesystem->get_contents( $local_path );
-			} else {
-				$block_default_attributes_value = array();
-			}
-		} else {
-			$block_default_attributes_value = wp_remote_retrieve_body( $response );
-		}
-
-		if ( empty( $block_default_attributes_value ) ) {
+		if ( ! is_readable( $path ) ) {
 			return array();
 		}
 
-		$block_default_attributes_value = json_decode( $block_default_attributes_value, true );
+		$data = wp_json_file_decode( $path, array( 'associative' => $assoc ) );
 
-		return $block_default_attributes_value;
+		return null === $data ? array() : $data;
 	}
 
 	private function set_custom_block_config( array &$config, $custom_block_config ): void {

@@ -224,8 +224,6 @@ class Queue_Route {
 
 		$provider = self::clean_provider( $request->get_param( 'provider' ) );
 
-		$provider = self::clean_provider( $request->get_param( 'provider' ) );
-
 		Job_Listener::reset_created();
 
 		$result = Job_Sender::send_posts( $post_ids, $langs, $provider );
@@ -612,29 +610,29 @@ class Queue_Route {
 		$result_id = isset( $row['result_id'] ) ? (int) $row['result_id'] : 0;
 
 		$out = array(
-			'job_id'        => (int) $row['job_id'],
-			'source_id'     => $source_id,
-			'result_id'     => $result_id,
-			'kind'          => $row['kind'],
-			'from_lang'     => $row['from_lang'],
-			'to_lang'       => $row['to_lang'],
-			'state'         => $row['state'],
-			'label'         => self::state_label( $row['state'] ),
-			'closed'        => in_array(
+			'job_id'            => (int) $row['job_id'],
+			'source_id'         => $source_id,
+			'result_id'         => $result_id,
+			'kind'              => $row['kind'],
+			'from_lang'         => $row['from_lang'],
+			'to_lang'           => $row['to_lang'],
+			'state'             => $row['state'],
+			'label'             => self::state_label( $row['state'] ),
+			'closed'            => in_array(
 				$row['state'],
 				array( Queue_Table::STATE_DONE, Queue_Table::STATE_FAILED, Queue_Table::STATE_STOPPED ),
 				true
 			),
-			'attempts'      => (int) $row['attempts'],
-			'error'         => ! empty( $row['last_error'] ) ? (string) $row['last_error'] : '',
-			'field_count'      => (int) $row['field_count'],
+			'attempts'          => (int) $row['attempts'],
+			'error'             => ! empty( $row['last_error'] ) ? (string) $row['last_error'] : '',
+			'field_count'       => (int) $row['field_count'],
 			'fields_translated' => isset( $row['fields_translated'] ) ? (int) $row['fields_translated'] : 0,
 			'progress_percent'  => Queue_Table::progress_percent( $row ),
-			'string_count'      => (int) $row['field_count'],
-			'char_count'    => (int) $row['char_count'],
-			'provider'      => isset( $row['provider'] ) ? (string) $row['provider'] : '',
-			'queued_at'     => $row['queued_at'],
-			'closed_at'     => ! empty( $row['closed_at'] ) ? $row['closed_at'] : '',
+			'string_count'      => self::string_units( $row ),
+			'char_count'        => (int) $row['char_count'],
+			'provider'          => isset( $row['provider'] ) ? (string) $row['provider'] : '',
+			'queued_at'         => $row['queued_at'],
+			'closed_at'         => ! empty( $row['closed_at'] ) ? $row['closed_at'] : '',
 		);
 
 		if ( 'post' === $row['kind'] && $source_id ) {
@@ -654,6 +652,29 @@ class Queue_Route {
 		}
 
 		return $out;
+	}
+
+	/**
+	 * Real string count for a job.
+	 *
+	 * While a job runs the dispatcher stores translation chunk units in
+	 * field_count, which is not what the string modal shows. The source map
+	 * holds one entry per string until the job closes; after that field_count
+	 * is rewritten to the number of saved strings.
+	 *
+	 * @param array $row Queue row.
+	 * @return int
+	 */
+	private static function string_units( array $row ) {
+		if ( 'string' === $row['kind'] && ! empty( $row['source_map'] ) ) {
+			$map = Queue_Table::read_source_map( $row );
+
+			if ( ! empty( $map ) ) {
+				return count( $map );
+			}
+		}
+
+		return (int) $row['field_count'];
 	}
 
 	/**

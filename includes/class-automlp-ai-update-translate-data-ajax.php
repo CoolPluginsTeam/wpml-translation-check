@@ -148,17 +148,17 @@ class AUTOMLP_AI_Update_Translate_Data_Ajax {
 			return;
 		}
 
-		$ctx         = is_array( $ctx ) ? $ctx : array();
-		$translated  = isset( $ctx['translated'] ) && is_array( $ctx['translated'] ) ? $ctx['translated'] : array();
-		$source_map  = isset( $ctx['source_map'] ) && is_array( $ctx['source_map'] ) ? $ctx['source_map'] : array();
-		$written     = isset( $ctx['written'] ) && is_array( $ctx['written'] ) ? $ctx['written'] : array();
-		$provider    = ! empty( $ctx['provider'] ) ? (string) $ctx['provider'] : ( isset( $job['provider'] ) ? (string) $job['provider'] : '' );
-		$from_lang   = isset( $job['from_lang'] ) ? (string) $job['from_lang'] : '';
-		$to_lang     = isset( $job['to_lang'] ) ? (string) $job['to_lang'] : '';
-		$kind        = isset( $job['kind'] ) ? (string) $job['kind'] : 'post';
-		$source_id   = isset( $job['source_id'] ) ? (int) $job['source_id'] : 0;
-		$result_id   = ! empty( $written['result_id'] ) ? (int) $written['result_id'] : 0;
-		$time_taken  = isset( $ctx['time_taken'] ) ? absint( $ctx['time_taken'] ) : 0;
+		$ctx        = is_array( $ctx ) ? $ctx : array();
+		$translated = isset( $ctx['translated'] ) && is_array( $ctx['translated'] ) ? $ctx['translated'] : array();
+		$source_map = isset( $ctx['source_map'] ) && is_array( $ctx['source_map'] ) ? $ctx['source_map'] : array();
+		$written    = isset( $ctx['written'] ) && is_array( $ctx['written'] ) ? $ctx['written'] : array();
+		$provider   = ! empty( $ctx['provider'] ) ? (string) $ctx['provider'] : ( isset( $job['provider'] ) ? (string) $job['provider'] : '' );
+		$from_lang  = isset( $job['from_lang'] ) ? (string) $job['from_lang'] : '';
+		$to_lang    = isset( $job['to_lang'] ) ? (string) $job['to_lang'] : '';
+		$kind       = isset( $job['kind'] ) ? (string) $job['kind'] : 'post';
+		$source_id  = isset( $job['source_id'] ) ? (int) $job['source_id'] : 0;
+		$result_id  = ! empty( $written['result_id'] ) ? (int) $written['result_id'] : 0;
+		$time_taken = isset( $ctx['time_taken'] ) ? absint( $ctx['time_taken'] ) : 0;
 
 		if ( '' === $provider || '' === $from_lang || '' === $to_lang ) {
 			return;
@@ -200,7 +200,7 @@ class AUTOMLP_AI_Update_Translate_Data_Ajax {
 				'source_language'        => $from_lang,
 				'target_language'        => $to_lang,
 				'string_count'           => $string_count,
-				'character_count'        => $char_count,
+				'character_count'        => $source_char_count,
 				'time_taken'             => $time_taken,
 				'date_time'              => current_time( 'Y-m-d H:i:s' ),
 				'total_word_count'       => $word_count,
@@ -272,7 +272,7 @@ class AUTOMLP_AI_Update_Translate_Data_Ajax {
 				continue;
 			}
 
-			$parts = preg_split( '/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY );
+			$parts  = preg_split( '/\s+/u', $text, -1, PREG_SPLIT_NO_EMPTY );
 			$total += is_array( $parts ) ? count( $parts ) : 0;
 		}
 

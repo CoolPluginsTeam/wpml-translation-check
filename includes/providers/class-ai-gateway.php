@@ -23,10 +23,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 class AI_Gateway {
 
 	/**
-	 * Approximate token ceiling per request. Mirrors the value the browser
-	 * used so translation quality does not change.
+	 * Approximate token ceiling per request (about 6000 characters). Fewer,
+	 * larger requests are faster overall; a request that fails is retried
+	 * split in half, so size never makes a whole job fail.
 	 */
-	const TOKENS_PER_BATCH = 500;
+	const TOKENS_PER_BATCH = 1500;
 
 	/**
 	 * Rough characters-per-token ratio used for batch sizing.
@@ -37,12 +38,17 @@ class AI_Gateway {
 	 * Large WPML fields are split into smaller translation units so the queue
 	 * can report real progress between provider calls.
 	 */
-	const CHARS_PER_CHUNK = 2000;
+	const CHARS_PER_CHUNK = 4000;
 
 	/**
 	 * Seconds to wait for a provider response.
 	 */
-	const TIMEOUT = 120;
+	const TIMEOUT = 60;
+
+	/**
+	 * Smallest unit batch worth splitting further after a failed request.
+	 */
+	const MIN_SPLIT_UNITS = 2;
 
 	/**
 	 * Fallback model per provider.
@@ -94,75 +100,6 @@ class AI_Gateway {
 	 */
 	public function model() {
 		return $this->model;
-	}
-
-	/**
-	 * Translate a map of field name => plain text.
-	 *
-	 * Splits the map into token-sized batches, sends each one, and merges the
-	 * results. Keys in the returned array match the keys passed in; any field
-	 * the provider failed to return is simply absent.
-	 *
-	 * @param array  $fields           field_name => source text.
-	 * @param string $from_lang        Source language code.
-	 * @param string $to_lang          Target language code.
-	 * @param callable|null $on_progress Called after each batch with
-	 *                                   ( fields_translated, fields_total ).
-	 * @return array|\WP_Error field_name => translated text.
-	 */
-	public function translate_fields( array $fields, $from_lang, $to_lang, $on_progress = null ) {
-		if ( empty( $fields ) ) {
-			return new \WP_Error( 'automlp_empty_batch', __( 'Nothing to translate.', 'wpml-translation-check' ) );
-		}
-
-		$ready = $this->ensure_ready();
-
-		if ( is_wp_error( $ready ) ) {
-			return $ready;
-		}
-
-		$units = $this->translation_units( $fields );
-
-		if ( empty( $units ) ) {
-			return new \WP_Error( 'automlp_empty_batch', __( 'Nothing to translate.', 'wpml-translation-check' ) );
-		}
-
-		$partial          = array();
-		$failures         = array();
-		$units_total      = count( $units );
-		$units_translated = 0;
-
-		foreach ( $this->split_units_into_batches( $units ) as $batch ) {
-			$result = $this->translate_units( $batch, $from_lang, $to_lang );
-
-			if ( is_wp_error( $result ) ) {
-				$failures[] = $result->get_error_message();
-				continue;
-			}
-
-			foreach ( $result as $field => $chunks ) {
-				if ( ! isset( $partial[ $field ] ) || ! is_array( $partial[ $field ] ) ) {
-					$partial[ $field ] = array();
-				}
-
-				foreach ( (array) $chunks as $index => $value ) {
-					$partial[ $field ][ (int) $index ] = (string) $value;
-				}
-			}
-
-			$units_translated = $this->count_translated_units( $units, $partial );
-
-			if ( is_callable( $on_progress ) ) {
-				call_user_func( $on_progress, $units_translated, $units_total );
-			}
-		}
-
-		// Every batch failed: surface the first error so the job can retry.
-		if ( empty( $partial ) && ! empty( $failures ) ) {
-			return new \WP_Error( 'automlp_provider_failed', $failures[0] );
-		}
-
-		return $this->reassemble_units( $fields, $units, $partial );
 	}
 
 	/**
@@ -275,6 +212,94 @@ class AI_Gateway {
 	}
 
 	/**
+	 * Translate a unit batch, splitting it in half when a request fails.
+	 *
+	 * A failed, truncated or timed-out request is retried as two smaller
+	 * requests, recursively, down to a single unit. Halves are only started
+	 * while the deadline leaves room for another call. Whatever was
+	 * translated is returned; units still missing are left for the next try.
+	 *
+	 * @param array  $units     Units to translate.
+	 * @param string $from_lang Source language.
+	 * @param string $to_lang   Target language.
+	 * @param float  $deadline  Unix time after which no new request starts. 0 for none.
+	 * @return array|\WP_Error field => chunk_index => translated text.
+	 */
+	public function translate_units_resilient( array $units, $from_lang, $to_lang, $deadline = 0.0 ) {
+		$units  = array_values( $units );
+		$result = $this->translate_units( $units, $from_lang, $to_lang );
+		$error  = is_wp_error( $result ) ? $result : null;
+		$done   = $error ? array() : $result;
+
+		$missing = $this->missing_units( $units, $done );
+
+		if ( empty( $missing ) ) {
+			return $done;
+		}
+
+		// Credentials or configuration problems will not improve by splitting.
+		if ( $error && in_array( $error->get_error_code(), array( 'automlp_no_sdk', 'automlp_no_provider', 'automlp_no_model', 'automlp_provider_unconfigured', 'automlp_no_builder' ), true ) ) {
+			return $error;
+		}
+
+		if ( count( $missing ) < self::MIN_SPLIT_UNITS ) {
+			return empty( $done )
+				? ( $error ? $error : new \WP_Error( 'automlp_incomplete_response', __( 'The AI provider skipped part of the translation response.', 'wpml-translation-check' ) ) )
+				: $done;
+		}
+
+		$half   = (int) ceil( count( $missing ) / 2 );
+		$halves = array( array_slice( $missing, 0, $half ), array_slice( $missing, $half ) );
+
+		foreach ( $halves as $part ) {
+			if ( $deadline > 0 && microtime( true ) >= $deadline ) {
+				break;
+			}
+
+			$sub = $this->translate_units_resilient( $part, $from_lang, $to_lang, $deadline );
+
+			if ( is_wp_error( $sub ) ) {
+				$error = $sub;
+				continue;
+			}
+
+			foreach ( $sub as $field => $chunks ) {
+				foreach ( (array) $chunks as $index => $value ) {
+					$done[ $field ][ (int) $index ] = (string) $value;
+				}
+			}
+		}
+
+		if ( empty( $done ) ) {
+			return $error ? $error : new \WP_Error( 'automlp_incomplete_response', __( 'The AI provider skipped part of the translation response.', 'wpml-translation-check' ) );
+		}
+
+		return $done;
+	}
+
+	/**
+	 * Units absent or empty in a translate_units() result.
+	 *
+	 * @param array $units  Units that were sent.
+	 * @param array $result field => chunk_index => translated text.
+	 * @return array Missing units, in their original order.
+	 */
+	private function missing_units( array $units, array $result ) {
+		$missing = array();
+
+		foreach ( $units as $unit ) {
+			$field = isset( $unit['field'] ) ? (string) $unit['field'] : '';
+			$index = isset( $unit['index'] ) ? (int) $unit['index'] : 0;
+
+			if ( '' === $field || ! isset( $result[ $field ][ $index ] ) || '' === trim( (string) $result[ $field ][ $index ] ) ) {
+				$missing[] = $unit;
+			}
+		}
+
+		return $missing;
+	}
+
+	/**
 	 * Rebuild field translations from completed unit chunks.
 	 *
 	 * Fields are returned only when every one of their chunks is present.
@@ -322,6 +347,24 @@ class AI_Gateway {
 	}
 
 	/**
+	 * Token ceiling for one provider request.
+	 *
+	 * @return int
+	 */
+	private function batch_token_limit() {
+		/**
+		 * Filter the approximate tokens sent per AI request.
+		 *
+		 * Lower values make each queue run shorter; higher values mean fewer
+		 * requests per job.
+		 *
+		 * @param int    $tokens   Token ceiling.
+		 * @param string $provider Provider slug.
+		 */
+		return max( 50, (int) apply_filters( 'automlp_translation_batch_tokens', \AUTOMLP_WPML\Includes\Queue\Dispatcher::tuning( 'batch_tokens', self::TOKENS_PER_BATCH ), $this->provider ) );
+	}
+
+	/**
 	 * Group units into batches under the token ceiling.
 	 *
 	 * A single unit longer than the ceiling gets its own batch rather than
@@ -334,12 +377,13 @@ class AI_Gateway {
 		$batches = array();
 		$current = array();
 		$tokens  = 0;
+		$limit   = $this->batch_token_limit();
 
 		foreach ( $units as $unit ) {
 			$text = isset( $unit['text'] ) ? (string) $unit['text'] : '';
 			$cost = (int) ceil( mb_strlen( $text ) / self::CHARS_PER_TOKEN );
 
-			if ( ! empty( $current ) && ( $tokens + $cost ) > self::TOKENS_PER_BATCH ) {
+			if ( ! empty( $current ) && ( $tokens + $cost ) > $limit ) {
 				$batches[] = $current;
 				$current   = array();
 				$tokens    = 0;
@@ -354,28 +398,6 @@ class AI_Gateway {
 		}
 
 		return $batches;
-	}
-
-	/**
-	 * Count translated units present in a partial response.
-	 *
-	 * @param array $units   Ordered units.
-	 * @param array $partial field => chunk_index => translated text.
-	 * @return int
-	 */
-	private function count_translated_units( array $units, array $partial ) {
-		$count = 0;
-
-		foreach ( $units as $unit ) {
-			$field = isset( $unit['field'] ) ? (string) $unit['field'] : '';
-			$index = isset( $unit['index'] ) ? (int) $unit['index'] : 0;
-
-			if ( '' !== $field && isset( $partial[ $field ] ) && is_array( $partial[ $field ] ) && array_key_exists( $index, $partial[ $field ] ) ) {
-				++$count;
-			}
-		}
-
-		return $count;
 	}
 
 	/**
@@ -583,8 +605,23 @@ class AI_Gateway {
 	 * @return string|\WP_Error Raw model output.
 	 */
 	private function run_prompt( $prompt ) {
-		$timeout_filter = static function () {
-			return self::TIMEOUT;
+		/**
+		 * Filter the per-request AI timeout in seconds.
+		 *
+		 * A timed-out batch is retried split in half, from saved progress.
+		 * Capped below max_execution_time so a slow provider cannot kill PHP.
+		 *
+		 * @param int $timeout Seconds.
+		 */
+		$timeout = max( 10, (int) apply_filters( 'automlp_ai_request_timeout', self::TIMEOUT ) );
+		$max_php = (int) ini_get( 'max_execution_time' );
+
+		if ( $max_php > 0 ) {
+			$timeout = max( 10, min( $timeout, (int) floor( $max_php * 0.6 ) ) );
+		}
+
+		$timeout_filter = static function () use ( $timeout ) {
+			return $timeout;
 		};
 
 		add_filter( 'wp_ai_client_default_request_timeout', $timeout_filter );
@@ -612,6 +649,11 @@ class AI_Gateway {
 			return new \WP_Error( 'automlp_generate_failed', $e->getMessage() );
 		} finally {
 			remove_filter( 'wp_ai_client_default_request_timeout', $timeout_filter );
+		}
+
+		// WordPress's AI client reports provider errors as WP_Error, not exceptions.
+		if ( is_wp_error( $raw ) ) {
+			return new \WP_Error( 'automlp_generate_failed', $raw->get_error_message() );
 		}
 
 		if ( ! is_string( $raw ) || '' === $raw ) {

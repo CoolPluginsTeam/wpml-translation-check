@@ -53,21 +53,70 @@ const request = async (path, body = null, method = 'POST') => {
 };
 
 /**
+ * Posts per /queue/posts request.
+ *
+ * @type {number}
+ */
+const QUEUE_POSTS_PER_REQUEST = 4;
+
+/**
  * Queue posts for translation.
  *
- * Returns immediately: translation happens on the server afterwards.
+ * Returns quickly: translation happens on the server afterwards. Posts are
+ * sent a few at a time so no single request holds a PHP worker for long
+ * while WPML builds the jobs. The merged result has the same shape as a
+ * single call.
  *
  * @param {number[]} postIds   Post ids.
  * @param {string[]} languages Target language codes.
  * @param {string}   provider  Provider slug, e.g. 'openai'. Optional.
- * @return {Promise<Object>} { queued, skipped, errors, jobs }
+ * @return {Promise<Object>} { queued, skipped, errors, jobs, skip_reasons, message }
  */
-export const queuePosts = async (postIds, languages, provider = '') =>
-	request('/queue/posts', {
-		post_ids: postIds,
-		languages,
-		provider,
-	});
+export const queuePosts = async (postIds, languages, provider = '') => {
+	const ids = Array.isArray(postIds) ? postIds : [postIds];
+	const merged = { queued: 0, skipped: 0, errors: {}, jobs: [], skip_reasons: {}, message: '' };
+	let firstError = null;
+
+	for (let i = 0; i < ids.length; i += QUEUE_POSTS_PER_REQUEST) {
+		let res;
+
+		try {
+			res = await request('/queue/posts', {
+				post_ids: ids.slice(i, i + QUEUE_POSTS_PER_REQUEST),
+				languages,
+				provider,
+			});
+		} catch (err) {
+			// Keep going: other posts may still queue. Rethrown below only
+			// when nothing at all was queued.
+			firstError = firstError || err;
+			merged.errors[`request_${i}`] = err && err.message ? err.message : String(err);
+			continue;
+		}
+
+		merged.queued += Number(res.queued) || 0;
+		merged.skipped += Number(res.skipped) || 0;
+		Object.assign(merged.errors, res.errors || {});
+		merged.jobs = merged.jobs.concat(Array.isArray(res.jobs) ? res.jobs : []);
+		Object.entries(res.skip_reasons || {}).forEach(([key, count]) => {
+			merged.skip_reasons[key] = (merged.skip_reasons[key] || 0) + (Number(count) || 0);
+		});
+
+		if (res.message) {
+			merged.message = res.message;
+		}
+	}
+
+	if (firstError && !merged.queued && !merged.skipped) {
+		throw firstError;
+	}
+
+	if (merged.queued) {
+		merged.message = '';
+	}
+
+	return merged;
+};
 
 /**
  * Queue String Translation strings.
@@ -145,7 +194,9 @@ export const pollUntilDone = async ({
 }) => {
 	const startedAt = Date.now();
 
-	let interval = 1000;
+	// Each poll is a full WordPress request. On small hosts (two PHP workers)
+	// polling every second keeps a worker busy, so poll gently.
+	let interval = 2500;
 	let last = null;
 	let runInFlight = false;
 
@@ -200,14 +251,15 @@ export const pollUntilDone = async ({
 			['claimed', 'sent', 'writing'].includes(job.state)
 		);
 
-		// Next waiting job when the previous one finished, or when cron is unhealthy.
-		if ((hasWaiting && !hasActive) || (status.health && status.health.state !== 'ok')) {
+		// Start the next waiting job only when none is running. The server
+		// lock makes extra kicks harmless, but each one still costs a worker.
+		if (hasWaiting && !hasActive) {
 			kickOne();
 		}
 
 		await wait(interval);
 
-		interval = hasActive ? 1000 : Math.min(interval + 500, 3000);
+		interval = hasActive ? 2500 : Math.min(interval + 500, 4000);
 	}
 };
 
