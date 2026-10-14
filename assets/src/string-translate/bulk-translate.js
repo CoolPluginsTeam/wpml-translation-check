@@ -1,6 +1,7 @@
 import {
   queueStrings,
   pollUntilDone,
+  retryJob,
   jobProgressPercent,
 } from "../shared/queue-client";
 import {
@@ -14,17 +15,7 @@ import {
 } from "./redux-store/features/actions";
 import { store } from "./redux-store/store";
 import { __ } from "@wordpress/i18n";
-// NOTE: The post/taxonomy bulk-translate pipeline (initBulkTranslate,
-// translateContent, updateContent, bulkTranslateEntries) has been removed
-// from this file. This module now only contains string-translation logic.
-// Post bulk translation uses assets/src/bulk-translate/bulk-translate.js.
-
-const bulkTranslateEntries = async ({ ids, langs, storeDispatch }) => {
-  // This function is kept only for API compatibility but is no-op in the
-  // string-translate context. Post/taxonomy bulk translation is handled by
-  // assets/src/bulk-translate/bulk-translate.js.
-  return { success: false, message: "bulkTranslateEntries is not used for strings" };
-};
+// String translation only. Posts and terms use bulk-translate/status-modal.
 /**
  * Bulk translate strings for String Translation page.
  * Fetches first page only; initBulkTranslateStrings will fetch further pages in a pipeline (no 10k in memory).
@@ -140,7 +131,14 @@ const bulkTranslateStrings = async ({
  */
 const STRING_QUEUE_CHUNK = 500;
 
-const errorRow = (message) => ({
+/**
+ * Row data for a failed language.
+ *
+ * aiError shows the "Translate" button in the error popup. retry holds what
+ * that button needs: failed job ids (sent to /queue/retry, like the Queue
+ * tab) and string ids that never got a job (queued again).
+ */
+const errorRow = (message, retry = {}) => ({
   status: "error",
   messageClass: "error",
   errorMessage: __("Translation failed", "wpml-translation-check"),
@@ -148,7 +146,40 @@ const errorRow = (message) => ({
     '<div class="automlp-wpml-error-html">' +
     escapeHtml(message || __("Translation failed", "wpml-translation-check")) +
     "</div>",
+  aiError: Boolean(
+    (retry.failedJobIds && retry.failedJobIds.length) ||
+      (retry.stringIds && retry.stringIds.length),
+  ),
+  retry,
 });
+
+/**
+ * Queue string ids for one language, in chunks.
+ *
+ * @param {number[]} ids      String ids.
+ * @param {string}   lang     Target language.
+ * @param {string}   provider Queue provider slug.
+ * @return {Promise<{jobIds: number[], error: string}>}
+ */
+const queueStringIds = async (ids, lang, provider) => {
+  const jobIds = [];
+  let error = "";
+
+  for (let i = 0; i < ids.length; i += STRING_QUEUE_CHUNK) {
+    try {
+      const res = await queueStrings(
+        ids.slice(i, i + STRING_QUEUE_CHUNK),
+        lang,
+        provider,
+      );
+      (res.jobs || []).forEach((job) => jobIds.push(Number(job.job_id)));
+    } catch (err) {
+      error = err?.message || "";
+    }
+  }
+
+  return { jobIds, error };
+};
 
 const escapeHtml = (value) =>
   String(value)
@@ -214,27 +245,17 @@ const initBulkTranslateStrings = async (
     const ids = (stringsByLanguage[lang] || [])
       .map((str) => parseInt(str.field_key, 10))
       .filter((id) => id > 0);
-    let queuedAny = false;
-    let lastError = "";
+    const queued = await queueStringIds(ids, lang, activeProvider);
 
-    for (let i = 0; i < ids.length; i += STRING_QUEUE_CHUNK) {
-      try {
-        const res = await queueStrings(
-          ids.slice(i, i + STRING_QUEUE_CHUNK),
-          lang,
-          activeProvider,
-        );
-        (res.jobs || []).forEach((job) => {
-          jobLang[job.job_id] = lang;
-          queuedAny = true;
-        });
-      } catch (err) {
-        lastError = err?.message || "";
-      }
-    }
+    queued.jobIds.forEach((jobId) => {
+      jobLang[jobId] = lang;
+    });
 
-    if (!queuedAny) {
-      finishLang(lang, errorRow(lastError));
+    if (!queued.jobIds.length) {
+      finishLang(
+        lang,
+        errorRow(queued.error, { provider: activeProvider, stringIds: ids }),
+      );
     }
   }
 
@@ -261,7 +282,15 @@ const initBulkTranslateStrings = async (
       if (!lang) return;
 
       if (!perLang[lang]) {
-        perLang[lang] = { done: 0, total: 0, chars: 0, closed: true, errors: [] };
+        perLang[lang] = {
+          done: 0,
+          doneOk: 0,
+          total: 0,
+          chars: 0,
+          closed: true,
+          errors: [],
+          failedJobIds: [],
+        };
       }
 
       const entry = perLang[lang];
@@ -270,12 +299,14 @@ const initBulkTranslateStrings = async (
 
       if (job.state === "done") {
         entry.chars += Number(job.char_count) || 0;
+        entry.doneOk += Number(job.string_count) || 0;
       }
       if (!job.closed) {
         entry.closed = false;
       }
       if (job.state === "failed" || job.state === "stopped") {
         entry.errors.push(job.error || job.label || "");
+        entry.failedJobIds.push(Number(job.job_id));
       }
     });
 
@@ -326,7 +357,12 @@ const initBulkTranslateStrings = async (
 
       if (entry.errors.length) {
         finishLang(lang, {
-          ...errorRow(entry.errors.filter(Boolean).join(" | ")),
+          ...errorRow(entry.errors.filter(Boolean).join(" | "), {
+            provider: activeProvider,
+            failedJobIds: entry.failedJobIds,
+            stringsDone: entry.doneOk,
+            charsDone: entry.chars,
+          }),
           completed: entry.done,
           total,
         });
@@ -382,8 +418,184 @@ const initBulkTranslateStrings = async (
   }
 };
 
+/**
+ * "Translate" button of the strings error popup.
+ *
+ * Failed jobs go back through POST /queue/retry, exactly like Retry in the
+ * Queue tab (REST nonce + capability checked on the server); strings that
+ * never got a job are queued again.
+ *
+ * @param {Object}   args
+ * @param {Object}   args.info                 The failed row (translatePostInfo entry).
+ * @param {Function} args.storeDispatch        Redux dispatch.
+ * @param {Function} args.updateDestoryHandler Registers a modal-close callback.
+ */
+const retryStringTranslation = async ({ info, storeDispatch, updateDestoryHandler }) => {
+  const retry = info?.retry || {};
+  const lang = info?.targetLanguage;
+  const provider = retry.provider || "";
+
+  if (!lang || !provider) {
+    return;
+  }
+
+  const langKey = `strings_${lang}`;
+  const total = Number(info.total) || 0;
+  const baseDone = Number(retry.stringsDone) || 0;
+  const baseChars = Number(retry.charsDone) || 0;
+  let closed = false;
+
+  updateDestoryHandler(() => {
+    closed = true;
+  });
+
+  storeDispatch(
+    updateTranslatePostInfo({
+      [langKey]: {
+        status: "in-progress",
+        messageClass: "in-progress",
+        aiError: false,
+        completed: baseDone,
+        total,
+      },
+    }),
+  );
+
+  const jobIds = [];
+  let lastError = "";
+
+  for (const jobId of retry.failedJobIds || []) {
+    try {
+      const res = await retryJob(jobId);
+      if (res && res.retried) {
+        jobIds.push(Number(jobId));
+      }
+    } catch (err) {
+      lastError = err?.message || "";
+    }
+  }
+
+  if (retry.stringIds && retry.stringIds.length) {
+    const queued = await queueStringIds(retry.stringIds, lang, provider);
+    jobIds.push(...queued.jobIds);
+    lastError = queued.error || lastError;
+  }
+
+  if (!jobIds.length) {
+    storeDispatch(
+      updateTranslatePostInfo({
+        [langKey]: { ...errorRow(lastError, retry), completed: baseDone, total },
+      }),
+    );
+    return;
+  }
+
+  const startedAt = Date.now();
+  const countBefore = store.getState().countInfo || {};
+
+  const onUpdate = (status) => {
+    const jobs = Array.isArray(status?.jobs) ? status.jobs : [];
+    let done = 0;
+    let doneOk = 0;
+    let chars = 0;
+    let open = false;
+    const errors = [];
+    const failedJobIds = [];
+
+    jobs.forEach((job) => {
+      done += jobStringsDone(job);
+      if (job.state === "done") {
+        doneOk += Number(job.string_count) || 0;
+        chars += Number(job.char_count) || 0;
+      }
+      if (!job.closed) {
+        open = true;
+      }
+      if (job.state === "failed" || job.state === "stopped") {
+        errors.push(job.error || job.label || "");
+        failedJobIds.push(Number(job.job_id));
+      }
+    });
+
+    if (open) {
+      storeDispatch(
+        updateTranslatePostInfo({
+          [langKey]: {
+            status: "in-progress",
+            messageClass: "in-progress",
+            completed: Math.min(total, baseDone + done),
+            total,
+          },
+        }),
+      );
+      return;
+    }
+
+    storeDispatch(
+      updateParentPostsInfo({
+        postId: langKey,
+        data: {
+          charactersCount: baseChars + chars,
+          stringsCount: baseDone + doneOk,
+        },
+      }),
+    );
+    storeDispatch(
+      updateCountInfo({
+        stringsTranslated: (Number(countBefore.stringsTranslated) || 0) + doneOk,
+        charactersTranslated: (Number(countBefore.charactersTranslated) || 0) + chars,
+        timeTaken:
+          (Number(countBefore.timeTaken) || 0) + (Date.now() - startedAt) / 1000,
+      }),
+    );
+
+    storeDispatch(
+      updateTranslatePostInfo({
+        [langKey]: errors.length
+          ? {
+              ...errorRow(errors.filter(Boolean).join(" | "), {
+                provider,
+                failedJobIds,
+                stringsDone: baseDone + doneOk,
+                charsDone: baseChars + chars,
+              }),
+              completed: Math.min(total, baseDone + done),
+              total,
+            }
+          : {
+              status: "completed",
+              messageClass: "success",
+              aiError: false,
+              completed: total,
+              total,
+            },
+      }),
+    );
+  };
+
+  try {
+    await pollUntilDone({
+      jobIds,
+      onUpdate,
+      shouldStop: () => closed,
+    });
+  } catch (err) {
+    if (!closed) {
+      storeDispatch(
+        updateTranslatePostInfo({
+          [langKey]: {
+            ...errorRow(err?.message, { provider, failedJobIds: jobIds }),
+            completed: baseDone,
+            total,
+          },
+        }),
+      );
+    }
+  }
+};
+
 export {
-  bulkTranslateEntries,
   bulkTranslateStrings,
   initBulkTranslateStrings,
+  retryStringTranslation,
 };

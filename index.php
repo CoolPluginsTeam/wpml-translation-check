@@ -363,7 +363,6 @@ final class AUTOMLP_Ai_Translate_Addon {
 			'includes/bulk-translation/register-assets.php',
 			'includes/string-translation/register-assets.php',
 			'includes/class-automlp-ai-helper.php',
-			'includes/class-automlp-ai-strings-ajax.php',
 			'includes/class-automlp-ai-update-translate-data-ajax.php',
 			'includes/routes/bulk-translation-route.php',
 			'admin/class-automlp_ai_dashboard.php',
@@ -426,9 +425,6 @@ final class AUTOMLP_Ai_Translate_Addon {
 		add_action( 'admin_init', array( $this, 'automlp_feedback_form' ) );
 
 		// Initialize AJAX handlers.
-		if ( class_exists( AUTOMLP_AI_Strings_Ajax::class ) ) {
-			AUTOMLP_AI_Strings_Ajax::init();
-		}
 		if ( class_exists( 'AUTOMLP_AI_Update_Translate_Data_Ajax' ) ) {
 			AUTOMLP_AI_Update_Translate_Data_Ajax::init();
 		}

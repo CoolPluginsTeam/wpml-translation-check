@@ -2,9 +2,8 @@
 /**
  * Records translation stats for the Auto Translation Status dashboard.
  *
- * Browser string translation still posts to the AJAX action. Page/post (and
- * queue string) jobs write through the background flow, so the same store
- * logic also runs on automlp_job_completed.
+ * Every translation is a queue job saved through the background flow, so
+ * stats are recorded on automlp_job_completed.
  *
  * @package WPML_Auto_Translate
  */
@@ -14,89 +13,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Register and handle wp_ajax_automlp_wpml_update_translate_data.
+ * Records queue job results for the CPT dashboard.
  */
 class AUTOMLP_AI_Update_Translate_Data_Ajax {
 
 	/**
-	 * Initialize: register the AJAX action and queue completion hook.
+	 * Initialize: record stats when a queue job completes.
 	 *
 	 * @return void
 	 */
 	public static function init() {
-		add_action( 'wp_ajax_automlp_wpml_update_translate_data', array( __CLASS__, 'handle_update_translate_data' ) );
 		add_action( 'automlp_job_completed', array( __CLASS__, 'record_queue_job' ), 10, 3 );
-	}
-
-	/**
-	 * Handle the update translate data request: verify nonce, map POST to store_options, save.
-	 *
-	 * @return void
-	 */
-	public static function handle_update_translate_data() {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_send_json_error( array( 'msg' => __( 'Unauthorized', 'wpml-translation-check' ) ), 403 );
-		}
-
-		$nonce = isset( $_POST['automlp_wpml_nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['automlp_wpml_nonce'] ) ) : '';
-		if ( empty( $nonce ) && isset( $_POST['translate_data_nonce'] ) ) {
-			$nonce = sanitize_text_field( wp_unslash( $_POST['translate_data_nonce'] ) );
-		}
-		if ( ! wp_verify_nonce( $nonce, 'automlp_wpml_update_translate_data' ) ) {
-			wp_send_json_error( array( 'msg' => __( 'Invalid nonce', 'wpml-translation-check' ) ), 400 );
-		}
-
-		$post_id             = isset( $_POST['post_id'] ) ? sanitize_text_field( wp_unslash( $_POST['post_id'] ) ) : '';
-		$provider            = isset( $_POST['provider'] ) ? sanitize_text_field( wp_unslash( $_POST['provider'] ) ) : '';
-		$source_lang         = isset( $_POST['sourceLang'] ) ? sanitize_text_field( wp_unslash( $_POST['sourceLang'] ) ) : '';
-		$target_lang         = isset( $_POST['targetLang'] ) ? sanitize_text_field( wp_unslash( $_POST['targetLang'] ) ) : '';
-		$string_count        = isset( $_POST['totalStringCount'] ) ? absint( $_POST['totalStringCount'] ) : 0;
-		$char_count          = isset( $_POST['totalCharacterCount'] ) ? absint( $_POST['totalCharacterCount'] ) : 0;
-		$time_taken          = isset( $_POST['timeTaken'] ) ? absint( $_POST['timeTaken'] ) : 0;
-		$total_word_count    = isset( $_POST['totalWordCount'] ) ? absint( $_POST['totalWordCount'] ) : 0;
-		$editor_type         = isset( $_POST['editorType'] ) ? sanitize_text_field( wp_unslash( $_POST['editorType'] ) ) : '';
-		$date                = isset( $_POST['date'] ) ? sanitize_text_field( wp_unslash( $_POST['date'] ) ) : '';
-		$source_string_count = isset( $_POST['sourceStringCount'] ) ? absint( $_POST['sourceStringCount'] ) : 0;
-		$source_word_count   = isset( $_POST['sourceWordCount'] ) ? absint( $_POST['sourceWordCount'] ) : 0;
-		$source_char_count   = isset( $_POST['sourceCharacterCount'] ) ? absint( $_POST['sourceCharacterCount'] ) : 0;
-		$extra_data          = isset( $_POST['extraData'] ) ? sanitize_text_field( wp_unslash( $_POST['extraData'] ) ) : '';
-		$bulk_translate      = isset( $_POST['bulk_translate'] ) ? sanitize_text_field( wp_unslash( $_POST['bulk_translate'] ) ) : '';
-
-		if ( empty( $post_id ) || empty( $provider ) || empty( $source_lang ) || empty( $target_lang ) ) {
-			wp_send_json_error( array( 'msg' => __( 'Missing required fields', 'wpml-translation-check' ) ), 400 );
-		}
-
-		$ok = self::record(
-			array(
-				'post_id'                => $post_id,
-				'service_provider'       => $provider,
-				'source_language'        => $source_lang,
-				'target_language'        => $target_lang,
-				'string_count'           => $string_count,
-				'character_count'        => $char_count,
-				'time_taken'             => $time_taken,
-				'date_time'              => ! empty( $date ) ? gmdate( 'Y-m-d H:i:s', strtotime( $date ) ) : current_time( 'Y-m-d H:i:s' ),
-				'total_word_count'       => $total_word_count,
-				'editor_type'            => $editor_type,
-				'source_string_count'    => $source_string_count,
-				'source_word_count'      => $source_word_count,
-				'source_character_count' => $source_char_count,
-				'extra_data'             => $extra_data,
-				'bulk_translate'         => $bulk_translate,
-			)
-		);
-
-		if ( ! $ok ) {
-			wp_send_json_error( array( 'msg' => __( 'Could not store translation data.', 'wpml-translation-check' ) ), 500 );
-		}
-
-		wp_send_json_success();
 	}
 
 	/**
 	 * Persist one translation status row to the CPT dashboard option.
 	 *
-	 * @param array $data Dashboard row fields (same keys as the AJAX handler).
+	 * @param array $data Dashboard row fields.
 	 * @return bool
 	 */
 	public static function record( array $data ) {
