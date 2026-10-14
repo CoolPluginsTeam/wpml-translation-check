@@ -14,6 +14,7 @@ namespace AUTOMLP_WPML\Admin;
 use AUTOMLP_WPML\Includes\Queue\Dispatcher;
 use AUTOMLP_WPML\Includes\Queue\Queue_Table;
 use AUTOMLP_WPML\Includes\Wpml\Background_Flow;
+use AUTOMLP_WPML\Includes\Wpml\Job_Listener;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -152,6 +153,11 @@ class Queue_Screen {
 				if ( $job_id && self::retry( $job_id ) ) {
 					$notice = 'retried';
 				}
+				break;
+
+			case 'cancel':
+				$job_id = isset( $_POST['job_id'] ) ? absint( $_POST['job_id'] ) : 0;
+				$notice = ( $job_id && Job_Listener::cancel_queue_job( $job_id ) ) ? 'cancelled' : 'not_cancelled';
 				break;
 
 			case 'retry_all':
@@ -333,8 +339,9 @@ class Queue_Screen {
 		$row['state_class'] = self::state_class( $row['state'] );
 		// can_retry requires both the failed state AND a stored source_map;
 		// the REST retry endpoint rejects jobs whose source has been cleared.
-		$row['can_retry']   = Queue_Table::STATE_FAILED === $row['state']
+		$row['can_retry']  = Queue_Table::STATE_FAILED === $row['state']
 			&& ! empty( $row['source_map'] );
+		$row['can_cancel'] = in_array( $row['state'], Job_Listener::cancellable_states(), true );
 
 		$row['source_title'] = '';
 		$row['source_link']  = '';
@@ -471,11 +478,13 @@ class Queue_Screen {
 		}
 
 		$map = array(
-			'ran'         => array( 'success', __( 'The queue was processed.', 'wpml-translation-check' ) ),
-			'retried'     => array( 'success', __( 'That job was sent back to the queue.', 'wpml-translation-check' ) ),
-			'retried_all' => array( 'success', __( 'Failed jobs were sent back to the queue.', 'wpml-translation-check' ) ),
-			'cleared'     => array( 'success', __( 'Finished jobs were removed from the history.', 'wpml-translation-check' ) ),
-			'nothing'     => array( 'info', __( 'There was nothing to retry. Jobs can only be retried while their source content is still stored.', 'wpml-translation-check' ) ),
+			'ran'           => array( 'success', __( 'The queue was processed.', 'wpml-translation-check' ) ),
+			'retried'       => array( 'success', __( 'That job was sent back to the queue.', 'wpml-translation-check' ) ),
+			'retried_all'   => array( 'success', __( 'Failed jobs were sent back to the queue.', 'wpml-translation-check' ) ),
+			'cleared'       => array( 'success', __( 'Finished jobs were removed from the history.', 'wpml-translation-check' ) ),
+			'nothing'       => array( 'info', __( 'There was nothing to retry. Jobs can only be retried while their source content is still stored.', 'wpml-translation-check' ) ),
+			'cancelled'     => array( 'success', __( 'The job was deleted from the queue and will not be translated.', 'wpml-translation-check' ) ),
+			'not_cancelled' => array( 'warning', __( 'That job could not be deleted. It may have finished or be saving right now.', 'wpml-translation-check' ) ),
 		);
 
 		if ( ! isset( $map[ $key ] ) ) {

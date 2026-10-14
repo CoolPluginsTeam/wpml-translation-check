@@ -519,6 +519,62 @@ class Job_Listener {
 	}
 
 	/**
+	 * Cancel one queue job so it is not translated.
+	 *
+	 * Marks the row cancelled first (only if it is still in the state we
+	 * read, so a finished or saving job is never touched), then cancels the
+	 * WPML job the standard way so nothing stays assigned to the AutoMLP
+	 * translator. A run working on the job notices before its next AI call
+	 * or save and stops without saving.
+	 *
+	 * @param int $job_id Queue job id.
+	 * @return bool True when the job was cancelled.
+	 */
+	public static function cancel_queue_job( $job_id ) {
+		$row = Queue_Table::get( (int) $job_id );
+
+		if ( ! $row || ! in_array( $row['state'], self::cancellable_states(), true ) ) {
+			return false;
+		}
+
+		$cancelled = Queue_Table::edit_if_state(
+			(int) $job_id,
+			$row['state'],
+			array(
+				'state'      => Queue_Table::STATE_STOPPED,
+				'closed_at'  => current_time( 'mysql', true ),
+				'source_map' => null,
+				'last_error' => __( 'Deleted from the queue by an administrator.', 'wpml-translation-check' ),
+			)
+		);
+
+		if ( ! $cancelled ) {
+			return false;
+		}
+
+		if ( ! empty( $row['wpml_job_id'] ) ) {
+			self::cancel_wpml_job( (int) $row['wpml_job_id'] );
+		}
+
+		return true;
+	}
+
+	/**
+	 * States a job can be cancelled from. Writing is excluded: the WPML
+	 * save is already under way.
+	 *
+	 * @return string[]
+	 */
+	public static function cancellable_states() {
+		return array(
+			Queue_Table::STATE_WAITING,
+			Queue_Table::STATE_CLAIMED,
+			Queue_Table::STATE_SENT,
+			Queue_Table::STATE_FAILED,
+		);
+	}
+
+	/**
 	 * WPML cancelled a job.
 	 *
 	 * @param int $wpml_job_id Job id.

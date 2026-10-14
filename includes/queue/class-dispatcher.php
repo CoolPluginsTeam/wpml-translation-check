@@ -821,8 +821,10 @@ class Dispatcher {
 			$partial          = Queue_Table::read_response_payload( $job );
 			$units_translated = self::count_translated_units( $units, $partial );
 
-			Queue_Table::edit(
+			// Conditional: the job may have been cancelled since it was claimed.
+			$started = Queue_Table::edit_if_state(
 				$job_id,
+				Queue_Table::STATE_CLAIMED,
 				array(
 					'state'             => Queue_Table::STATE_SENT,
 					'provider'          => $gateway->provider(),
@@ -831,6 +833,10 @@ class Dispatcher {
 					'fields_translated' => $units_translated,
 				)
 			);
+
+			if ( ! $started ) {
+				return;
+			}
 
 			if ( Queue_Table::debug_enabled() ) {
 				Queue_Table::edit( $job_id, array( 'request_payload' => $fields ) );
@@ -845,6 +851,12 @@ class Dispatcher {
 				// the remaining budget fits a call as long as the previous one.
 				if ( $last_call > 0 && ( $deadline - $now ) < max( 5.0, $last_call * 1.2 ) ) {
 					self::park( $job_id, $units_total, $units_translated, $partial );
+					return;
+				}
+
+				// Cancelled from the Queue screen or in WPML: stop before paying for
+				// another AI call. Nothing is saved.
+				if ( Queue_Table::STATE_SENT !== Queue_Table::state( $job_id ) ) {
 					return;
 				}
 

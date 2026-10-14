@@ -413,7 +413,8 @@ class Queue_Table {
 	public static function fail( $job_id, $message, $max_retries = 3 ) {
 		$row = self::get( $job_id );
 
-		if ( ! $row ) {
+		// A job cancelled or finished meanwhile must stay that way.
+		if ( ! $row || in_array( $row['state'], array( self::STATE_STOPPED, self::STATE_DONE ), true ) ) {
 			return;
 		}
 
@@ -575,6 +576,25 @@ class Queue_Table {
 		);
 
 		return ! empty( $hit );
+	}
+
+	/**
+	 * Current state of one job. Cheap: reads one column.
+	 *
+	 * @param int $job_id Job id.
+	 * @return string Empty when the row is gone.
+	 */
+	public static function state( $job_id ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Must be read fresh.
+		return (string) $wpdb->get_var(
+			$wpdb->prepare(
+				'SELECT state FROM %i WHERE job_id = %d',
+				self::table(),
+				(int) $job_id
+			)
+		);
 	}
 
 	/**

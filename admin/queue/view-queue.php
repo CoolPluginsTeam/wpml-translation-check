@@ -123,8 +123,7 @@ $automlp_page_url = $automlp_filter
 				</form>
 			<?php endif; ?>
 
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>"
-			      onsubmit="return confirm('<?php echo esc_js( __( 'Remove all finished jobs from this list? Translations are not affected.', 'wpml-translation-check' ) ); ?>');">
+			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<?php wp_nonce_field( 'automlp_queue_action' ); ?>
 				<input type="hidden" name="action" value="automlp_queue_action">
 				<input type="hidden" name="queue_action" value="clear">
@@ -218,6 +217,28 @@ $automlp_page_url = $automlp_filter
 									<input type="hidden" name="job_id" value="<?php echo esc_attr( $automlp_row['job_id'] ); ?>">
 									<button type="submit" class="button button-small">
 										<?php esc_html_e( 'Retry', 'wpml-translation-check' ); ?>
+									</button>
+								</form>
+							<?php endif; ?>
+
+							<?php if ( ! empty( $automlp_row['can_cancel'] ) ) : ?>
+								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" class="automlp-queue__inline-form">
+									<?php wp_nonce_field( 'automlp_queue_action' ); ?>
+									<input type="hidden" name="action" value="automlp_queue_action">
+									<input type="hidden" name="queue_action" value="cancel">
+									<input type="hidden" name="job_id" value="<?php echo esc_attr( $automlp_row['job_id'] ); ?>">
+									<button type="submit" class="button button-small button-link-delete" aria-label="
+									<?php
+									echo esc_attr(
+										sprintf(
+											/* translators: %s: content title */
+											__( 'Delete queue job for %s', 'wpml-translation-check' ),
+											$automlp_row['source_title']
+										)
+									);
+									?>
+									">
+										<?php esc_html_e( 'Delete', 'wpml-translation-check' ); ?>
 									</button>
 								</form>
 							<?php endif; ?>
