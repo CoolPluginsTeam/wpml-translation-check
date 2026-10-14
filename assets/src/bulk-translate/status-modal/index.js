@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectTranslatePostInfo, selectProgressStatus, selectCountInfo, selectPendingPosts, selectServiceProvider, selectErrorPostsInfo, selectTargetLanguages } from '../redux-store/features/selectors';
 import { __, sprintf } from '@wordpress/i18n';
@@ -7,11 +7,32 @@ import { store } from '../redux-store/store';
 import DOMPurify from 'dompurify';
 import { updatePendingPosts, updateCountInfo, updateTranslatePostInfo, unsetPendingPost, updateProgressStatus } from '../redux-store/features/actions';
 
-import { queuePosts, pollUntilDone, summarise, retryJob, jobProgressPercent } from '../../shared/queue-client';
+import { queuePosts, pollUntilDone, retryJob, jobProgressPercent } from '../../shared/queue-client';
+
+/**
+ * Posts per /queue/posts request. WPML needs a few seconds to build each job,
+ * so small sequential requests keep the modal responsive.
+ */
+const POSTS_PER_REQUEST = 1;
+
+/**
+ * Row states that need no more work.
+ */
+const TERMINAL_ROW = ['completed', 'error', 'skipped'];
+
+const escapeHtml = (value) =>
+    String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 
 const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
     const storeDispatch = useDispatch();
+    // Every selected post x language, rendered before the server answers.
+    const rowKeysRef = useRef([]);
     const [isLoading, setIsLoading] = useState(true);
     const [errorModal, setErrorModal] = useState(false);
     const [errorModalData, setErrorModalData] = useState(false);
@@ -54,6 +75,39 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
     };
 
     /**
+     * Overall percent across every selected row, not just the jobs created
+     * so far: a row still being queued counts as 0%, a finished or skipped
+     * one as 100%.
+     */
+    const overallPercent = (status) => {
+        const keys = rowKeysRef.current;
+
+        if (!keys.length) {
+            return 0;
+        }
+
+        const byKey = {};
+        (status.jobs || []).forEach((job) => {
+            byKey[`${job.source_id}_${job.to_lang}`] = job;
+        });
+
+        const info = store.getState().translatePostInfo || {};
+        let sum = 0;
+
+        keys.forEach((key) => {
+            const job = byKey[key];
+
+            if (job) {
+                sum += job.closed ? 100 : jobProgressPercent(job);
+            } else if (info[key] && TERMINAL_ROW.includes(info[key].status)) {
+                sum += 100;
+            }
+        });
+
+        return sum / keys.length;
+    };
+
+    /**
      * Push one poll payload into the store.
      *
      * While jobs are still running, only the progress bar moves — individual
@@ -66,7 +120,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         }
 
         const current = store.getState().progressStatus || 0;
-        const { percent } = summarise(status);
+        const percent = overallPercent(status);
 
         if (!status.finished) {
             const displayPercent = Math.min(Math.max(current, percent), 99);
@@ -189,57 +243,44 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         let cancelled = false;
     
         const run = async () => {
-            try {
-                const { queued, skipped, errors, jobs, message } = await queuePosts(postIds, selectedLanguages, serviceProvider);
-    
-                if (!queued) {
-                    setEmptyPostMessage(
-                        message
-                            ? message
-                            : skipped
-                            ? sprintf(
-                                  __('Translations already exist for all selected %s in the chosen languages.', 'wpml-translation-check'),
-                                  automlp_wpml_bulk_translate_object.post_label
-                              )
-                            : Object.values(errors || {})[0] || __('Nothing could be queued.', 'wpml-translation-check')
-                    );
-                    setIsLoading(false);
-                    setProgressBarVisibility(false);
-                    return;
-                }
+            const languageObject = automlp_wpml_bulk_translate_object.languageObject || {};
+            const rowKeys = [];
+            const jobIds = [];
+            const seen = [];
+            let skippedRows = 0;
+            let adding = true;
+            let polling = null;
 
-                // Queued, but the server returned nothing to watch. Do not
-                // fall through to the empty-state message, which would show
-                // the misleading "already translated" default.
-                if (!Array.isArray(jobs) || jobs.length === 0) {
-                    setEmptyPostMessage(
-                        __('Translation was queued but no jobs came back. Open the Translation Queue screen to check status.', 'wpml-translation-check')
-                    );
-                    setIsLoading(false);
-                    setProgressBarVisibility(false);
-                    return;
-                }
-    
-                // Seed the store so rows appear immediately, before the first poll.
-                const seen = [];
-    
-                jobs.forEach(job => {
-                    const key = `${job.source_id}_${job.to_lang}`;
-                    const lang = automlp_wpml_bulk_translate_object.languageObject[job.to_lang] || {};
-    
-                    const firstPostLanguage = !seen.includes(job.source_id);
-                    if (firstPostLanguage) seen.push(job.source_id);
-    
+            const rowTitle = (postId) => {
+                const row = document.getElementById(`post-${postId}`) || document.getElementById(`tag-${postId}`);
+                const title = row ? row.querySelector('.row-title') : null;
+                const text = title ? title.textContent.trim() : '';
+
+                return text || sprintf(__('#%s', 'wpml-translation-check'), postId);
+            };
+
+            // 1. Show every selected post x language at once.
+            postIds.forEach((rawId) => {
+                const postId = Number(rawId);
+
+                selectedLanguages.forEach((langCode) => {
+                    const key = `${postId}_${langCode}`;
+                    const lang = languageObject[langCode] || {};
+                    const firstPostLanguage = !seen.includes(postId);
+
+                    if (firstPostLanguage) seen.push(postId);
+
+                    rowKeys.push(key);
                     storeDispatch(updatePendingPosts([key]));
                     storeDispatch(updateTranslatePostInfo({
                         [key]: {
-                            jobId: job.job_id,
-                            parentPostId: job.source_id,
-                            parentPostTitle: job.source_title,
+                            jobId: null,
+                            parentPostId: postId,
+                            parentPostTitle: rowTitle(postId),
                             targetPostId: null,
-                            targetLanguage: job.to_lang,
+                            targetLanguage: langCode,
                             postLink: null,
-                            status: 'in-queue',
+                            status: 'queuing',
                             messageClass: 'warning',
                             firstPostLanguage,
                             flagUrl: lang.flag,
@@ -248,28 +289,159 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                         },
                     }));
                 });
-    
-                storeDispatch(updateCountInfo({
-                    totalPosts: jobs.length,
-                    startTime: new Date().getTime(),
-                }));
-                setIsLoading(false);
-    
-                await pollUntilDone({
-                    jobIds: jobs.map(job => job.job_id),
-                    shouldStop: () => cancelled,
-                    onUpdate: applyStatus,
+            });
+
+            rowKeysRef.current = rowKeys;
+            storeDispatch(updateCountInfo({
+                totalPosts: rowKeys.length,
+                startTime: new Date().getTime(),
+            }));
+            setIsLoading(false);
+
+            const closeRow = (key, update) => {
+                storeDispatch(updateTranslatePostInfo({ [key]: update }));
+                storeDispatch(unsetPendingPost(key));
+            };
+
+            const skipRow = (key, message) => {
+                skippedRows++;
+                closeRow(key, { status: 'skipped', messageClass: 'warning', errorMessage: message, errorHtml: '' });
+                storeDispatch(updateCountInfo({ totalPosts: rowKeys.length - skippedRows }));
+            };
+
+            const failRow = (key, postId, langCode, message) => {
+                closeRow(key, {
+                    status: 'error',
+                    messageClass: 'error',
+                    errorMessage: __('Could not be queued.', 'wpml-translation-check'),
+                    errorHtml: `<div class="automlp-wpml-error-html">${escapeHtml(message || __('Could not be queued.', 'wpml-translation-check'))}</div>`,
+                    aiError: false,
+                    parentPostId: postId,
+                    targetLanguage: langCode,
                 });
-    
+            };
+
+            const reportProgress = () => {
+                const current = store.getState().progressStatus || 0;
+                const percent = Math.min(overallPercent({ jobs: [] }), 99);
+
+                if (percent > current) {
+                    storeDispatch(updateProgressStatus(percent - current));
+                }
+            };
+
+            // 2. Merge each request's outcome into its pre-rendered rows.
+            const onChunk = (chunk, res, err) => {
+                if (cancelled) {
+                    return;
+                }
+
+                const jobsByKey = {};
+                ((res && res.jobs) || []).forEach((job) => {
+                    jobsByKey[`${job.source_id}_${job.to_lang}`] = job;
+                });
+
+                const items = (res && res.items) || null;
+                const errors = (res && res.errors) || {};
+
+                chunk.forEach((rawId) => {
+                    const postId = Number(rawId);
+
+                    selectedLanguages.forEach((langCode) => {
+                        const key = `${postId}_${langCode}`;
+                        const job = jobsByKey[key];
+
+                        if (err) {
+                            failRow(key, postId, langCode, err.message || String(err));
+                            return;
+                        }
+
+                        if (job) {
+                            jobIds.push(job.job_id);
+                            storeDispatch(updateTranslatePostInfo({
+                                [key]: {
+                                    jobId: job.job_id,
+                                    parentPostTitle: job.source_title || rowTitle(postId),
+                                    status: 'in-queue',
+                                    messageClass: 'warning',
+                                },
+                            }));
+                            return;
+                        }
+
+                        const outcome = items ? items[key] : (errors[key] ? 'error' : 'already_translated');
+
+                        if (outcome === 'already_translated') {
+                            skipRow(key, __('Already translated.', 'wpml-translation-check'));
+                        } else if (outcome === 'ate_active') {
+                            skipRow(key, errors[key] || __('Skipped: WPML Advanced Translation Editor is already active for this page and language.', 'wpml-translation-check'));
+                        } else {
+                            failRow(key, postId, langCode, errors[key] || (res && res.message) || '');
+                        }
+                    });
+                });
+
+                reportProgress();
+
+                if (!polling && jobIds.length) {
+                    polling = pollUntilDone({
+                        jobIds: () => jobIds,
+                        shouldStop: () => cancelled,
+                        isAdding: () => adding,
+                        onUpdate: applyStatus,
+                    });
+                }
+            };
+
+            let result = null;
+
+            try {
+                result = await queuePosts(postIds, selectedLanguages, serviceProvider, {
+                    perRequest: POSTS_PER_REQUEST,
+                    onChunk,
+                });
+            } catch (error) {
+                // Every request failed; rows were already marked by onChunk.
+                result = { queued: 0, skipped: 0, message: error && error.message ? error.message : '' };
+            } finally {
+                adding = false;
+            }
+
+            if (cancelled) {
+                return;
+            }
+
+            try {
+                if (!polling) {
+                    // Nothing to watch: every row is skipped or failed.
+                    if (skippedRows === rowKeys.length) {
+                        setEmptyPostMessage(
+                            result.message
+                                ? result.message
+                                : sprintf(
+                                      __('Translations already exist for all selected %s in the chosen languages.', 'wpml-translation-check'),
+                                      automlp_wpml_bulk_translate_object.post_label
+                                  )
+                        );
+                        setProgressBarVisibility(false);
+                    }
+
+                    const current = store.getState().progressStatus || 0;
+                    storeDispatch(updateProgressStatus(100 - current));
+                    storeDispatch(updateCountInfo({ endTime: new Date().getTime() }));
+                    return;
+                }
+
+                await polling;
+
                 storeDispatch(updateCountInfo({ endTime: new Date().getTime() }));
             } catch (error) {
+                // Polling timed out: work continues on the server.
                 setEmptyPostMessage(
                     error && error.message
                         ? error.message
                         : __('Translation could not be started.', 'wpml-translation-check')
                 );
-                setIsLoading(false);
-                setProgressBarVisibility(false);
             }
         };
     
@@ -325,7 +497,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
             const runLoop = (items, index) => {
                 const status = translatePostInfo[items[index]].status;
 
-                if (status === 'running' || status === 'in-progress' || status === 'pending' || status === 'in-queue') {
+                if (status === 'running' || status === 'in-progress' || status === 'pending' || status === 'in-queue' || status === 'queuing') {
                     running = true;
                     bulkStatus !== 'running' && updateBulkStatus('running');
                     return;
@@ -467,7 +639,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
             return true;
         }
 
-        const ACTIVE = ['pending', 'in-progress', 'running', 'in-queue'];
+        const ACTIVE = ['pending', 'in-progress', 'running', 'in-queue', 'queuing'];
         return siblingKeys.every(
             (k) => !ACTIVE.includes(translatePostInfo[k].status)
         );
@@ -481,6 +653,8 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 return __('Completed', 'wpml-translation-check');
             case 'in-queue':
                 return __('In Queue', 'wpml-translation-check');
+            case 'queuing':
+                return __('Preparing', 'wpml-translation-check');
             case 'running':
             case 'in-progress':
                 return __('In Progress', 'wpml-translation-check');
@@ -634,7 +808,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                     {info.flagUrl && <img src={info.flagUrl} width="20" alt={info.targetLanguage} />}
                                                     {info.languageName || info.targetLanguage}
                                                 </div>
-                                                {info.status === 'error' ?
+                                                {(info.status === 'error' || info.status === 'skipped') ?
                                                     <>
                                                         {!info.errorHtml ?
                                                             <div className={`${prefix}-status-target-post-error ${prefix}-error-message`} style={{ gridColumn: 'span 4' }}>

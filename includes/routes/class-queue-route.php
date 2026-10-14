@@ -251,6 +251,7 @@ class Queue_Route {
 					'skip_reasons' => $skip_reasons,
 					'errors'       => isset( $result['errors'] ) ? $result['errors'] : array(),
 					'jobs'         => array(),
+					'items'        => isset( $result['items'] ) ? $result['items'] : array(),
 					'message'      => $message,
 				),
 				200
@@ -291,6 +292,7 @@ class Queue_Route {
 				'skipped' => $result['skipped'],
 				'errors'  => $result['errors'],
 				'jobs'    => self::jobs_by_id( $created ),
+				'items'   => isset( $result['items'] ) ? $result['items'] : array(),
 			),
 			200
 		);

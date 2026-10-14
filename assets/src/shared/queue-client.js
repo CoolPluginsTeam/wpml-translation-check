@@ -67,26 +67,37 @@ const QUEUE_POSTS_PER_REQUEST = 4;
  * while WPML builds the jobs. The merged result has the same shape as a
  * single call.
  *
- * @param {number[]} postIds   Post ids.
- * @param {string[]} languages Target language codes.
- * @param {string}   provider  Provider slug, e.g. 'openai'. Optional.
- * @return {Promise<Object>} { queued, skipped, errors, jobs, skip_reasons, message }
+ * @param {number[]} postIds              Post ids.
+ * @param {string[]} languages            Target language codes.
+ * @param {string}   provider             Provider slug, e.g. 'openai'. Optional.
+ * @param {Object}   options              Optional.
+ * @param {number}   options.perRequest   Posts per request.
+ * @param {Function} options.onChunk      Called after each request with
+ *                                        (postIds, result, error).
+ * @return {Promise<Object>} { queued, skipped, errors, jobs, items, skip_reasons, message }
  */
-export const queuePosts = async (postIds, languages, provider = '') => {
+export const queuePosts = async (postIds, languages, provider = '', options = {}) => {
 	const ids = Array.isArray(postIds) ? postIds : [postIds];
-	const merged = { queued: 0, skipped: 0, errors: {}, jobs: [], skip_reasons: {}, message: '' };
+	const merged = { queued: 0, skipped: 0, errors: {}, jobs: [], items: {}, skip_reasons: {}, message: '' };
+	const perRequest = Math.max(1, Number(options.perRequest) || QUEUE_POSTS_PER_REQUEST);
+	const onChunk = typeof options.onChunk === 'function' ? options.onChunk : null;
 	let firstError = null;
 
-	for (let i = 0; i < ids.length; i += QUEUE_POSTS_PER_REQUEST) {
+	for (let i = 0; i < ids.length; i += perRequest) {
+		const chunk = ids.slice(i, i + perRequest);
 		let res;
 
 		try {
 			res = await request('/queue/posts', {
-				post_ids: ids.slice(i, i + QUEUE_POSTS_PER_REQUEST),
+				post_ids: chunk,
 				languages,
 				provider,
 			});
 		} catch (err) {
+			if (onChunk) {
+				onChunk(chunk, null, err);
+			}
+
 			// Keep going: other posts may still queue. Rethrown below only
 			// when nothing at all was queued.
 			firstError = firstError || err;
@@ -98,12 +109,17 @@ export const queuePosts = async (postIds, languages, provider = '') => {
 		merged.skipped += Number(res.skipped) || 0;
 		Object.assign(merged.errors, res.errors || {});
 		merged.jobs = merged.jobs.concat(Array.isArray(res.jobs) ? res.jobs : []);
+		Object.assign(merged.items, res.items || {});
 		Object.entries(res.skip_reasons || {}).forEach(([key, count]) => {
 			merged.skip_reasons[key] = (merged.skip_reasons[key] || 0) + (Number(count) || 0);
 		});
 
 		if (res.message) {
 			merged.message = res.message;
+		}
+
+		if (onChunk) {
+			onChunk(chunk, res, null);
 		}
 	}
 
@@ -180,9 +196,10 @@ export const retryJob = async (jobId) =>
  * like an instant 100% jump.
  *
  * @param {Object}   options            Options.
- * @param {number[]} options.jobIds     Jobs to watch.
+ * @param {number[]|Function} options.jobIds Jobs to watch, or a getter while more are added.
  * @param {Function} options.onUpdate   Called with each status payload.
  * @param {Function} options.shouldStop Return true to abort polling.
+ * @param {Function} options.isAdding   Return true while more jobs are still being queued.
  * @param {number}   options.timeoutMs  Give up after this long.
  * @return {Promise<Object>} Final status payload.
  */
@@ -190,8 +207,10 @@ export const pollUntilDone = async ({
 	jobIds,
 	onUpdate = () => {},
 	shouldStop = () => false,
+	isAdding = () => false,
 	timeoutMs = 30 * 60 * 1000,
 }) => {
+	const currentIds = () => (typeof jobIds === 'function' ? jobIds() : jobIds);
 	const startedAt = Date.now();
 
 	// Each poll is a full WordPress request. On small hosts (two PHP workers)
@@ -231,11 +250,16 @@ export const pollUntilDone = async ({
 		let status;
 
 		try {
-			status = await fetchStatus(jobIds);
+			status = await fetchStatus(currentIds());
 		} catch (error) {
 			interval = Math.min(interval * 2, 5000);
 			await wait(interval);
 			continue;
+		}
+
+		// Never finished while selected posts are still being queued.
+		if (status && status.finished && isAdding()) {
+			status = { ...status, finished: false };
 		}
 
 		last = status;

@@ -139,6 +139,9 @@ class Job_Sender {
 			'ate_active'         => 0,
 		);
 
+		// Outcome per post_lang key, so the modal can update each row.
+		$items = array();
+
 		foreach ( array_map( 'absint', $post_ids ) as $post_id ) {
 			if ( ! $post_id ) {
 				continue;
@@ -152,6 +155,7 @@ class Job_Sender {
 				if ( WPML_AT_Helper::get_existing_translation_id( $post_id, $post_type, $to_lang ) ) {
 					++$skipped;
 					++$skip_reasons['already_translated'];
+					$items[ $post_id . '_' . $to_lang ] = 'already_translated';
 					continue;
 				}
 
@@ -160,20 +164,25 @@ class Job_Sender {
 					++$skipped;
 					++$skip_reasons['ate_active'];
 					$errors[ $post_id . '_' . $to_lang ] = __( 'Skipped: WPML Advanced Translation Editor is already active for this page and language.', 'wpml-translation-check' );
+					$items[ $post_id . '_' . $to_lang ]  = 'ate_active';
 					continue;
 				}
 
 				$sent = self::send_post( $post_id, $to_lang, $from_lang, $provider );
 
 				if ( is_wp_error( $sent ) ) {
-					if ( 'automlp_ate_in_progress' === $sent->get_error_code() ) {
+					$ate = 'automlp_ate_in_progress' === $sent->get_error_code();
+
+					if ( $ate ) {
 						++$skipped;
 						++$skip_reasons['ate_active'];
 					}
 					$errors[ $post_id . '_' . $to_lang ] = $sent->get_error_message();
+					$items[ $post_id . '_' . $to_lang ]  = $ate ? 'ate_active' : 'error';
 					continue;
 				}
 
+				$items[ $post_id . '_' . $to_lang ] = 'queued';
 				++$queued;
 			}
 		}
@@ -183,6 +192,7 @@ class Job_Sender {
 			'skipped'      => $skipped,
 			'errors'       => $errors,
 			'skip_reasons' => $skip_reasons,
+			'items'        => $items,
 		);
 	}
 
