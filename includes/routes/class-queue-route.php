@@ -548,7 +548,7 @@ class Queue_Route {
 	 * @return array
 	 */
 	private static function filter_languages( array $langs ) {
-		$active = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) );
+		$active = apply_filters( 'wpml_active_languages', null, 'skip_missing=0' );
 		$codes  = is_array( $active ) ? array_keys( $active ) : array();
 
 		$langs = array_values( array_intersect( $langs, $codes ) );

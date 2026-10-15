@@ -39,6 +39,7 @@ class Bot_Translator {
 
 		// Keep the bot out of the users list and out of author dropdowns.
 		add_action( 'pre_get_users', array( __CLASS__, 'hide_from_user_list' ) );
+		add_action( 'admin_notices', array( __CLASS__, 'conflict_notice' ) );
 	}
 
 	/**
@@ -50,6 +51,10 @@ class Bot_Translator {
 	 * @return int Bot user id, or 0 on failure.
 	 */
 	public static function ensure() {
+		if ( self::is_wpml_polylang_conflict() ) {
+			return 0;
+		}
+
 		$user_id = self::user_id();
 
 		if ( ! $user_id ) {
@@ -65,6 +70,34 @@ class Bot_Translator {
 		return $user_id;
 	}
 
+	/**
+	 * Are WPML and Polylang both active?
+	 *
+	 * Polylang's WPML compatibility layer hooks WPML filters and calls
+	 * icl_get_languages() with an array; with real WPML loaded that ends in
+	 * a fatal TypeError, so the bot is not registered in this state.
+	 *
+	 * @return bool
+	 */
+	public static function is_wpml_polylang_conflict() {
+		return defined( 'ICL_SITEPRESS_VERSION' ) && defined( 'POLYLANG_VERSION' );
+	}
+
+	/**
+	 * Warn admins when WPML and Polylang are both active.
+	 *
+	 * @return void
+	 */
+	public static function conflict_notice() {
+		if ( ! self::is_wpml_polylang_conflict() || ! current_user_can( 'activate_plugins' ) ) {
+			return;
+		}
+
+		printf(
+			'<div class="notice notice-error is-dismissible"><p>%s</p></div>',
+			esc_html__( 'AutoMLP: WPML and Polylang are both active. They cannot run together, so AutoMLP has paused WPML translator registration. Please deactivate one of them.', 'wpml-translation-check' )
+		);
+	}
 	/**
 	 * Stored bot user id, verified to still exist.
 	 *
@@ -189,7 +222,7 @@ class Bot_Translator {
 	 * @return array<string,array<string,int>>
 	 */
 	private static function build_pairs() {
-		$languages = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) );
+		$languages = apply_filters( 'wpml_active_languages', null, 'skip_missing=0' );
 
 		if ( ! is_array( $languages ) || count( $languages ) < 2 ) {
 			return array();
