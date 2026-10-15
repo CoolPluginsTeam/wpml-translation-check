@@ -95,7 +95,7 @@ class Bot_Translator {
 
 		printf(
 			'<div class="notice notice-error is-dismissible"><p>%s</p></div>',
-			esc_html__( 'AutoMLP: WPML and Polylang are both active. They cannot run together, so AutoMLP has paused WPML translator registration. Please deactivate one of them.', 'wpml-translation-check' )
+			esc_html__( 'WPML and Polylang cannot work together. Please deactivate Polylang to use WPML with AutoMLP.', 'wpml-translation-check' )
 		);
 	}
 	/**
