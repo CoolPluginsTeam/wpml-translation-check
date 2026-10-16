@@ -685,9 +685,20 @@ class Queue_Table {
 	}
 
 	/**
-	 * Jobs for the admin queue view, newest first.
+	 * Jobs for the admin queue view, newest first by default.
 	 *
-	 * @param array $args page, per_page, states.
+	 * @param array $args {
+	 *     Optional. Filters and paging.
+	 *
+	 *     @type int      $page     Page number.
+	 *     @type int      $per_page Rows per page, 1-100.
+	 *     @type string[] $states   Only these states.
+	 *     @type string   $lang     Only this target language code.
+	 *     @type string   $type     'string' for string jobs, or a post type slug.
+	 *     @type string   $search   Matches the content title, the error text or the job id.
+	 *     @type string   $orderby  job_id, title, language, state or queued.
+	 *     @type string   $order    asc or desc.
+	 * }
 	 * @return array{rows:array,total:int,pages:int}
 	 */
 	public static function browse( array $args = array() ) {
@@ -696,50 +707,137 @@ class Queue_Table {
 		$page     = max( 1, (int) ( $args['page'] ?? 1 ) );
 		$per_page = min( 100, max( 1, (int) ( $args['per_page'] ?? 20 ) ) );
 		$states   = isset( $args['states'] ) && is_array( $args['states'] ) ? $args['states'] : array();
+		$lang     = isset( $args['lang'] ) ? (string) $args['lang'] : '';
+		$type     = isset( $args['type'] ) ? (string) $args['type'] : '';
+		$search   = isset( $args['search'] ) ? trim( (string) $args['search'] ) : '';
+		$orderby  = isset( $args['orderby'] ) ? (string) $args['orderby'] : 'job_id';
+		$order    = isset( $args['order'] ) && 'asc' === strtolower( (string) $args['order'] ) ? 'ASC' : 'DESC';
 		$offset   = ( $page - 1 ) * $per_page;
 
-		$key    = 'browse:' . md5( wp_json_encode( array( $page, $per_page, $states ) ) ) . ':' . self::cache_gen();
+		$key    = 'browse:' . md5( wp_json_encode( array( $page, $per_page, $states, $lang, $type, $search, $orderby, $order ) ) ) . ':' . self::cache_gen();
 		$cached = wp_cache_get( $key, self::CACHE_GROUP );
 
 		if ( false !== $cached ) {
 			return $cached;
 		}
 
-		$where  = '1=1';
-		$params = array( self::table() );
+		// Column names cannot be prepared, so only these are ever used for sorting.
+		$sortable = array(
+			'job_id'   => 'q.job_id',
+			'title'    => 'p.post_title',
+			'language' => 'q.to_lang',
+			'state'    => 'q.state',
+			'queued'   => 'q.queued_at',
+		);
+		$sort_col = isset( $sortable[ $orderby ] ) ? $sortable[ $orderby ] : $sortable['job_id'];
+
+		$wheres = array();
+		$params = array();
 
 		if ( ! empty( $states ) ) {
-			$slots  = implode( ', ', array_fill( 0, count( $states ), '%s' ) );
-			$where  = "state IN ({$slots})";
-			$params = array_merge( $params, $states );
+			$wheres[] = 'q.state IN (' . implode( ', ', array_fill( 0, count( $states ), '%s' ) ) . ')';
+			$params   = array_merge( $params, $states );
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		if ( '' !== $lang ) {
+			$wheres[] = 'q.to_lang = %s';
+			$params[] = $lang;
+		}
+
+		if ( 'string' === $type ) {
+			$wheres[] = "q.kind = 'string'";
+		} elseif ( '' !== $type ) {
+			$wheres[] = "q.kind = 'post' AND p.post_type = %s";
+			$params[] = $type;
+		}
+
+		if ( '' !== $search ) {
+			$like     = '%' . $wpdb->esc_like( $search ) . '%';
+			$clauses  = array( 'p.post_title LIKE %s', 'q.last_error LIKE %s' );
+			$params[] = $like;
+			$params[] = $like;
+
+			if ( ctype_digit( $search ) ) {
+				$clauses[] = 'q.job_id = %d';
+				$params[]  = (int) $search;
+			}
+
+			$wheres[] = '(' . implode( ' OR ', $clauses ) . ')';
+		}
+
+		// The posts table is only joined when a filter, a search or the sort needs the title.
+		$join = '';
+		$from = array( self::table() );
+
+		if ( '' !== $search || ( '' !== $type && 'string' !== $type ) || 'title' === $orderby ) {
+			$join   = "LEFT JOIN %i p ON ( p.ID = q.source_id AND q.kind = 'post' )";
+			$from[] = $wpdb->posts;
+		}
+
+		$where = empty( $wheres ) ? '1=1' : implode( ' AND ', $wheres );
+
+		// Only the whitelisted sort column and order, and the join and where fragments built above, are
+		// interpolated. They contain placeholders, every value is passed through prepare().
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 		$total = (int) $wpdb->get_var(
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
-			$wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE {$where}", $params )
+			$wpdb->prepare( "SELECT COUNT(*) FROM %i q {$join} WHERE {$where}", array_merge( $from, $params ) )
 		);
 
-		$params[] = $per_page;
-		$params[] = $offset;
-
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$rows = $wpdb->get_results(
-			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->prepare(
-				"SELECT job_id, wpml_job_id, source_id, result_id, kind, from_lang, to_lang,
-				        state, provider, model, attempts, last_error, field_count,
-				        fields_translated, char_count, queued_at, closed_at
-				 FROM %i WHERE {$where} ORDER BY job_id DESC LIMIT %d OFFSET %d",
-				$params
+				"SELECT q.job_id, q.wpml_job_id, q.source_id, q.result_id, q.kind, q.from_lang, q.to_lang,
+				        q.state, q.provider, q.model, q.attempts, q.last_error, q.field_count,
+				        q.fields_translated, q.char_count, q.queued_at, q.closed_at,
+				        ( q.source_map IS NOT NULL AND q.source_map <> '' ) AS has_source
+				 FROM %i q {$join} WHERE {$where} ORDER BY {$sort_col} {$order}, q.job_id {$order} LIMIT %d OFFSET %d",
+				array_merge( $from, $params, array( $per_page, $offset ) )
 			),
 			ARRAY_A
 		);
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
 		$out = array(
 			'rows'  => $rows ? $rows : array(),
 			'total' => $total,
 			'pages' => (int) ceil( $total / $per_page ),
+		);
+
+		wp_cache_set( $key, $out, self::CACHE_GROUP, 5 * MINUTE_IN_SECONDS );
+
+		return $out;
+	}
+
+	/**
+	 * What the queue can be filtered by: the target languages and content types that exist.
+	 *
+	 * @return array{languages:string[],post_types:string[],has_strings:bool}
+	 */
+	public static function filter_options() {
+		$key    = 'filter_options:' . self::cache_gen();
+		$cached = wp_cache_get( $key, self::CACHE_GROUP );
+
+		if ( false !== $cached ) {
+			return $cached;
+		}
+
+		global $wpdb;
+
+		// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery
+		$languages = $wpdb->get_col( $wpdb->prepare( "SELECT DISTINCT to_lang FROM %i WHERE to_lang <> '' ORDER BY to_lang", self::table() ) );
+		$types     = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT DISTINCT p.post_type FROM %i q INNER JOIN %i p ON p.ID = q.source_id WHERE q.kind = 'post' ORDER BY p.post_type",
+				self::table(),
+				$wpdb->posts
+			)
+		);
+		$strings   = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM %i WHERE kind = 'string'", self::table() ) );
+		// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery
+
+		$out = array(
+			'languages'   => $languages ? array_map( 'strval', $languages ) : array(),
+			'post_types'  => $types ? array_map( 'strval', $types ) : array(),
+			'has_strings' => $strings > 0,
 		);
 
 		wp_cache_set( $key, $out, self::CACHE_GROUP, 5 * MINUTE_IN_SECONDS );

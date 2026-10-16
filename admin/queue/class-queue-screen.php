@@ -40,6 +40,7 @@ class Queue_Screen {
 
 		add_filter( 'automlp_dashboard_tabs', array( __CLASS__, 'add_tab' ) );
 		add_action( 'admin_post_automlp_queue_action', array( __CLASS__, 'handle_action' ) );
+		add_action( 'admin_init', array( __CLASS__, 'maybe_render_partial' ), 1 );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
 	}
 
@@ -88,14 +89,56 @@ class Queue_Screen {
 			AUTOMLP_AI_VERSION
 		);
 
-		// Refresh while work is in flight so progress is visible without a
-		// manual reload.
-		if ( self::active_count() > 0 ) {
-			wp_add_inline_script(
-				'jquery-core',
-				'setTimeout( function () { window.location.reload(); }, 15000 );'
-			);
+		wp_enqueue_script(
+			'automlp-queue-screen',
+			AUTOMLP_AI_PLUGIN_URL . 'admin/queue/queue-screen.js',
+			array(),
+			AUTOMLP_AI_VERSION,
+			true
+		);
+
+		// While work is in flight the page reloads so progress is visible without
+		// a manual refresh, unless someone is selecting rows or typing a search.
+		wp_localize_script(
+			'automlp-queue-screen',
+			'automlpQueue',
+			array(
+				'refreshMs'        => 15000,
+				'loading'          => __( 'Loading jobs…', 'wpml-translation-check' ),
+				'loaded'           => __( 'Jobs updated.', 'wpml-translation-check' ),
+				'confirmDelete'    => __( 'Delete the selected jobs from the queue? They will not be translated.', 'wpml-translation-check' ),
+				'confirmDeleteOne' => __( 'Delete this job from the queue? It will not be translated.', 'wpml-translation-check' ),
+				'confirmClear'     => __( 'Remove all finished jobs from the history?', 'wpml-translation-check' ),
+			)
+		);
+	}
+
+	/**
+	 * Answer the screen's own AJAX requests with just the queue markup.
+	 *
+	 * Sorting, filtering, paging and the row actions refresh the table in place, as WPML's
+	 * own tables do. The same view renders the full page and this fragment, so the page keeps
+	 * working without JavaScript.
+	 *
+	 * @return void
+	 */
+	public static function maybe_render_partial() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! isset( $_GET['automlp_partial'] ) || ! self::is_current_screen() ) {
+			return;
 		}
+
+		// Same capability as the menu page itself.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'You are not allowed to do this.', 'wpml-translation-check' ), '', array( 'response' => 403 ) );
+		}
+
+		nocache_headers();
+		header( 'Content-Type: text/html; charset=utf-8' );
+
+		require AUTOMLP_AI_PLUGIN_DIR . 'admin/queue/view-queue.php';
+
+		exit;
 	}
 
 	/**
@@ -169,18 +212,44 @@ class Queue_Screen {
 				self::clear_closed();
 				$notice = 'cleared';
 				break;
+
+			case 'bulk':
+				$bulk   = isset( $_POST['bulk_action'] ) ? sanitize_key( wp_unslash( $_POST['bulk_action'] ) ) : '';
+				$job_id = isset( $_POST['job_ids'] ) ? array_map( 'absint', (array) wp_unslash( $_POST['job_ids'] ) ) : array();
+				$job_id = array_slice( array_unique( array_filter( $job_id ) ), 0, 100 );
+				$count  = 0;
+
+				foreach ( $job_id as $id ) {
+					if ( 'retry' === $bulk && self::retry( $id ) ) {
+						++$count;
+					} elseif ( 'delete' === $bulk && Job_Listener::cancel_queue_job( $id ) ) {
+						++$count;
+					}
+				}
+
+				$notice = in_array( $bulk, array( 'retry', 'delete' ), true ) && ! empty( $job_id ) ? 'bulk_' . $bulk : 'bulk_none';
+				break;
 		}
 
-		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page'   => 'automlp_ai_dashboard',
-					'tab'    => self::TAB,
-					'notice' => $notice,
-				),
-				admin_url( 'admin.php' )
-			)
-		);
+		// Back to the same filtered view the action was taken from.
+		$return = wp_get_referer();
+
+		if ( ! $return || false === strpos( $return, 'page=automlp_ai_dashboard' ) ) {
+			$return = admin_url( 'admin.php?page=automlp_ai_dashboard&tab=' . self::TAB );
+		}
+
+		$args = array( 'notice' => $notice );
+
+		// The screen submitted this through AJAX: the redirect must lead to the fragment again.
+		if ( isset( $_POST['automlp_partial'] ) ) {
+			$args['automlp_partial'] = 1;
+		}
+
+		if ( isset( $count ) ) {
+			$args['count'] = (int) $count;
+		}
+
+		wp_safe_redirect( add_query_arg( $args, remove_query_arg( array( 'notice', 'count' ), $return ) ) );
 
 		exit;
 	}
@@ -276,6 +345,11 @@ class Queue_Screen {
 
 		$states = array();
 
+		// An unknown status behaves as "All", and the screen highlights it that way too.
+		if ( 'active' !== $filter && ! in_array( $filter, self::known_states(), true ) ) {
+			$filter = '';
+		}
+
 		if ( 'active' === $filter ) {
 			$states = array(
 				Queue_Table::STATE_WAITING,
@@ -287,24 +361,82 @@ class Queue_Screen {
 			$states = array( $filter );
 		}
 
-		$browse = Queue_Table::browse(
-			array(
-				'page'     => $page,
-				'per_page' => self::PER_PAGE,
-				'states'   => $states,
-			)
+		// Filters that depend on what is in the queue are checked against it, so a stale or
+		// hand-edited URL falls back to "all" instead of an empty page.
+		$options = Queue_Table::filter_options();
+
+		// `lang` is WPML's own admin language switch, so this filter has its own name.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$lang = isset( $_GET['target_lang'] ) ? sanitize_text_field( wp_unslash( $_GET['target_lang'] ) ) : '';
+		$lang = in_array( $lang, $options['languages'], true ) ? $lang : '';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$type = isset( $_GET['type'] ) ? sanitize_key( wp_unslash( $_GET['type'] ) ) : '';
+		$type = ( 'string' === $type && $options['has_strings'] ) || in_array( $type, $options['post_types'], true ) ? $type : '';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$orderby = isset( $_GET['orderby'] ) ? sanitize_key( wp_unslash( $_GET['orderby'] ) ) : '';
+		$orderby = in_array( $orderby, array( 'job_id', 'title', 'language', 'state', 'queued' ), true ) ? $orderby : 'job_id';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$order = isset( $_GET['order'] ) && 'asc' === sanitize_key( wp_unslash( $_GET['order'] ) ) ? 'asc' : 'desc';
+
+		$query  = array(
+			'page'     => $page,
+			'per_page' => self::PER_PAGE,
+			'states'   => $states,
+			'lang'     => $lang,
+			'type'     => $type,
+			'search'   => $search,
+			'orderby'  => $orderby,
+			'order'    => $order,
 		);
+		$browse = Queue_Table::browse( $query );
+
+		// A page past the end (a stale link after jobs were removed) shows the last page, not an empty list.
+		if ( empty( $browse['rows'] ) && $browse['total'] > 0 && $page > $browse['pages'] ) {
+			$page          = max( 1, (int) $browse['pages'] );
+			$query['page'] = $page;
+			$browse        = Queue_Table::browse( $query );
+		}
+
+		$languages = array();
+
+		foreach ( $options['languages'] as $code ) {
+			$languages[ $code ] = self::language_label( $code );
+		}
+
+		$types = array();
+
+		foreach ( $options['post_types'] as $post_type ) {
+			$object              = get_post_type_object( $post_type );
+			$types[ $post_type ] = $object ? $object->labels->singular_name : $post_type;
+		}
+
+		if ( $options['has_strings'] ) {
+			$types['string'] = __( 'Strings', 'wpml-translation-check' );
+		}
 
 		return array(
-			'rows'     => array_map( array( __CLASS__, 'decorate' ), $browse['rows'] ),
-			'total'    => $browse['total'],
-			'pages'    => $browse['pages'],
-			'page'     => $page,
-			'filter'   => $filter,
-			'counts'   => Queue_Table::summary(),
-			'health'   => Dispatcher::health(),
-			'notice'   => self::current_notice(),
-			'per_page' => self::PER_PAGE,
+			'rows'      => array_map( array( __CLASS__, 'decorate' ), $browse['rows'] ),
+			'total'     => $browse['total'],
+			'pages'     => $browse['pages'],
+			'page'      => $page,
+			'filter'    => $filter,
+			'lang'      => $lang,
+			'type'      => $type,
+			'search'    => $search,
+			'orderby'   => $orderby,
+			'order'     => $order,
+			'languages' => $languages,
+			'types'     => $types,
+			'counts'    => Queue_Table::summary(),
+			'health'    => Dispatcher::health(),
+			'notice'    => self::current_notice(),
+			'per_page'  => self::PER_PAGE,
 		);
 	}
 
@@ -339,8 +471,9 @@ class Queue_Screen {
 		$row['state_class'] = self::state_class( $row['state'] );
 		// can_retry requires both the failed state AND a stored source_map;
 		// the REST retry endpoint rejects jobs whose source has been cleared.
+		// browse() does not load the (large) source map, only whether one is stored.
 		$row['can_retry']  = Queue_Table::STATE_FAILED === $row['state']
-			&& ! empty( $row['source_map'] );
+			&& ( ! empty( $row['source_map'] ) || ! empty( $row['has_source'] ) );
 		$row['can_cancel'] = in_array( $row['state'], Job_Listener::cancellable_states(), true );
 
 		$row['source_title'] = '';
@@ -378,9 +511,66 @@ class Queue_Screen {
 				: ( $result_id ? (string) get_edit_post_link( $result_id, 'raw' ) : '' );
 		}
 		$row['language']    = self::language_label( $row['to_lang'] );
+		$row['languages']   = self::language_label( $row['from_lang'] ) . ' » ' . $row['language'];
 		$row['queued_ago']  = self::ago( $row['queued_at'] );
+		$row['queued_full'] = self::local_time( $row['queued_at'] );
+		$row['type_label']  = self::type_label( $row['kind'], $source_id );
+		$row['provider']    = self::provider_label( isset( $row['provider'] ) ? (string) $row['provider'] : '' );
 
 		return $row;
+	}
+
+	/**
+	 * Content type shown in the Type column.
+	 *
+	 * @param string $kind      Job kind: post or string.
+	 * @param int    $source_id Source post id.
+	 * @return string
+	 */
+	private static function type_label( $kind, $source_id ) {
+		if ( 'string' === $kind ) {
+			return __( 'Strings', 'wpml-translation-check' );
+		}
+
+		$object = $source_id ? get_post_type_object( (string) get_post_type( $source_id ) ) : null;
+
+		return $object ? $object->labels->singular_name : '—';
+	}
+
+	/**
+	 * Name of the AI provider that translated the job.
+	 *
+	 * @param string $provider Stored provider key.
+	 * @return string
+	 */
+	private static function provider_label( $provider ) {
+		$names = array(
+			'openai' => 'OpenAI',
+			'gemini' => 'Gemini',
+			'chrome' => __( 'Chrome built-in AI', 'wpml-translation-check' ),
+		);
+
+		if ( '' === $provider ) {
+			return '—';
+		}
+
+		return isset( $names[ strtolower( $provider ) ] ) ? $names[ strtolower( $provider ) ] : ucfirst( $provider );
+	}
+
+	/**
+	 * Date and time in the site's timezone, for tooltips.
+	 *
+	 * @param string $datetime MySQL datetime in UTC.
+	 * @return string
+	 */
+	private static function local_time( $datetime ) {
+		if ( empty( $datetime ) ) {
+			return '';
+		}
+
+		$timestamp = strtotime( $datetime . ' UTC' );
+
+		return $timestamp ? wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $timestamp ) : '';
 	}
 
 	/**
@@ -477,7 +667,31 @@ class Queue_Screen {
 			return null;
 		}
 
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$count = isset( $_GET['count'] ) ? absint( $_GET['count'] ) : 0;
+
 		$map = array(
+			'bulk_retry'    => $count
+				? array(
+					'success',
+					sprintf(
+						/* translators: %d: number of jobs */
+						_n( '%d job was sent back to the queue.', '%d jobs were sent back to the queue.', $count, 'wpml-translation-check' ),
+						$count
+					),
+				)
+				: array( 'info', __( 'None of the selected jobs could be retried. Only failed jobs whose source content is still stored can be retried.', 'wpml-translation-check' ) ),
+			'bulk_delete'   => $count
+				? array(
+					'success',
+					sprintf(
+						/* translators: %d: number of jobs */
+						_n( '%d job was deleted from the queue and will not be translated.', '%d jobs were deleted from the queue and will not be translated.', $count, 'wpml-translation-check' ),
+						$count
+					),
+				)
+				: array( 'warning', __( 'None of the selected jobs could be deleted. They may have finished or be saving right now.', 'wpml-translation-check' ) ),
+			'bulk_none'     => array( 'info', __( 'Select at least one job and choose an action.', 'wpml-translation-check' ) ),
 			'ran'           => array( 'success', __( 'The queue was processed.', 'wpml-translation-check' ) ),
 			'retried'       => array( 'success', __( 'That job was sent back to the queue.', 'wpml-translation-check' ) ),
 			'retried_all'   => array( 'success', __( 'Failed jobs were sent back to the queue.', 'wpml-translation-check' ) ),
