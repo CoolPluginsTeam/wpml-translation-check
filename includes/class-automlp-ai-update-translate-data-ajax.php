@@ -52,7 +52,7 @@ class AUTOMLP_AI_Update_Translate_Data_Ajax {
 			'target_language'        => sanitize_text_field( (string) $data['target_language'] ),
 			'string_count'           => (string) absint( isset( $data['string_count'] ) ? $data['string_count'] : 0 ),
 			'character_count'        => (string) absint( isset( $data['character_count'] ) ? $data['character_count'] : 0 ),
-			'time_taken'             => absint( isset( $data['time_taken'] ) ? $data['time_taken'] : 0 ),
+			'time_taken'             => self::sanitize_time_taken( isset( $data['time_taken'] ) ? $data['time_taken'] : 0 ),
 			'date_time'              => ! empty( $data['date_time'] ) ? sanitize_text_field( (string) $data['date_time'] ) : current_time( 'Y-m-d H:i:s' ),
 			'total_word_count'       => (string) absint( isset( $data['total_word_count'] ) ? $data['total_word_count'] : 0 ),
 			'editor_type'            => sanitize_text_field( isset( $data['editor_type'] ) ? (string) $data['editor_type'] : '' ),
@@ -66,6 +66,23 @@ class AUTOMLP_AI_Update_Translate_Data_Ajax {
 		AUTOMLP_Ai_Cpt_Dashboard::store_options( 'automlp_ai', 'post_id', 'update', $row );
 
 		return true;
+	}
+
+	/**
+	 * Seconds one job took, or 0 when the value cannot be a real duration
+	 * (negative, not numeric, or longer than a day).
+	 *
+	 * @param mixed $time_taken Raw seconds.
+	 * @return int
+	 */
+	public static function sanitize_time_taken( $time_taken ) {
+		$time_taken = is_numeric( $time_taken ) ? (float) $time_taken : 0;
+
+		if ( $time_taken < 0 || $time_taken > DAY_IN_SECONDS ) {
+			return 0;
+		}
+
+		return (int) round( $time_taken );
 	}
 
 	/**
@@ -91,7 +108,7 @@ class AUTOMLP_AI_Update_Translate_Data_Ajax {
 		$kind       = isset( $job['kind'] ) ? (string) $job['kind'] : 'post';
 		$source_id  = isset( $job['source_id'] ) ? (int) $job['source_id'] : 0;
 		$result_id  = ! empty( $written['result_id'] ) ? (int) $written['result_id'] : 0;
-		$time_taken = isset( $ctx['time_taken'] ) ? absint( $ctx['time_taken'] ) : 0;
+		$time_taken = isset( $ctx['time_taken'] ) ? self::sanitize_time_taken( $ctx['time_taken'] ) : 0;
 
 		if ( '' === $provider || '' === $from_lang || '' === $to_lang ) {
 			return;

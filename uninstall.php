@@ -26,6 +26,8 @@ wp_clear_scheduled_hook( 'automlp_run_queue' );
 delete_transient( 'automlp_queue_lock' );
 delete_transient( 'automlp_pending_provider' );
 delete_option( 'automlp_debug_mode' );
+// Removed setting: translations now follow WPML's translated document status.
+delete_option( 'automlp_bulk_post_status' );
 
 require_once __DIR__ . '/includes/wpml/class-bot-translator.php';
 \AUTOMLP_WPML\Includes\Wpml\Bot_Translator::remove();

@@ -33,12 +33,77 @@ class Writer {
 	private static $writing = false;
 
 	/**
+	 * Value of WPML's review mode "Wait for review before publishing".
+	 */
+	const REVIEW_BEFORE_PUBLISH = 'before-publish';
+
+	/**
 	 * Attach the writer to the dispatcher's seam.
 	 *
 	 * @return void
 	 */
 	public static function boot() {
 		add_filter( 'automlp_write_translation', array( __CLASS__, 'write' ), 10, 4 );
+		add_filter( 'wpml_pre_save_pro_translation', array( __CLASS__, 'hold_for_review' ), 10, 2 );
+	}
+
+	/**
+	 * Keep a new translation as a draft when WPML is set to review before publishing.
+	 *
+	 * WPML applies "After auto-translation > Wait for review before publishing"
+	 * only to its own automatic jobs, and the jobs saved here are not flagged as
+	 * automatic. Without this, WPML publishes the new translation as soon as the
+	 * original is published. This follows what WPML does for its own jobs: only a
+	 * new translation is held, an existing one keeps its status.
+	 *
+	 * Reads WPML's \WPML\Setup\Option, which is not a documented API (verified
+	 * against WPML 5.0.0), so it is guarded and does nothing if it is missing.
+	 *
+	 * @param array       $postarr Post array WPML is about to save.
+	 * @param object|null $job     WPML translation job.
+	 * @return array
+	 */
+	public static function hold_for_review( $postarr, $job = null ) {
+		if ( ! self::$writing || ! is_array( $postarr ) || ! empty( $postarr['ID'] ) ) {
+			return $postarr;
+		}
+
+		if ( ! is_callable( array( '\WPML\Setup\Option', 'getReviewMode' ) ) || self::REVIEW_BEFORE_PUBLISH !== \WPML\Setup\Option::getReviewMode() ) {
+			return $postarr;
+		}
+
+		if ( self::is_excluded_from_review( $job ) ) {
+			return $postarr;
+		}
+
+		$postarr['post_status'] = 'draft';
+
+		return $postarr;
+	}
+
+	/**
+	 * Is this job left out of review? Same exclusions as WPML's own review:
+	 * the posts page, string and package jobs, and what a site filters out.
+	 *
+	 * @param object|null $job WPML translation job.
+	 * @return bool
+	 */
+	private static function is_excluded_from_review( $job ) {
+		if ( ! is_object( $job ) ) {
+			return false;
+		}
+
+		$original_id = isset( $job->original_doc_id ) ? (int) $job->original_doc_id : 0;
+
+		if ( $original_id && (int) get_option( 'page_for_posts' ) === $original_id ) {
+			return true;
+		}
+
+		$type     = isset( $job->original_post_type ) ? (string) $job->original_post_type : '';
+		$excluded = 0 === strpos( $type, 'st-batch' ) || 0 === strpos( $type, 'package' );
+
+		/** This filter is documented in sitepress-multilingual-cms/classes/ATE/Review/ApplyJob.php */
+		return (bool) apply_filters( 'wpml_tm_skip_element_type_from_review', $excluded, $type );
 	}
 
 	/**
@@ -433,10 +498,13 @@ class Writer {
 			$value = (string) $value;
 
 			$fields[ $name ] = array(
-				'tid'      => (int) $source_map[ $name ]['tid'],
-				'data'     => $value,
-				'finished' => 1,
-				'format'   => 'base64',
+				// WPML's own editors send field_type; handlers on
+				// wpml_pro_translation_completed (WCML) read it.
+				'field_type' => $name,
+				'tid'        => (int) $source_map[ $name ]['tid'],
+				'data'       => $value,
+				'finished'   => 1,
+				'format'     => 'base64',
 			);
 		}
 

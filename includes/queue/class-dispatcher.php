@@ -822,7 +822,7 @@ class Dispatcher {
 			$units_translated = self::count_translated_units( $units, $partial );
 
 			// Conditional: the job may have been cancelled since it was claimed.
-			$started = Queue_Table::edit_if_state(
+			$claimed = Queue_Table::edit_if_state(
 				$job_id,
 				Queue_Table::STATE_CLAIMED,
 				array(
@@ -834,7 +834,7 @@ class Dispatcher {
 				)
 			);
 
-			if ( ! $started ) {
+			if ( ! $claimed ) {
 				return;
 			}
 

@@ -373,6 +373,8 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
                         if (outcome === 'already_translated') {
                             skipRow(key, __('Already translated.', 'wpml-translation-check'));
+                        } else if (outcome === 'no_permission') {
+                            skipRow(key, errors[key] || __('You are not allowed to translate this post.', 'wpml-translation-check'));
                         } else if (outcome === 'ate_active') {
                             skipRow(key, errors[key] || __('Skipped: WPML Advanced Translation Editor is already active for this page and language.', 'wpml-translation-check'));
                         } else {

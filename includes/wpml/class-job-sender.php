@@ -137,6 +137,7 @@ class Job_Sender {
 		$skip_reasons = array(
 			'already_translated' => 0,
 			'ate_active'         => 0,
+			'no_permission'      => 0,
 		);
 
 		// Outcome per post_lang key, so the modal can update each row.
@@ -169,6 +170,14 @@ class Job_Sender {
 				}
 
 				$sent = self::send_post( $post_id, $to_lang, $from_lang, $provider );
+
+				if ( is_wp_error( $sent ) && 'automlp_forbidden' === $sent->get_error_code() ) {
+					++$skipped;
+					++$skip_reasons['no_permission'];
+					$errors[ $post_id . '_' . $to_lang ] = $sent->get_error_message();
+					$items[ $post_id . '_' . $to_lang ]  = 'no_permission';
+					continue;
+				}
 
 				if ( is_wp_error( $sent ) ) {
 					$ate = 'automlp_ate_in_progress' === $sent->get_error_code();

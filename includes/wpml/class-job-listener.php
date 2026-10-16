@@ -489,8 +489,22 @@ class Job_Listener {
 
 		$job = self::load_job( $wpml_job_id );
 
-		if ( $job && ! empty( $job->rid ) ) {
-			$iclTranslationManagement->cancel_translation_request( (int) $job->rid );
+		if ( ! $job ) {
+			return;
+		}
+
+		// WPML cancels by translation id (icl_translation_status.translation_id), not by rid.
+		$translation_id = ! empty( $job->translation_id ) ? (int) $job->translation_id : 0;
+
+		if ( ! $translation_id && ! empty( $job->rid ) ) {
+			global $wpdb;
+
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- WPML exposes no API for this lookup.
+			$translation_id = (int) $wpdb->get_var( $wpdb->prepare( "SELECT translation_id FROM {$wpdb->prefix}icl_translation_status WHERE rid = %d", (int) $job->rid ) );
+		}
+
+		if ( $translation_id ) {
+			$iclTranslationManagement->cancel_translation_request( $translation_id );
 		}
 	}
 

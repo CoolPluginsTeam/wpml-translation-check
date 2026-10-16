@@ -235,8 +235,13 @@ class Queue_Route {
 			$skip_reasons = isset( $result['skip_reasons'] ) ? $result['skip_reasons'] : array();
 			$ate_skipped  = ! empty( $skip_reasons['ate_active'] ) ? (int) $skip_reasons['ate_active'] : 0;
 			$done_skipped = ! empty( $skip_reasons['already_translated'] ) ? (int) $skip_reasons['already_translated'] : 0;
+			$perm_skipped = ! empty( $skip_reasons['no_permission'] ) ? (int) $skip_reasons['no_permission'] : 0;
 
-			if ( $ate_skipped > 0 && 0 === $done_skipped ) {
+			if ( $perm_skipped > 0 && 0 === $ate_skipped && 0 === $done_skipped ) {
+				$message = __( 'Nothing was queued. You do not have permission to translate the selected items.', 'wpml-translation-check' );
+			} elseif ( $perm_skipped > 0 ) {
+				$message = __( 'Nothing was queued. Some items are already translated or have an active WPML Advanced Translation Editor job; you do not have permission to translate the others.', 'wpml-translation-check' );
+			} elseif ( $ate_skipped > 0 && 0 === $done_skipped ) {
 				$message = __( 'Skipped: WPML Advanced Translation Editor already has an active job for the selected page(s) and language(s). Finish or cancel those ATE jobs first.', 'wpml-translation-check' );
 			} elseif ( $ate_skipped > 0 ) {
 				$message = __( 'Nothing was queued. Some items are already translated; others already have an active WPML Advanced Translation Editor job.', 'wpml-translation-check' );
@@ -376,7 +381,8 @@ class Queue_Route {
 			foreach ( $job_ids as $job_id ) {
 				$row = Queue_Table::get( $job_id );
 
-				if ( $row ) {
+				// Only jobs for content this user may translate.
+				if ( $row && self::can_access_row( $row ) ) {
 					$rows[] = self::shape( $row );
 				}
 			}
@@ -392,6 +398,15 @@ class Queue_Route {
 					'health'   => Dispatcher::health(),
 				),
 				200
+			);
+		}
+
+		// The full job list is the Queue screen's, which is for administrators.
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return new \WP_Error(
+				'automlp_forbidden',
+				__( 'You are not allowed to do this.', 'wpml-translation-check' ),
+				array( 'status' => rest_authorization_required_code() )
 			);
 		}
 
@@ -418,6 +433,21 @@ class Queue_Route {
 	}
 
 	/**
+	 * Whether the current user may see or act on a queue row: a post job
+	 * needs edit rights on its source post, any other job manage_options.
+	 *
+	 * @param array $row Queue row.
+	 * @return bool
+	 */
+	private static function can_access_row( array $row ) {
+		if ( 'post' === $row['kind'] && (int) $row['source_id'] ) {
+			return current_user_can( 'edit_post', (int) $row['source_id'] );
+		}
+
+		return current_user_can( 'manage_options' );
+	}
+
+	/**
 	 * Send a failed job back to the queue.
 	 *
 	 * Retry is only possible while the source map survives. It is cleared on
@@ -439,19 +469,19 @@ class Queue_Route {
 			);
 		}
 
+		if ( ! self::can_access_row( $row ) ) {
+			return new \WP_Error(
+				'automlp_forbidden',
+				__( 'You are not allowed to translate that content.', 'wpml-translation-check' ),
+				array( 'status' => rest_authorization_required_code() )
+			);
+		}
+
 		if ( Queue_Table::STATE_FAILED !== $row['state'] ) {
 			return new \WP_Error(
 				'automlp_job_not_failed',
 				__( 'Only failed jobs can be retried.', 'wpml-translation-check' ),
 				array( 'status' => 400 )
-			);
-		}
-
-		if ( 'post' === $row['kind'] && (int) $row['source_id'] && ! current_user_can( 'edit_post', (int) $row['source_id'] ) ) {
-			return new \WP_Error(
-				'automlp_forbidden',
-				__( 'You are not allowed to translate that content.', 'wpml-translation-check' ),
-				array( 'status' => rest_authorization_required_code() )
 			);
 		}
 

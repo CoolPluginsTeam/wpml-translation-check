@@ -85,7 +85,6 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 
 					// Current selected models (saved by the addon).
 					$automlp_wpml_current_models       = get_option( 'automlp_ai_translation_models', array() );
-					$automlp_wpml_bulk_post_status   = get_option( 'automlp_bulk_post_status', 'draft' );
 					$automlp_wpml_current_openai_model = isset( $automlp_wpml_current_models['openai'] ) ? $automlp_wpml_current_models['openai'] : 'gpt-4o-mini';
 					$automlp_wpml_current_google_model = isset( $automlp_wpml_current_models['google'] ) ? $automlp_wpml_current_models['google'] : 'gemini-2.5-flash';
 					$automlp_wpml_openai_api_key       = isset( $automlp_wpml_ai_credentials['openai'] ) ? $automlp_wpml_ai_credentials['openai'] : '';
@@ -449,15 +448,6 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 								</p>
 							</div>
 						<?php endif; ?>
-						<label for="automlp_bulk_post_status-input" class="api-settings-label">
-									<?php esc_html_e( 'Bulk Translation Default Post Status', 'wpml-translation-check-pro' ); ?>
-								</label>
-								<div class="automlp-bulk-post-status-options">
-								<input type="radio" name="automlp_bulk_post_status" id="automlp_bulk_post_status_publish" value="publish" <?php checked( $automlp_wpml_bulk_post_status, 'publish' ); ?>>
-									<label for="automlp_bulk_post_status_publish"><?php esc_html_e( 'Published', 'wpml-translation-check-pro' ); ?></label>
-									<input type="radio" name="automlp_bulk_post_status" id="automlp_bulk_post_status_draft" value="draft" <?php checked( $automlp_wpml_bulk_post_status, 'draft' ); ?>>
-									<label for="automlp_bulk_post_status_draft"><?php esc_html_e( 'Draft', 'wpml-translation-check-pro' ); ?></label>
-								</div>
 						<hr>
 						<?php
 						 // Handle feedback checkbox
@@ -707,14 +697,11 @@ if ( $automlp_wpml_wizard_language_set ) :
 		var googleModel = document.getElementById('automlp_ai_selected_google_model') ? document.getElementById('automlp_ai_selected_google_model').value : '';
 		var feedbackCheckbox = document.getElementById('automlp_ai_dashboard_feedback_checkbox');
        var feedbackOptIn = feedbackCheckbox && feedbackCheckbox.checked ? 'yes' : 'no';
-	   var bulkPostStatusRadio = document.querySelector('input[name="automlp_bulk_post_status"]:checked');
-		var bulkPostStatus = bulkPostStatusRadio ? bulkPostStatusRadio.value : 'draft';
 		// Build request data - only include keys that should be updated
 		var requestData = {
 			openai_model: openaiModel || null,
 			google_model: googleModel || null,
-			automlp_feedback_opt_in: feedbackOptIn,
-			automlp_bulk_post_status: bulkPostStatus || 'draft'
+			automlp_feedback_opt_in: feedbackOptIn
 		};
 		
 		if (openaiInput && (openaiKey !== '' || (openaiInput.getAttribute('data-has-key') === '1' && openaiInput.value.trim() === ''))) {
