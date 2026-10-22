@@ -224,6 +224,17 @@ class Queue_Route {
 
 		$provider = self::clean_provider( $request->get_param( 'provider' ) );
 
+		// One request now creates every selected item x language, so jobs are
+		// not lost when the tab closes mid-way. WPML needs a moment per job:
+		// give a large batch room to finish, even if the client goes away.
+		if ( count( $post_ids ) * count( $langs ) > 4 ) {
+			ignore_user_abort( true );
+
+			if ( function_exists( 'set_time_limit' ) ) {
+				@set_time_limit( max( 60, min( 600, 15 * count( $post_ids ) * count( $langs ) ) ) ); // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Disabled on some hosts.
+			}
+		}
+
 		Job_Listener::reset_created();
 
 		$result = Job_Sender::send_posts( $post_ids, $langs, $provider );
@@ -236,8 +247,11 @@ class Queue_Route {
 			$ate_skipped  = ! empty( $skip_reasons['ate_active'] ) ? (int) $skip_reasons['ate_active'] : 0;
 			$done_skipped = ! empty( $skip_reasons['already_translated'] ) ? (int) $skip_reasons['already_translated'] : 0;
 			$perm_skipped = ! empty( $skip_reasons['no_permission'] ) ? (int) $skip_reasons['no_permission'] : 0;
+			$unsupported  = ! empty( $skip_reasons['unsupported_editor'] ) ? (int) $skip_reasons['unsupported_editor'] : 0;
 
-			if ( $perm_skipped > 0 && 0 === $ate_skipped && 0 === $done_skipped ) {
+			if ( $unsupported > 0 && $unsupported === (int) $result['skipped'] ) {
+				$message = WPML_AT_Helper::unsupported_post_message();
+			} elseif ( $perm_skipped > 0 && 0 === $ate_skipped && 0 === $done_skipped ) {
 				$message = __( 'Nothing was queued. You do not have permission to translate the selected items.', 'wpml-translation-check' );
 			} elseif ( $perm_skipped > 0 ) {
 				$message = __( 'Nothing was queued. Some items are already translated or have an active WPML Advanced Translation Editor job; you do not have permission to translate the others.', 'wpml-translation-check' );
@@ -245,8 +259,10 @@ class Queue_Route {
 				$message = __( 'Skipped: WPML Advanced Translation Editor already has an active job for the selected page(s) and language(s). Finish or cancel those ATE jobs first.', 'wpml-translation-check' );
 			} elseif ( $ate_skipped > 0 ) {
 				$message = __( 'Nothing was queued. Some items are already translated; others already have an active WPML Advanced Translation Editor job.', 'wpml-translation-check' );
+			} elseif ( $unsupported > 0 ) {
+				$message = __( 'Nothing was queued. The selected items are already translated or are not supported in the free version (Classic editor / other page builders / Elementor templates). Re-translation is available in the Pro version.', 'wpml-translation-check' );
 			} else {
-				$message = __( 'Everything selected is already translated into the chosen languages.', 'wpml-translation-check' );
+				$message = __( 'Everything selected is already translated into the chosen language. Re-translation is available in the Pro version.', 'wpml-translation-check' );
 			}
 
 			return new \WP_REST_Response(
@@ -290,6 +306,10 @@ class Queue_Route {
 				)
 			);
 		}
+
+		// Start the worker now, so the work runs even if the tab that queued
+		// it is closed before its first poll.
+		Dispatcher::kick();
 
 		return new \WP_REST_Response(
 			array(
@@ -477,11 +497,42 @@ class Queue_Route {
 			);
 		}
 
+		if ( 'post' === ( isset( $row['kind'] ) ? $row['kind'] : '' ) && ! WPML_AT_Helper::is_supported_post( (int) $row['source_id'] ) ) {
+			return new \WP_Error( 'automlp_unsupported_editor', WPML_AT_Helper::unsupported_post_message(), array( 'status' => 409 ) );
+		}
+
+		// Free never re-translates: close the row instead of retrying it.
+		if ( Queue_Table::STATE_FAILED === $row['state'] && self::close_if_translated( $row ) ) {
+			return new \WP_Error( 'automlp_already_translated', WPML_AT_Helper::already_translated_message(), array( 'status' => 409 ) );
+		}
+
 		if ( Queue_Table::STATE_FAILED !== $row['state'] ) {
 			return new \WP_Error(
 				'automlp_job_not_failed',
 				__( 'Only failed jobs can be retried.', 'wpml-translation-check' ),
 				array( 'status' => 400 )
+			);
+		}
+
+		// The WPML job behind a post row is gone, finished, replaced, or its
+		// source changed: retrying it would fail again or report a false
+		// "Completed". Ask WPML for a fresh job instead (same post, language).
+		if ( self::needs_new_job( $row ) ) {
+			$new_id = self::recreate_job( $row );
+
+			if ( is_wp_error( $new_id ) ) {
+				return $new_id;
+			}
+
+			Dispatcher::kick();
+
+			return new \WP_REST_Response(
+				array(
+					'retried'     => true,
+					'replaced_id' => $job_id,
+					'job'         => self::shape( Queue_Table::get( $new_id ) ),
+				),
+				200
 			);
 		}
 
@@ -503,6 +554,10 @@ class Queue_Route {
 			)
 		);
 
+		if ( $done ) {
+			Dispatcher::kick();
+		}
+
 		if ( ! $done ) {
 			return new \WP_Error(
 				'automlp_retry_failed',
@@ -518,6 +573,154 @@ class Queue_Route {
 			),
 			200
 		);
+	}
+
+	/**
+	 * Close a failed post row whose post already has a translation.
+	 *
+	 * Free never re-translates, so such a row is closed with a clear reason
+	 * instead of being retried or re-created.
+	 *
+	 * @param array $row Queue row.
+	 * @return bool True when the row was closed.
+	 */
+	public static function close_if_translated( array $row ) {
+		if ( 'post' !== ( isset( $row['kind'] ) ? $row['kind'] : '' ) || empty( $row['source_id'] ) ) {
+			return false;
+		}
+
+		$source_id = (int) $row['source_id'];
+
+		if ( ! WPML_AT_Helper::get_existing_translation_id( $source_id, get_post_type( $source_id ), (string) $row['to_lang'] ) ) {
+			return false;
+		}
+
+		Queue_Table::edit_if_state(
+			(int) $row['job_id'],
+			(string) $row['state'],
+			array(
+				'state'      => Queue_Table::STATE_STOPPED,
+				'closed_at'  => current_time( 'mysql', true ),
+				'last_error' => WPML_AT_Helper::already_translated_message(),
+			)
+		);
+
+		return true;
+	}
+
+	/**
+	 * Whether a failed post row needs a fresh WPML job to be retried.
+	 *
+	 * @param array $row Queue row.
+	 * @return bool
+	 */
+	public static function needs_new_job( array $row ) {
+		if ( 'post' !== ( isset( $row['kind'] ) ? $row['kind'] : '' ) || empty( $row['source_id'] ) ) {
+			return false;
+		}
+
+		return empty( $row['source_map'] ) || empty( $row['wpml_job_id'] ) || '' !== self::stale_reason( $row );
+	}
+
+	/**
+	 * Why a row's WPML job can no longer be saved into, or '' when it can.
+	 *
+	 * Saving into a job that is gone, already translated or replaced by a
+	 * newer one, or whose source changed after it was queued, would report a
+	 * false "Completed" or overwrite newer work. One indexed query.
+	 *
+	 * @param array $row Queue row.
+	 * @return string
+	 */
+	private static function stale_reason( array $row ) {
+		global $wpdb;
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Must be read fresh.
+		$job = $wpdb->get_row(
+			$wpdb->prepare(
+				'SELECT j.job_id, j.translated, j.revision,
+				        ( SELECT MAX( l.job_id ) FROM %i l WHERE l.rid = j.rid ) AS latest
+				 FROM %i j WHERE j.job_id = %d',
+				$wpdb->prefix . 'icl_translate_job',
+				$wpdb->prefix . 'icl_translate_job',
+				(int) $row['wpml_job_id']
+			),
+			ARRAY_A
+		);
+
+		if ( ! $job ) {
+			return 'missing';
+		}
+
+		if ( 1 === (int) $job['translated'] ) {
+			return 'completed';
+		}
+
+		if ( null !== $job['revision'] || (int) $job['latest'] !== (int) $job['job_id'] ) {
+			return 'replaced';
+		}
+
+		$modified = get_post_field( 'post_modified_gmt', (int) $row['source_id'], 'raw' );
+
+		if ( $modified && ! empty( $row['queued_at'] ) && strtotime( $modified . ' UTC' ) > strtotime( $row['queued_at'] . ' UTC' ) ) {
+			return 'source_changed';
+		}
+
+		return '';
+	}
+
+	/**
+	 * Replace a failed post row with a fresh WPML job through WPML's TM API.
+	 *
+	 * The old row is closed and points at its replacement; the old WPML job
+	 * is left alone (cancelling it could cancel the new one, which shares its
+	 * translation status).
+	 *
+	 * @param array $row Failed queue row.
+	 * @return int|\WP_Error New queue job id.
+	 */
+	public static function recreate_job( array $row ) {
+		$source_id = (int) $row['source_id'];
+		$provider  = self::clean_provider( isset( $row['provider'] ) ? (string) $row['provider'] : '' );
+
+		if ( ! current_user_can( 'edit_post', $source_id ) ) {
+			return new \WP_Error( 'automlp_forbidden', __( 'You are not allowed to translate that content.', 'wpml-translation-check' ), array( 'status' => rest_authorization_required_code() ) );
+		}
+
+		Job_Listener::reset_created();
+
+		$sent = Job_Sender::send_post( $source_id, (string) $row['to_lang'], (string) $row['from_lang'], $provider );
+
+		if ( is_wp_error( $sent ) ) {
+			$sent->add_data( array( 'status' => 409 ) );
+			return $sent;
+		}
+
+		$created = Job_Listener::created_ids();
+		$new_id  = $created ? (int) end( $created ) : 0;
+
+		if ( ! $new_id ) {
+			$skipped = Job_Listener::skipped();
+
+			return new \WP_Error(
+				'automlp_nothing_queued',
+				! empty( $skipped ) ? $skipped[0]['reason'] : __( 'WPML did not create a new job for this item.', 'wpml-translation-check' ),
+				array( 'status' => 409 )
+			);
+		}
+
+		Queue_Table::edit_if_state(
+			(int) $row['job_id'],
+			(string) $row['state'],
+			array(
+				'state'      => Queue_Table::STATE_STOPPED,
+				'closed_at'  => current_time( 'mysql', true ),
+				/* translators: %d: new queue job id */
+				'last_error' => sprintf( __( 'Retried as job #%d with a fresh WPML job.', 'wpml-translation-check' ), $new_id ),
+			)
+		);
+
+		return $new_id;
 	}
 
 	/**

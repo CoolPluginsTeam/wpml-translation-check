@@ -13,7 +13,6 @@ import { queuePosts, pollUntilDone, retryJob, jobProgressPercent } from '../../s
  * Posts per /queue/posts request. WPML needs a few seconds to build each job,
  * so small sequential requests keep the modal responsive.
  */
-const POSTS_PER_REQUEST = 1;
 
 /**
  * Row states that need no more work.
@@ -59,6 +58,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         done: 'completed',
         failed: 'error',
         stopped: 'error',
+        retrying: 'retrying',
     }[state] || 'pending');
 
     const mapClass = (state) => ({
@@ -66,10 +66,16 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         failed: 'error',
         stopped: 'error',
         waiting: 'warning',
+        retrying: 'warning',
     }[state] || 'in-progress');
 
     const displayState = (job) => {
         const progress = jobProgressPercent(job);
+
+        // A failed attempt waits for its automatic retry: not terminal yet.
+        if (job.state === 'waiting' && Number(job.attempts) > 0 && !job.closed) {
+            return 'retrying';
+        }
 
         return job.state === 'waiting' && progress > 0 ? 'sent' : job.state;
     };
@@ -372,11 +378,13 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                         const outcome = items ? items[key] : (errors[key] ? 'error' : 'already_translated');
 
                         if (outcome === 'already_translated') {
-                            skipRow(key, __('Already translated.', 'wpml-translation-check'));
+                            skipRow(key, errors[key] || __('Already translated. Re-translation is available in the Pro version.', 'wpml-translation-check'));
                         } else if (outcome === 'no_permission') {
                             skipRow(key, errors[key] || __('You are not allowed to translate this post.', 'wpml-translation-check'));
+                        } else if (outcome === 'unsupported_editor') {
+                            skipRow(key, errors[key] || __('Not supported in the free version (Classic editor / other page builders / Elementor templates).', 'wpml-translation-check'));
                         } else if (outcome === 'ate_active') {
-                            skipRow(key, errors[key] || __('Skipped: WPML Advanced Translation Editor is already active for this page and language.', 'wpml-translation-check'));
+                            skipRow(key, errors[key] || __('Skipped: this page already has an open WPML translation job for this language. Finish or cancel it in WPML first.', 'wpml-translation-check'));
                         } else {
                             failRow(key, postId, langCode, errors[key] || (res && res.message) || '');
                         }
@@ -399,7 +407,9 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
 
             try {
                 result = await queuePosts(postIds, selectedLanguages, serviceProvider, {
-                    perRequest: POSTS_PER_REQUEST,
+                    // One request queues every selected post, so nothing is
+                    // lost if the tab closes while jobs are being created.
+                    perRequest: Math.max(1, postIds.length),
                     onChunk,
                 });
             } catch (error) {
@@ -421,7 +431,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                             result.message
                                 ? result.message
                                 : sprintf(
-                                      __('Translations already exist for all selected %s in the chosen languages.', 'wpml-translation-check'),
+                                      __('Translations already exist for all selected %s in the chosen language. Re-translation is available in the Pro version.', 'wpml-translation-check'),
                                       automlp_wpml_bulk_translate_object.post_label
                                   )
                         );
@@ -486,10 +496,19 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 // Only mark completed if at least one job succeeded; otherwise
                 // stay at 'pending' so the heading does not say Completed when
                 // every job failed.
-                const anyDone = Object.values(translatePostInfo).some(
-                    (info) => info.status === 'completed'
-                );
-                updateBulkStatus(anyDone ? 'completed' : 'pending');
+                const infos = Object.values(translatePostInfo);
+                const anyDone = infos.some((info) => info.status === 'completed');
+                const anyError = infos.some((info) => info.status === 'error');
+                const anySkipped = infos.some((info) => info.status === 'skipped');
+                // Every row is terminal here (done, failed/cancelled or
+                // skipped): failures always read "Completed with errors".
+                if (anyError) {
+                    updateBulkStatus('partial');
+                } else if (anyDone) {
+                    updateBulkStatus(anySkipped ? 'completed-skipped' : 'completed');
+                } else {
+                    updateBulkStatus('pending');
+                }
                 return;
             }
 
@@ -541,6 +560,10 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 return __('Pending', 'wpml-translation-check');
             case 'completed':
                 return __('Completed', 'wpml-translation-check');
+            case 'partial':
+                return __('Completed with errors', 'wpml-translation-check');
+            case 'completed-skipped':
+                return __('Completed – some items were skipped', 'wpml-translation-check');
             default:
                 return __('Status', 'wpml-translation-check');
         }
@@ -587,10 +610,15 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
         }));
 
         try {
-            await retryJob(jobId);
+            // A missing, finished or replaced WPML job is retried as a new
+            // queue job: watch that one, not the closed original.
+            const retried = await retryJob(jobId);
+            const nextId = (retried && retried.job && retried.job.job_id) || jobId;
+
+            storeDispatch(updateTranslatePostInfo({ [key]: { jobId: nextId } }));
 
             await pollUntilDone({
-                jobIds: [jobId],
+                jobIds: [nextId],
                 onUpdate: applyStatus,
             });
         } catch (error) {
@@ -657,6 +685,12 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                 return __('In Queue', 'wpml-translation-check');
             case 'queuing':
                 return __('Preparing', 'wpml-translation-check');
+            case 'skipped':
+                return __('Skipped', 'wpml-translation-check');
+            case 'retrying':
+                return __('Retrying', 'wpml-translation-check');
+            case 'error':
+                return __('Failed', 'wpml-translation-check');
             case 'running':
             case 'in-progress':
                 return __('In Progress', 'wpml-translation-check');
@@ -810,13 +844,25 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                                                     {info.flagUrl && <img src={info.flagUrl} width="20" alt={info.targetLanguage} />}
                                                     {info.languageName || info.targetLanguage}
                                                 </div>
-                                                {(info.status === 'error' || info.status === 'skipped') ?
+                                                {info.status === 'skipped' ?
                                                     <>
+                                                        <div className={`${prefix}-status-target-post-status`}>
+                                                            <span className="neutral skipped">{getPostStatus('skipped')}</span>
+                                                        </div>
+                                                        <div className={`${prefix}-status-skip-reason`} style={{ gridColumn: 'span 3' }}>
+                                                            {info.errorMessage}
+                                                        </div>
+                                                    </> :
+                                                (info.status === 'error') ?
+                                                    <>
+                                                        <div className={`${prefix}-status-target-post-status`}>
+                                                            <span className="error">{getPostStatus('error')}</span>
+                                                        </div>
                                                         {!info.errorHtml ?
-                                                            <div className={`${prefix}-status-target-post-error ${prefix}-error-message`} style={{ gridColumn: 'span 4' }}>
+                                                            <div className={`${prefix}-status-target-post-error ${prefix}-error-message`} style={{ gridColumn: 'span 3' }}>
                                                                 <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(info.errorMessage) }}></div>
                                                             </div> :
-                                                            <div className={`${prefix}-status-target-post-error-button`} style={{ gridColumn: 'span 4' }}>
+                                                            <div className={`${prefix}-status-target-post-error-button`} style={{ gridColumn: 'span 3' }}>
                                                                 {info.errorHtml && <div className={`${prefix}-status-target-post-error-button`} onClick={() => { handleErrorModal(info) }}><button className={`${prefix}-status-error-button`}>{__('Error Details', 'wpml-translation-check')}</button></div>}
                                                             </div>
                                                         }

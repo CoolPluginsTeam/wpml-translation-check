@@ -35,6 +35,13 @@ class Queue_Table {
 	const STATE_STOPPED = 'stopped';
 
 	/**
+	 * Seconds a retried job waits per attempt before it can be claimed
+	 * again, so a failing job never blocks the jobs queued behind it and
+	 * the queue can keep chaining runs without burning its retries.
+	 */
+	const RETRY_DELAY_SECONDS = 30;
+
+	/**
 	 * Fully qualified table name.
 	 *
 	 * @return string
@@ -609,9 +616,13 @@ class Queue_Table {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Queue state must be read fresh.
 		$ids = $wpdb->get_col(
 			$wpdb->prepare(
-				'SELECT job_id FROM %i WHERE state = %s LIMIT %d',
+				'SELECT job_id FROM %i WHERE state = %s
+				 AND ( attempts = 0 OR TIMESTAMPADD( SECOND, attempts * %d, touched_at ) <= %s )
+				LIMIT %d',
 				self::table(),
 				self::STATE_WAITING,
+				self::RETRY_DELAY_SECONDS,
+				current_time( 'mysql', true ),
 				max( 1, (int) $limit )
 			)
 		);
@@ -633,9 +644,13 @@ class Queue_Table {
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare(
-				'SELECT * FROM %i WHERE state = %s ORDER BY job_id ASC LIMIT %d',
+				'SELECT * FROM %i WHERE state = %s
+				 AND ( attempts = 0 OR TIMESTAMPADD( SECOND, attempts * %d, touched_at ) <= %s )
+				ORDER BY job_id ASC LIMIT %d',
 				self::table(),
 				self::STATE_WAITING,
+				self::RETRY_DELAY_SECONDS,
+				current_time( 'mysql', true ),
 				$limit
 			),
 			ARRAY_A

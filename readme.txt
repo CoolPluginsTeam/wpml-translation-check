@@ -98,6 +98,10 @@ You can continue using the tools already installed on your WordPress website whi
 
 * **[Linguator AI – Auto Translate & Create Multilingual Sites](https://linguator.com/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=lmat_check_out)** is a powerful multilingual plugin that helps you create and manage all-in-one multilingual WordPress website. Translate your posts, pages, menus, categories, and more into different languages using AI.
 
+* **[Toolkit for Polylang – Translation Inspector & Duplicate Content](https://wordpress.org/plugins/duplicate-content-addon-for-polylang/)** scans and manages your Polylang website for missing translations, out-dated content, URLs & routing, site setup, Elementor translation, and more issues.
+
+
+
 ### Special Thanks!
 A special thanks to the authors of the [WPML](https://wpml.org/) plugin for creating an outstanding tool for multilingual WordPress website management.
 All automatic translations are powered by third-party auto-translate providers (OpenAI and Gemini AI), so we don't guarantee 100% correctness. Please check all translated text carefully before making it live on your production site.

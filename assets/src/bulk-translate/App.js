@@ -163,8 +163,8 @@ const App = ({ onDestory, prefix, postIds }) => {
               type="button"
               className={`${prefix}-modal-close`}
               onClick={destroyApp}
-              title={__("Close", "wpml-translation-check-pro")}
-              aria-label={__("Close", "wpml-translation-check-pro")}
+              title={__("Close", "wpml-translation-check")}
+              aria-label={__("Close", "wpml-translation-check")}
             >
               &times;
             </button>
@@ -245,4 +245,4 @@ const App = ({ onDestory, prefix, postIds }) => {
     );
 };
 
-export default App;
+export default App;

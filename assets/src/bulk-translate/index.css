@@ -1537,4 +1537,18 @@ body.automlp-wpml-bulk-translate-google-translate {
 }
 
 /* Google Translate CSS End */
-/*# sourceMappingURL=index.css.map */
+/* Skipped rows: neutral pill plus the reason as smaller wrapping text. */
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-target-post-status span.neutral {
+  color: #50575e;
+  background: #dcdcde;
+}
+
+#automlp-wpml-bulk-translate-wrapper #automlp-wpml-bulk-translate-container #automlp-wpml-bulk-translate-status-modal-container .automlp-wpml-bulk-translate-status-skip-reason {
+  padding: 0.6rem 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #50575e;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+/*# sourceMappingURL=index.css.map */

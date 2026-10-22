@@ -67,7 +67,7 @@ class String_Translation {
 	public function render_string_bulk_translate_button()
 	{
     ?>
-		<button class="button button-primary automlp-wpml-bulk-translate-btn" style="display: none;">
+		<button type="button" class="button button-primary automlp-wpml-bulk-translate-btn" style="display: none;">
 			<?php esc_html_e('AI Translate', 'wpml-translation-check'); ?>
 		</button>
 	<?php
@@ -97,4 +97,4 @@ class String_Translation {
 	}
 }
 
-String_Translation::get_instance();
+String_Translation::get_instance();

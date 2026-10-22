@@ -274,6 +274,141 @@ public static function mask_api_key( $api_key ) {
 	}
 
 	/**
+	 * Whether the free plugin can translate this post.
+	 *
+	 * Supported: Elementor pages (not Elementor templates) and block editor
+	 * (Gutenberg) posts. Classic editor posts and other page builders are not.
+	 *
+	 * @param int|\WP_Post $post Post id or object.
+	 * @return bool
+	 */
+	public static function is_supported_post( $post ) {
+		$post = get_post( $post );
+
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+
+		$supported = false;
+
+		/**
+		 * Elementor template post types, never supported.
+		 *
+		 * @param string[] $types Post types.
+		 */
+		$templates = (array) apply_filters( 'automlp_unsupported_template_post_types', array( 'elementor_library', 'e-landing-page', 'e-floating-buttons', 'elementor_snippet', 'elementor_font', 'elementor_icons' ) );
+
+		if ( ! in_array( $post->post_type, $templates, true ) ) {
+			if ( 'builder' === get_post_meta( $post->ID, '_elementor_edit_mode', true ) ) {
+				$supported = true;
+			} elseif ( ! self::uses_other_builder( $post ) ) {
+				if ( has_blocks( $post ) ) {
+					$supported = true;
+				} elseif ( '' === trim( (string) $post->post_content ) ) {
+					// Empty content: follow the editor this post opens in.
+					if ( ! function_exists( 'use_block_editor_for_post' ) ) {
+						require_once ABSPATH . 'wp-admin/includes/post.php';
+					}
+
+					$supported = (bool) use_block_editor_for_post( $post );
+				}
+			}
+		}
+
+		/**
+		 * Filters whether the free plugin translates a post.
+		 *
+		 * @param bool     $supported Whether the post is supported.
+		 * @param \WP_Post $post      Post.
+		 */
+		return (bool) apply_filters( 'automlp_is_supported_post', $supported, $post );
+	}
+
+	/**
+	 * Whether a page builder other than Elementor or the block editor owns the post.
+	 *
+	 * @param \WP_Post $post Post.
+	 * @return bool
+	 */
+	private static function uses_other_builder( $post ) {
+		// One cached query loads every meta key of the post.
+		$meta = get_post_meta( (int) $post->ID );
+		$meta = is_array( $meta ) ? $meta : array();
+
+		/*
+		 * Meta keys written by other builders. Checked by presence, so they
+		 * are detected even while the builder plugin is inactive.
+		 * Beaver Builder, Cornerstone, Oxygen 4 / 6, Breakdance, Bricks, Brizy,
+		 * Thrive Architect, SiteOrigin.
+		 */
+		$keys = array(
+			'_fl_builder_enabled', '_fl_builder_data', '_fl_builder_draft',
+			'_cornerstone_data', '_cornerstone_override',
+			'ct_builder_shortcodes', 'ct_builder_json', '_ct_builder_json', 'ct_other_template', '_oxygen_data',
+			'_breakdance_data',
+			'_bricks_page_content_2',
+			'brizy', 'brizy_post_uid',
+			'tve_updated_post',
+			'panels_data',
+		);
+
+		$other = false;
+
+		foreach ( $keys as $key ) {
+			if ( isset( $meta[ $key ][0] ) && '' !== $meta[ $key ][0] && '0' !== $meta[ $key ][0] ) {
+				$other = true;
+				break;
+			}
+		}
+
+		if ( ! $other ) {
+			$other = ( isset( $meta['_et_pb_use_builder'][0] ) && 'on' === $meta['_et_pb_use_builder'][0] ) // Divi.
+				|| ( isset( $meta['_wpb_vc_js_status'][0] ) && 'true' === $meta['_wpb_vc_js_status'][0] ) // WPBakery.
+				|| ( isset( $meta['_bricks_editor_mode'][0] ) && 'bricks' === $meta['_bricks_editor_mode'][0] ); // Bricks.
+		}
+
+		// Content markers: builder blocks or shortcodes saved in post_content.
+		if ( ! $other ) {
+			$other = (bool) preg_match( '/<!-- wp:(?:fl-builder|divi)\/|<!-- cs-content|\[cs_content|\[et_pb_|\[vc_row|\[fl_builder_insert_layout/', (string) $post->post_content );
+		}
+
+		/**
+		 * Filters whether another page builder owns the post.
+		 *
+		 * @param bool     $other Whether another builder was detected.
+		 * @param \WP_Post $post  Post.
+		 */
+		return (bool) apply_filters( 'automlp_uses_other_builder', $other, $post );
+	}
+
+	/**
+	 * Message for a post the free plugin does not translate.
+	 *
+	 * @return string
+	 */
+	public static function unsupported_post_message() {
+		return __( 'Not supported in the free version (Classic editor / other page builders / Elementor templates).', 'wpml-translation-check' );
+	}
+
+	/**
+	 * Message for a post that already has a translation. Free never re-translates.
+	 *
+	 * @return string
+	 */
+	public static function already_translated_message() {
+		return __( 'Already translated. Re-translation is available in the Pro version.', 'wpml-translation-check' );
+	}
+
+	/**
+	 * Message for a post that already has an open WPML translation job.
+	 *
+	 * @return string
+	 */
+	public static function open_job_message() {
+		return __( 'Skipped: this page already has an open WPML translation job for this language. Finish or cancel it in WPML first.', 'wpml-translation-check' );
+	}
+
+	/**
 	 * Bulk translation supported
 	 *
 	 * @param object $current_screen The current screen object.

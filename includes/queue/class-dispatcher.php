@@ -243,6 +243,16 @@ class Dispatcher {
 	}
 
 	/**
+	 * Start queue workers now (non-blocking loopback), e.g. right after jobs
+	 * were queued, instead of waiting for the next cron tick or a poll.
+	 *
+	 * @return void
+	 */
+	public static function kick() {
+		self::spawn();
+	}
+
+	/**
 	 * Read one advanced tuning value.
 	 *
 	 * Stored in the non-autoloaded automlp_queue_tuning option so it can be
@@ -402,11 +412,10 @@ class Dispatcher {
 			return;
 		}
 
-		// After a failure, let the retry wait for cron or the modal instead of
-		// burning every attempt within seconds.
-		if ( self::$had_failure ) {
-			return;
-		}
+		// A failed job is held back for RETRY_DELAY_SECONDS per attempt by
+		// Queue_Table::waiting(), so chaining on after a failure moves on to
+		// the next job instead of burning the failed one's retries. backoff()
+		// has already dropped to one slot, so a failing provider is not hammered.
 
 		$free = self::slots() - self::busy_slots();
 
@@ -421,7 +430,8 @@ class Dispatcher {
 		}
 
 		for ( $i = 0; $i < $count; $i++ ) {
-			$time = (string) microtime( true );
+			$time  = (string) microtime( true );
+			$nonce = wp_generate_password( 20, false );
 
 			wp_remote_post(
 				admin_url( 'admin-ajax.php' ),
@@ -433,7 +443,8 @@ class Dispatcher {
 					'body'      => array(
 						'action' => self::TICK_ACTION,
 						'time'   => $time,
-						'token'  => self::tick_token( $time ),
+						'nonce'  => $nonce,
+						'token'  => self::tick_token( $time, $nonce ),
 					),
 				)
 			);
@@ -443,11 +454,21 @@ class Dispatcher {
 	/**
 	 * Signature for a spawned request, built from the site's secret salts.
 	 *
-	 * @param string $time Spawn time.
+	 * A per-request nonce makes every token unique, so handle_tick() can
+	 * accept each one only once without ever rejecting a legitimate spawn.
+	 *
+	 * @param string $time  Spawn time.
+	 * @param string $nonce Per-request nonce.
 	 * @return string
 	 */
-	private static function tick_token( $time ) {
-		return wp_hash( self::TICK_ACTION . '|' . $time, 'nonce' );
+	private static function tick_token( $time, $nonce = '' ) {
+		$payload = self::TICK_ACTION . '|' . $time;
+
+		if ( '' !== $nonce ) {
+			$payload .= '|' . $nonce;
+		}
+
+		return wp_hash( $payload, 'nonce' );
 	}
 
 	/**
@@ -495,10 +516,20 @@ class Dispatcher {
 		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Signed with tick_token(); a WordPress nonce is user-bound and this request has no user.
 		$time  = isset( $_POST['time'] ) ? sanitize_text_field( wp_unslash( $_POST['time'] ) ) : '';
 		$token = isset( $_POST['token'] ) ? sanitize_text_field( wp_unslash( $_POST['token'] ) ) : '';
+		$nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
 		// phpcs:enable WordPress.Security.NonceVerification.Missing
 
-		if ( '' === $time || ! is_numeric( $time ) || ! hash_equals( self::tick_token( $time ), $token ) ) {
+		if ( '' === $time || ! is_numeric( $time ) || ! hash_equals( self::tick_token( $time, $nonce ), $token ) ) {
 			wp_die( '', '', array( 'response' => 403 ) );
+		}
+
+		// Single use: spawn() signs every tick with a fresh time and nonce, so
+		// a repeat can only be a replay. add_option() is an atomic insert, and
+		// the marker outlives the 60s window. A replay gets an empty 200.
+		$used_key = 'automlp_tick_used_' . md5( $token );
+
+		if ( ! add_option( $used_key, (string) ( time() + 2 * MINUTE_IN_SECONDS ), '', false ) ) {
+			wp_die( '', '', array( 'response' => 200 ) );
 		}
 
 		$delay = microtime( true ) - (float) $time;
@@ -1136,6 +1167,12 @@ class Dispatcher {
 		$purge = (int) apply_filters( 'automlp_queue_purge_after_days', 180 );
 
 		Queue_Table::prune( $slim, $purge );
+
+		global $wpdb;
+
+		// Expired single-use tick markers, see handle_tick().
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- One-off bulk purge of plugin rows.
+		$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s AND CAST( option_value AS UNSIGNED ) < %d", $wpdb->esc_like( 'automlp_tick_used_' ) . '%', time() ) );
 	}
 
 	/**

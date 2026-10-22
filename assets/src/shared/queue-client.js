@@ -248,18 +248,26 @@ export const pollUntilDone = async ({
 		}
 
 		let status;
+		const asked = currentIds().slice();
 
 		try {
-			status = await fetchStatus(currentIds());
+			status = await fetchStatus(asked);
 		} catch (error) {
 			interval = Math.min(interval * 2, 5000);
 			await wait(interval);
 			continue;
 		}
 
-		// Never finished while selected posts are still being queued.
-		if (status && status.finished && isAdding()) {
-			status = { ...status, finished: false };
+		// Never finished while selected posts are still being queued, nor
+		// when jobs were added while this poll was in flight: its answer
+		// does not cover them, and their rows would be left "In Queue".
+		if (status && status.finished) {
+			const now = currentIds();
+			const covered = now.length === asked.length && now.every((id) => asked.includes(id));
+
+			if (isAdding() || !covered) {
+				status = { ...status, finished: false };
+			}
 		}
 
 		last = status;
@@ -351,7 +359,24 @@ export const summarise = (status) => {
  * @param {number} ms Milliseconds.
  * @return {Promise<void>} Resolves after the delay.
  */
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+// Browsers throttle timers in background tabs; the server keeps working
+// regardless. Poll again as soon as the tab is visible.
+const wait = (ms) =>
+	new Promise((resolve) => {
+		const done = () => {
+			clearTimeout(timer);
+			document.removeEventListener('visibilitychange', onVisible);
+			resolve();
+		};
+		const onVisible = () => {
+			if (document.visibilityState === 'visible') {
+				done();
+			}
+		};
+		const timer = setTimeout(done, ms);
+
+		document.addEventListener('visibilitychange', onVisible);
+	});
 
 export default {
 	queuePosts,

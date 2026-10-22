@@ -11,6 +11,7 @@
 
 namespace AUTOMLP_WPML\Includes\Wpml;
 
+use AUTOMLP_WPML\Includes\Queue\Queue_Table;
 use WPML_AT_Helper;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -69,6 +70,15 @@ class Job_Sender {
 			return new \WP_Error( 'automlp_missing_post', __( 'That post no longer exists.', 'wpml-translation-check' ) );
 		}
 
+		if ( ! WPML_AT_Helper::is_supported_post( $post ) ) {
+			return new \WP_Error( 'automlp_unsupported_editor', WPML_AT_Helper::unsupported_post_message() );
+		}
+
+		// Free never re-translates: every path (bulk, retry) ends here.
+		if ( WPML_AT_Helper::get_existing_translation_id( $post_id, $post->post_type, $to_lang ) ) {
+			return new \WP_Error( 'automlp_already_translated', WPML_AT_Helper::already_translated_message() );
+		}
+
 		$bot_id = Bot_Translator::ensure();
 
 		if ( ! $bot_id ) {
@@ -123,6 +133,57 @@ class Job_Sender {
 	}
 
 	/**
+	 * Send several checked posts to WPML as one batch for one language.
+	 *
+	 * @param array  $posts    post_id => source language code.
+	 * @param string $to_lang  Target language code.
+	 * @param string $provider Provider slug.
+	 * @return true|\WP_Error
+	 */
+	private static function send_batch( array $posts, $to_lang, $provider = '' ) {
+		if ( ! self::classes_available() ) {
+			return new \WP_Error( 'automlp_no_wpml_tm', __( 'WPML Translation Management is not available.', 'wpml-translation-check' ) );
+		}
+
+		$bot_id = Bot_Translator::ensure();
+
+		if ( ! $bot_id ) {
+			return new \WP_Error( 'automlp_no_bot', __( 'The translator account could not be created.', 'wpml-translation-check' ) );
+		}
+
+		self::flag_build();
+		self::remember_provider( $provider );
+
+		try {
+			$elements = array();
+
+			foreach ( $posts as $post_id => $from_lang ) {
+				$elements[] = new \WPML_TM_Translation_Batch_Element(
+					(int) $post_id,
+					'post',
+					(string) $from_lang,
+					array( $to_lang => \TranslationManagement::TRANSLATE_ELEMENT_ACTION )
+				);
+			}
+
+			$batch = new \WPML_TM_Translation_Batch(
+				$elements,
+				self::batch_name( $to_lang ),
+				array( $to_lang => $bot_id )
+			);
+
+			do_action( 'wpml_tm_send_post_jobs', $batch, 'post', null );
+
+		} catch ( \Throwable $e ) {
+			return new \WP_Error( 'automlp_batch_failed', $e->getMessage() );
+		} finally {
+			self::remember_provider( '' );
+		}
+
+		return true;
+	}
+
+	/**
 	 * Queue several posts across several languages.
 	 *
 	 * @param array  $post_ids Source post ids.
@@ -138,10 +199,14 @@ class Job_Sender {
 			'already_translated' => 0,
 			'ate_active'         => 0,
 			'no_permission'      => 0,
+			'unsupported_editor' => 0,
 		);
 
 		// Outcome per post_lang key, so the modal can update each row.
 		$items = array();
+
+		// Posts that passed every check: to_lang => post_id => from_lang.
+		$eligible = array();
 
 		foreach ( array_map( 'absint', $post_ids ) as $post_id ) {
 			if ( ! $post_id ) {
@@ -151,12 +216,24 @@ class Job_Sender {
 			$post_type = get_post_type( $post_id );
 			$from_lang = WPML_AT_Helper::get_post_source_language( $post_id, $post_type );
 
+			$supported = WPML_AT_Helper::is_supported_post( $post_id );
+
 			foreach ( array_map( 'sanitize_text_field', $langs ) as $to_lang ) {
+				// Classic editor, other builders and Elementor templates.
+				if ( ! $supported ) {
+					++$skipped;
+					++$skip_reasons['unsupported_editor'];
+					$errors[ $post_id . '_' . $to_lang ] = WPML_AT_Helper::unsupported_post_message();
+					$items[ $post_id . '_' . $to_lang ]  = 'unsupported_editor';
+					continue;
+				}
+
 				// Already translated: nothing to do.
 				if ( WPML_AT_Helper::get_existing_translation_id( $post_id, $post_type, $to_lang ) ) {
 					++$skipped;
 					++$skip_reasons['already_translated'];
-					$items[ $post_id . '_' . $to_lang ] = 'already_translated';
+					$errors[ $post_id . '_' . $to_lang ] = WPML_AT_Helper::already_translated_message();
+					$items[ $post_id . '_' . $to_lang ]  = 'already_translated';
 					continue;
 				}
 
@@ -164,35 +241,56 @@ class Job_Sender {
 				if ( WPML_AT_Helper::has_open_ate_job( $post_id, $post_type, $to_lang ) ) {
 					++$skipped;
 					++$skip_reasons['ate_active'];
-					$errors[ $post_id . '_' . $to_lang ] = __( 'Skipped: WPML Advanced Translation Editor is already active for this page and language.', 'wpml-translation-check' );
+					$errors[ $post_id . '_' . $to_lang ] = WPML_AT_Helper::open_job_message();
 					$items[ $post_id . '_' . $to_lang ]  = 'ate_active';
 					continue;
 				}
 
-				$sent = self::send_post( $post_id, $to_lang, $from_lang, $provider );
-
-				if ( is_wp_error( $sent ) && 'automlp_forbidden' === $sent->get_error_code() ) {
+				if ( ! current_user_can( 'edit_post', $post_id ) ) {
 					++$skipped;
 					++$skip_reasons['no_permission'];
-					$errors[ $post_id . '_' . $to_lang ] = $sent->get_error_message();
+					$errors[ $post_id . '_' . $to_lang ] = __( 'You are not allowed to translate this post.', 'wpml-translation-check' );
 					$items[ $post_id . '_' . $to_lang ]  = 'no_permission';
 					continue;
 				}
 
-				if ( is_wp_error( $sent ) ) {
-					$ate = 'automlp_ate_in_progress' === $sent->get_error_code();
-
-					if ( $ate ) {
-						++$skipped;
-						++$skip_reasons['ate_active'];
-					}
-					$errors[ $post_id . '_' . $to_lang ] = $sent->get_error_message();
-					$items[ $post_id . '_' . $to_lang ]  = $ate ? 'ate_active' : 'error';
+				if ( $from_lang === $to_lang ) {
+					$errors[ $post_id . '_' . $to_lang ] = __( 'Source and target languages are the same.', 'wpml-translation-check' );
+					$items[ $post_id . '_' . $to_lang ]  = 'error';
 					continue;
 				}
 
-				$items[ $post_id . '_' . $to_lang ] = 'queued';
-				++$queued;
+				$eligible[ $to_lang ][ $post_id ] = $from_lang;
+			}
+		}
+
+		// One WPML batch per language instead of one per post: WPML's per-batch
+		// work (including its remote calls) then runs once, not per post.
+		foreach ( $eligible as $to_lang => $posts ) {
+			$before = count( Job_Listener::created_ids() );
+			$sent   = self::send_batch( $posts, $to_lang, $provider );
+			$rows   = array_slice( Job_Listener::created_ids(), $before );
+			$made   = array();
+
+			foreach ( $rows as $row_id ) {
+				$row = Queue_Table::get( (int) $row_id );
+
+				if ( $row ) {
+					$made[ (int) $row['source_id'] ] = true;
+				}
+			}
+
+			foreach ( array_keys( $posts ) as $post_id ) {
+				$key = $post_id . '_' . $to_lang;
+
+				if ( isset( $made[ $post_id ] ) ) {
+					$items[ $key ] = 'queued';
+					++$queued;
+					continue;
+				}
+
+				$errors[ $key ] = is_wp_error( $sent ) ? $sent->get_error_message() : __( 'WPML did not create a translation job for this item.', 'wpml-translation-check' );
+				$items[ $key ]  = 'error';
 			}
 		}
 

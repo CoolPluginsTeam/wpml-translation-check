@@ -270,11 +270,34 @@ class Queue_Screen {
 			return false;
 		}
 
+		// Classic editor, other builders and Elementor templates.
+		if ( 'post' === $row['kind'] && class_exists( 'WPML_AT_Helper' ) && ! \WPML_AT_Helper::is_supported_post( (int) $row['source_id'] ) ) {
+			return false;
+		}
+
+		// Free never re-translates: close the row instead.
+		if ( \AUTOMLP_WPML\Includes\Routes\Queue_Route::close_if_translated( $row ) ) {
+			return false;
+		}
+
+		// Missing, finished or replaced WPML job: retry with a fresh one.
+		if ( \AUTOMLP_WPML\Includes\Routes\Queue_Route::needs_new_job( $row ) ) {
+			$new_id = \AUTOMLP_WPML\Includes\Routes\Queue_Route::recreate_job( $row );
+
+			if ( is_wp_error( $new_id ) ) {
+				return false;
+			}
+
+			Dispatcher::kick();
+
+			return true;
+		}
+
 		if ( empty( $row['source_map'] ) ) {
 			return false;
 		}
 
-		return Queue_Table::edit(
+		$done = Queue_Table::edit(
 			$job_id,
 			array(
 				'state'      => Queue_Table::STATE_WAITING,
@@ -283,6 +306,12 @@ class Queue_Screen {
 				'closed_at'  => null,
 			)
 		);
+
+		if ( $done ) {
+			Dispatcher::kick();
+		}
+
+		return $done;
 	}
 
 	/**

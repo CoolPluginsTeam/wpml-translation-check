@@ -61,15 +61,24 @@ import { __ } from '@wordpress/i18n';
             }
         }
 
+        // One delegated listener covers every cloned copy of the button
+        // (automlp-admin.js clones it into each tablenav), survives cloning,
+        // and can never be bound twice, so one click opens one modal.
         useEffect(() => {
-            const doActionsBtn = document.querySelectorAll(`.${prefix}-btn`);
-            
-            if (doActionsBtn) {
-                clearOldTranslatorCacheOnLoad();
-                doActionsBtn.forEach(btn => {
-                    btn.addEventListener('click', bulkTranslationHandler);
-                });
-            }
+            clearOldTranslatorCacheOnLoad();
+
+            const selector = `.${prefix}-btn`;
+            const onClick = (e) => {
+                if (e.target && e.target.closest && e.target.closest(selector)) {
+                    bulkTranslationHandler(e);
+                }
+            };
+
+            document.addEventListener('click', onClick);
+
+            return () => {
+                document.removeEventListener('click', onClick);
+            };
         }, []);
 
         useEffect(() => {
