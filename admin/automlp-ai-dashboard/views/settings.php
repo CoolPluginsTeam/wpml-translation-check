@@ -84,9 +84,9 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 					$automlp_is_google_provider_installed  = $automlp_is_ConnectorsAi && class_exists( 'WordPress\GoogleAiProvider\Provider\GoogleProvider' ) ? true : false;
 
 					// Current selected models (saved by the addon).
-					$automlp_wpml_current_models       = get_option( 'automlp_ai_translation_models', array() );
-					$automlp_wpml_current_openai_model = isset( $automlp_wpml_current_models['openai'] ) ? $automlp_wpml_current_models['openai'] : 'gpt-4o-mini';
-					$automlp_wpml_current_google_model = isset( $automlp_wpml_current_models['google'] ) ? $automlp_wpml_current_models['google'] : 'gemini-2.5-flash';
+					$automlp_wpml_current_models = get_option( 'automlp_ai_translation_models', array() );
+					$automlp_wpml_current_openai_model = isset( $automlp_wpml_current_models['openai'] ) ? $automlp_wpml_current_models['openai'] : WPML_AT_Helper::default_model( 'openai' );
+					$automlp_wpml_current_google_model = isset( $automlp_wpml_current_models['google'] ) ? $automlp_wpml_current_models['google'] : WPML_AT_Helper::default_model( 'google' );
 					$automlp_wpml_openai_api_key       = isset( $automlp_wpml_ai_credentials['openai'] ) ? $automlp_wpml_ai_credentials['openai'] : '';
 					$automlp_wpml_google_api_key       = isset( $automlp_wpml_ai_credentials['google'] ) ? $automlp_wpml_ai_credentials['google'] : '';
 
@@ -98,12 +98,20 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 					}
 
 					if ( empty( $automlp_wpml_current_openai_model ) && ! empty( $automlp_wpml_openai_api_key ) ) {
-						$automlp_wpml_current_openai_model = 'gpt-4o-mini';
-						update_option( 'automlp_ai_translation_models', array( 'openai' => $automlp_wpml_current_openai_model ) );
+						$automlp_wpml_current_openai_model = WPML_AT_Helper::default_model( 'openai' );
+						// Merge so the other provider's saved model is kept.
+						$automlp_wpml_saved_models = is_array( $automlp_wpml_current_models ) ? $automlp_wpml_current_models : array();
+						$automlp_wpml_saved_models['openai'] = $automlp_wpml_current_openai_model;
+						$automlp_wpml_current_models = $automlp_wpml_saved_models;
+						update_option( 'automlp_ai_translation_models', $automlp_wpml_saved_models );
 					}
 					if ( empty( $automlp_wpml_current_google_model ) && ! empty( $automlp_wpml_google_api_key ) ) {
-						$automlp_wpml_current_google_model = 'gemini-2.5-flash';
-						update_option( 'automlp_ai_translation_models', array( 'google' => $automlp_wpml_current_google_model ) );
+						$automlp_wpml_current_google_model = WPML_AT_Helper::default_model( 'google' );
+						// Merge so the other provider's saved model is kept.
+						$automlp_wpml_saved_models = is_array( $automlp_wpml_current_models ) ? $automlp_wpml_current_models : array();
+						$automlp_wpml_saved_models['google'] = $automlp_wpml_current_google_model;
+						$automlp_wpml_current_models = $automlp_wpml_saved_models;
+						update_option( 'automlp_ai_translation_models', $automlp_wpml_saved_models );
 					}
 
 					$automlp_wpml_openai_models = array();
@@ -121,7 +129,7 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 							$automlp_wpml_cache_key = 'automlp_wpml_openai_models';
 							$automlp_wpml_cached    = get_transient( $automlp_wpml_cache_key );
 							if ( false !== $automlp_wpml_cached && is_array( $automlp_wpml_cached ) ) {
-								$automlp_wpml_openai_models = $automlp_wpml_cached;
+								$automlp_wpml_openai_models = WPML_AT_Helper::filter_translation_models( 'openai', $automlp_wpml_cached );
 							} else {
 								try {
 									if (
@@ -142,29 +150,8 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 											$automlp_models_metadata
 										);
 										
-										// Filter out non-translation models (audio, transcribe, search, codex, etc.)
-										$automlp_wpml_openai_models = array_filter( $automlp_wpml_openai_models, function( $model_id ) {
-											$excluded_patterns = array(
-												'audio',
-												'transcribe',
-												'search',
-												'codex',
-												'diarize',
-												'whisper',
-												'tts',
-												'dall-e',
-												'embedding',
-												'image'
-											);
-											
-											$model_lower = strtolower( $model_id );
-											foreach ( $excluded_patterns as $pattern ) {
-												if ( strpos( $model_lower, $pattern ) !== false ) {
-													return false;
-												}
-											}
-											return true;
-										});
+										// Keep only text models suitable for translation (pattern based).
+										$automlp_wpml_openai_models = WPML_AT_Helper::filter_translation_models( 'openai', $automlp_wpml_openai_models );
 										set_transient( $automlp_wpml_cache_key, $automlp_wpml_openai_models, 24 * HOUR_IN_SECONDS );
 									}
 								} catch ( \Throwable $e ) {
@@ -181,7 +168,7 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 							$automlp_wpml_cache_key = 'automlp_wpml_google_models';
 							$automlp_wpml_cached    = get_transient( $automlp_wpml_cache_key );
 							if ( false !== $automlp_wpml_cached && is_array( $automlp_wpml_cached ) ) {
-								$automlp_wpml_google_models = $automlp_wpml_cached;
+								$automlp_wpml_google_models = WPML_AT_Helper::filter_translation_models( 'google', $automlp_wpml_cached );
 							} else {
 								try {
 									if (
@@ -202,28 +189,8 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 											$automlp_models_metadata
 										);
 										
-										// Filter out non-translation models (audio, transcribe, search, etc.)
-										$automlp_wpml_google_models = array_filter( $automlp_wpml_google_models, function( $model_id ) {
-											$excluded_patterns = array(
-												'audio',
-												'transcribe',
-												'search',
-												'vision',
-												'embedding',
-												'code',
-												'imagen',
-												'musiclm',
-												'image'
-											);
-											
-											$model_lower = strtolower( $model_id );
-											foreach ( $excluded_patterns as $pattern ) {
-												if ( strpos( $model_lower, $pattern ) !== false ) {
-													return false;
-												}
-											}
-											return true;
-										});
+										// Keep only text models suitable for translation (pattern based).
+										$automlp_wpml_google_models = WPML_AT_Helper::filter_translation_models( 'google', $automlp_wpml_google_models );
 										set_transient( $automlp_wpml_cache_key, $automlp_wpml_google_models, 24 * HOUR_IN_SECONDS );
 									}
 								} catch ( \Throwable $e ) {
@@ -237,12 +204,16 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 
 						// If we have a key but model list is empty (e.g. fetch failed), show selector with default so user can still save.
 						if ( $automlp_wpml_has_openai_key && empty( $automlp_wpml_openai_models ) ) {
-							$automlp_wpml_openai_models = array( 'gpt-4o-mini' );
+							$automlp_wpml_openai_models = array( WPML_AT_Helper::default_model( 'openai' ) );
 						}
 						if ( $automlp_wpml_has_google_key && empty( $automlp_wpml_google_models ) ) {
-							$automlp_wpml_google_models = array( 'gemini-2.5-flash' );
+							$automlp_wpml_google_models = array( WPML_AT_Helper::default_model( 'google' ) );
 						}
 					}
+
+					// A saved model that is no longer offered falls back to the default.
+					$automlp_wpml_current_openai_model = WPML_AT_Helper::resolve_model( 'openai', $automlp_wpml_current_openai_model, $automlp_wpml_openai_models );
+					$automlp_wpml_current_google_model = WPML_AT_Helper::resolve_model( 'google', $automlp_wpml_current_google_model, $automlp_wpml_google_models );
 					?>
 						<?php
 						// Providers shown in the UI.
@@ -334,19 +305,23 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 									>
 									<?php
 									$automlp_preferred_models = array(
-										'gpt-5.6-sol'         => __( 'gpt-5.6-sol (Best Quality)', 'wpml-translation-check' ),
-										'gpt-5.6-terra'       => __( 'gpt-5.6-terra (Recommended)', 'wpml-translation-check' ),
-										'gpt-5.5'             => __( 'gpt-5.5 (High Quality)', 'wpml-translation-check' ),
-										'gpt-5.6-luna'        => __( 'gpt-5.6-luna (Very Good)', 'wpml-translation-check' ),
-										'gpt-5.4'             => __( 'gpt-5.4 (Good Quality)', 'wpml-translation-check' ),
-										'gpt-5.4-pro'         => __( 'gpt-5.4-pro (Highest Accuracy)', 'wpml-translation-check' ),
-										'gpt-5.4-mini'        => __( 'gpt-5.4-mini (Fast)', 'wpml-translation-check' ),
-										'gpt-5.4-nano'        => __( 'gpt-5.4-nano (Basic)', 'wpml-translation-check' ),
-										'gpt-5.3-chat-latest' => __( 'gpt-5.3-chat-latest (Recommended)', 'wpml-translation-check' ),
-										'gpt-5.2'             => __( 'gpt-5.2 (Balanced)', 'wpml-translation-check' ),
-										'gpt-5-mini'          => __( 'gpt-5-mini (Fast)', 'wpml-translation-check' ),
-										'gpt-5-nano'          => __( 'gpt-5-nano (Cheapest)', 'wpml-translation-check' ),
-										'gpt-4o-mini'         => __( 'gpt-4o-mini (Fast & Cheap)', 'wpml-translation-check' ),
+										'gpt-6.1-sol'             => __( 'gpt-6.1-sol (Best Quality)', 'wpml-translation-check' ),
+										'gpt-6-sol'               => __( 'gpt-6-sol (High Quality)', 'wpml-translation-check' ),
+										'gpt-6-astra'             => __( 'gpt-6-astra (Highest Accuracy)', 'wpml-translation-check' ),
+										'gpt-6-luna'              => __( 'gpt-6-luna (Recommended, Fast & Cheap)', 'wpml-translation-check' ),
+										'gpt-5.6-sol'             => __( 'gpt-5.6-sol (High Quality)', 'wpml-translation-check' ),
+										'gpt-5.6-terra'           => __( 'gpt-5.6-terra (Very Good)', 'wpml-translation-check' ),
+										'gpt-5.6-luna'            => __( 'gpt-5.6-luna (Fast & Cheap)', 'wpml-translation-check' ),
+										'gpt-5.5'                 => __( 'gpt-5.5 (High Quality)', 'wpml-translation-check' ),
+										'gpt-5.4'                 => __( 'gpt-5.4 (Good Quality)', 'wpml-translation-check' ),
+										'gpt-5.4-pro'             => __( 'gpt-5.4-pro (Highest Accuracy)', 'wpml-translation-check' ),
+										'gpt-5.4-mini'            => __( 'gpt-5.4-mini (Fast)', 'wpml-translation-check' ),
+										'gpt-5.4-nano'            => __( 'gpt-5.4-nano (Cheapest)', 'wpml-translation-check' ),
+										'gpt-5.3-chat-latest'     => __( 'gpt-5.3-chat-latest (Balanced)', 'wpml-translation-check' ),
+										'gpt-5.2'                 => __( 'gpt-5.2 (Balanced)', 'wpml-translation-check' ),
+										'gpt-5-mini'              => __( 'gpt-5-mini (Fast)', 'wpml-translation-check' ),
+										'gpt-5-nano'              => __( 'gpt-5-nano (Cheapest)', 'wpml-translation-check' ),
+										'gpt-4o-mini'             => __( 'gpt-4o-mini (Legacy)', 'wpml-translation-check' ),
 									);
 
 									$automlp_filtered_models = array_intersect_key(
@@ -354,9 +329,7 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 										array_flip( $automlp_wpml_openai_models )
 									);
 
-									$automlp_display_models = ! empty( $automlp_filtered_models )
-										? $automlp_filtered_models
-										: array_combine( $automlp_wpml_openai_models, $automlp_wpml_openai_models );
+									$automlp_display_models = $automlp_filtered_models + array_combine( $automlp_wpml_openai_models, $automlp_wpml_openai_models );
 
 									foreach ( $automlp_display_models as $automlp_model_id => $automlp_model_label ) :
 									?>
@@ -384,19 +357,19 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 									>
 									<?php
 									$automlp_preferred_google_models = array(
-										'gemini-3.7-flash'              => __( 'gemini-3.7-flash (Recommended)', 'wpml-translation-check' ),
+										'gemini-4-argon'                => __( 'gemini-4-argon (Best Quality)', 'wpml-translation-check' ),
+										'gemini-3.8-flash'              => __( 'gemini-3.8-flash (High Quality)', 'wpml-translation-check' ),
+										'gemini-3.7-flash'              => __( 'gemini-3.7-flash (Very Good)', 'wpml-translation-check' ),
 										'gemini-3.6-flash'              => __( 'gemini-3.6-flash (Fast & Reliable)', 'wpml-translation-check' ),
 										'gemini-3.5-flash'              => __( 'gemini-3.5-flash (High Accuracy)', 'wpml-translation-check' ),
-										'gemini-3.5-flash-lite'         => __( 'gemini-3.5-flash-lite (Fast & Cheap)', 'wpml-translation-check' ),
-										'gemini-3.1-pro-preview'        => __( 'gemini-3.1-pro-preview (Best Quality)', 'wpml-translation-check' ),
+										'gemini-3.5-flash-lite'         => __( 'gemini-3.5-flash-lite (Recommended, Fast & Cheap)', 'wpml-translation-check' ),
+										'gemini-3.1-pro-preview'        => __( 'gemini-3.1-pro-preview (Pro Preview)', 'wpml-translation-check' ),
+										'gemini-3.1-flash-lite'         => __( 'gemini-3.1-flash-lite (Fast & Cheap)', 'wpml-translation-check' ),
 										'gemini-3.1-flash-lite-preview' => __( 'gemini-3.1-flash-lite-preview (Fast & Cheap)', 'wpml-translation-check' ),
-										'gemini-3-flash-preview'        => __( 'gemini-3-flash-preview (Recommended)', 'wpml-translation-check' ),
-										'gemini-3-deep-think'           => __( 'gemini-3-deep-think (Advanced Reasoning)', 'wpml-translation-check' ),
-										'gemini-2.5-pro'                => __( 'gemini-2.5-pro (Best Overall)', 'wpml-translation-check' ),
-										'gemini-2.5-flash'              => __( 'gemini-2.5-flash (Balanced)', 'wpml-translation-check' ),
-										'gemini-2.5-pro-preview-tts'    => __( 'gemini-2.5-pro-preview-tts (High Accuracy)', 'wpml-translation-check' ),
-										'gemma-4-26b-a4b-it'            => __( 'gemma-4-26b-a4b-it (Cheapest)', 'wpml-translation-check' ),
-										'gemma-3n-e4b-it'               => __( 'gemma-3n-e4b-it (Cheapest)', 'wpml-translation-check' ),
+										'gemini-3-flash-preview'        => __( 'gemini-3-flash-preview (Fast)', 'wpml-translation-check' ),
+										'gemini-2.5-pro'                => __( 'gemini-2.5-pro (Legacy)', 'wpml-translation-check' ),
+										'gemini-2.5-flash'              => __( 'gemini-2.5-flash (Legacy)', 'wpml-translation-check' ),
+										'gemini-2.5-flash-lite'         => __( 'gemini-2.5-flash-lite (Legacy)', 'wpml-translation-check' ),
 									);
 
 									$automlp_filtered_google_models = array_intersect_key(
@@ -404,9 +377,7 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
 										array_flip( $automlp_wpml_google_models )
 									);
 
-									$automlp_display_google_models = ! empty( $automlp_filtered_google_models )
-										? $automlp_filtered_google_models
-										: array_combine( $automlp_wpml_google_models, $automlp_wpml_google_models );
+									$automlp_display_google_models = $automlp_filtered_google_models + array_combine( $automlp_wpml_google_models, $automlp_wpml_google_models );
 
 									foreach ( $automlp_display_google_models as $automlp_model_id => $automlp_model_label ) :
 									?>
@@ -850,4 +821,4 @@ if ( $automlp_wpml_wizard_language_set ) :
 	consumeFlashNotice();
 })();
 </script>
-<?php endif; ?>
+<?php endif; ?>

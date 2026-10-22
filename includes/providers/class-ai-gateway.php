@@ -56,8 +56,8 @@ class AI_Gateway {
 	 * @var array<string,string>
 	 */
 	private static $fallback_models = array(
-		'openai' => 'gpt-4o-mini',
-		'google' => 'gemini-2.5-flash',
+		'openai' => 'gpt-6-luna',
+		'google' => 'gemini-3.5-flash-lite',
 	);
 
 	/**
@@ -752,7 +752,7 @@ class AI_Gateway {
 	}
 
 	/**
-	 * Model for a provider: saved choice, else fallback.
+	 * Model for a provider: saved choice if still supported, else fallback.
 	 *
 	 * @param string $provider Provider slug.
 	 * @return string
@@ -763,9 +763,15 @@ class AI_Gateway {
 		}
 
 		$saved = get_option( 'automlp_ai_translation_models', array() );
+		$saved = is_array( $saved ) && ! empty( $saved[ $provider ] ) ? (string) $saved[ $provider ] : '';
 
-		if ( is_array( $saved ) && ! empty( $saved[ $provider ] ) ) {
-			return (string) $saved[ $provider ];
+		// A saved model that is no longer a supported translation model falls back to the default.
+		if ( class_exists( 'WPML_AT_Helper' ) ) {
+			return WPML_AT_Helper::resolve_model( $provider, $saved );
+		}
+
+		if ( '' !== $saved ) {
+			return $saved;
 		}
 
 		return isset( self::$fallback_models[ $provider ] ) ? self::$fallback_models[ $provider ] : '';

@@ -382,7 +382,7 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
                         } else if (outcome === 'no_permission') {
                             skipRow(key, errors[key] || __('You are not allowed to translate this post.', 'wpml-translation-check'));
                         } else if (outcome === 'unsupported_editor') {
-                            skipRow(key, errors[key] || __('Not supported in the free version (Classic editor / other page builders / Elementor templates).', 'wpml-translation-check'));
+                            skipRow(key, errors[key] || __('The current editor is not supported.', 'wpml-translation-check'));
                         } else if (outcome === 'ate_active') {
                             skipRow(key, errors[key] || __('Skipped: this page already has an open WPML translation job for this language. Finish or cancel it in WPML first.', 'wpml-translation-check'));
                         } else {

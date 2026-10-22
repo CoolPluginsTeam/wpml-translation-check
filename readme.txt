@@ -224,7 +224,7 @@ Here is a simple comparison between WPML automatic credits and AutoMLP:
 | Feature | WPML Credits | AutoMLP |
 | :--- | :--- | :--- |
 | **Cost (1M chars)** | About ~$195 – ~$200 | **~$0.19 (OpenAI) / ~$0.125 (Gemini)** / **Zero cost (Chrome built-in AI)** |
-| **Model Choice** | Fixed | **GPT-4o-mini, gemini-2.5-flash-lite, Chrome built-in AI** |
+| **Model Choice** | Fixed | **Latest OpenAI & Gemini models (e.g. gpt-6-luna, gemini-3.5-flash-lite), Chrome built-in AI** |
 | **Speed** | Standard | **Instant (High-limit APIs)** |
 | **Control** | Middleman Managed | **Direct API Billing / Zero cost for Chrome AI** | 
 
@@ -310,4 +310,4 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Upgrade Notice ==
 = 1.2.0 =
 WPML Translation Check  is transitioning to our new *AutoMLP** AI Translation For WPML.
-WPML Translation Check is now under new ownership by [Cool Plugins](https://profiles.wordpress.org/coolplugins/) and is actively maintained.
+WPML Translation Check is now under new ownership by [Cool Plugins](https://profiles.wordpress.org/coolplugins/) and is actively maintained.

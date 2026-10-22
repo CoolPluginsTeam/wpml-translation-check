@@ -387,7 +387,7 @@ public static function mask_api_key( $api_key ) {
 	 * @return string
 	 */
 	public static function unsupported_post_message() {
-		return __( 'Not supported in the free version (Classic editor / other page builders / Elementor templates).', 'wpml-translation-check' );
+		return __( 'The current editor is not supported.', 'wpml-translation-check' );
 	}
 
 	/**
@@ -490,5 +490,104 @@ public static function mask_api_key( $api_key ) {
 
 		return $api_key;
 	}
-}
 
+	/**
+	 * Default model per AI provider: current, cheap text models.
+	 *
+	 * @var array<string,string>
+	 */
+	const DEFAULT_MODELS = array(
+		'openai' => 'gpt-6-luna',
+		'google' => 'gemini-3.5-flash-lite',
+	);
+
+	/**
+	 * Default translation model for a provider.
+	 *
+	 * @param string $provider Provider slug ('openai' or 'google').
+	 * @return string Model id, empty for unknown providers.
+	 */
+	public static function default_model( $provider ) {
+		return isset( self::DEFAULT_MODELS[ $provider ] ) ? self::DEFAULT_MODELS[ $provider ] : '';
+	}
+
+	/**
+	 * Whether a model id is a text model suitable for translation.
+	 *
+	 * Pattern based so new model generations are picked up automatically.
+	 *
+	 * @param string $provider Provider slug.
+	 * @param string $model_id Model id.
+	 * @return bool
+	 */
+	public static function is_translation_model( $provider, $model_id ) {
+		$model_id = strtolower( trim( (string) $model_id ) );
+
+		if ( '' === $model_id || preg_match( '/tts|audio|realtime|live|transcribe|whisper|diarize|search|codex|dall-e|image|banana|imagen|lyria|musiclm|robotics|computer-use|antigravity|customtools|omni|embedding|vision|moderation/', $model_id ) ) {
+			return false;
+		}
+
+		if ( 'openai' === $provider ) {
+			// gpt-5 and newer, any named tier (mini, nano, luna, sol, pro, chat-latest...), no dated snapshots.
+			if ( preg_match( '/^gpt-(\d+)(?:\.\d+)?(?:-[a-z]+)*$/', $model_id, $matches ) && (int) $matches[1] >= 5 ) {
+				return true;
+			}
+
+			// Older models still kept so existing saved choices stay valid.
+			return (bool) preg_match( '/^gpt-(?:4o-mini|4\.1(?:-mini|-nano)?)$/', $model_id );
+		}
+
+		if ( 'google' === $provider ) {
+			// gemini-4 and newer: any text variant.
+			if ( preg_match( '/^gemini-(\d+)(?:\.\d+)?(?:-[a-z]+)+$/', $model_id, $matches ) && (int) $matches[1] >= 4 ) {
+				return true;
+			}
+
+			// gemini-2.5 / 3.x flash, flash-lite and pro (stable or preview), plus -latest aliases.
+			if ( preg_match( '/^gemini-(?:2\.5|3(?:\.\d+)?)-(?:flash|flash-lite|pro)(?:-preview)?$/', $model_id ) || preg_match( '/^gemini-(?:flash|flash-lite|pro)-latest$/', $model_id ) ) {
+				return true;
+			}
+
+			return (bool) preg_match( '/^gemma-4(?:-[a-z0-9]+)+$/', $model_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Keep only translation-suitable models from a provider model list.
+	 *
+	 * @param string $provider  Provider slug.
+	 * @param array  $model_ids Model ids.
+	 * @return string[] Re-indexed list.
+	 */
+	public static function filter_translation_models( $provider, $model_ids ) {
+		$out = array();
+
+		foreach ( (array) $model_ids as $model_id ) {
+			if ( is_string( $model_id ) && self::is_translation_model( $provider, $model_id ) ) {
+				$out[] = $model_id;
+			}
+		}
+
+		return array_values( array_unique( $out ) );
+	}
+
+	/**
+	 * Saved model if still usable, else the provider default.
+	 *
+	 * @param string     $provider  Provider slug.
+	 * @param string     $saved     Saved model id.
+	 * @param array|null $available Optional list of models currently offered.
+	 * @return string
+	 */
+	public static function resolve_model( $provider, $saved, $available = null ) {
+		$saved = is_string( $saved ) ? trim( $saved ) : '';
+
+		if ( '' !== $saved && self::is_translation_model( $provider, $saved ) && ( empty( $available ) || in_array( $saved, (array) $available, true ) ) ) {
+			return $saved;
+		}
+
+		return self::default_model( $provider );
+	}
+}

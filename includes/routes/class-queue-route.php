@@ -260,7 +260,7 @@ class Queue_Route {
 			} elseif ( $ate_skipped > 0 ) {
 				$message = __( 'Nothing was queued. Some items are already translated; others already have an active WPML Advanced Translation Editor job.', 'wpml-translation-check' );
 			} elseif ( $unsupported > 0 ) {
-				$message = __( 'Nothing was queued. The selected items are already translated or are not supported in the free version (Classic editor / other page builders / Elementor templates). Re-translation is available in the Pro version.', 'wpml-translation-check' );
+				$message = __( 'Nothing was queued. The selected items are already translated or use an editor that is not supported. Re-translation is available in the Pro version.', 'wpml-translation-check' );
 			} else {
 				$message = __( 'Everything selected is already translated into the chosen language. Re-translation is available in the Pro version.', 'wpml-translation-check' );
 			}
