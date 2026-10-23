@@ -84,14 +84,14 @@ class Queue_Screen {
 
 		wp_enqueue_style(
 			'automlp-queue-screen',
-			AUTOMLP_AI_PLUGIN_URL . 'admin/queue/queue-screen.css',
+			AUTOMLP_AI_PLUGIN_URL . 'admin/queue/queue-screen.min.css',
 			array(),
 			AUTOMLP_AI_VERSION
 		);
 
 		wp_enqueue_script(
 			'automlp-queue-screen',
-			AUTOMLP_AI_PLUGIN_URL . 'admin/queue/queue-screen.js',
+			AUTOMLP_AI_PLUGIN_URL . 'admin/queue/queue-screen.min.js',
 			array(),
 			AUTOMLP_AI_VERSION,
 			true

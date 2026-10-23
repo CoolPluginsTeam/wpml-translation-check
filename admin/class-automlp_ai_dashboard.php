@@ -190,7 +190,7 @@ if ( ! class_exists( 'AUTOMLP_Ai_Dashboard' ) ) {
 			// Adjust paths if you place assets elsewhere.
 			wp_enqueue_style(
 				'automlp_ai_dashboard-style',
-				AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/css/admin-styles.css',
+				AUTOMLP_AI_PLUGIN_URL . 'admin/automlp-ai-dashboard/css/admin-styles.min.css',
 				array(),
 				AUTOMLP_AI_VERSION
 			);
