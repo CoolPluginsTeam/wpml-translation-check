@@ -1,9 +1,7 @@
-// import YandexTranslater from "./yandex";
-import AIService from "./ai-services";
 import { sprintf, __ } from "@wordpress/i18n";
 
 /**
- * Provides translation services using Yandex Translate.
+ * Provider metadata for the picker. Translation runs through the queue.
  */
 export default (props) => {
     props=props || {};
@@ -26,7 +24,6 @@ export default (props) => {
             filterHtmlContent: true
         },
         openai_ai: {
-            Provider: AIService,
             title: "OpenAI Model",
             SettingBtnText: "Translate",
             serviceLabel: "OpenAI",
@@ -39,7 +36,6 @@ export default (props) => {
             filterHtmlContent: true
         },
         google_ai: {
-            Provider: AIService,
             title: "Gemini Model",
             SettingBtnText: "Translate",
             serviceLabel: "Gemini",

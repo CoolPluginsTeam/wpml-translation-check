@@ -10,7 +10,7 @@ import { selectCountInfo } from "./redux-store/features/selectors";
 import ErrorModalBox from "./components/error-modal-box";
 import SettingModal from "./setting-modal";
 import DOMPurify from "dompurify";
-import Notice from "./components/notice";
+import Notice from "./components/Notice";
 
 const App = ({ onDestory, prefix, postIds }) => {
   const dispatch = useDispatch();

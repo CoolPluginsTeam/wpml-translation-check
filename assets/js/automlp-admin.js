@@ -64,7 +64,7 @@
     
             if($defaultFilter.length){
                 $defaultFilter.each(function(){
-                    const clone=btn.clone(true);
+                    const clone=btn.clone(false);
                     jQuery(this).append(clone);
                     clone.show();
                 });
@@ -72,7 +72,7 @@
                 btn.remove();
             }else if($bulkAction.length){
                 $bulkAction.each(function(){
-                    const clone=btn.clone(true);
+                    const clone=btn.clone(false);
                     jQuery(this).after(clone);
                     clone.show();
                 });
@@ -91,4 +91,4 @@
     window.addEventListener('load', () => {
         enableBulkTranslateBtn();
     });
-})();
+})();

@@ -3,7 +3,7 @@ Contributors: coolplugins, narinder-singh, satindersingh
 Donate link: https://donate.stripe.com/5kQdR92iBevO75WbPm6c00i
 Tags: WPML, Automatic Translation, WPML Addon, Block Translation
 Tested up to: 7.1
-Stable tag: 1.2.8
+Stable tag: 2.0.0
 Requires at least: 6.9
 Requires PHP: 7.4
 License: GPLv2 or later
@@ -97,6 +97,10 @@ You can continue using the tools already installed on your WordPress website whi
 * **[AI Translation for TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=tpa_check_out)** is a powerful AI addon for the TranslatePress plugin. Integrated with AI translation services, like Google Translate, Yandex, and Chrome built-in AI translator, it provides accurate and instant translations for your web pages.
 
 * **[Linguator AI – Auto Translate & Create Multilingual Sites](https://linguator.com/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=lmat_check_out)** is a powerful multilingual plugin that helps you create and manage all-in-one multilingual WordPress website. Translate your posts, pages, menus, categories, and more into different languages using AI.
+
+* **[Toolkit for Polylang – Translation Inspector & Duplicate Content](https://wordpress.org/plugins/duplicate-content-addon-for-polylang/)** scans and manages your Polylang website for missing translations, out-dated content, URLs & routing, site setup, Elementor translation, and more issues.
+
+
 
 ### Special Thanks!
 A special thanks to the authors of the [WPML](https://wpml.org/) plugin for creating an outstanding tool for multilingual WordPress website management.
@@ -220,7 +224,7 @@ Here is a simple comparison between WPML automatic credits and AutoMLP:
 | Feature | WPML Credits | AutoMLP |
 | :--- | :--- | :--- |
 | **Cost (1M chars)** | About ~$195 – ~$200 | **~$0.19 (OpenAI) / ~$0.125 (Gemini)** / **Zero cost (Chrome built-in AI)** |
-| **Model Choice** | Fixed | **GPT-4o-mini, gemini-2.5-flash-lite, Chrome built-in AI** |
+| **Model Choice** | Fixed | **Latest OpenAI & Gemini models (e.g. gpt-6-luna, gemini-3.5-flash-lite), Chrome built-in AI** |
 | **Speed** | Standard | **Instant (High-limit APIs)** |
 | **Control** | Middleman Managed | **Direct API Billing / Zero cost for Chrome AI** | 
 
@@ -251,6 +255,11 @@ No. AutoMLP works inside the WordPress dashboard and uses the familiar WPML tran
 You can report security bugs through the Patchstack Vulnerability Disclosure Program. The Patchstack team help validate, triage and handle any security vulnerabilities. [Report a security vulnerability.](https://patchstack.com/database/vdp/90801d43-fbe7-45a2-9131-5c4fcccbc87d)
 
 == Changelog ==
+
+= Version 2.0.0 | 26/10/2026 =
+* Added: MCP support.
+* Improved: Aligned the translation workflow with WPML standards and added background translation support.
+* Optimized: Reduced plugin size by minifying admin CSS and JavaScript files and removing unused images.
 
 = Version 1.2.8 | 18/09/2026 =
 * Fixed: Compatibility issues with wpml v5.0.0.
@@ -306,4 +315,4 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Upgrade Notice ==
 = 1.2.0 =
 WPML Translation Check  is transitioning to our new *AutoMLP** AI Translation For WPML.
-WPML Translation Check is now under new ownership by [Cool Plugins](https://profiles.wordpress.org/coolplugins/) and is actively maintained.
+WPML Translation Check is now under new ownership by [Cool Plugins](https://profiles.wordpress.org/coolplugins/) and is actively maintained.

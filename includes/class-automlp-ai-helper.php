@@ -176,6 +176,239 @@ public static function mask_api_key( $api_key ) {
 	}
 
 	/**
+	 * Whether WPML Advanced Translation Editor already owns an open job
+	 * for this source post and target language.
+	 *
+	 * Clicking "+" in the language column can create an ATE job (gear icon)
+	 * before any translated post exists. AutoMLP must not queue those.
+	 *
+	 * @param int    $post_id     Source post ID.
+	 * @param string $post_type   Post type.
+	 * @param string $target_lang Target language code.
+	 * @return bool
+	 */
+	public static function has_open_ate_job( $post_id, $post_type, $target_lang ) {
+		global $wpdb;
+
+		$post_id     = absint( $post_id );
+		$target_lang = sanitize_text_field( (string) $target_lang );
+		$post_type   = sanitize_key( (string) $post_type );
+
+		if ( ! $post_id || '' === $target_lang || '' === $post_type ) {
+			return false;
+		}
+
+		if ( ! defined( 'ICL_TM_WAITING_FOR_TRANSLATOR' ) || ! defined( 'ICL_TM_IN_PROGRESS' ) ) {
+			return false;
+		}
+
+		$element_type = apply_filters( 'wpml_element_type', $post_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		$trid         = apply_filters( 'wpml_element_trid', false, $post_id, $element_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
+		if ( ! $trid ) {
+			return false;
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$editor = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT j.editor
+				FROM {$wpdb->prefix}icl_translate_job j
+				INNER JOIN {$wpdb->prefix}icl_translation_status ts ON ts.rid = j.rid
+				INNER JOIN {$wpdb->prefix}icl_translations t ON t.translation_id = ts.translation_id
+				WHERE t.trid = %d
+					AND t.language_code = %s
+					AND ts.status IN (%d, %d)
+				ORDER BY j.job_id DESC
+				LIMIT 1",
+				(int) $trid,
+				$target_lang,
+				ICL_TM_WAITING_FOR_TRANSLATOR,
+				ICL_TM_IN_PROGRESS
+			)
+		);
+
+		return 'ate' === $editor;
+	}
+
+	/**
+	 * Admin URL for WPML's classic Translation Editor (CTE) for a job.
+	 *
+	 * @param int    $wpml_job_id icl_translate_job.job_id.
+	 * @param string $return_url  Optional admin URL to return to after editing.
+	 * @return string Empty when WPML is unavailable or the job id is invalid.
+	 */
+	public static function get_translation_editor_url( $wpml_job_id, $return_url = '' ) {
+		$wpml_job_id = absint( $wpml_job_id );
+
+		if ( ! $wpml_job_id ) {
+			return '';
+		}
+
+		if ( class_exists( '\WPML\TM\API\Jobs' ) && is_callable( array( '\WPML\TM\API\Jobs', 'getEditUrl' ) ) ) {
+			$back = $return_url ? $return_url : admin_url();
+			$url  = \WPML\TM\API\Jobs::getEditUrl( $back, $wpml_job_id );
+
+			return is_string( $url ) ? $url : '';
+		}
+
+		if ( ! defined( 'WPML_TM_FOLDER' ) ) {
+			return '';
+		}
+
+		$url = admin_url(
+			'admin.php?page=' . WPML_TM_FOLDER . '/menu/translations-queue.php&job_id=' . $wpml_job_id
+		);
+
+		if ( $return_url ) {
+			$url .= '&return_url=' . rawurlencode( $return_url );
+		}
+
+		/**
+		 * Filter the translation editor URL, same hook WPML uses internally.
+		 *
+		 * @param string $url         Editor URL.
+		 * @param int    $wpml_job_id Job id.
+		 */
+		return apply_filters( 'icl_job_edit_url', $url, $wpml_job_id ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+	}
+
+	/**
+	 * Whether the free plugin can translate this post.
+	 *
+	 * Supported: Elementor pages (not Elementor templates) and block editor
+	 * (Gutenberg) posts. Classic editor posts and other page builders are not.
+	 *
+	 * @param int|\WP_Post $post Post id or object.
+	 * @return bool
+	 */
+	public static function is_supported_post( $post ) {
+		$post = get_post( $post );
+
+		if ( ! $post instanceof \WP_Post ) {
+			return false;
+		}
+
+		$supported = false;
+
+		/**
+		 * Elementor template post types, never supported.
+		 *
+		 * @param string[] $types Post types.
+		 */
+		$templates = (array) apply_filters( 'automlp_unsupported_template_post_types', array( 'elementor_library', 'e-landing-page', 'e-floating-buttons', 'elementor_snippet', 'elementor_font', 'elementor_icons' ) );
+
+		if ( ! in_array( $post->post_type, $templates, true ) ) {
+			if ( 'builder' === get_post_meta( $post->ID, '_elementor_edit_mode', true ) ) {
+				$supported = true;
+			} elseif ( ! self::uses_other_builder( $post ) ) {
+				if ( has_blocks( $post ) ) {
+					$supported = true;
+				} elseif ( '' === trim( (string) $post->post_content ) ) {
+					// Empty content: follow the editor this post opens in.
+					if ( ! function_exists( 'use_block_editor_for_post' ) ) {
+						require_once ABSPATH . 'wp-admin/includes/post.php';
+					}
+
+					$supported = (bool) use_block_editor_for_post( $post );
+				}
+			}
+		}
+
+		/**
+		 * Filters whether the free plugin translates a post.
+		 *
+		 * @param bool     $supported Whether the post is supported.
+		 * @param \WP_Post $post      Post.
+		 */
+		return (bool) apply_filters( 'automlp_is_supported_post', $supported, $post );
+	}
+
+	/**
+	 * Whether a page builder other than Elementor or the block editor owns the post.
+	 *
+	 * @param \WP_Post $post Post.
+	 * @return bool
+	 */
+	private static function uses_other_builder( $post ) {
+		// One cached query loads every meta key of the post.
+		$meta = get_post_meta( (int) $post->ID );
+		$meta = is_array( $meta ) ? $meta : array();
+
+		/*
+		 * Meta keys written by other builders. Checked by presence, so they
+		 * are detected even while the builder plugin is inactive.
+		 * Beaver Builder, Cornerstone, Oxygen 4 / 6, Breakdance, Bricks, Brizy,
+		 * Thrive Architect, SiteOrigin.
+		 */
+		$keys = array(
+			'_fl_builder_enabled', '_fl_builder_data', '_fl_builder_draft',
+			'_cornerstone_data', '_cornerstone_override',
+			'ct_builder_shortcodes', 'ct_builder_json', '_ct_builder_json', 'ct_other_template', '_oxygen_data',
+			'_breakdance_data',
+			'_bricks_page_content_2',
+			'brizy', 'brizy_post_uid',
+			'tve_updated_post',
+			'panels_data',
+		);
+
+		$other = false;
+
+		foreach ( $keys as $key ) {
+			if ( isset( $meta[ $key ][0] ) && '' !== $meta[ $key ][0] && '0' !== $meta[ $key ][0] ) {
+				$other = true;
+				break;
+			}
+		}
+
+		if ( ! $other ) {
+			$other = ( isset( $meta['_et_pb_use_builder'][0] ) && 'on' === $meta['_et_pb_use_builder'][0] ) // Divi.
+				|| ( isset( $meta['_wpb_vc_js_status'][0] ) && 'true' === $meta['_wpb_vc_js_status'][0] ) // WPBakery.
+				|| ( isset( $meta['_bricks_editor_mode'][0] ) && 'bricks' === $meta['_bricks_editor_mode'][0] ); // Bricks.
+		}
+
+		// Content markers: builder blocks or shortcodes saved in post_content.
+		if ( ! $other ) {
+			$other = (bool) preg_match( '/<!-- wp:(?:fl-builder|divi)\/|<!-- cs-content|\[cs_content|\[et_pb_|\[vc_row|\[fl_builder_insert_layout/', (string) $post->post_content );
+		}
+
+		/**
+		 * Filters whether another page builder owns the post.
+		 *
+		 * @param bool     $other Whether another builder was detected.
+		 * @param \WP_Post $post  Post.
+		 */
+		return (bool) apply_filters( 'automlp_uses_other_builder', $other, $post );
+	}
+
+	/**
+	 * Message for a post the free plugin does not translate.
+	 *
+	 * @return string
+	 */
+	public static function unsupported_post_message() {
+		return __( 'The current editor is not supported.', 'wpml-translation-check' );
+	}
+
+	/**
+	 * Message for a post that already has a translation. Free never re-translates.
+	 *
+	 * @return string
+	 */
+	public static function already_translated_message() {
+		return __( 'Already translated. Re-translation is available in the Pro version.', 'wpml-translation-check' );
+	}
+
+	/**
+	 * Message for a post that already has an open WPML translation job.
+	 *
+	 * @return string
+	 */
+	public static function open_job_message() {
+		return __( 'Skipped: this page already has an open WPML translation job for this language. Finish or cancel it in WPML first.', 'wpml-translation-check' );
+	}
+
+	/**
 	 * Bulk translation supported
 	 *
 	 * @param object $current_screen The current screen object.
@@ -202,11 +435,7 @@ public static function mask_api_key( $api_key ) {
 		return true;
 	}
 
-	public static function supported_editors(): array {
-		return array( 'Gutenberg', 'Elementor' );
-	}
-
-		/**
+	/**
 	 * Get the single target language code allowed by the setup wizard, if any.
 	 * When the wizard has been completed with a language selection, only that language
 	 * is allowed for string/bulk translation; backend must reject other languages.
@@ -261,5 +490,104 @@ public static function mask_api_key( $api_key ) {
 
 		return $api_key;
 	}
-}
 
+	/**
+	 * Default model per AI provider: current, cheap text models.
+	 *
+	 * @var array<string,string>
+	 */
+	const DEFAULT_MODELS = array(
+		'openai' => 'gpt-6-luna',
+		'google' => 'gemini-3.5-flash-lite',
+	);
+
+	/**
+	 * Default translation model for a provider.
+	 *
+	 * @param string $provider Provider slug ('openai' or 'google').
+	 * @return string Model id, empty for unknown providers.
+	 */
+	public static function default_model( $provider ) {
+		return isset( self::DEFAULT_MODELS[ $provider ] ) ? self::DEFAULT_MODELS[ $provider ] : '';
+	}
+
+	/**
+	 * Whether a model id is a text model suitable for translation.
+	 *
+	 * Pattern based so new model generations are picked up automatically.
+	 *
+	 * @param string $provider Provider slug.
+	 * @param string $model_id Model id.
+	 * @return bool
+	 */
+	public static function is_translation_model( $provider, $model_id ) {
+		$model_id = strtolower( trim( (string) $model_id ) );
+
+		if ( '' === $model_id || preg_match( '/tts|audio|realtime|live|transcribe|whisper|diarize|search|codex|dall-e|image|banana|imagen|lyria|musiclm|robotics|computer-use|antigravity|customtools|omni|embedding|vision|moderation/', $model_id ) ) {
+			return false;
+		}
+
+		if ( 'openai' === $provider ) {
+			// gpt-5 and newer, any named tier (mini, nano, luna, sol, pro, chat-latest...), no dated snapshots.
+			if ( preg_match( '/^gpt-(\d+)(?:\.\d+)?(?:-[a-z]+)*$/', $model_id, $matches ) && (int) $matches[1] >= 5 ) {
+				return true;
+			}
+
+			// Older models still kept so existing saved choices stay valid.
+			return (bool) preg_match( '/^gpt-(?:4o-mini|4\.1(?:-mini|-nano)?)$/', $model_id );
+		}
+
+		if ( 'google' === $provider ) {
+			// gemini-4 and newer: any text variant.
+			if ( preg_match( '/^gemini-(\d+)(?:\.\d+)?(?:-[a-z]+)+$/', $model_id, $matches ) && (int) $matches[1] >= 4 ) {
+				return true;
+			}
+
+			// gemini-2.5 / 3.x flash, flash-lite and pro (stable or preview), plus -latest aliases.
+			if ( preg_match( '/^gemini-(?:2\.5|3(?:\.\d+)?)-(?:flash|flash-lite|pro)(?:-preview)?$/', $model_id ) || preg_match( '/^gemini-(?:flash|flash-lite|pro)-latest$/', $model_id ) ) {
+				return true;
+			}
+
+			return (bool) preg_match( '/^gemma-4(?:-[a-z0-9]+)+$/', $model_id );
+		}
+
+		return false;
+	}
+
+	/**
+	 * Keep only translation-suitable models from a provider model list.
+	 *
+	 * @param string $provider  Provider slug.
+	 * @param array  $model_ids Model ids.
+	 * @return string[] Re-indexed list.
+	 */
+	public static function filter_translation_models( $provider, $model_ids ) {
+		$out = array();
+
+		foreach ( (array) $model_ids as $model_id ) {
+			if ( is_string( $model_id ) && self::is_translation_model( $provider, $model_id ) ) {
+				$out[] = $model_id;
+			}
+		}
+
+		return array_values( array_unique( $out ) );
+	}
+
+	/**
+	 * Saved model if still usable, else the provider default.
+	 *
+	 * @param string     $provider  Provider slug.
+	 * @param string     $saved     Saved model id.
+	 * @param array|null $available Optional list of models currently offered.
+	 * @return string
+	 */
+	public static function resolve_model( $provider, $saved, $available = null ) {
+		$saved = is_string( $saved ) ? trim( $saved ) : '';
+
+		if ( '' !== $saved && self::is_translation_model( $provider, $saved ) && ( empty( $available ) || in_array( $saved, (array) $available, true ) ) ) {
+			return $saved;
+		}
+
+		return self::default_model( $provider );
+	}
+}
