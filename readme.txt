@@ -257,7 +257,7 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Changelog ==
 
 = Version 2.0.0 | 26/10/2026 =
-* Added: MCP support.
+* Added: Latest OpenAI and Google Gemini models for translation.
 * Improved: Aligned the translation workflow with WPML standards and added background translation support.
 * Optimized: Reduced plugin size by minifying admin CSS and JavaScript files and removing unused images.
 
@@ -315,4 +315,4 @@ You can report security bugs through the Patchstack Vulnerability Disclosure Pro
 == Upgrade Notice ==
 = 1.2.0 =
 WPML Translation Check  is transitioning to our new *AutoMLP** AI Translation For WPML.
-WPML Translation Check is now under new ownership by [Cool Plugins](https://profiles.wordpress.org/coolplugins/) and is actively maintained.
+WPML Translation Check is now under new ownership by [Cool Plugins](https://profiles.wordpress.org/coolplugins/) and is actively maintained.
