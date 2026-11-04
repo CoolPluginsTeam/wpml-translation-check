@@ -72,6 +72,36 @@ class Origin_Collector {
 	private static $current_widget_id = '';
 
 	/**
+	 * Gettext recording phase: e = early (init/registration), r = render (template output).
+	 *
+	 * @var string
+	 */
+	private static $phase = 'e';
+
+	/**
+	 * Monotonic gettext sequence (later calls override earlier ones for the same text).
+	 *
+	 * @var int
+	 */
+	private static $gettext_seq = 0;
+
+	/**
+	 * Gettext patterns for strings with printf placeholders / HTML that render differently.
+	 *
+	 * Each entry: re (JS-safe regex body), plus the same hint fields as map entries (k/d/o/c/u).
+	 *
+	 * @var array<int, array<string, mixed>>
+	 */
+	private static $patterns = array();
+
+	/**
+	 * Guard against re-entrancy while recording a term (get_term lookups).
+	 *
+	 * @var bool
+	 */
+	private static $recording_term = false;
+
+	/**
 	 * Start collecting for an inspect-mode front-end request.
 	 *
 	 * @return void
@@ -86,6 +116,11 @@ class Origin_Collector {
 		self::$default_lang = (string) apply_filters( 'wpml_default_language', null );
 
 		self::build_value_index();
+
+		// maybe_boot() already runs on template_redirect, so this request is rendering.
+		// Also arm the hook in case start() is ever called earlier.
+		self::$phase = did_action( 'template_redirect' ) ? 'r' : 'e';
+		add_action( 'template_redirect', array( __CLASS__, 'enter_render_phase' ), 0 );
 
 		// Track every option_* read during this inspect render (covers non-autoload options).
 		add_action( 'all', array( __CLASS__, 'on_all_hooks' ), 1, 2 );
@@ -106,6 +141,16 @@ class Origin_Collector {
 			add_action( 'elementor/frontend/before_render', array( __CLASS__, 'on_elementor_before_render' ), 5 );
 			add_filter( 'elementor/widget/render_content', array( __CLASS__, 'on_elementor_render_content' ), 9999, 2 );
 		}
+
+		// Taxonomy term names (any taxonomy): cheap core filters only in inspect mode.
+		add_filter( 'get_term', array( __CLASS__, 'on_get_term' ), 9999, 2 );
+		add_filter( 'get_terms', array( __CLASS__, 'on_get_terms' ), 9999, 4 );
+		add_filter( 'get_the_terms', array( __CLASS__, 'on_get_the_terms' ), 9999, 3 );
+		add_filter( 'wp_get_object_terms', array( __CLASS__, 'on_wp_get_object_terms' ), 9999, 4 );
+		add_filter( 'list_cats', array( __CLASS__, 'on_list_cats' ), 9999, 2 );
+		add_filter( 'single_cat_title', array( __CLASS__, 'on_single_term_title' ), 9999, 1 );
+		add_filter( 'single_tag_title', array( __CLASS__, 'on_single_term_title' ), 9999, 1 );
+		add_filter( 'single_term_title', array( __CLASS__, 'on_single_term_title' ), 9999, 1 );
 	}
 
 	/**
@@ -122,6 +167,7 @@ class Origin_Collector {
 			'nav_menu_item' => 1,
 			'widget'        => 1,
 			'elementor'     => 1,
+			'term'          => 1,
 		);
 
 		$priority = array();
@@ -134,7 +180,7 @@ class Origin_Collector {
 					'k' => isset( $origin['k'] ) ? (string) $origin['k'] : 'unknown',
 					'u' => ! empty( $origin['u'] ) ? 1 : 0,
 				);
-				foreach ( array( 'd', 'o', 'c', 'n', 'p', 'id', 'eid', 'did', 'wid' ) as $key ) {
+				foreach ( array( 'd', 'o', 'c', 'n', 'p', 'id', 'eid', 'did', 'wid', 'ph', 'cd', 'cs', 'sq', 'tax' ) as $key ) {
 					if ( isset( $origin[ $key ] ) && '' !== $origin[ $key ] && null !== $origin[ $key ] ) {
 						$entry[ $key ] = $origin[ $key ];
 					}
@@ -152,8 +198,14 @@ class Origin_Collector {
 			$entries = array_slice( $entries, 0, self::MAX_ENTRIES );
 		}
 
+		$patterns = self::$patterns;
+		if ( count( $patterns ) > 200 ) {
+			$patterns = array_slice( $patterns, 0, 200 );
+		}
+
 		return array(
 			'entries'     => $entries,
+			'patterns'    => $patterns,
 			'currentLang' => self::$current_lang,
 			'defaultLang' => self::$default_lang,
 		);
@@ -218,7 +270,7 @@ class Origin_Collector {
 		$kind        = isset( $origin['k'] ) ? (string) $origin['k'] : '';
 		$is_priority = in_array(
 			$kind,
-			array( 'option', 'theme_mod', 'post_title', 'post_content', 'nav_menu_item', 'widget', 'elementor' ),
+			array( 'option', 'theme_mod', 'post_title', 'post_content', 'nav_menu_item', 'widget', 'elementor', 'term' ),
 			true
 		);
 
@@ -260,8 +312,21 @@ class Origin_Collector {
 		}
 
 		$sig = wp_json_encode( $origin );
-		foreach ( self::$map[ $text ] as $existing ) {
+		foreach ( self::$map[ $text ] as $idx => $existing ) {
 			if ( wp_json_encode( $existing ) === $sig ) {
+				return;
+			}
+			// Same term recorded twice with different u — keep the untranslated flag.
+			if (
+				'term' === $kind
+				&& isset( $existing['k'], $existing['id'], $origin['id'] )
+				&& 'term' === $existing['k']
+				&& (int) $existing['id'] === (int) $origin['id']
+				&& (string) ( isset( $existing['tax'] ) ? $existing['tax'] : '' ) === (string) ( isset( $origin['tax'] ) ? $origin['tax'] : '' )
+			) {
+				if ( ! empty( $origin['u'] ) ) {
+					self::$map[ $text ][ $idx ]['u'] = 1;
+				}
 				return;
 			}
 		}
@@ -466,6 +531,64 @@ class Origin_Collector {
 	}
 
 	/**
+	 * Whether a gettext string contains printf-style placeholders.
+	 *
+	 * @param string $text Text.
+	 * @return bool
+	 */
+	private static function has_printf_placeholder( $text ) {
+		return (bool) preg_match( '/%(?:\d+\$)?[sdFcCOPuxX]/', (string) $text );
+	}
+
+	/**
+	 * Whether a gettext string contains HTML tags.
+	 *
+	 * @param string $text Text.
+	 * @return bool
+	 */
+	private static function has_html_markup( $text ) {
+		return (bool) preg_match( '/<[^>]+>/', (string) $text );
+	}
+
+	/**
+	 * Build a JS-safe regex body that matches the rendered (sprintf + strip-tags) form.
+	 *
+	 * Placeholders become .+?; whitespace is flexible. Returns empty when no
+	 * placeholder survives tag-stripping (exact map key is enough then).
+	 *
+	 * @param string $translation Gettext return value (may include HTML / %s).
+	 * @return string
+	 */
+	private static function build_match_pattern( $translation ) {
+		$raw = (string) $translation;
+		if ( strlen( $raw ) > self::MAX_TEXT_LEN * 2 ) {
+			return '';
+		}
+		// Sentinel keeps placeholders that live inside HTML attributes through strip_tags.
+		$marked = preg_replace( '/%(?:\d+\$)?[sdFcCOPuxX]/', "\x01", $raw );
+		$marked = wp_strip_all_tags( (string) $marked );
+		$marked = html_entity_decode( $marked, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+		$marked = preg_replace( '/\s+/u', ' ', $marked );
+		$marked = trim( (string) $marked );
+		if ( '' === $marked || false === strpos( $marked, "\x01" ) ) {
+			return '';
+		}
+		if ( strlen( $marked ) > self::MAX_TEXT_LEN + 32 ) {
+			return '';
+		}
+		$parts = explode( "\x01", $marked );
+		$re    = '';
+		foreach ( $parts as $i => $part ) {
+			if ( $i > 0 ) {
+				$re .= '.+?';
+			}
+			$re .= preg_quote( $part, '/' );
+		}
+		$re = preg_replace( '/\s+/', '\\s+', $re );
+		return (string) $re;
+	}
+
+	/**
 	 * Record a gettext origin.
 	 *
 	 * @param string $translation Translated visible text.
@@ -476,22 +599,279 @@ class Origin_Collector {
 	 */
 	private static function record_gettext( $translation, $original, $domain, $context ) {
 		$visible = self::normalize( $translation );
-		$orig    = self::normalize( $original );
-		if ( self::is_trivial( $visible ) ) {
+		// Keep the raw gettext original (HTML + placeholders) for icl_strings lookup.
+		$raw_orig = (string) $original;
+		if ( strlen( $raw_orig ) > 2000 ) {
+			$raw_orig = substr( $raw_orig, 0, 2000 );
+		}
+		$orig_norm = self::normalize( $raw_orig );
+		if ( self::is_trivial( $visible ) && self::is_trivial( $orig_norm ) ) {
 			return;
 		}
-		$likely_untranslated = self::is_secondary_lang() && $visible === $orig;
-		self::record(
-			$visible,
-			array(
-				'k' => 'gettext',
-				'd' => (string) $domain,
-				'o' => $orig,
-				'c' => (string) $context,
-				'u' => $likely_untranslated ? 1 : 0,
-			)
+		$likely_untranslated = self::is_secondary_lang() && '' !== $visible && $visible === $orig_norm;
+		$hint                = array(
+			'k'  => 'gettext',
+			'd'  => (string) $domain,
+			'o'  => $raw_orig,
+			'c'  => (string) $context,
+			'u'  => $likely_untranslated ? 1 : 0,
+			'ph' => self::$phase,
+			'sq' => ++self::$gettext_seq,
 		);
-		self::attach_value_matches( $visible );
+		// Caller text domain + whether the frame is a theme or plugin (generic path signals).
+		$caller = self::detect_caller();
+		if ( ! empty( $caller['d'] ) ) {
+			$hint['cd'] = $caller['d'];
+		}
+		if ( ! empty( $caller['cs'] ) ) {
+			$hint['cs'] = $caller['cs'];
+		}
+
+		if ( ! self::is_trivial( $visible ) ) {
+			self::record( $visible, $hint );
+			self::attach_value_matches( $visible );
+		}
+
+		// Pattern for sprintf/HTML gettext: rendered block text may differ from the map key.
+		if ( self::has_printf_placeholder( $translation ) || self::has_printf_placeholder( $raw_orig ) || self::has_html_markup( $translation ) || self::has_html_markup( $raw_orig ) ) {
+			$re = self::build_match_pattern( $translation );
+			if ( '' === $re ) {
+				// Placeholders only lived in attributes; stripped visible text already matches the block.
+				return;
+			}
+			if ( count( self::$patterns ) >= 200 ) {
+				return;
+			}
+			foreach ( self::$patterns as $existing ) {
+				if ( isset( $existing['re'] ) && $existing['re'] === $re && isset( $existing['d'] ) && $existing['d'] === $hint['d'] ) {
+					return;
+				}
+			}
+			self::$patterns[] = array_merge(
+				array( 're' => $re ),
+				$hint
+			);
+		}
+	}
+
+
+	/**
+	 * Mark that template rendering has begun (vs init/registration).
+	 *
+	 * @return void
+	 */
+	public static function enter_render_phase() {
+		self::$phase = 'r';
+	}
+
+	/**
+	 * Resolve a PHP file path to its theme/plugin text domain (dynamic, no name lists).
+	 *
+	 * Accepts absolute paths or paths relative to wp-content. Uses the theme/plugin
+	 * header Text Domain when present, otherwise the directory slug (WP convention).
+	 *
+	 * @param string $path File path.
+	 * @return string Empty when outside themes/plugins.
+	 */
+	public static function textdomain_for_path( $path ) {
+		if ( ! is_string( $path ) || '' === $path ) {
+			return '';
+		}
+		// Drop optional :line suffix from shortcode locations.
+		if ( preg_match( '/:\d+$/', $path ) ) {
+			$path = (string) preg_replace( '/:\d+$/', '', $path );
+		}
+		$path = wp_normalize_path( $path );
+
+		static $cache = array();
+		if ( isset( $cache[ $path ] ) ) {
+			return $cache[ $path ];
+		}
+
+		$content = wp_normalize_path( WP_CONTENT_DIR );
+		$abs     = $path;
+		if ( 0 !== strpos( $abs, $content ) ) {
+			// Relative to wp-content (e.g. themes/foo/bar.php).
+			if ( 0 === strpos( $abs, 'themes/' ) || 0 === strpos( $abs, 'plugins/' ) || 0 === strpos( $abs, 'mu-plugins/' ) ) {
+				$abs = wp_normalize_path( trailingslashit( $content ) . ltrim( $abs, '/' ) );
+			}
+		}
+
+		$td      = '';
+		$plugins = wp_normalize_path( WP_PLUGIN_DIR );
+		$themes  = wp_normalize_path( get_theme_root() );
+		$mu      = defined( 'WPMU_PLUGIN_DIR' ) ? wp_normalize_path( WPMU_PLUGIN_DIR ) : '';
+
+		if ( 0 === strpos( $abs, trailingslashit( $plugins ) ) ) {
+			$rel  = substr( $abs, strlen( trailingslashit( $plugins ) ) );
+			$slug = strtok( $rel, '/' );
+			$td   = self::domain_for_plugin_slug( (string) $slug );
+		} elseif ( '' !== $mu && 0 === strpos( $abs, trailingslashit( $mu ) ) ) {
+			$rel  = substr( $abs, strlen( trailingslashit( $mu ) ) );
+			$slug = strtok( $rel, '/' );
+			$td   = self::domain_for_mu_slug( (string) $slug, $mu );
+		} elseif ( 0 === strpos( $abs, trailingslashit( $themes ) ) ) {
+			$rel   = substr( $abs, strlen( trailingslashit( $themes ) ) );
+			$slug  = strtok( $rel, '/' );
+			$theme = wp_get_theme( (string) $slug );
+			if ( $theme instanceof \WP_Theme && $theme->exists() ) {
+				$td = (string) $theme->get( 'TextDomain' );
+			}
+			if ( '' === $td ) {
+				$td = (string) $slug;
+			}
+		}
+
+		$cache[ $path ] = $td;
+		return $td;
+	}
+
+	/**
+	 * Text domain for a plugin directory slug (from plugin header, else slug).
+	 *
+	 * @param string $slug Plugin directory (or single-file stem).
+	 * @return string
+	 */
+	private static function domain_for_plugin_slug( $slug ) {
+		if ( '' === $slug ) {
+			return '';
+		}
+		$map = self::plugin_domain_map();
+		if ( isset( $map[ $slug ] ) ) {
+			return $map[ $slug ];
+		}
+		return $slug;
+	}
+
+	/**
+	 * Build slug -> TextDomain map from installed plugins (cached per request).
+	 *
+	 * @return array<string, string>
+	 */
+	private static function plugin_domain_map() {
+		static $map = null;
+		if ( null !== $map ) {
+			return $map;
+		}
+		$map = array();
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+		if ( ! function_exists( 'get_plugins' ) ) {
+			return $map;
+		}
+		foreach ( get_plugins() as $file => $data ) {
+			$slug = dirname( (string) $file );
+			if ( '.' === $slug || '' === $slug ) {
+				$slug = (string) pathinfo( (string) $file, PATHINFO_FILENAME );
+			}
+			$header       = ( is_array( $data ) && ! empty( $data['TextDomain'] ) ) ? (string) $data['TextDomain'] : '';
+			$map[ $slug ] = '' !== $header ? $header : $slug;
+		}
+		return $map;
+	}
+
+	/**
+	 * Text domain for a must-use plugin file or directory.
+	 *
+	 * @param string $slug First path segment under mu-plugins.
+	 * @param string $mu   Absolute mu-plugins directory.
+	 * @return string
+	 */
+	private static function domain_for_mu_slug( $slug, $mu ) {
+		if ( '' === $slug ) {
+			return '';
+		}
+		$base = trailingslashit( $mu ) . $slug;
+		$file = is_dir( $base ) ? $base : $base;
+		if ( is_dir( $base ) ) {
+			$files = glob( trailingslashit( $base ) . '*.php' );
+			$file  = ( is_array( $files ) && $files ) ? $files[0] : '';
+		} elseif ( ! preg_match( '/\.php$/i', $slug ) ) {
+			$file = $base . '.php';
+		}
+		if ( is_string( $file ) && is_readable( $file ) && function_exists( 'get_plugin_data' ) ) {
+			$data = get_plugin_data( $file, false, false );
+			if ( is_array( $data ) && ! empty( $data['TextDomain'] ) ) {
+				return (string) $data['TextDomain'];
+			}
+		} elseif ( is_string( $file ) && is_readable( $file ) ) {
+			if ( ! function_exists( 'get_plugin_data' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			}
+			if ( function_exists( 'get_plugin_data' ) ) {
+				$data = get_plugin_data( $file, false, false );
+				if ( is_array( $data ) && ! empty( $data['TextDomain'] ) ) {
+					return (string) $data['TextDomain'];
+				}
+			}
+		}
+		return (string) pathinfo( $slug, PATHINFO_FILENAME );
+	}
+
+	/**
+	 * Walk a short backtrace to the first theme/plugin frame.
+	 *
+	 * @return array{d:string,cs:string} d = text domain, cs = t (theme) | p (plugin) | ''.
+	 */
+	private static function detect_caller() {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_debug_backtrace -- Inspect-mode only; bounded depth.
+		$trace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 16 );
+		foreach ( $trace as $frame ) {
+			if ( empty( $frame['file'] ) || ! is_string( $frame['file'] ) ) {
+				continue;
+			}
+			$file = wp_normalize_path( $frame['file'] );
+			if ( false !== strpos( $file, '/wp-includes/' ) || false !== strpos( $file, '/wp-admin/' ) ) {
+				continue;
+			}
+			// Skip this inspector plugin's own frames.
+			if ( false !== strpos( $file, '/wpml-translation-check/' ) ) {
+				continue;
+			}
+			$info = self::caller_info_for_path( $file );
+			if ( '' !== $info['d'] ) {
+				return $info;
+			}
+		}
+		return array(
+			'd'  => '',
+			'cs' => '',
+		);
+	}
+
+	/**
+	 * Text domain + theme/plugin classification for a file path.
+	 *
+	 * @param string $path File path.
+	 * @return array{d:string,cs:string}
+	 */
+	private static function caller_info_for_path( $path ) {
+		$td = self::textdomain_for_path( $path );
+		if ( '' === $td ) {
+			return array(
+				'd'  => '',
+				'cs' => '',
+			);
+		}
+		$abs     = wp_normalize_path( $path );
+		$content = wp_normalize_path( WP_CONTENT_DIR );
+		if ( 0 !== strpos( $abs, $content ) && ( 0 === strpos( $abs, 'themes/' ) || 0 === strpos( $abs, 'plugins/' ) || 0 === strpos( $abs, 'mu-plugins/' ) ) ) {
+			$abs = wp_normalize_path( trailingslashit( $content ) . ltrim( $abs, '/' ) );
+		}
+		$cs      = '';
+		$themes  = wp_normalize_path( get_theme_root() );
+		$plugins = wp_normalize_path( WP_PLUGIN_DIR );
+		$mu      = defined( 'WPMU_PLUGIN_DIR' ) ? wp_normalize_path( WPMU_PLUGIN_DIR ) : '';
+		if ( 0 === strpos( $abs, trailingslashit( $themes ) ) || 0 === strpos( $abs, 'themes/' ) ) {
+			$cs = 't';
+		} elseif ( 0 === strpos( $abs, trailingslashit( $plugins ) ) || 0 === strpos( $abs, 'plugins/' ) || ( '' !== $mu && 0 === strpos( $abs, trailingslashit( $mu ) ) ) || 0 === strpos( $abs, 'mu-plugins/' ) ) {
+			$cs = 'p';
+		}
+		return array(
+			'd'  => $td,
+			'cs' => $cs,
+		);
 	}
 
 	/**
@@ -552,6 +932,241 @@ class Origin_Collector {
 		$original = ( 1 === (int) $number ) ? $single : $plural;
 		self::record_gettext( $translation, $original, $domain, (string) $context );
 		return $translation;
+	}
+
+
+	/**
+	 * Record a taxonomy term name for the origin map.
+	 *
+	 * @param \WP_Term $term Term object.
+	 * @return void
+	 */
+	private static function record_term( $term ) {
+		if ( ! $term instanceof \WP_Term ) {
+			return;
+		}
+		$name = isset( $term->name ) ? (string) $term->name : '';
+		if ( '' === self::normalize( $name ) ) {
+			return;
+		}
+
+		$taxonomy = isset( $term->taxonomy ) ? (string) $term->taxonomy : '';
+		$term_id  = isset( $term->term_id ) ? (int) $term->term_id : 0;
+		if ( $term_id <= 0 || '' === $taxonomy ) {
+			return;
+		}
+
+		self::record(
+			$name,
+			array(
+				'k'   => 'term',
+				'id'  => $term_id,
+				'tax' => $taxonomy,
+				'u'   => self::term_likely_untranslated( $term ) ? 1 : 0,
+			)
+		);
+	}
+
+	/**
+	 * Whether a term name is likely untranslated on a secondary language page.
+	 *
+	 * @param \WP_Term $term Term.
+	 * @return bool
+	 */
+	/**
+	 * Read a term name as stored for a given language (WPML filters get_term otherwise).
+	 *
+	 * @param int    $term_id  Term ID.
+	 * @param string $taxonomy Taxonomy.
+	 * @param string $lang     Language code.
+	 * @return string Normalized name or empty.
+	 */
+	private static function term_name_in_language( $term_id, $taxonomy, $lang ) {
+		$term_id  = (int) $term_id;
+		$taxonomy = (string) $taxonomy;
+		$lang     = (string) $lang;
+		if ( $term_id <= 0 || '' === $taxonomy || '' === $lang ) {
+			return '';
+		}
+
+		$was_rec              = self::$recording_term;
+		self::$recording_term = true;
+		$prev_lang            = (string) apply_filters( 'wpml_current_language', null );
+		do_action( 'wpml_switch_language', $lang );
+		$term = get_term( $term_id, $taxonomy );
+		if ( '' !== $prev_lang ) {
+			do_action( 'wpml_switch_language', $prev_lang );
+		}
+		self::$recording_term = $was_rec;
+
+		if ( ! $term instanceof \WP_Term ) {
+			return '';
+		}
+		return self::normalize( $term->name );
+	}
+
+	/**
+	 * Whether a term is positively untranslated on a secondary-language page.
+	 *
+	 * Unknown / inconclusive is treated as translated (not flagged).
+	 *
+	 * @param \WP_Term $term Term instance from the current page.
+	 * @return bool
+	 */
+	private static function term_likely_untranslated( $term ) {
+		if ( ! self::is_secondary_lang() ) {
+			return false;
+		}
+		$taxonomy = (string) $term->taxonomy;
+		$is_trans = (bool) apply_filters( 'wpml_is_translated_taxonomy', false, $taxonomy );
+		if ( ! $is_trans ) {
+			return false;
+		}
+
+		$term_id    = (int) $term->term_id;
+		$source_id  = (int) apply_filters( 'wpml_object_id', $term_id, $taxonomy, true, self::$default_lang );
+		$current_id = (int) apply_filters( 'wpml_object_id', $term_id, $taxonomy, false, self::$current_lang );
+
+		// Positive evidence only: missing translation object, or fallback to source object.
+		if ( $current_id <= 0 ) {
+			return true;
+		}
+		if ( $source_id > 0 && $current_id === $source_id ) {
+			return true;
+		}
+		// Displaying the default-language term itself on a secondary page.
+		if ( $source_id > 0 && $source_id === $term_id && $current_id === $term_id ) {
+			return true;
+		}
+		if ( $source_id <= 0 ) {
+			return false;
+		}
+
+		$src = self::term_name_in_language( $source_id, $taxonomy, self::$default_lang );
+		$cur = self::normalize( $term->name );
+		if ( '' === $src || '' === $cur ) {
+			return false;
+		}
+		return ( $src === $cur );
+	}
+
+	/**
+	 * Get_term filter - any taxonomy.
+	 *
+	 * @param \WP_Term|array|\WP_Error|null $term     Term.
+	 * @param string                        $taxonomy Taxonomy.
+	 * @return \WP_Term|array|\WP_Error|null
+	 */
+	public static function on_get_term( $term, $taxonomy = '' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( self::$recording_term || ! $term instanceof \WP_Term ) {
+			return $term;
+		}
+		self::$recording_term = true;
+		self::record_term( $term );
+		self::$recording_term = false;
+		return $term;
+	}
+
+	/**
+	 * Get_terms filter - record each WP_Term in the result set.
+	 *
+	 * @param array|\WP_Error $terms      Terms.
+	 * @param array|null      $taxonomies Taxonomies.
+	 * @param array           $args       Query args.
+	 * @param \WP_Term_Query  $term_query Query.
+	 * @return array|\WP_Error
+	 */
+	public static function on_get_terms( $terms, $taxonomies = null, $args = null, $term_query = null ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( self::$recording_term || is_wp_error( $terms ) || ! is_array( $terms ) ) {
+			return $terms;
+		}
+		self::$recording_term = true;
+		foreach ( $terms as $term ) {
+			if ( $term instanceof \WP_Term ) {
+				self::record_term( $term );
+			}
+		}
+		self::$recording_term = false;
+		return $terms;
+	}
+
+	/**
+	 * Get_the_terms filter.
+	 *
+	 * @param array|\WP_Error|false $terms    Terms.
+	 * @param int                   $post_id  Post ID.
+	 * @param string                $taxonomy Taxonomy.
+	 * @return array|\WP_Error|false
+	 */
+	public static function on_get_the_terms( $terms, $post_id = 0, $taxonomy = '' ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( self::$recording_term || ! is_array( $terms ) ) {
+			return $terms;
+		}
+		self::$recording_term = true;
+		foreach ( $terms as $term ) {
+			if ( $term instanceof \WP_Term ) {
+				self::record_term( $term );
+			}
+		}
+		self::$recording_term = false;
+		return $terms;
+	}
+
+	/**
+	 * Wp_get_object_terms filter.
+	 *
+	 * @param array|\WP_Error $terms      Terms.
+	 * @param int|array       $object_ids Object IDs.
+	 * @param string|array    $taxonomies Taxonomies.
+	 * @param array           $args       Args.
+	 * @return array|\WP_Error
+	 */
+	public static function on_wp_get_object_terms( $terms, $object_ids = null, $taxonomies = null, $args = null ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+		if ( self::$recording_term || is_wp_error( $terms ) || ! is_array( $terms ) ) {
+			return $terms;
+		}
+		self::$recording_term = true;
+		foreach ( $terms as $term ) {
+			if ( $term instanceof \WP_Term ) {
+				self::record_term( $term );
+			} elseif ( is_string( $term ) && '' !== self::normalize( $term ) ) {
+				// fields=names: no id available - skip (cannot build a fix link).
+				continue;
+			}
+		}
+		self::$recording_term = false;
+		return $terms;
+	}
+
+	/**
+	 * List_cats filter (category / taxonomy list walkers).
+	 *
+	 * @param string        $name Category name.
+	 * @param \WP_Term|null $category Term or null for option labels.
+	 * @return string
+	 */
+	public static function on_list_cats( $name, $category = null ) {
+		if ( $category instanceof \WP_Term ) {
+			self::record_term( $category );
+		}
+		return $name;
+	}
+
+	/**
+	 * Single_cat_title / single_tag_title / single_term_title.
+	 *
+	 * @param string $title Term title.
+	 * @return string
+	 */
+	public static function on_single_term_title( $title ) {
+		$obj = get_queried_object();
+		if ( $obj instanceof \WP_Term ) {
+			// Prefer queried term id/taxonomy; use filtered title as visible text.
+			$clone       = clone $obj;
+			$clone->name = (string) $title;
+			self::record_term( $clone );
+		}
+		return $title;
 	}
 
 	/**

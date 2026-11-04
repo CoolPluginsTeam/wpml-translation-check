@@ -389,11 +389,15 @@ class Frontend_Inspector {
 		if ( isset( $_POST['hint_k'] ) ) {
 			$flat['k'] = sanitize_key( wp_unslash( $_POST['hint_k'] ) );
 		}
-		foreach ( array( 'd', 'o', 'c', 'n', 'p', 'eid', 'wid' ) as $key ) {
+		foreach ( array( 'd', 'c', 'n', 'p', 'eid', 'wid', 'tax' ) as $key ) {
 			$post_key = 'hint_' . $key;
 			if ( isset( $_POST[ $post_key ] ) ) {
 				$flat[ $key ] = sanitize_text_field( wp_unslash( $_POST[ $post_key ] ) );
 			}
+		}
+		if ( isset( $_POST['hint_o'] ) ) {
+			// Gettext originals may include intentional HTML / placeholders — keep them.
+			$flat['o'] = self::sanitize_gettext_original( wp_unslash( $_POST['hint_o'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_gettext_original().
 		}
 		foreach ( array( 'id', 'did', 'u' ) as $key ) {
 			$post_key = 'hint_' . $key;
@@ -421,10 +425,13 @@ class Frontend_Inspector {
 		if ( isset( $hint['k'] ) && is_scalar( $hint['k'] ) ) {
 			$out['k'] = sanitize_key( (string) $hint['k'] );
 		}
-		foreach ( array( 'd', 'o', 'c', 'n', 'p', 'eid', 'wid' ) as $key ) {
+		foreach ( array( 'd', 'c', 'n', 'p', 'eid', 'wid', 'tax' ) as $key ) {
 			if ( isset( $hint[ $key ] ) && is_scalar( $hint[ $key ] ) ) {
 				$out[ $key ] = sanitize_text_field( (string) $hint[ $key ] );
 			}
+		}
+		if ( isset( $hint['o'] ) && is_scalar( $hint['o'] ) ) {
+			$out['o'] = self::sanitize_gettext_original( (string) $hint['o'] );
 		}
 		foreach ( array( 'id', 'did', 'u' ) as $key ) {
 			if ( isset( $hint[ $key ] ) && is_scalar( $hint[ $key ] ) ) {
@@ -435,44 +442,64 @@ class Frontend_Inspector {
 	}
 
 	/**
+	 * Sanitize a gettext original that may contain HTML placeholders.
+	 *
+	 * Calling sanitize_text_field() would strip tags and break icl_strings lookups.
+	 *
+	 * @param string $value Raw original.
+	 * @return string
+	 */
+	private static function sanitize_gettext_original( $value ) {
+		$value = wp_check_invalid_utf8( (string) $value );
+		$value = str_replace( "\0", '', $value );
+		if ( strlen( $value ) > 2000 ) {
+			$value = substr( $value, 0, 2000 );
+		}
+		return $value;
+	}
+
+	/**
 	 * Panel copy.
 	 *
 	 * @return array<string, string>
 	 */
 	private static function strings() {
 		return array(
-			'title'         => __( 'Text Origin Inspector', 'wpml-translation-check' ),
-			'close'         => __( 'Close', 'wpml-translation-check' ),
-			'openLabel'     => __( 'Text Inspector', 'wpml-translation-check' ),
-			'closeLabel'    => __( 'Close Text Inspector', 'wpml-translation-check' ),
-			'hint'          => __( 'Click any text on the page, or an item below, to see where it comes from.', 'wpml-translation-check' ),
-			'loading'       => __( 'Resolving…', 'wpml-translation-check' ),
-			'loadingMap'    => __( 'Collecting text origins for this page…', 'wpml-translation-check' ),
-			'mapError'      => __( 'Could not load the origin map for this page.', 'wpml-translation-check' ),
-			'error'         => __( 'Could not resolve this text.', 'wpml-translation-check' ),
-			'source'        => __( 'Source', 'wpml-translation-check' ),
-			'status'        => __( 'Status', 'wpml-translation-check' ),
-			'identifiers'   => __( 'Identifiers', 'wpml-translation-check' ),
-			'fix'           => __( 'Fix', 'wpml-translation-check' ),
-			'selected'      => __( 'Selected text', 'wpml-translation-check' ),
-			'untranslated'  => __( 'Likely untranslated', 'wpml-translation-check' ),
-			'openFix'       => __( 'Open fix link', 'wpml-translation-check' ),
-			'noHint'        => __( 'No collector hint matched; resolver may still find a source.', 'wpml-translation-check' ),
-			'scanTitle'     => __( 'Untranslated on this page', 'wpml-translation-check' ),
-			'scanning'      => __( 'Checking visible strings…', 'wpml-translation-check' ),
+			'title'          => __( 'Text Origin Inspector', 'wpml-translation-check' ),
+			'close'          => __( 'Close', 'wpml-translation-check' ),
+			'openLabel'      => __( 'Text Inspector', 'wpml-translation-check' ),
+			'closeLabel'     => __( 'Close Text Inspector', 'wpml-translation-check' ),
+			'hint'           => __( 'Click any text on the page, or an item below, to see where it comes from.', 'wpml-translation-check' ),
+			'loading'        => __( 'Resolving…', 'wpml-translation-check' ),
+			'loadingMap'     => __( 'Collecting text origins for this page…', 'wpml-translation-check' ),
+			'mapError'       => __( 'Could not load the origin map for this page.', 'wpml-translation-check' ),
+			'error'          => __( 'Could not resolve this text.', 'wpml-translation-check' ),
+			'source'         => __( 'Source', 'wpml-translation-check' ),
+			'status'         => __( 'Status', 'wpml-translation-check' ),
+			'identifiers'    => __( 'Identifiers', 'wpml-translation-check' ),
+			'fix'            => __( 'Fix', 'wpml-translation-check' ),
+			'selected'       => __( 'Selected text', 'wpml-translation-check' ),
+			'untranslated'   => __( 'Likely untranslated', 'wpml-translation-check' ),
+			'openFix'        => __( 'Open fix link', 'wpml-translation-check' ),
+			'alsoPossible'   => __( 'Also possible', 'wpml-translation-check' ),
+			'noHint'         => __( 'No collector hint matched; resolver may still find a source.', 'wpml-translation-check' ),
+			'scanTitle'      => __( 'Untranslated on this page', 'wpml-translation-check' ),
+			'scanning'       => __( 'Checking visible strings…', 'wpml-translation-check' ),
 			/* translators: 1: untranslated count, 2: scanned count */
-			'scanSummary'   => __( '%1$d untranslated of %2$d checked', 'wpml-translation-check' ),
+			'scanSummary'    => __( '%1$d untranslated of %2$d checked', 'wpml-translation-check' ),
 			/* translators: %d: maximum number of strings checked */
-			'scanCapped'    => __( 'Only the first %d visible strings were checked.', 'wpml-translation-check' ),
-			'scanEmpty'     => __( 'No untranslated strings found on this page.', 'wpml-translation-check' ),
-			'scanError'     => __( 'Could not check strings on this page.', 'wpml-translation-check' ),
-			'notFound'      => __( 'Source unknown', 'wpml-translation-check' ),
-			'container'     => __( 'Rendered by', 'wpml-translation-check' ),
-			'region'        => __( 'Theme template', 'wpml-translation-check' ),
-			'edit'          => __( 'Edit', 'wpml-translation-check' ),
-			'byJs'          => __( 'Added by JavaScript', 'wpml-translation-check' ),
-			'byJsStatus'    => __( 'Not in the server HTML: inserted in the browser after load.', 'wpml-translation-check' ),
-			'containerOnly' => __( 'Not registered as a translatable string; edit it in the source above.', 'wpml-translation-check' ),
+			'scanCapped'     => __( 'Only the first %d visible strings were checked.', 'wpml-translation-check' ),
+			'scanEmpty'      => __( 'No untranslated strings found on this page.', 'wpml-translation-check' ),
+			'scanError'      => __( 'Could not check strings on this page.', 'wpml-translation-check' ),
+			'notFound'       => __( 'Source unknown', 'wpml-translation-check' ),
+			'container'      => __( 'Rendered by', 'wpml-translation-check' ),
+			'region'         => __( 'Theme template', 'wpml-translation-check' ),
+			'edit'           => __( 'Edit', 'wpml-translation-check' ),
+			'byJs'           => __( 'Added by JavaScript', 'wpml-translation-check' ),
+			'byJsStatus'     => __( 'Not in the server HTML: inserted in the browser after load.', 'wpml-translation-check' ),
+			'containerOnly'  => __( 'Not registered as a translatable string; edit it in the source above.', 'wpml-translation-check' ),
+			'controlOptions' => __( 'Options in this control', 'wpml-translation-check' ),
+			'resizeHandle'   => __( 'Drag to resize panel. Arrow keys adjust width.', 'wpml-translation-check' ),
 		);
 	}
 }

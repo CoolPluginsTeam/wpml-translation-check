@@ -277,15 +277,22 @@ class Container_Markers {
 				$did = (int) $doc->get_main_id();
 			}
 		}
-		return self::wrap(
-			$content,
-			array(
-				'type'   => 'elementor',
-				'eid'    => (string) $widget->get_id(),
-				'did'    => $did,
-				'widget' => method_exists( $widget, 'get_name' ) ? (string) $widget->get_name() : '',
-			)
+		$meta = array(
+			'type'   => 'elementor',
+			'eid'    => (string) $widget->get_id(),
+			'did'    => $did,
+			'widget' => method_exists( $widget, 'get_name' ) ? (string) $widget->get_name() : '',
 		);
+		try {
+			$ref = new \ReflectionClass( $widget );
+			$td  = Origin_Collector::textdomain_for_path( (string) $ref->getFileName() );
+			if ( '' !== $td ) {
+				$meta['td'] = $td;
+			}
+		} catch ( \ReflectionException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Leave td unset when reflection fails.
+		}
+		return self::wrap( $content, $meta );
 	}
 
 	/**
@@ -306,13 +313,17 @@ class Container_Markers {
 	 */
 	private static function region( $label, array $templates ) {
 		$file = $templates ? locate_template( $templates ) : '';
-		$id   = self::open(
-			array(
-				'type'  => 'template',
-				'label' => $label,
-				'file'  => self::relative_path( (string) $file ),
-			)
+		$rel  = self::relative_path( (string) $file );
+		$meta = array(
+			'type'  => 'template',
+			'label' => $label,
+			'file'  => $rel,
 		);
+		$td   = Origin_Collector::textdomain_for_path( '' !== $file ? (string) $file : $rel );
+		if ( '' !== $td ) {
+			$meta['td'] = $td;
+		}
+		$id = self::open( $meta );
 		if ( $id ) {
 			echo '<!--afi:r:' . (int) $id . '-->';
 		}
@@ -388,13 +399,18 @@ class Container_Markers {
 		}
 		remove_action( 'loop_start', array( __CLASS__, 'region_template' ), 1 );
 		global $template;
-		$id = self::open(
-			array(
-				'type'  => 'template',
-				'label' => 'template',
-				'file'  => self::relative_path( is_string( $template ) ? $template : '' ),
-			)
+		$abs  = is_string( $template ) ? $template : '';
+		$rel  = self::relative_path( $abs );
+		$meta = array(
+			'type'  => 'template',
+			'label' => 'template',
+			'file'  => $rel,
 		);
+		$td   = Origin_Collector::textdomain_for_path( '' !== $abs ? $abs : $rel );
+		if ( '' !== $td ) {
+			$meta['td'] = $td;
+		}
+		$id = self::open( $meta );
 		if ( $id ) {
 			echo '<!--afi:r:' . (int) $id . '-->';
 		}
@@ -600,6 +616,15 @@ class Container_Markers {
 		}
 		if ( '' !== $edit ) {
 			$out['edit'] = $edit;
+		}
+		// Dynamic container text domain (caller theme/plugin) for gettext disambiguation.
+		if ( ! empty( $meta['td'] ) && is_string( $meta['td'] ) ) {
+			$out['td'] = $meta['td'];
+		} elseif ( ! empty( $meta['file'] ) && is_string( $meta['file'] ) ) {
+			$td = Origin_Collector::textdomain_for_path( $meta['file'] );
+			if ( '' !== $td ) {
+				$out['td'] = $td;
+			}
 		}
 		return $out;
 	}

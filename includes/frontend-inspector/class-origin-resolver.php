@@ -160,6 +160,8 @@ class Origin_Resolver {
 				return self::resolve_menu_item( $text, $hint, $current, $default_lang );
 			case 'widget':
 				return self::resolve_widget( $text, $hint, $current, $default_lang );
+			case 'term':
+				return self::resolve_term( $text, $hint, $current, $default_lang );
 		}
 
 		// No collector hint: try exact-value matches only (never fuzzy guess).
@@ -372,6 +374,13 @@ class Origin_Resolver {
 			// Domain in WPML ST is often stored as context column.
 			$row = self::lookup_icl_string_by_value( $original, $domain );
 		}
+		if ( ! $row ) {
+			// Hint original may be HTML/placeholders; try the normalized visible text.
+			$row = self::lookup_icl_string( $domain, $text, $context );
+			if ( ! $row ) {
+				$row = self::lookup_icl_string_by_value( $text, $domain );
+			}
+		}
 
 		$translated   = null;
 		$status_label = __( 'Not in String Translation', 'wpml-translation-check' );
@@ -380,19 +389,19 @@ class Origin_Resolver {
 			$translated   = $st['translated'];
 			$status_label = $st['label'];
 		}
-		if ( $current !== $default_lang && $text !== $original ) {
+		$orig_norm = Origin_Collector::normalize( $original );
+		if ( $current !== $default_lang && $text !== $orig_norm && $text !== $original ) {
 			// Visible text differs from the source string: a translation is being applied (.mo or ST).
 			$translated   = true;
 			$status_label = __( 'Translated via gettext', 'wpml-translation-check' );
 		} elseif ( ! $row && $current !== $default_lang ) {
 			$translated   = false;
 			$status_label = __( 'Appears untranslated (matches original)', 'wpml-translation-check' );
-		} elseif ( $current !== $default_lang && $text !== $original ) {
-			$translated   = true;
-			$status_label = __( 'Translated via gettext', 'wpml-translation-check' );
 		}
 
-		$fix_url = self::st_search_url( $original, $domain );
+		$string_id = $row ? (int) $row['id'] : 0;
+		$st_ctx    = $row ? (string) $row['context'] : $domain;
+		$fix_url   = self::st_search_url( $original, $st_ctx, $string_id );
 
 		return array(
 			'found'             => true,
@@ -403,7 +412,7 @@ class Origin_Resolver {
 					'domain'     => $domain,
 					'original'   => $original,
 					'context'    => $context,
-					'string_id'  => $row ? (int) $row['id'] : null,
+					'string_id'  => $string_id ? $string_id : null,
 					'st_context' => $row ? (string) $row['context'] : null,
 				)
 			),
@@ -486,7 +495,7 @@ class Origin_Resolver {
 		}
 
 		if ( $registered && $st_row ) {
-			$fix_url   = self::st_search_url( isset( $st_row['value'] ) ? (string) $st_row['value'] : $text, (string) $st_row['context'] );
+			$fix_url   = self::st_search_url( isset( $st_row['value'] ) ? (string) $st_row['value'] : $text, (string) $st_row['context'], (int) $st_row['id'] );
 			$fix_label = __( 'Open in String Translation', 'wpml-translation-check' );
 		} else {
 			$fix_url   = admin_url( 'admin.php?page=wpml-admin-texts-translation' );
@@ -521,6 +530,161 @@ class Origin_Resolver {
 			'status_label'      => $status_label,
 			'fix_url'           => $fix_url,
 			'fix_label'         => $fix_label,
+			'message'           => '',
+			'text'              => $text,
+		);
+	}
+
+
+	/**
+	 * Term name as stored for a language (avoids WPML rewriting get_term on the page lang).
+	 *
+	 * @param int    $term_id  Term ID.
+	 * @param string $taxonomy Taxonomy.
+	 * @param string $lang     Language code.
+	 * @return string
+	 */
+	private static function term_name_in_language( $term_id, $taxonomy, $lang ) {
+		$term_id  = (int) $term_id;
+		$taxonomy = (string) $taxonomy;
+		$lang     = (string) $lang;
+		if ( $term_id <= 0 || '' === $taxonomy || '' === $lang ) {
+			return '';
+		}
+		$prev = (string) apply_filters( 'wpml_current_language', null );
+		do_action( 'wpml_switch_language', $lang );
+		$term = get_term( $term_id, $taxonomy );
+		if ( '' !== $prev ) {
+			do_action( 'wpml_switch_language', $prev );
+		}
+		if ( ! $term instanceof \WP_Term ) {
+			return '';
+		}
+		return Origin_Collector::normalize( $term->name );
+	}
+
+	/**
+	 * Resolve a taxonomy term name captured during inspect render.
+	 *
+	 * Fix link is always the term edit screen (translated term when present,
+	 * otherwise the source/default-language term) — never the WPML translation editor.
+	 *
+	 * @param string               $text         Visible text.
+	 * @param array<string, mixed> $hint         Hint with id + tax.
+	 * @param string               $current      Current language.
+	 * @param string               $default_lang Default language.
+	 * @return array<string, mixed>
+	 */
+	private static function resolve_term( $text, array $hint, $current, $default_lang ) {
+		$term_id  = isset( $hint['id'] ) ? absint( $hint['id'] ) : 0;
+		$taxonomy = isset( $hint['tax'] ) ? sanitize_key( (string) $hint['tax'] ) : '';
+
+		if ( $term_id <= 0 ) {
+			return self::not_found( __( 'Term ID was not captured for this text.', 'wpml-translation-check' ) );
+		}
+
+		$term = $taxonomy ? get_term( $term_id, $taxonomy ) : get_term( $term_id );
+		if ( ! $term instanceof \WP_Term ) {
+			return self::not_found( __( 'Term could not be loaded.', 'wpml-translation-check' ) );
+		}
+
+		$taxonomy     = (string) $term->taxonomy;
+		$element_type = 'tax_' . $taxonomy;
+		$is_trans_tax = (bool) apply_filters( 'wpml_is_translated_taxonomy', false, $taxonomy );
+
+		$details = apply_filters(
+			'wpml_element_language_details',
+			null,
+			array(
+				'element_id'   => (int) $term->term_id,
+				'element_type' => $element_type,
+			)
+		);
+		$lang    = ( is_object( $details ) && isset( $details->language_code ) )
+			? (string) $details->language_code
+			: $current;
+
+		$source_id  = (int) apply_filters( 'wpml_object_id', (int) $term->term_id, $taxonomy, true, $default_lang );
+		$current_id = (int) apply_filters( 'wpml_object_id', (int) $term->term_id, $taxonomy, false, $current );
+		if ( $source_id <= 0 ) {
+			$source_id = (int) $term->term_id;
+		}
+
+		$translated   = null;
+		$status_label = __( 'Term language: ', 'wpml-translation-check' ) . $lang;
+		$edit_id      = $current_id > 0 ? $current_id : $source_id;
+
+		if ( ! $is_trans_tax ) {
+			$translated   = null;
+			$status_label = __( 'Taxonomy is not translatable in WPML', 'wpml-translation-check' );
+			$edit_id      = (int) $term->term_id;
+		} elseif ( $current === $default_lang || $lang === $default_lang ) {
+			$translated   = null;
+			$status_label = __( 'Original-language term', 'wpml-translation-check' );
+			$edit_id      = (int) $term->term_id;
+		} elseif ( $current_id <= 0 ) {
+			$translated   = false;
+			$status_label = __( 'Missing translation in current language', 'wpml-translation-check' );
+			$edit_id      = $source_id;
+		} elseif ( $source_id > 0 && $current_id === $source_id ) {
+			// Fallback: secondary page still uses the default-language term object.
+			$translated   = false;
+			$status_label = __( 'Missing translation in current language', 'wpml-translation-check' );
+			$edit_id      = $source_id;
+		} else {
+			// Compare names in their own languages (get_term is WPML-filtered otherwise).
+			$src_name = self::term_name_in_language( $source_id, $taxonomy, $default_lang );
+			$cur_name = self::term_name_in_language( $current_id, $taxonomy, $current );
+			if ( '' === $cur_name ) {
+				$cur_name = Origin_Collector::normalize( $text );
+			}
+			if ( '' !== $src_name && '' !== $cur_name && $src_name === $cur_name ) {
+				$translated   = false;
+				$status_label = __( 'Matches original-language term (likely untranslated)', 'wpml-translation-check' );
+			} elseif ( '' !== $src_name && '' !== $cur_name && $src_name !== $cur_name ) {
+				$translated   = true;
+				$status_label = __( 'Translated term name', 'wpml-translation-check' );
+			} elseif ( $lang === $current && $current_id > 0 && $current_id !== $source_id ) {
+				// Distinct current-lang term object with no contradictory name evidence.
+				$translated   = true;
+				$status_label = __( 'Translated term name', 'wpml-translation-check' );
+			} else {
+				// No positive evidence either way.
+				$translated   = null;
+				$status_label = __( 'Term language: ', 'wpml-translation-check' ) . $lang;
+			}
+			$edit_id = $current_id > 0 ? $current_id : $source_id;
+		}
+
+		$fix_url = get_edit_term_link( $edit_id, $taxonomy );
+		// Some taxonomies (e.g. internal product types) yield an empty or non-admin URL.
+		if (
+			! is_string( $fix_url )
+			|| '' === $fix_url
+			|| ( false === strpos( $fix_url, 'tag_ID=' ) && false === strpos( $fix_url, 'taxonomy=' ) )
+		) {
+			$fix_url = admin_url( 'term.php?taxonomy=' . rawurlencode( $taxonomy ) . '&tag_ID=' . (int) $edit_id );
+		}
+
+		return array(
+			'found'             => true,
+			'source_type'       => 'term',
+			'source_type_label' => __( 'Taxonomy term', 'wpml-translation-check' ),
+			'identifiers'       => array_filter(
+				array(
+					'term_id'      => (int) $term->term_id,
+					'taxonomy'     => $taxonomy,
+					'language'     => $lang,
+					'source_id'    => $source_id ? $source_id : null,
+					'current_id'   => $current_id ? $current_id : null,
+					'element_type' => $element_type,
+					'edit_id'      => (int) $edit_id,
+				)
+			),
+			'translated'        => $translated,
+			'status_label'      => $status_label,
+			'fix_url'           => $fix_url,
+			'fix_label'         => __( 'Edit term', 'wpml-translation-check' ),
 			'message'           => '',
 			'text'              => $text,
 		);
@@ -774,7 +938,7 @@ class Origin_Resolver {
 			$translated   = $st['translated'];
 			$status_label = $st['label'];
 			if ( $secondary ) {
-				$fix_url   = self::st_search_url( $text, 'Widgets' );
+				$fix_url   = self::st_search_url( $text, 'Widgets', $string_id );
 				$fix_label = __( 'Translate in String Translation', 'wpml-translation-check' );
 			}
 		} elseif ( $secondary ) {
@@ -1195,20 +1359,80 @@ class Origin_Resolver {
 	// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
 	/**
-	 * String Translation admin URL filtered by search text.
+	 * String Translation admin URL filtered to one string when possible.
 	 *
-	 * @param string $search  Search string.
-	 * @param string $context Optional ST context.
+	 * WPML ST supports search + context + em (exact match). When string_id is
+	 * known we look up the exact icl_strings.value so the table shows one row.
+	 *
+	 * @param string $search    Search string (fallback).
+	 * @param string $context   Optional ST context / domain.
+	 * @param int    $string_id Optional icl_strings.id.
 	 * @return string
 	 */
-	private static function st_search_url( $search, $context = '' ) {
+	private static function st_search_url( $search, $context = '', $string_id = 0 ) {
+		$string_id = (int) $string_id;
+		if ( $string_id > 0 ) {
+			$row = self::lookup_icl_string_by_id( $string_id );
+			if ( $row ) {
+				$search  = (string) $row['value'];
+				$context = (string) $row['context'];
+			}
+		}
+
+		$page = defined( 'WPML_ST_MENU_URL' )
+			? WPML_ST_MENU_URL
+			: 'wpml-string-translation/menu/string-translation.php';
+
+		// WPML_ST_MENU_URL may already include "&tab=strings".
+		$url = admin_url( 'admin.php?page=' . $page );
+
 		$args = array(
-			'page'   => 'wpml-string-translation/menu/string-translation.php',
-			'search' => $search,
+			'search' => (string) $search,
+			'em'     => 1,
 		);
 		if ( '' !== $context ) {
 			$args['context'] = $context;
 		}
-		return add_query_arg( $args, admin_url( 'admin.php' ) );
+
+		/*
+		 * add_query_arg() leaves newly added values unencoded, and esc_url_raw()
+		 * strips HTML from the search text. Encode explicitly so placeholders
+		 * like %1$s and quoted attributes survive and WPML exact-match (em=1)
+		 * receives the real icl_strings.value.
+		 */
+		$join = ( false !== strpos( $url, '?' ) ) ? '&' : '?';
+		return $url . $join . http_build_query( $args, '', '&', PHP_QUERY_RFC3986 );
+	}
+
+	/**
+	 * Read-only icl_strings row by id.
+	 *
+	 * @param int $string_id String ID.
+	 * @return array{id:int,context:string,name:string,value:string}|null
+	 */
+	private static function lookup_icl_string_by_id( $string_id ) {
+		global $wpdb;
+		$string_id = (int) $string_id;
+		if ( $string_id <= 0 ) {
+			return null;
+		}
+		foreach ( self::$cache['values'] as $rows ) {
+			foreach ( (array) $rows as $row ) {
+				if ( isset( $row['id'] ) && (int) $row['id'] === $string_id ) {
+					return $row;
+				}
+			}
+		}
+		$table = $wpdb->prefix . 'icl_strings';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- Read-only lookup by primary key.
+		$row = $wpdb->get_row(
+			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- Table name from $wpdb->prefix.
+				"SELECT id, context, name, value FROM {$table} WHERE id = %d LIMIT 1",
+				$string_id
+			),
+			ARRAY_A
+		);
+		return is_array( $row ) ? $row : null;
 	}
 }

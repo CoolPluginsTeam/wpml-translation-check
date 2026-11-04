@@ -311,3 +311,89 @@ body.automlp-fi-open {
 	margin-left: 4px;
 	font-weight: 600;
 }
+
+#automlp-fi .automlp-fi__control-item {
+	margin-bottom: 10px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--automlp-fi-border);
+	cursor: pointer;
+}
+#automlp-fi .automlp-fi__control-item.is-selected > .automlp-fi__card {
+	outline: 2px solid var(--automlp-fi-primary);
+	outline-offset: 2px;
+}
+#automlp-fi .automlp-fi__control-item:last-child {
+	border-bottom: 0;
+}
+
+/* Drag handle on the left edge; page margin uses the same CSS variable. */
+#automlp-fi .automlp-fi__resize {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: -4px;
+	z-index: 2;
+	width: 8px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: ew-resize;
+	touch-action: none;
+}
+
+#automlp-fi .automlp-fi__resize:hover,
+#automlp-fi .automlp-fi__resize:focus-visible,
+body.automlp-fi-resizing #automlp-fi .automlp-fi__resize {
+	background: rgba(37, 99, 235, 0.25);
+	outline: none;
+}
+
+body.automlp-fi-resizing {
+	cursor: ew-resize;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+#automlp-fi .automlp-fi__item-wrap {
+	margin: 0 0 2px;
+}
+
+#automlp-fi .automlp-fi__item.is-open {
+	background: var(--automlp-fi-warn-bg);
+	font-weight: 600;
+}
+
+#automlp-fi .automlp-fi__inline {
+	margin: 0 4px 8px;
+	padding: 8px;
+	border: 1px solid var(--automlp-fi-border);
+	border-radius: 6px;
+	background: var(--automlp-fi-bg);
+}
+
+#automlp-fi .automlp-fi__card--inline {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	box-shadow: none;
+	background: transparent;
+}
+
+
+#automlp-fi .automlp-fi__alt {
+	margin-top: 8px;
+	padding-top: 8px;
+	border-top: 1px solid rgba(0,0,0,0.08);
+}
+#automlp-fi .automlp-fi__scan-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+#automlp-fi .automlp-fi__control-item {
+	margin: 6px 0;
+	cursor: pointer;
+}
+#automlp-fi .automlp-fi__control-item.is-selected {
+	outline: 2px solid #2271b1;
+}
