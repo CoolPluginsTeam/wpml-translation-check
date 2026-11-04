@@ -379,7 +379,11 @@ final class AUTOMLP_Ai_Translate_Addon {
 			'includes/wpml/class-background-flow.php',
 			'includes/routes/class-queue-route.php',
 			'includes/wpml/class-legacy-bridge.php',
-			'admin/queue/class-queue-screen.php'
+			'admin/queue/class-queue-screen.php',
+			'includes/frontend-inspector/class-origin-collector.php',
+			'includes/frontend-inspector/class-origin-resolver.php',
+			'includes/frontend-inspector/class-container-markers.php',
+			'includes/frontend-inspector/class-frontend-inspector.php',
 		);
 
 		foreach ( $files as $file ) {
@@ -411,6 +415,7 @@ final class AUTOMLP_Ai_Translate_Addon {
 		\AUTOMLP_WPML\Includes\Wpml\Background_Flow::boot();
 		\AUTOMLP_WPML\Includes\Routes\Queue_Route::boot();
 		\AUTOMLP_WPML\Includes\Wpml\Legacy_Bridge::boot();
+		\AUTOMLP_WPML\Includes\FrontendInspector\Frontend_Inspector::boot();
 
 		add_action( 'init', array( '\AUTOMLP_WPML\Includes\Queue\Queue_Table', 'maybe_upgrade' ), 5 );
 

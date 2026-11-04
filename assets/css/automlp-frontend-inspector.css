@@ -1,0 +1,313 @@
+/* AutoMLP front-end text origin inspector. Scoped to #automlp-fi. */
+
+body.automlp-fi-open {
+	margin-right: var(--automlp-fi-width, 360px) !important;
+}
+
+@media screen and (max-width: 782px) {
+	body.automlp-fi-open {
+		margin-right: 0 !important;
+	}
+}
+
+#automlp-fi {
+	--automlp-fi-primary: #2563eb;
+	--automlp-fi-text: #0f172a;
+	--automlp-fi-muted: #64748b;
+	--automlp-fi-border: #e2e8f0;
+	--automlp-fi-surface: #fff;
+	--automlp-fi-bg: #f8fafc;
+	--automlp-fi-warn: #b45309;
+	--automlp-fi-warn-bg: #fffbeb;
+	--automlp-fi-ok: #15803d;
+	--automlp-fi-ok-bg: #f0fdf4;
+	position: fixed;
+	top: 32px;
+	right: 0;
+	bottom: 0;
+	z-index: 99999;
+	display: flex;
+	flex-direction: column;
+	width: var(--automlp-fi-width, 360px);
+	max-width: 100%;
+	box-sizing: border-box;
+	background: var(--automlp-fi-bg);
+	color: var(--automlp-fi-text);
+	border-left: 1px solid var(--automlp-fi-border);
+	box-shadow: -8px 0 24px rgba(15, 23, 42, 0.08);
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	font-size: 13px;
+	line-height: 1.45;
+}
+
+#automlp-fi * {
+	box-sizing: border-box;
+}
+
+#automlp-fi .automlp-fi__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 12px 14px;
+	background: var(--automlp-fi-surface);
+	border-bottom: 1px solid var(--automlp-fi-border);
+}
+
+#automlp-fi .automlp-fi__title {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+}
+
+#automlp-fi .automlp-fi__close {
+	border: 0;
+	background: transparent;
+	color: var(--automlp-fi-muted);
+	cursor: pointer;
+	font-size: 18px;
+	line-height: 1;
+	padding: 4px 6px;
+}
+
+#automlp-fi .automlp-fi__body {
+	flex: 1;
+	overflow: auto;
+	padding: 14px;
+}
+
+#automlp-fi .automlp-fi__hint {
+	margin: 0 0 12px;
+	color: var(--automlp-fi-muted);
+}
+
+#automlp-fi .automlp-fi__card {
+	background: var(--automlp-fi-surface);
+	border: 1px solid var(--automlp-fi-border);
+	border-radius: 8px;
+	padding: 12px;
+	margin-bottom: 12px;
+}
+
+#automlp-fi .automlp-fi__label {
+	display: block;
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--automlp-fi-muted);
+	margin-bottom: 4px;
+}
+
+#automlp-fi .automlp-fi__value {
+	margin: 0 0 10px;
+	word-break: break-word;
+}
+
+#automlp-fi .automlp-fi__value:last-child {
+	margin-bottom: 0;
+}
+
+#automlp-fi .automlp-fi__badge {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 600;
+}
+
+#automlp-fi .automlp-fi__badge.is-bad {
+	background: var(--automlp-fi-warn-bg);
+	color: var(--automlp-fi-warn);
+}
+
+#automlp-fi .automlp-fi__badge.is-ok {
+	background: var(--automlp-fi-ok-bg);
+	color: var(--automlp-fi-ok);
+}
+
+#automlp-fi .automlp-fi__fix {
+	display: inline-block;
+	margin-top: 4px;
+	padding: 8px 12px;
+	border-radius: 6px;
+	background: var(--automlp-fi-primary);
+	color: #fff !important;
+	text-decoration: none !important;
+	font-weight: 600;
+}
+
+#automlp-fi .automlp-fi__fix:hover {
+	filter: brightness(0.95);
+}
+
+#automlp-fi .automlp-fi__ids {
+	margin: 0;
+	padding-left: 18px;
+}
+
+#automlp-fi .automlp-fi__ids li {
+	margin: 0 0 4px;
+}
+
+.automlp-fi-mark {
+	outline: 2px dashed rgba(37, 99, 235, 0.55) !important;
+	outline-offset: 2px;
+	cursor: crosshair !important;
+}
+
+.automlp-fi-untranslated {
+	outline-color: rgba(180, 83, 9, 0.85) !important;
+	background-color: rgba(245, 158, 11, 0.12) !important;
+}
+
+.automlp-fi-selected {
+	outline: 2px solid #2563eb !important;
+	outline-offset: 2px;
+	background-color: rgba(37, 99, 235, 0.12) !important;
+}
+
+#automlp-fi .automlp-fi__detail:empty {
+	display: none;
+}
+
+#automlp-fi .automlp-fi__scan {
+	border-top: 1px solid var(--automlp-fi-border);
+	padding-top: 12px;
+}
+
+#automlp-fi .automlp-fi__scan-title {
+	margin: 0 0 6px;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+#automlp-fi .automlp-fi__scan-summary {
+	margin: 0 0 8px;
+	color: var(--automlp-fi-warn);
+	font-weight: 600;
+}
+
+#automlp-fi .automlp-fi__group {
+	margin: 0 0 10px;
+	background: var(--automlp-fi-surface);
+	border: 1px solid var(--automlp-fi-border);
+	border-radius: 8px;
+}
+
+#automlp-fi .automlp-fi__group-title {
+	padding: 8px 10px;
+	cursor: pointer;
+	font-weight: 600;
+}
+
+#automlp-fi .automlp-fi__items {
+	margin: 0;
+	padding: 0 6px 6px;
+	list-style: none;
+}
+
+#automlp-fi .automlp-fi__item {
+	display: block;
+	width: 100%;
+	padding: 6px 8px;
+	border: 0;
+	border-radius: 4px;
+	background: transparent;
+	color: var(--automlp-fi-text);
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+	word-break: break-word;
+}
+
+#automlp-fi .automlp-fi__item:hover,
+#automlp-fi .automlp-fi__item:focus-visible {
+	background: var(--automlp-fi-warn-bg);
+	outline: 2px solid var(--automlp-fi-primary);
+	outline-offset: -2px;
+}
+
+.automlp-fi-listed {
+	outline-color: rgba(180, 83, 9, 0.85) !important;
+}
+
+.automlp-fi-flash {
+	animation: automlp-fi-flash 1.2s ease-out 2;
+}
+
+@keyframes automlp-fi-flash {
+	0% {
+		box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+	}
+
+	100% {
+		box-shadow: 0 0 0 12px rgba(37, 99, 235, 0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.automlp-fi-flash {
+		animation: none;
+	}
+}
+
+/* Loading skeleton for the untranslated list. */
+.automlp-fi__skeleton {
+	display: grid;
+	gap: 8px;
+	padding: 4px 0;
+}
+
+.automlp-fi__skel-row {
+	height: 14px;
+	border-radius: 4px;
+	background: linear-gradient(90deg, #e6e6e6 25%, #f5f5f5 37%, #e6e6e6 63%);
+	background-size: 400% 100%;
+	animation: automlp-fi-shimmer 1.4s ease infinite;
+}
+
+.automlp-fi__skel-row:nth-child(odd) {
+	width: 85%;
+}
+
+.automlp-fi__skel-row--title {
+	width: 50%;
+	height: 18px;
+}
+
+@keyframes automlp-fi-shimmer {
+
+	0% {
+		background-position: 100% 50%;
+	}
+
+	100% {
+		background-position: 0 50%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+	.automlp-fi__skel-row {
+		animation: none;
+	}
+}
+
+/* Container layer */
+.automlp-fi__chain {
+	margin: 0 0 10px;
+	padding-left: 16px;
+	font-size: 12px;
+}
+.automlp-fi__chain li {
+	margin: 0 0 6px;
+	word-break: break-word;
+}
+.automlp-fi__mono {
+	font-family: Menlo, Consolas, monospace;
+	font-size: 11px;
+}
+.automlp-fi__edit {
+	margin-left: 4px;
+	font-weight: 600;
+}
