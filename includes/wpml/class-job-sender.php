@@ -44,6 +44,28 @@ class Job_Sender {
 	private static $pending_provider = '';
 
 	/**
+	 * Register a page builder post's strings with WPML before its job is built.
+	 *
+	 * WPML adds builder text to a job only as package strings, and rescans a
+	 * post only when it has no package at all. An empty or stale package
+	 * would produce a job without the layout text.
+	 *
+	 * @param \WP_Post $post Source post.
+	 * @return void
+	 */
+	private static function register_builder_strings( $post ) {
+		if ( ! apply_filters( 'wpml_pb_is_page_builder_page', false, $post ) ) {
+			return;
+		}
+
+		try {
+			do_action( 'wpml_pb_register_all_strings_for_translation', $post );
+		} catch ( \Throwable $e ) {
+			unset( $e ); // Writer refuses a job that arrives without builder strings.
+		}
+	}
+
+	/**
 	 * Queue one post for one target language.
 	 *
 	 * @param int    $post_id   Source post id.
@@ -103,6 +125,8 @@ class Job_Sender {
 		if ( ! self::classes_available() ) {
 			return new \WP_Error( 'automlp_no_wpml_tm', __( 'WPML Translation Management is not available.', 'wpml-translation-check' ) );
 		}
+
+		self::register_builder_strings( $post );
 
 		self::flag_build();
 		self::remember_provider( $provider );

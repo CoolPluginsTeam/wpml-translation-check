@@ -137,10 +137,8 @@ class Writer {
 		}
 
 		// A recovered job may already have been saved before its run died.
-		// Still verify the result: WPML marks the job complete before page
-		// builder content is applied, so "complete" alone proves nothing.
 		if ( self::is_completed_in_wpml( $wpml_job_id ) ) {
-			$incomplete = self::verify_post_content( $job, $translated );
+			$incomplete = self::verify_translated_post( $job );
 
 			if ( is_wp_error( $incomplete ) ) {
 				return $incomplete;
@@ -233,7 +231,7 @@ class Writer {
 			);
 		}
 
-		$incomplete = self::verify_post_content( $job, $translated );
+		$incomplete = self::verify_translated_post( $job );
 
 		if ( is_wp_error( $incomplete ) ) {
 			return $incomplete;
@@ -246,165 +244,25 @@ class Writer {
 	}
 
 	/**
-	 * Make sure WPML actually applied the translated body.
+	 * Confirm WPML created the translated post for a completed job.
 	 *
-	 * For page builder posts (Gutenberg, Elementor) WPML saves the post with
-	 * an empty body and fills it from the package string translations in a
-	 * later step. That step depends on per-request state and can be skipped
-	 * (seen when the queue runs under WP-CLI cron), leaving an empty page
-	 * while the WPML job reads "complete". When that happens, ask WPML to
-	 * resave the translation from its own string translations, then check
-	 * again. Still missing means the job must not be reported as done.
+	 * WPML applies custom fields and page builder data itself, following its
+	 * Custom Fields Translation settings, so only its result is checked here.
 	 *
-	 * @param array $job        Queue row.
-	 * @param array $translated field_name => translated text.
+	 * @param array $job Queue row.
 	 * @return true|\WP_Error
 	 */
-	private static function verify_post_content( array $job, array $translated ) {
-		$kind      = isset( $job['kind'] ) ? (string) $job['kind'] : 'post';
-		$source_id = isset( $job['source_id'] ) ? (int) $job['source_id'] : 0;
+	private static function verify_translated_post( array $job ) {
+		$kind = isset( $job['kind'] ) ? (string) $job['kind'] : 'post';
 
-		if ( 'post' !== $kind || ! $source_id ) {
-			return true;
-		}
-
-		$source_content = (string) get_post_field( 'post_content', $source_id, 'raw' );
-
-		// Nothing to compare against: an empty source legitimately stays empty.
-		if ( '' === trim( $source_content ) ) {
-			return true;
-		}
-
-		$target_id = self::translated_id( $job );
-
-		if ( ! $target_id ) {
-			return new \WP_Error(
-				'automlp_no_translated_post',
-				__( 'WPML accepted the translation but no translated post was found.', 'wpml-translation-check' )
-			);
-		}
-
-		$needles = self::page_builder_needles( $translated );
-
-		if ( self::is_body_applied( $target_id, $needles ) ) {
-			return true;
-		}
-
-		self::resave_page_builder_translation( $target_id, $source_id );
-
-		if ( self::is_body_applied( $target_id, $needles ) ) {
+		if ( 'post' !== $kind || self::translated_id( $job ) ) {
 			return true;
 		}
 
 		return new \WP_Error(
-			'automlp_empty_body',
-			sprintf(
-				/* translators: %d: translated post id */
-				__( 'WPML saved translated post #%d without its translated content. The job will be retried.', 'wpml-translation-check' ),
-				$target_id
-			)
+			'automlp_no_translated_post',
+			__( 'WPML accepted the translation but no translated post was found.', 'wpml-translation-check' )
 		);
-	}
-
-	/**
-	 * Short samples of translated page builder strings.
-	 *
-	 * Page builder text reaches the post only through WPML's package update,
-	 * so finding some of it in the saved post proves that step ran.
-	 *
-	 * @param array $translated field_name => translated text.
-	 * @return string[]
-	 */
-	private static function page_builder_needles( array $translated ) {
-		$needles = array();
-
-		foreach ( $translated as $name => $value ) {
-			if ( 0 !== strpos( (string) $name, 'package-string-' ) ) {
-				continue;
-			}
-
-			$text = trim( preg_replace( '/\s+/u', ' ', wp_strip_all_tags( (string) $value ) ) );
-
-			if ( mb_strlen( $text ) < 6 ) {
-				continue;
-			}
-
-			$needles[] = mb_substr( $text, 0, 20 );
-
-			if ( count( $needles ) >= 10 ) {
-				break;
-			}
-		}
-
-		return $needles;
-	}
-
-	/**
-	 * Does the translated post carry its translated body?
-	 *
-	 * Without page builder samples only emptiness can be judged. With them,
-	 * at least one sample must appear in the content or the Elementor data.
-	 *
-	 * @param int      $post_id Translated post id.
-	 * @param string[] $needles Samples from page_builder_needles().
-	 * @return bool
-	 */
-	private static function is_body_applied( $post_id, array $needles ) {
-		clean_post_cache( $post_id );
-
-		$content = (string) get_post_field( 'post_content', $post_id, 'raw' );
-
-		if ( '' === trim( $content ) ) {
-			return false;
-		}
-
-		if ( empty( $needles ) ) {
-			return true;
-		}
-
-		$haystack = preg_replace( '/\s+/u', ' ', wp_strip_all_tags( $content ) )
-			. "\n" . (string) get_post_meta( $post_id, '_elementor_data', true );
-
-		foreach ( $needles as $needle ) {
-			$escaped = substr( (string) wp_json_encode( $needle ), 1, -1 );
-
-			if ( false !== strpos( $haystack, $needle ) || ( '' !== $escaped && false !== strpos( $haystack, $escaped ) ) ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	/**
-	 * Rebuild a translated page builder post through WPML's own hooks.
-	 *
-	 * Uses the same public actions WPML runs after a translation job: queue
-	 * the post's packages for an update, then apply the string translations.
-	 *
-	 * @param int $target_id Translated post id.
-	 * @param int $source_id Original post id.
-	 * @return void
-	 */
-	private static function resave_page_builder_translation( $target_id, $source_id ) {
-		global $sitepress;
-
-		if ( ! $sitepress || ! class_exists( '\WPML_Translation_Element_Factory' ) ) {
-			return;
-		}
-
-		$element = ( new \WPML_Translation_Element_Factory( $sitepress ) )->create_post( (int) $target_id );
-
-		self::$writing = true;
-
-		try {
-			do_action( 'wpml_pb_resave_post_translation', $element, false );
-			do_action( 'wpml_pb_finished_adding_string_translations', (int) $target_id, (int) $source_id, array() );
-		} catch ( \Throwable $e ) {
-			unset( $e ); // The caller re-checks the body and reports the failure.
-		} finally {
-			self::$writing = false;
-		}
 	}
 
 	/**

@@ -9,6 +9,20 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
+// Free-only bookkeeping.
+wp_clear_scheduled_hook( 'automlp_extra_data_update' );
+wp_clear_scheduled_hook( 'automlp-ai_extra_data_update' );
+delete_option( 'automlp_ai_activation_time' );
+delete_option( 'automlp_ai_install_date' );
+delete_option( 'automlp_ai_initial_save_version' );
+delete_option( 'AUTOMLP_AI_VERSION' );
+
+// Pro shares this queue, bot user and options. Keep them while Pro is still
+// installed so switching to Pro does not lose queued jobs.
+if ( file_exists( WP_PLUGIN_DIR . '/automlp-pro/automlp-pro.php' ) ) {
+	return;
+}
+
 require_once __DIR__ . '/includes/queue/class-queue-table.php';
 \AUTOMLP_WPML\Includes\Queue\Queue_Table::uninstall();
 
@@ -35,3 +49,7 @@ require_once __DIR__ . '/includes/wpml/class-bot-translator.php';
 delete_option( 'automlp_background_flow' );
 delete_option( 'automlp_bot_user_id' );
 delete_option( 'automlp_bot_pairs_signature' );
+
+// One-time loopback tokens used by the queue dispatcher.
+global $wpdb;
+$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s", $wpdb->esc_like( 'automlp_tick_used_' ) . '%' ) ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery
