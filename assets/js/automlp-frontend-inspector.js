@@ -54,6 +54,11 @@
 
 	var added = window.WeakSet ? new WeakSet() : null;
 	var moQueued = null;
+	var markSeq = 0;
+
+	function scheduleWork(fn) {
+		window.setTimeout(fn, 0);
+	}
 
 	function isOurNode(node) {
 		if (!node) {
@@ -88,7 +93,7 @@
 		}
 		if (state.mo && state.moPaused === 0 && document.body) {
 			try {
-				state.mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+				state.mo.observe(document.body, { childList: true, subtree: true });
 			} catch (e) {
 				// ignore
 			}
@@ -105,29 +110,29 @@
 	}
 
 	if (added && window.MutationObserver) {
+		var moRaf = 0;
 		state.mo = new MutationObserver(function (records) {
 			if (state.moPaused || !state.open) {
 				return;
 			}
-			// Throttle bursts (e.g. large panel re-renders) to one microtask.
+			// Coalesce bursts to one animation frame (no characterData — that loops with mark/scan).
 			if (moQueued) {
+				moQueued = moQueued.concat(records);
 				return;
 			}
-			moQueued = records;
-			Promise.resolve().then(function () {
+			moQueued = records.slice();
+			if (moRaf) {
+				return;
+			}
+			moRaf = window.requestAnimationFrame(function () {
+				moRaf = 0;
 				var batch = moQueued || [];
 				moQueued = null;
-				if (state.moPaused || !added) {
+				if (state.moPaused || !added || !state.open) {
 					return;
 				}
 				batch.forEach(function (r) {
-					if (r.type === 'characterData') {
-						if (!isOurNode(r.target)) {
-							added.add(r.target);
-						}
-						return;
-					}
-					Array.prototype.forEach.call(r.addedNodes, function (n) {
+					Array.prototype.forEach.call(r.addedNodes || [], function (n) {
 						if (isOurNode(n)) {
 							return;
 						}
@@ -138,7 +143,7 @@
 				});
 			});
 		});
-		state.mo.observe(document.body, { childList: true, subtree: true, characterData: true });
+		state.mo.observe(document.body, { childList: true, subtree: true });
 	}
 
 	function isAdded(node) {
@@ -532,6 +537,10 @@
 		if (!text || !state.patterns || !state.patterns.length) {
 			return null;
 		}
+		// Huge concatenated block texts make every regex O(n) and freeze the tab.
+		if (text.length > 400) {
+			return null;
+		}
 		for (var i = 0; i < state.patterns.length; i++) {
 			var item = state.patterns[i];
 			if (item.re.test(text)) {
@@ -609,78 +618,161 @@
 		return true;
 	}
 
-	function markPage() {
-		withMoPaused(function () {
+	function markPage(done) {
+		var seq = ++markSeq;
 		var byText = state.byText;
-		var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
-			acceptNode: function (node) {
-				if (!node.parentElement || isInspectorUi(node.parentElement)) {
-					return NodeFilter.FILTER_REJECT;
+		var MARK_CAP = 400;
+		var CHUNK = 80;
+		var marked = 0;
+		var finished = false;
+
+		function finish() {
+			if (finished) {
+				return;
+			}
+			finished = true;
+			if (typeof done === 'function') {
+				done();
+			}
+		}
+
+		function stillValid() {
+			return seq === markSeq && state.open;
+		}
+
+		// Collect candidate text nodes first (cheap accept), then apply marks in chunks.
+		var textNodes = [];
+		withMoPaused(function () {
+			var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+				acceptNode: function (node) {
+					if (!node.parentElement || isInspectorUi(node.parentElement)) {
+						return NodeFilter.FILTER_REJECT;
+					}
+					var tag = node.parentElement.tagName;
+					if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') {
+						return NodeFilter.FILTER_REJECT;
+					}
+					var t = normalize(node.nodeValue);
+					return t.length > 1 && byText[t] ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
 				}
-				var tag = node.parentElement.tagName;
-				if (tag === 'SCRIPT' || tag === 'STYLE' || tag === 'NOSCRIPT') {
-					return NodeFilter.FILTER_REJECT;
-				}
-				var t = normalize(node.nodeValue);
-				return t.length > 1 && byText[t] ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+			});
+			var node;
+			while ((node = walker.nextNode()) && textNodes.length < MARK_CAP) {
+				textNodes.push(node);
 			}
 		});
-		var node;
-		var marked = 0;
-		while ((node = walker.nextNode()) && marked <= 2000) {
-			var parent = node.parentElement;
-			var text = normalize(node.nodeValue);
-			var hint = pickHint(byText[text]);
-			if (applyMark(parent, text, hint)) {
-				marked++;
+
+		var ti = 0;
+		function markTextChunk() {
+			if (!stillValid()) {
+				return finish();
 			}
-		}
-		// Block-level: HTML/placeholder gettext renders across multiple text nodes.
-		var blocks = document.body.querySelectorAll('p,li,td,th,h1,h2,h3,h4,h5,h6,blockquote,label,button,figcaption,dt,dd,summary,legend');
-		for (var i = 0; i < blocks.length && marked <= 2000; i++) {
-			var el = blocks[i];
-			if (isInspectorUi(el) || el.classList.contains('automlp-fi-mark')) {
-				continue;
-			}
-			var btext = normalize(el.textContent);
-			if (btext.length < 12) {
-				continue;
-			}
-			var bhint = pickHint(byText[btext]) || matchPattern(btext);
-			if (bhint && applyMark(el, btext, bhint)) {
-				marked++;
-			}
-		}
-			// Form-control / attribute texts.
-			var controls = document.body.querySelectorAll('select, option, optgroup, input, textarea, button, [placeholder], [title], [aria-label]');
-			for (var c = 0; c < controls.length && marked <= 2000; c++) {
-				var ctrl = controls[c];
-				if (isInspectorUi(ctrl)) {
-					continue;
-				}
-				if (ctrl.tagName === 'OPTION') {
-					var otext = normalize(ctrl.getAttribute('data-automlp-fi-text') || ctrl.label || ctrl.text || ctrl.textContent || '');
-					if (otext.length > 1 && byText[otext] && applyMark(ctrl, otext, pickHint(byText[otext]))) {
-						marked++;
-					}
-					continue;
-				}
-				var attrs = attrCandidates(ctrl);
-				for (var a = 0; a < attrs.length && marked <= 2000; a++) {
-					var at = attrs[a];
-					if (!byText[at.text]) {
+			withMoPaused(function () {
+				var n = 0;
+				while (ti < textNodes.length && n < CHUNK && marked < MARK_CAP) {
+					var tn = textNodes[ti++];
+					var parent = tn.parentElement;
+					if (!parent) {
 						continue;
 					}
-					if (ctrl.classList.contains('automlp-fi-mark')) {
+					var text = normalize(tn.nodeValue);
+					var hint = pickHint(byText[text]);
+					if (applyMark(parent, text, hint)) {
+						marked++;
+						n++;
+					}
+				}
+			});
+			if (ti < textNodes.length && marked < MARK_CAP && stillValid()) {
+				scheduleWork(markTextChunk);
+				return;
+			}
+			scheduleWork(markBlocksChunk);
+		}
+
+		var blocks = null;
+		var bi = 0;
+		function markBlocksChunk() {
+			if (!stillValid()) {
+				return finish();
+			}
+			if (!blocks) {
+				blocks = document.body.querySelectorAll('p,li,td,th,h1,h2,h3,h4,h5,h6,blockquote,label,button,figcaption,dt,dd,summary,legend');
+			}
+			withMoPaused(function () {
+				var n = 0;
+				while (bi < blocks.length && n < CHUNK && marked < MARK_CAP) {
+					var el = blocks[bi++];
+					if (isInspectorUi(el) || el.classList.contains('automlp-fi-mark')) {
+						continue;
+					}
+					var btext = normalize(el.textContent);
+					if (btext.length < 12 || btext.length > 400) {
+						continue;
+					}
+					var bhint = pickHint(byText[btext]) || matchPattern(btext);
+					if (bhint && applyMark(el, btext, bhint)) {
+						marked++;
+						n++;
+					}
+				}
+			});
+			if (bi < blocks.length && marked < MARK_CAP && stillValid()) {
+				scheduleWork(markBlocksChunk);
+				return;
+			}
+			scheduleWork(markControlsChunk);
+		}
+
+		var controls = null;
+		var ci = 0;
+		function markControlsChunk() {
+			if (!stillValid()) {
+				return finish();
+			}
+			if (!controls) {
+				controls = document.body.querySelectorAll('select, option, optgroup, input, textarea, button, [placeholder], [title], [aria-label]');
+			}
+			withMoPaused(function () {
+				var n = 0;
+				while (ci < controls.length && n < CHUNK && marked < MARK_CAP) {
+					var ctrl = controls[ci++];
+					if (isInspectorUi(ctrl)) {
+						continue;
+					}
+					if (ctrl.tagName === 'OPTION') {
+						var otext = normalize(ctrl.getAttribute('data-automlp-fi-text') || ctrl.label || ctrl.text || ctrl.textContent || '');
+						if (otext.length > 1 && byText[otext] && applyMark(ctrl, otext, pickHint(byText[otext]))) {
+							marked++;
+							n++;
+						}
+						continue;
+					}
+					var attrs = attrCandidates(ctrl);
+					for (var a = 0; a < attrs.length && marked < MARK_CAP; a++) {
+						var at = attrs[a];
+						if (!byText[at.text]) {
+							continue;
+						}
+						if (ctrl.classList.contains('automlp-fi-mark')) {
+							break;
+						}
+						if (applyMark(ctrl, at.text, pickHint(byText[at.text]))) {
+							marked++;
+							n++;
+						}
 						break;
 					}
-					if (applyMark(ctrl, at.text, pickHint(byText[at.text]))) {
-						marked++;
-					}
-					break;
 				}
+			});
+			if (ci < controls.length && marked < MARK_CAP && stillValid()) {
+				scheduleWork(markControlsChunk);
+				return;
 			}
-		});
+			finish();
+		}
+
+		scheduleWork(markTextChunk);
 	}
 
 	function unmarkPage() {
@@ -1197,7 +1289,8 @@
 			items.push({ t: key, h: hint });
 			nodes.push(target);
 		}
-		Array.prototype.forEach.call(document.querySelectorAll('.automlp-fi-mark'), function (node) {
+		var markNodes = document.querySelectorAll('.automlp-fi-mark');
+		Array.prototype.forEach.call(markNodes, function (node) {
 			add(node, node.getAttribute('data-automlp-fi-text'), true);
 		});
 		// Block-level pattern hits that were marked on the <p>/<li> itself.
@@ -1207,13 +1300,15 @@
 				add(node, t, true);
 			}
 		});
-		// Text rendered inside known containers (Elementor widgets, blocks, …) that
-		// has no string-map mark: exactly what a click on it would resolve.
+		// Only walk unmarked container texts when few marks exist (avoids second full-DOM freeze).
 		var texts = (state.ct && state.ct.texts) || null;
-		if (texts && document.body) {
+		if (texts && document.body && markNodes.length < 40) {
 			var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
 			var tn;
-			while ((tn = walker.nextNode())) {
+			var walked = 0;
+			var WALK_CAP = 2500;
+			while ((tn = walker.nextNode()) && walked < WALK_CAP) {
+				walked++;
 				var parent = tn.parentElement;
 				if (!parent || isInspectorUi(parent) || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE)$/.test(parent.tagName)) {
 					continue;
@@ -1234,6 +1329,10 @@
 			return rank(items[b].h) - rank(items[a].h) || a - b;
 		});
 		var limit = parseInt(cfg.scanLimit, 10) || 200;
+		// Soft ceiling so huge Elementor pages finish scanning without a stuck loader.
+		if (limit > 80) {
+			limit = 80;
+		}
 		order = order.slice(0, limit);
 		return {
 			items: order.map(function (i) { return items[i]; }),
@@ -1571,12 +1670,18 @@
 						throw new Error('scan');
 					}
 					results = results.concat(json.data.results);
-					renderScan(scan, results, offset + size >= scan.items.length);
-					next(offset + size);
+					var finished = offset + size >= scan.items.length;
+					renderScan(scan, results, finished);
+					if (!finished) {
+						scheduleWork(function () {
+							next(offset + size);
+						});
+					}
 				})
 				.catch(function () {
 					if (seq === state.scanSeq && state.open) {
 						setBusy(false);
+						renderScan(scan, results, true);
 						state.listEl.appendChild(el('p', 'automlp-fi__hint', i18n.scanError || 'Error'));
 					}
 				});
@@ -1609,7 +1714,8 @@
 		state.listEl.innerHTML = '';
 		state.listEl.appendChild(el('p', 'automlp-fi__scan-summary', format(i18n.scanSummary || '%1$d / %2$d', count, results.length)));
 		setBusy(!done);
-		if (!done) {
+		// Only show skeleton before the first batch lands — keeps the list usable on slow AJAX.
+		if (!done && results.length === 0) {
 			state.listEl.appendChild(skeleton(3));
 		}
 		if (scan.total > scan.limit) {
@@ -1834,6 +1940,50 @@
 	}
 
 	/**
+	 * Deepest non-bulk element under (x,y) that directly owns visible text.
+	 * Falls back when caret APIs miss (overlays, replaced content, Elementor spacers).
+	 */
+	function leafTextElementFromPoint(x, y) {
+		var tn = textNodeFromPoint(x, y);
+		if (tn && tn.parentElement && !isInspectorUi(tn.parentElement)) {
+			return tn.parentElement;
+		}
+		var stack = [];
+		try {
+			if (document.elementsFromPoint) {
+				stack = document.elementsFromPoint(x, y) || [];
+			} else {
+				var top = document.elementFromPoint(x, y);
+				if (top) {
+					stack = [top];
+				}
+			}
+		} catch (e) {
+			stack = [];
+		}
+		for (var i = 0; i < stack.length; i++) {
+			var elNode = stack[i];
+			if (!elNode || elNode.nodeType !== 1 || isInspectorUi(elNode)) {
+				continue;
+			}
+			if (/^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|SVG|PATH|IMG|VIDEO|CANVAS)$/i.test(elNode.tagName)) {
+				continue;
+			}
+			var direct = '';
+			var kids = elNode.childNodes;
+			for (var k = 0; k < kids.length; k++) {
+				if (kids[k].nodeType === 3) {
+					direct += kids[k].nodeValue || '';
+				}
+			}
+			if (normalize(direct).length > 1 && !isBulkContainer(elNode)) {
+				return elNode;
+			}
+		}
+		return null;
+	}
+
+	/**
 	 * Deepest non-bulk .automlp-fi-mark under the pointer (pierces stretched link overlays).
 	 */
 	function leafMarkFromPoint(x, y) {
@@ -1880,34 +2030,28 @@
 		if (leafHit) {
 			return { kind: 'node', node: leafHit };
 		}
-		// Prefer caret text under the pointer (empty padding / grid gaps).
+		// Prefer caret text under the pointer — always resolve THAT sentence first.
+		// (Previously unmarked leaf text inside a multi-mark Elementor container fell
+		// through to multi-card, so a specific testimonial sentence could not be selected.)
 		var tn = textNodeFromPoint(event.clientX, event.clientY);
 		if (tn && tn.parentElement) {
 			var mark = tn.parentElement.closest ? tn.parentElement.closest('.automlp-fi-mark') : null;
-			// Leaf mark only — a marked wrapper with nested marks must not concatenate.
+			// Non-bulk marked ancestor of the caret text.
 			if (mark && !isInspectorUi(mark) && !isBulkContainer(mark)) {
 				return { kind: 'node', node: mark };
 			}
-			// Unmarked text sitting inside a multi-mark container -> multi-card (never concatenate).
-			var bulk = tn.parentElement;
-			while (bulk && bulk !== document.body && !isBulkContainer(bulk)) {
-				bulk = bulk.parentElement;
-			}
-			if (bulk && isBulkContainer(bulk)) {
-				var bulkMarks = Array.prototype.slice.call(bulk.querySelectorAll('.automlp-fi-mark')).filter(function (n) {
-					return !isInspectorUi(n);
-				});
-				if (bulkMarks.length >= 2) {
-					return { kind: 'multi', node: bulk, marks: bulkMarks };
-				}
-				if (bulkMarks.length === 1) {
-					return { kind: 'node', node: bulkMarks[0] };
-				}
-			}
-			// Truly isolated unmarked leaf text.
+			// Unmarked (or bulk-wrapped) leaf: still resolve the caret parent as the unit.
 			var leaf = tn.parentElement;
-			if (leaf && leaf.nodeType === 1 && !isInspectorUi(leaf) && !isBulkContainer(leaf)) {
-				return { kind: 'node', node: leaf };
+			if (leaf && leaf.nodeType === 1 && !isInspectorUi(leaf)) {
+				 // If leaf itself is a bulk wrapper, try a single child mark under the caret.
+				if (isBulkContainer(leaf)) {
+					var under = leafMarkFromPoint(event.clientX, event.clientY);
+					if (under) {
+						return { kind: 'node', node: under };
+					}
+				} else {
+					return { kind: 'node', node: leaf };
+				}
 			}
 		}
 		// Hit a mark directly (innermost via closest). Wrapper marks with nested marks -> multi.
@@ -1933,6 +2077,19 @@
 				return { kind: 'node', node: raw };
 			}
 			return { kind: 'select', node: selectEl };
+		}
+		// Prefer the deepest text-bearing leaf under the pointer over a bulk multi-card.
+		// Elementor testimonials / absolute overlays often miss caretRangeFromPoint;
+		// without this, empty-space logic selects a huge container (Contains N texts).
+		var textLeaf = leafTextElementFromPoint(event.clientX, event.clientY);
+		if (textLeaf) {
+			var textMark = textLeaf.closest ? textLeaf.closest('.automlp-fi-mark') : null;
+			if (textMark && !isInspectorUi(textMark) && !isBulkContainer(textMark)) {
+				return { kind: 'node', node: textMark };
+			}
+			if (!isBulkContainer(textLeaf)) {
+				return { kind: 'node', node: textLeaf };
+			}
 		}
 		// Empty space inside a multi-mark container -> multi-card, never concatenate.
 		var container = raw;
@@ -2023,8 +2180,18 @@
 				}
 				indexMap(map);
 				state.detailEl.innerHTML = '';
-				markPage();
-				runScan();
+				// Yield so panel/skeleton can paint; mark in chunks, then scan.
+				scheduleWork(function () {
+					if (!state.open) {
+						return;
+					}
+					markPage(function () {
+						if (!state.open) {
+							return;
+						}
+						runScan();
+					});
+				});
 			})
 			.catch(function () {
 				state.busy = false;
@@ -2066,6 +2233,7 @@
 			window.removeEventListener('resize', state.onWinResize);
 			state.onWinResize = null;
 		}
+		markSeq++;
 		unmarkPage();
 		clearPageSelection();
 		if (state.panel) {

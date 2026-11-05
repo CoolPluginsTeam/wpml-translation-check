@@ -19,7 +19,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Origin_Collector {
 
-	const MAX_ENTRIES  = 3500;
+	const MAX_ENTRIES  = 2200;
+	const MAX_GETTEXT_ENTRIES = 900;
 	const MAX_TEXT_LEN = 500;
 
 	/**
@@ -28,6 +29,9 @@ class Origin_Collector {
 	 * @var array<string, array<int, array<string, mixed>>>
 	 */
 	private static $map = array();
+
+	/** @var int */
+	private static $gettext_entry_count = 0;
 
 	/**
 	 * Pre-collected option/theme_mod value => origin hint.
@@ -122,8 +126,10 @@ class Origin_Collector {
 		self::$phase = did_action( 'template_redirect' ) ? 'r' : 'e';
 		add_action( 'template_redirect', array( __CLASS__, 'enter_render_phase' ), 0 );
 
-		// Track every option_* read during this inspect render (covers non-autoload options).
-		add_action( 'all', array( __CLASS__, 'on_all_hooks' ), 1, 2 );
+		// option_* via 'all' is expensive on Elementor pages; opt-in only.
+		if ( apply_filters( 'automlp_fi_track_option_hooks', false ) ) {
+			add_action( 'all', array( __CLASS__, 'on_all_hooks' ), 1, 2 );
+		}
 
 		add_filter( 'gettext', array( __CLASS__, 'on_gettext' ), 9999, 3 );
 		add_filter( 'gettext_with_context', array( __CLASS__, 'on_gettext_with_context' ), 9999, 4 );
@@ -609,6 +615,12 @@ class Origin_Collector {
 			return;
 		}
 		$likely_untranslated = self::is_secondary_lang() && '' !== $visible && $visible === $orig_norm;
+
+		// Cap translated gettext noise — keeps Elementor pages interactive under inspect.
+		if ( ! $likely_untranslated && self::$gettext_entry_count >= self::MAX_GETTEXT_ENTRIES ) {
+			return;
+		}
+
 		$hint                = array(
 			'k'  => 'gettext',
 			'd'  => (string) $domain,
@@ -618,17 +630,20 @@ class Origin_Collector {
 			'ph' => self::$phase,
 			'sq' => ++self::$gettext_seq,
 		);
-		// Caller text domain + whether the frame is a theme or plugin (generic path signals).
-		$caller = self::detect_caller();
-		if ( ! empty( $caller['d'] ) ) {
-			$hint['cd'] = $caller['d'];
-		}
-		if ( ! empty( $caller['cs'] ) ) {
-			$hint['cs'] = $caller['cs'];
+		// detect_caller is expensive (debug_backtrace); only for likely-untranslated / early slots.
+		if ( $likely_untranslated || self::$gettext_entry_count < 50 ) {
+			$caller = self::detect_caller();
+			if ( ! empty( $caller['d'] ) ) {
+				$hint['cd'] = $caller['d'];
+			}
+			if ( ! empty( $caller['cs'] ) ) {
+				$hint['cs'] = $caller['cs'];
+			}
 		}
 
 		if ( ! self::is_trivial( $visible ) ) {
 			self::record( $visible, $hint );
+			self::$gettext_entry_count++;
 			self::attach_value_matches( $visible );
 		}
 
