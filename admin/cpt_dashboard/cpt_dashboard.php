@@ -146,7 +146,10 @@ if(!defined('ABSPATH')){
                             if($old_data=='update'){
                                 $data['string_count'] = absint($data['string_count']) + absint($translate_data['string_count']);
                                 $data['character_count'] = absint($data['character_count']) + absint($translate_data['character_count']);
-                                $data['time_taken'] = absint($data['time_taken']) + absint($translate_data['time_taken']);
+                                // Drop a stored time that cannot be real so it does not poison the new total.
+                                $old_time = floatval($translate_data['time_taken']);
+                                $old_time = ($old_time > 0 && $old_time <= DAY_IN_SECONDS) ? $old_time : 0;
+                                $data['time_taken'] = max(0, floatval($data['time_taken'])) + $old_time;
                             }
                             
                             foreach($data as $id => $value){

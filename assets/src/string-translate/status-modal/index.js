@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   bulkTranslateStrings,
   initBulkTranslateStrings,
+  retryStringTranslation,
 } from "../bulk-translate";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -14,7 +15,6 @@ import {
 } from "../redux-store/features/selectors";
 import { __, sprintf } from "@wordpress/i18n";
 import ErrorModalBox from "../components/error-modal-box";
-import AIService from "../components/translate-provider/ai-services";
 import { store } from "../redux-store/store";
 import DOMPurify from "dompurify";
 
@@ -221,23 +221,13 @@ const StatusModal = ({ postIds, selectedLanguages, prefix, onDestory }) => {
   }, [pendingPosts, countInfo.errorPosts, translatePostInfo]);
 
   const AIErrorBtnHandler = (e) => {
-    const type = {
-      translateAgain: AIService.translateAgain,
-      continue: AIService.translateComplete,
-    };
+    const info = errorModalData;
+    closeErrorModal(e);
 
-    const btnType = e.target.dataset.status;
-    type[btnType]({
-      postId: errorModalData.parentPostId,
-      targetLang: errorModalData.targetLanguage,
-      storeDispatch,
-      prefix,
-      updateDestoryHandler,
-      nonce: errorModalData.nonce,
-      closeErrorModal,
-      completedStrings: errorModalData.completedStrings,
-      totalPosts: errorModalData.totalPosts,
-    });
+    // "Continue" keeps the error; "Translate" re-queues the failed strings.
+    if (e.target.dataset.status === "translateAgain") {
+      retryStringTranslation({ info, storeDispatch, updateDestoryHandler });
+    }
   };
 
   // When any string-aggregate row is completed, hide the header skeleton

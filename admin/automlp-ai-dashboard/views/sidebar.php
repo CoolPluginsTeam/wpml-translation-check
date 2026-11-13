@@ -33,10 +33,18 @@ if ( ! function_exists( 'automlp_ai_format_time_taken' ) ) :
 			return sprintf( esc_html__( '%1$d min %2$d sec', 'wpml-translation-check' ), $min, $sec );
 		}
 
-		$hours = floor( $time_taken / 3600 );
+		if ( $time_taken < DAY_IN_SECONDS ) {
+			$hours = floor( $time_taken / 3600 );
+			$min   = floor( ( $time_taken % 3600 ) / 60 );
+			// translators: 1: hours, 2: minutes.
+			return sprintf( esc_html__( '%1$d hours %2$d min', 'wpml-translation-check' ), $hours, $min );
+		}
+
+		$days  = floor( $time_taken / DAY_IN_SECONDS );
+		$hours = floor( ( $time_taken % DAY_IN_SECONDS ) / 3600 );
 		$min   = floor( ( $time_taken % 3600 ) / 60 );
-		// translators: 1: hours, 2: minutes.
-		return sprintf( esc_html__( '%1$d hours %2$d min', 'wpml-translation-check' ), $hours, $min );
+		// translators: 1: days, 2: hours, 3: minutes.
+		return sprintf( esc_html__( '%1$d days %2$d hours %3$d min', 'wpml-translation-check' ), $days, $hours, $min );
 	}
 endif;
 
@@ -135,19 +143,28 @@ endif;
 				$automlp_wpml_all_translation_data['automlp_ai'] = array();
 			}
 
-			$automlp_valid_providers = array('openai'=>'OpenAI Characters', 'google_ai'=>'Google Gemini Characters');
+			$automlp_valid_providers = array('openai'=>'OpenAI Characters', 'google'=>'Google Gemini Characters');
 			$totals = array_reduce(
 				$automlp_wpml_all_translation_data['automlp_ai'],
 				function ( $carry, $translation ) {
 					$carry['string_count']    += intval( $translation['string_count'] ?? 0 );
 					$carry['character_count'] += intval( $translation['character_count'] ?? 0 );
-					$carry['time_taken']      += intval( $translation['time_taken'] ?? 0 );
 
-					if(!isset($carry[$translation['service_provider']])){
-						$carry[$translation['service_provider']] = 0;
+					// Skip per-job times that cannot be real (older builds stored a Unix timestamp here).
+					$job_time = (float) ( $translation['time_taken'] ?? 0 );
+					if ( $job_time > 0 && $job_time <= DAY_IN_SECONDS ) {
+						$carry['time_taken'] += (int) round( $job_time );
 					}
 
-					$carry[$translation['service_provider']] += intval( $translation['character_count'] ?? 0 );
+					// Older builds saved google_ai / openai_ai as the provider slug.
+					$provider = (string) ( $translation['service_provider'] ?? '' );
+					$provider = str_replace( array( 'google_ai', 'openai_ai' ), array( 'google', 'openai' ), $provider );
+
+					if(!isset($carry[$provider])){
+						$carry[$provider] = 0;
+					}
+
+					$carry[$provider] += intval( $translation['character_count'] ?? 0 );
 
 					if ( ! empty( $translation['post_id'] ) ) {
 						$carry['translation_count']++;

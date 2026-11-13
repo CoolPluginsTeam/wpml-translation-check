@@ -48,3 +48,13 @@ postcss.config.js       export-ignore
 *.scss                  export-ignore
 .claude/                export-ignore
 .codex/                 export-ignore
+
+# Unminified sources (the .min versions are what the plugin loads)
+admin/automlp-ai-dashboard/css/admin-styles.css export-ignore
+admin/queue/queue-screen.css export-ignore
+admin/queue/queue-screen.js export-ignore
+assets/js/automlp-admin.js export-ignore
+
+# Not referenced by any code in the plugin
+assets/js/wpml-at-datatable.js export-ignore
+assets/css/wpml-at-datatable.css export-ignore

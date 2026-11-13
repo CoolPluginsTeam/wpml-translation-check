@@ -36,6 +36,7 @@ class Register_Assets {
 		$available_ai_services     = array();
 		$automlp_active_providers = get_option('automlp_enabled_providers', array('google', 'openai'));
 
+
 		// Enqueue translation dashboard/post list scripts.
 			if ( $needs_ai_services ) {
 				// Build from saved credentials so button shows "Add API Key" when key is missing/empty.
@@ -74,27 +75,6 @@ class Register_Assets {
 					'flag' => isset( $selected_language['flag_url'] ) ? $selected_language['flag_url'] : '',
 				);
 			}
-			wp_localize_script(
-				'automlp-wpml-auto-translate-admin',
-				'AUTOMLP_WPML_AUTO_TRANSLATE',
-				array(
-					'ajax'      => esc_url(admin_url('admin-ajax.php')),
-					'nonce'     => wp_create_nonce('automlp_wpml_auto_translate_nonce'),
-					'languages' => $selected_language,
-					'admin_url' => esc_url(admin_url()),
-					'i18n'      => array(
-						'errorPageId'      => esc_html__('Could not detect page ID for this row.', 'wpml-translation-check'),
-						'errorNoSelection' => esc_html__('Please select at least one post to translate.', 'wpml-translation-check'),
-						'errorNoLanguage'  => esc_html__('Please select a target language.', 'wpml-translation-check'),
-						'errorInvalidData' => esc_html__('Invalid post ID or language.', 'wpml-translation-check'),
-						'errorNoStrings'   => esc_html__('No translation strings found.', 'wpml-translation-check'),
-						'errorAjax'        => esc_html__('AJAX error while loading content.', 'wpml-translation-check'),
-						'errorAjaxSave'    => esc_html__('AJAX error while saving.', 'wpml-translation-check'),
-						'errorUnknown'     => esc_html__('Unknown error occurred.', 'wpml-translation-check'),
-					),
-				)
-			);
-
 			// Enqueue bulk translate build files on string translation page.
 			if ($is_string_translation) {
 
@@ -123,21 +103,14 @@ class Register_Assets {
 						'taxonomy_page'          => '',
 						'languageObject'         => $lang_object,
 						'selected_language_object' => $selected_lang_object,
-						'ajax_url'               => esc_url( admin_url( 'admin-ajax.php' ) ),  
-						'nonce'                  => wp_create_nonce('automlp_wpml_auto_translate_nonce'),
+						'nonce'                  => wp_create_nonce('wp_rest'),
 						'default_language_slug'  => $default_language,
-						'update_translate_data'   => 'automlp_wpml_update_translate_data',     
-						'update_translate_data_nonce' => wp_create_nonce( 'automlp_wpml_update_translate_data' ), 
-						'bulkTranslateRouteUrl' => get_rest_url(null, 'automlp-bulk-translate'),
-						'bulkTranslatePrivateKey' => wp_create_nonce('automlp_wpml_bulk_translate_entries_nonce'),
 						'automlp_wpml_url'           => esc_url(AUTOMLP_AI_PLUGIN_URL),
 						'AIServices' => $available_ai_services,
 						'automlp_active_providers' => $automlp_active_providers,
 						'admin_url' => admin_url(),
-						'ai_translate_route_url' => get_rest_url(null, 'automlp-bulk-translate'),
-						'ai_translate_route_nonce' => wp_create_nonce('wp_rest'),
-						'ai_translate_nonce' => wp_create_nonce('automlp_wpml_ai_translate_nonce'),
-						'get_glossary_validate' => wp_create_nonce('automlp_wpml_get_glossary_private'),
+						'queueRouteUrl'    => get_rest_url( null, 'automlp/v1' ),
+						'backgroundFlow'   => \AUTOMLP_WPML\Includes\Wpml\Background_Flow::enabled(),
 					)
 				);
 			}

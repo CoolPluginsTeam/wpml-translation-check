@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AutoMLP – AI Translation for WPML
  * Description: AutoMLP – AI translation addon for WPML that helps translate WordPress pages and posts content faster and more accurately.
- * Version: 1.2.8
+ * Version: 2.0.0
  * Author: Cool Plugins
  * Author URI: https://coolplugins.net/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=plugins_list
  * Text Domain: wpml-translation-check
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define plugin constants.
 if ( ! defined( 'AUTOMLP_AI_VERSION' ) ) {
-	define( 'AUTOMLP_AI_VERSION', '1.2.8' );
+	define( 'AUTOMLP_AI_VERSION', '2.0.0' );
 }
 if ( ! defined( 'AUTOMLP_AI_PLUGIN_DIR' ) ) {
 	define( 'AUTOMLP_AI_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -70,7 +70,6 @@ final class AUTOMLP_Ai_Translate_Addon {
 		$this->init_cron();
 	}
 
-
 	/**
 		 * Initialize the cron job for the plugin.
 		 */
@@ -83,6 +82,14 @@ final class AUTOMLP_Ai_Translate_Addon {
 			}
 
 	public function register_ai_client() {
+		if ( version_compare( get_option( 'AUTOMLP_AI_VERSION', '0' ), '1.3.0', '<' ) ) {
+			\AUTOMLP_WPML\Includes\Wpml\Legacy_Bridge::purge_legacy_meta();
+		}
+
+		if(is_admin()){
+			\AUTOMLP_WPML\Admin\Queue_Screen::boot();
+		}
+
 		$is_wp70 = function_exists( 'wp_ai_client_prompt' );
 		if ( ! $is_wp70 ) {
 			$sdk_autoload = AUTOMLP_AI_PLUGIN_DIR . 'vendor/wordpress/wp-ai-client/autoload.php';
@@ -350,25 +357,29 @@ final class AUTOMLP_Ai_Translate_Addon {
 	 */
 	private function load_dependencies() {
 		$files = array(
-			'helper/helper.php',
-			'includes/helper/sanitized-content.php',
 			'includes/wpml/builder/gutenberg/update-block-config.php',
-			'includes/wpml/get-package-content.php',
-			'includes/wpml/builder/content-update-base.php',
-			'includes/wpml/builder/elementor/elementor-update.php',
-			'includes/wpml/builder/gutenberg/gutenberg-update.php',
-			'includes/wpml/create-translated-post.php',
 			'includes/bulk-translation/bulk-translation.php',
 			'includes/string-translation/string-translation.php',
 			'includes/bulk-translation/register-assets.php',
 			'includes/string-translation/register-assets.php',
 			'includes/class-automlp-ai-helper.php',
-			'includes/class-automlp-ai-strings-ajax.php',
 			'includes/class-automlp-ai-update-translate-data-ajax.php',
 			'includes/routes/bulk-translation-route.php',
 			'admin/class-automlp_ai_dashboard.php',
 			'admin/cpt_dashboard/cpt_dashboard.php',
 			'includes/wizard/load.php',
+			'includes/queue/class-queue-table.php',
+			'includes/queue/class-dispatcher.php',
+			'includes/providers/class-prompt-builder.php',
+			'includes/providers/class-ai-gateway.php',
+			'includes/wpml/class-bot-translator.php',
+			'includes/wpml/class-writer.php',
+			'includes/wpml/class-job-listener.php',
+			'includes/wpml/class-job-sender.php',
+			'includes/wpml/class-background-flow.php',
+			'includes/routes/class-queue-route.php',
+			'includes/wpml/class-legacy-bridge.php',
+			'admin/queue/class-queue-screen.php'
 		);
 
 		foreach ( $files as $file ) {
@@ -395,6 +406,14 @@ final class AUTOMLP_Ai_Translate_Addon {
 			return;
 		}
 		$this->load_dependencies();
+
+		\AUTOMLP_WPML\Includes\Queue\Dispatcher::boot();
+		\AUTOMLP_WPML\Includes\Wpml\Background_Flow::boot();
+		\AUTOMLP_WPML\Includes\Routes\Queue_Route::boot();
+		\AUTOMLP_WPML\Includes\Wpml\Legacy_Bridge::boot();
+
+		add_action( 'init', array( '\AUTOMLP_WPML\Includes\Queue\Queue_Table', 'maybe_upgrade' ), 5 );
+
 		add_filter(
 			'plugin_action_links_' . AUTOMLP_AI_PLUGIN_BASENAME,
 			array( $this, 'add_settings_action_link' )
@@ -406,9 +425,6 @@ final class AUTOMLP_Ai_Translate_Addon {
 		add_action( 'admin_init', array( $this, 'automlp_feedback_form' ) );
 
 		// Initialize AJAX handlers.
-		if ( class_exists( AUTOMLP_AI_Strings_Ajax::class ) ) {
-			AUTOMLP_AI_Strings_Ajax::init();
-		}
 		if ( class_exists( 'AUTOMLP_AI_Update_Translate_Data_Ajax' ) ) {
 			AUTOMLP_AI_Update_Translate_Data_Ajax::init();
 		}
@@ -585,6 +601,11 @@ register_activation_hook( __FILE__, 'automlp_ai_on_activation' );
 register_deactivation_hook( __FILE__, 'automlp_ai_on_deactivation' );
 
 function automlp_ai_on_activation() {
+	if ( ! class_exists( '\AUTOMLP_WPML\Includes\Queue\Queue_Table' ) ) {
+		require_once AUTOMLP_AI_PLUGIN_DIR . 'includes/queue/class-queue-table.php';
+	}
+	\AUTOMLP_WPML\Includes\Queue\Queue_Table::install();
+
     // 1) Run the existing wizard activation.
 	if ( class_exists( '\AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard' ) ) {
 		\AUTOMLP_WPML\Modules\Wizard\AUTOMLP_Ai_Wizard::start_wizard( false );
@@ -601,6 +622,9 @@ function automlp_ai_on_activation() {
 
 function automlp_ai_on_deactivation() {
     wp_clear_scheduled_hook('automlp_extra_data_update');
+	if ( class_exists( '\AUTOMLP_WPML\Includes\Queue\Dispatcher' ) ) {
+    	\AUTOMLP_WPML\Includes\Queue\Dispatcher::unschedule();
+	}
 }
 
 
