@@ -96,7 +96,7 @@ You can continue using the tools already installed on your WordPress website whi
 
 * **[AI Translation for TranslatePress](https://coolplugins.net/product/automatic-translate-addon-for-translatepress-pro/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=tpa_check_out)** is a powerful AI addon for the TranslatePress plugin. Integrated with AI translation services, like Google Translate, Yandex, and Chrome built-in AI translator, it provides accurate and instant translations for your web pages.
 
-* **[Linguator AI – Auto Translate & Create Multilingual Sites](https://linguator.com/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=lmat_check_out)** is a powerful multilingual plugin that helps you create and manage all-in-one multilingual WordPress website. Translate your posts, pages, menus, categories, and more into different languages using AI.
+* **[Linguator – AI Auto Translate & Create Multilingual Sites](https://linguator.com/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=lmat_check_out)** is a powerful multilingual plugin that helps you create and manage all-in-one multilingual WordPress website. Translate your posts, pages, menus, categories, and more into different languages using AI.
 
 * **[Toolkit for Polylang – Translation Inspector & Duplicate Content](https://wordpress.org/plugins/duplicate-content-addon-for-polylang/)** scans and manages your Polylang website for missing translations, out-dated content, URLs & routing, site setup, Elementor translation, and more issues.
 
