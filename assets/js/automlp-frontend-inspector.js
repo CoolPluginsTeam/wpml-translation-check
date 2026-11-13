@@ -18,8 +18,19 @@
 	var i18n = cfg.i18n || {};
 	// Specific sources win over generic option matches.
 	var STRING_KINDS = { gettext: 1, option: 1, theme_mod: 1, term: 1 };
-	var PRIORITY = { widget: 10, nav_menu_item: 9, elementor: 8, post_title: 7, post_content: 6, gettext: 5, term: 4, theme_mod: 2, option: 1 };
-	var HINT_KEYS = ['d', 'o', 'c', 'n', 'p', 'eid', 'wid', 'id', 'did', 'u', 'ph', 'cd', 'cs', 'sq', 'tax'];
+	var PRIORITY = { acf: 12, form: 12, builder: 12, widget: 10, nav_menu_item: 9, elementor: 8, post_title: 7, post_content: 6, gettext: 5, term: 4, theme_mod: 2, option: 1 };
+	// Field/form/builder hints name the exact source inside post content: they beat the container chain.
+	var SOURCE_KINDS = { acf: 1, form: 1, builder: 1 };
+	// Kinds tied to one element: the clicked element's own container decides, never the same text elsewhere.
+	var FIELD_SELECTOR = 'textarea, select, option, [contenteditable]:not([contenteditable="false"]), input:not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="image"]):not([type="hidden"])';
+	var ELEMENT_KINDS = { post_title: 1, post_content: 1, widget: 1, nav_menu_item: 1, elementor: 1 };
+	var HINT_KEYS = ['d', 'o', 'c', 'n', 'p', 'eid', 'wid', 'id', 'did', 'u', 'ph', 'cd', 'cs', 'sq', 'tax', 'b', 'fk', 'oid', 'f'];
+	// Labels for result identifiers shown under "Details" (others stay hidden).
+	// Only the facts a site admin needs; labels come translated from PHP (i18n.detailLabels).
+	var DETAIL_KEYS = (i18n.detailLabels && typeof i18n.detailLabels === 'object') ? i18n.detailLabels : {
+		component: 'Comes from', plugin: 'Plugin', builder: 'Page builder', builder_active: 'Page builder active',
+		menu: 'Menu', field_name: 'Field', form_id: 'Form ID', post_id: 'Post ID', language: 'Language'
+	};
 
 	var state = {
 		open: false,
@@ -36,6 +47,9 @@
 		scanEntries: [],
 		openKey: null,
 		resolveCache: Object.create(null),
+		scanPending: Object.create(null),
+		clicks: 0,
+		lastClick: 0,
 		ptrDown: null,
 		resizing: false,
 		mo: null,
@@ -48,6 +62,7 @@
 
 	var WIDTH_KEY = 'automlpFiWidth:' + (cfg.userId || 0);
 	var MIN_WIDTH = 280;
+	var SCAN_QUIET_MS = 1200;
 	var DEFAULT_WIDTH = 360;
 
 	/* ---------- JS-added text (layer: browser) ---------- */
@@ -55,6 +70,7 @@
 	var added = window.WeakSet ? new WeakSet() : null;
 	var moQueued = null;
 	var markSeq = 0;
+	var clickSeq = 0;
 
 	function scheduleWork(fn) {
 		window.setTimeout(fn, 0);
@@ -221,8 +237,60 @@
 		return out;
 	}
 
-	function fieldsForHint(text, hint) {
-		var fields = { action: cfg.action, text: text, hint: hint ? JSON.stringify(hint) : '' };
+	function pageCtx(extra) {
+		var map = state.map || {};
+		var ctx = { qid: map.qid || 0, scripts: Array.isArray(map.scripts) ? map.scripts : [] };
+		if (extra) {
+			Object.keys(extra).forEach(function (k) {
+				ctx[k] = extra[k];
+			});
+		}
+		return ctx;
+	}
+
+	/** Handles of inline <script> blocks on this page that contain the text (snippets, localized data). */
+	function inlineHandlesFor(text) {
+		var out = [];
+		if (!text || text.length < 3) {
+			return out;
+		}
+		var json = JSON.stringify(text).slice(1, -1);
+		var needles = [text, json, json.replace(/\//g, '\\/')];
+		var nodes = document.querySelectorAll('script:not([src])');
+		for (var i = 0; i < nodes.length && i < 300 && out.length < 3; i++) {
+			var node = nodes[i];
+			if (node.id === (cfg.mapId || 'automlp-fi-map') || node.id === (cfg.containersId || 'automlp-fi-containers') || node.type === 'application/ld+json') {
+				continue;
+			}
+			var body = node.textContent || '';
+			if (body.length > 2000000) {
+				continue;
+			}
+			for (var n = 0; n < needles.length; n++) {
+				if (body.indexOf(needles[n]) !== -1) {
+					var id = node.id || '';
+					out.push(id ? id.replace(/-js(-extra|-after|-before|-translations)?$/, '') : 'inline-script-' + i);
+					break;
+				}
+			}
+		}
+		return out;
+	}
+
+	function ctxFor(text, info, hint) {
+		var extra = {};
+		if (info && info.js) {
+			extra.js = 1;
+			extra.inline = inlineHandlesFor(text);
+		}
+		if (info && info.region && (!hint || !hint.k)) {
+			extra.region = { td: info.region.td || '', file: info.region.file || '', label: info.region.label || '' };
+		}
+		return pageCtx(extra);
+	}
+
+	function fieldsForHint(text, hint, info) {
+		var fields = { action: cfg.action, text: text, hint: hint ? JSON.stringify(hint) : '', ctx: JSON.stringify(ctxFor(text, info, hint)) };
 		if (hint) {
 			fields.hint_k = String(hint.k || '');
 			HINT_KEYS.forEach(function (key) {
@@ -390,9 +458,109 @@
 			type: 'elementor',
 			eid: w.getAttribute('data-id'),
 			did: did,
-			label: 'Elementor ' + name + ' #' + w.getAttribute('data-id') + ' (' + did + ')',
+			label: (i18n.elWidget || 'Elementor %s widget').replace('%s', name.replace(/[-_]+/g, ' ')),
 			edit: cfg.adminUrl ? cfg.adminUrl + 'post.php?post=' + did + '&action=elementor' : ''
 		};
+	}
+
+	function skipCount(t) {
+		var p = t.parentElement;
+		return !p || !!p.closest('#automlp-fi, script, style, noscript, template, textarea');
+	}
+
+	/**
+	 * Same text in several places (title and paragraph): pick the place of the clicked copy.
+	 * 1) Page order of the server-rendered copies (copies added later by scripts are skipped).
+	 * 2) If the page still differs from the server, the nearest unique neighbour text decides.
+	 * 3) Else the first place.
+	 */
+	function placeOf(node, key, hit) {
+		var places = state.ct && state.ct.dups && state.ct.dups[key];
+		if (!places || !places.length || !document.body) {
+			return hit;
+		}
+		var own = null;
+		var t;
+		var walker = document.createTreeWalker(node, NodeFilter.SHOW_TEXT, null);
+		while ((t = walker.nextNode())) {
+			if (normalize(t.nodeValue) === key) {
+				own = t;
+				break;
+			}
+		}
+		if (!own) {
+			return hit;
+		}
+		var index = -1;
+		var count = 0;
+		var all = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+		while ((t = all.nextNode())) {
+			if (normalize(t.nodeValue) === key && !skipCount(t) && (t === own || !isAdded(t))) {
+				if (t === own) {
+					index = count;
+				}
+				count++;
+			}
+		}
+		if (index >= 0 && count === places.length) {
+			return places[index];
+		}
+		return placeByNeighbour(own, places) || hit;
+	}
+
+	/** Container chain ids of a container (itself first). */
+	function chainIds(cid) {
+		var ids = [];
+		var all = (state.ct && state.ct.containers) || {};
+		while (cid && ids.length < 8) {
+			ids.push(String(cid));
+			cid = all[cid] ? all[cid].parent : 0;
+		}
+		return ids;
+	}
+
+	/** Nearest text before/after the copy that occurs once on the page names its container. */
+	function placeByNeighbour(own, places) {
+		var texts = state.ct.texts || {};
+		var dups = state.ct.dups || {};
+		var steps = [['previousNode', 40], ['nextNode', 40]];
+		for (var s = 0; s < steps.length; s++) {
+			var w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+			w.currentNode = own;
+			var n;
+			var left = steps[s][1];
+			while (left-- > 0 && (n = w[steps[s][0]]())) {
+				if (skipCount(n)) {
+					continue;
+				}
+				var v = normalize(n.nodeValue);
+				if (v.length < 2 || !texts[v] || dups[v]) {
+					continue;
+				}
+				if (!texts[v][0]) {
+					// Neighbour outside any container (e.g. the title area): pick the copy that is too.
+					for (var z = 0; z < places.length; z++) {
+						if (!places[z][0]) {
+							return places[z];
+						}
+					}
+					break;
+				}
+				var anchor = chainIds(texts[v][0]);
+				for (var i = 0; i < places.length; i++) {
+					if (places[i][0] && anchor.indexOf(String(places[i][0])) !== -1) {
+						return places[i];
+					}
+				}
+				for (var j = 0; j < places.length; j++) {
+					if (places[j][0] && chainIds(places[j][0]).indexOf(anchor[0]) !== -1) {
+						return places[j];
+					}
+				}
+				break;
+			}
+		}
+		return null;
 	}
 
 	function originOf(node, text) {
@@ -403,6 +571,7 @@
 			var hit = texts[list[i]];
 			if (hit) {
 				info.inServer = true;
+				hit = placeOf(node, list[i], hit);
 				info.chain = chainOf(hit[0]);
 				info.region = hit[1] ? ((state.ct.containers || {})[hit[1]] || null) : null;
 				break;
@@ -412,7 +581,9 @@
 		if (dom && !info.chain.some(function (c) { return c.type === 'elementor'; })) {
 			info.chain.unshift(dom);
 		}
-		info.js = isAdded(node) || (!!texts && !info.inServer && !(state.byText && state.byText[text]));
+		// Attribute text (button value, option label) is never in the text index: not script text.
+		var attrText = /^(INPUT|OPTION|OPTGROUP|SELECT|TEXTAREA)$/.test(node.tagName || '');
+		info.js = isAdded(node) || (!attrText && !!texts && !info.inServer && !(state.byText && state.byText[text]));
 		return info;
 	}
 
@@ -428,8 +599,11 @@
 			if (c.type === 'nav_menu_item' && c.id) {
 				return { k: 'nav_menu_item', id: c.id };
 			}
+			if (c.type === 'block' && c.id && c.block === 'core/post-title') {
+				return { k: 'post_title', id: c.id };
+			}
 			if ((c.type === 'post_content' || c.type === 'block') && c.id) {
-				return { k: 'post_content', id: c.id };
+				return c.excerpt ? { k: 'post_content', id: c.id, x: 1 } : { k: 'post_content', id: c.id };
 			}
 		}
 		return null;
@@ -452,8 +626,8 @@
 		var list = state.byText && state.byText[key];
 		var hint = pickHint(list, ctx);
 		var fromChain = hintFromChain(info.chain);
-		// A string hit (gettext / Admin Text / theme_mod / term) always wins; containers stay in "Rendered by".
-		if (hint && STRING_KINDS[hint.k]) {
+		// A string hit (gettext / Admin Text / theme_mod / term) always wins over the container.
+		if (hint && (STRING_KINDS[hint.k] || SOURCE_KINDS[hint.k])) {
 			return hint;
 		}
 		// Same as click: sprintf/HTML gettext matched via patterns when exact map key differs.
@@ -462,6 +636,10 @@
 		}
 		if (!hint && matched.hint) {
 			hint = matched.hint;
+		}
+		// Same text in a title and a paragraph: each element resolves to its own source.
+		if (fromChain && hint && ELEMENT_KINDS[hint.k]) {
+			return fromChain;
 		}
 		if (fromChain && (!hint || (PRIORITY[fromChain.k] || 0) > (PRIORITY[hint.k] || 0))) {
 			hint = fromChain;
@@ -603,8 +781,21 @@
 
 	/* ---------- marking ---------- */
 
+	function isPlaceholderLabel(el, text) {
+		if (!el || el.tagName !== 'LABEL') {
+			return false;
+		}
+		var field = el.control || (el.htmlFor ? document.getElementById(el.htmlFor) : null);
+		return !!(field && normalize(field.getAttribute('placeholder') || '') === normalize(text || el.textContent || ''));
+	}
+
 	function applyMark(el, text, hint) {
 		if (!el || !el.classList || el.classList.contains('automlp-fi-mark')) {
+			return false;
+		}
+		// Form fields (text boxes, selects, editable areas) are never marked: no outline, no card.
+		// A label that only repeats its field's placeholder is skipped too.
+		if (isFormField(el) || isPlaceholderLabel(el, text)) {
 			return false;
 		}
 		el.classList.add('automlp-fi-mark');
@@ -933,37 +1124,96 @@
 		state.detailEl.appendChild(c);
 	}
 
-	function renderOrigin(c, info) {
+	function renderOrigin(c, info, data) {
 		if (!info) {
 			return;
 		}
-		if (info.chain.length) {
-			c.appendChild(el('span', 'automlp-fi__label', i18n.container || 'Rendered by'));
-			var ul = el('ul', 'automlp-fi__chain');
-			info.chain.slice(0, 4).forEach(function (item) {
-				var li = el('li', '', item.label || item.type);
-				if (item.edit) {
-					var a = el('a', 'automlp-fi__edit', i18n.edit || 'Edit');
-					a.href = item.edit;
-					a.target = '_blank';
-					a.rel = 'noopener noreferrer';
-					li.appendChild(document.createTextNode(' '));
-					li.appendChild(a);
-				}
-				ul.appendChild(li);
-			});
-			c.appendChild(ul);
-		}
-		if (info.region && !info.chain.length) {
-			c.appendChild(el('span', 'automlp-fi__label', i18n.region || 'Theme template'));
-			c.appendChild(el('p', 'automlp-fi__value automlp-fi__mono', info.region.label || ''));
+		// The container list ("Shown in") is not shown; the main Fix link covers editing.
+		// Theme/plugin name only, and only when it adds something (source not identified).
+		if (info.region && !info.chain.length && data && data.found === false && info.region.label) {
+			c.appendChild(el('span', 'automlp-fi__label', i18n.region || 'Shown by'));
+			c.appendChild(el('p', 'automlp-fi__value', info.region.label));
 		}
 	}
 
 
+	/** Same key for a click and a scan item with the same text + hint. */
+	function hintKey(text, hint) {
+		var h = hint || {};
+		return String(text || '') + '\0' + String(h.k || '') + '\0' + String(h.id || '') + '\0' + String(h.x || '');
+	}
+
 	function entryKey(text, res) {
 		var r = res || {};
 		return String(text || '') + '\0' + String(r.source_type || '') + '\0' + String(r.fix_url || '');
+	}
+
+	function renderDetails(c, ids) {
+		if (!ids || typeof ids !== 'object') {
+			return;
+		}
+		var dl = null;
+		Object.keys(DETAIL_KEYS).forEach(function (key) {
+			var v = ids[key];
+			if (v === undefined || v === null || v === '' || typeof v === 'object') {
+				return;
+			}
+			if (!dl) {
+				c.appendChild(el('span', 'automlp-fi__label', i18n.details || 'Details'));
+				dl = el('dl', 'automlp-fi__details');
+			}
+			dl.appendChild(el('dt', '', DETAIL_KEYS[key]));
+			var s = String(v);
+			if (s === 'yes' || s === 'no') {
+				s = s === 'yes' ? (i18n.yes || 'Yes') : (i18n.no || 'No');
+			}
+			dl.appendChild(el('dd', '', s.length > 160 ? s.slice(0, 157) + '\u2026' : s));
+		});
+		if (dl) {
+			c.appendChild(dl);
+		}
+	}
+
+	function renderActions(c, data) {
+		if (!data.actions || !data.actions.length) {
+			return;
+		}
+		data.actions.forEach(function (action) {
+			if (!action || action.id !== 'register' || !action.payload) {
+				return;
+			}
+			var btn = el('button', 'automlp-fi__action', action.label || 'Register');
+			btn.type = 'button';
+			var out = el('p', 'automlp-fi__hint');
+			btn.addEventListener('click', function (ev) {
+				ev.preventDefault();
+				ev.stopPropagation();
+				btn.disabled = true;
+				out.textContent = i18n.registering || 'Registering…';
+				var fields = { action: cfg.regAction };
+				Object.keys(action.payload).forEach(function (k) {
+					fields[k] = String(action.payload[k]);
+				});
+				post(fields).then(function (json) {
+					if (!json || !json.success || !json.data) {
+						throw new Error((json && json.data && json.data.message) || 'register');
+					}
+					out.textContent = (i18n.registered || 'Registered.') + ' ';
+					var a = el('a', 'automlp-fi__fix', json.data.fix_label || i18n.openFix || 'Open');
+					a.href = json.data.fix_url;
+					a.target = '_blank';
+					a.rel = 'noopener noreferrer';
+					out.appendChild(a);
+					btn.remove();
+					state.resolveCache = Object.create(null);
+				}).catch(function (e) {
+					btn.disabled = false;
+					out.textContent = (i18n.registerFailed || 'Could not register.') + (e && e.message && e.message !== 'register' ? ' ' + e.message : '');
+				});
+			});
+			c.appendChild(btn);
+			c.appendChild(out);
+		});
 	}
 
 	function fillResultFields(c, data, info) {
@@ -974,7 +1224,7 @@
 		if (!data.found && info) {
 			if (info.js) {
 				data.source_type_label = i18n.byJs || 'Added by JavaScript';
-				data.status_label = i18n.byJsStatus || '';
+				data.status_label = i18n.byJsStatus || data.status_label;
 				data.translated = null;
 			} else if (info.chain && info.chain.length) {
 				data.source_type_label = info.chain[0].label || data.source_type_label;
@@ -996,9 +1246,21 @@
 		statusWrap.appendChild(badge);
 		c.appendChild(statusWrap);
 
+		if (data.warning) {
+			c.appendChild(el('p', 'automlp-fi__warning', data.warning));
+		}
+		if (data.reasons && data.reasons.length) {
+			c.appendChild(el('span', 'automlp-fi__label', i18n.reasons || 'Why it is not shown'));
+			var rl = el('ul', 'automlp-fi__reasons');
+			data.reasons.forEach(function (r) {
+				rl.appendChild(el('li', '', String(r)));
+			});
+			c.appendChild(rl);
+		}
 		if (data.message) {
 			c.appendChild(el('p', 'automlp-fi__value', data.message));
 		}
+		renderDetails(c, data.identifiers);
 		if (data.fix_url) {
 			c.appendChild(el('span', 'automlp-fi__label', i18n.fix || 'Fix'));
 			var link = el('a', 'automlp-fi__fix', data.fix_label || i18n.openFix || 'Open');
@@ -1007,35 +1269,25 @@
 			link.rel = 'noopener noreferrer';
 			c.appendChild(link);
 		}
-		if (data.alternates && data.alternates.length) {
-			c.appendChild(el('span', 'automlp-fi__label', i18n.alsoPossible || 'Also possible'));
-			data.alternates.forEach(function (alt) {
-				var row = el('div', 'automlp-fi__alt');
-				var label = (alt.source_type_label || alt.source_type || '') + '';
-				if (alt.identifiers && alt.identifiers.domain) {
-					label = label || String(alt.identifiers.domain);
+		renderActions(c, data);
+		if (data.links && data.links.length) {
+			c.appendChild(el('span', 'automlp-fi__label', i18n.more || 'More links'));
+			var ll = el('ul', 'automlp-fi__links');
+			data.links.forEach(function (l) {
+				if (!l || !l.url) {
+					return;
 				}
-				row.appendChild(el('p', 'automlp-fi__value', label || '\u2014'));
-				if (alt.status_label) {
-					var b = el('span', 'automlp-fi__badge', alt.status_label);
-					if (alt.translated === false) {
-						b.classList.add('is-bad');
-					} else if (alt.translated === true) {
-						b.classList.add('is-ok');
-					}
-					row.appendChild(b);
-				}
-				if (alt.fix_url) {
-					var alink = el('a', 'automlp-fi__fix', alt.fix_label || i18n.openFix || 'Open');
-					alink.href = alt.fix_url;
-					alink.target = '_blank';
-					alink.rel = 'noopener noreferrer';
-					row.appendChild(alink);
-				}
-				c.appendChild(row);
+				var li = el('li');
+				var a = el('a', 'automlp-fi__edit', String(l.label || l.url));
+				a.href = l.url;
+				a.target = '_blank';
+				a.rel = 'noopener noreferrer';
+				li.appendChild(a);
+				ll.appendChild(li);
 			});
+			c.appendChild(ll);
 		}
-		renderOrigin(c, info);
+		renderOrigin(c, info, data);
 	}
 
 	function renderResult(text, data, info) {
@@ -1075,17 +1327,12 @@
 
 
 	function resolveOne(target, text, hint, info) {
-		var alts = (hint && hint.alts) ? hint.alts.slice() : [];
+		// Only the best match is resolved and shown (no list of other matches).
 		var primary = hint ? cloneHint(hint) : null;
 		if (primary && primary.alts) {
 			delete primary.alts;
 		}
-		var jobs = [post(fieldsForHint(text, primary))];
-		alts.forEach(function (a) {
-			jobs.push(post(fieldsForHint(text, a)));
-		});
-		return Promise.all(jobs).then(function (results) {
-			var json = results[0];
+		return post(fieldsForHint(text, primary, info)).then(function (json) {
 			if (!json || !json.success) {
 				return {
 					text: text,
@@ -1098,15 +1345,6 @@
 				};
 			}
 			var data = json.data || {};
-			var altData = [];
-			for (var i = 1; i < results.length; i++) {
-				if (results[i] && results[i].success && results[i].data) {
-					altData.push(results[i].data);
-				}
-			}
-			if (altData.length) {
-				data.alternates = altData;
-			}
 			return { text: text, node: target, info: info, data: data };
 		});
 	}
@@ -1177,6 +1415,23 @@
 			state.selectedEl.classList.remove('automlp-fi-selected');
 			state.selectedEl = null;
 		}
+		// No form fields, and one card per distinct text.
+		var seenText = Object.create(null);
+		marks = marks.filter(function (mark) {
+			var t = normalize(mark.getAttribute('data-automlp-fi-text') || mark.textContent || '');
+			if (!t || isFormField(mark) || isPlaceholderLabel(mark, t) || seenText[t]) {
+				return false;
+			}
+			seenText[t] = true;
+			return true;
+		});
+		if (!marks.length) {
+			return;
+		}
+		if (marks.length === 1) {
+			resolveNode(marks[0]);
+			return;
+		}
 		state.detailEl.innerHTML = '';
 		state.detailEl.appendChild(el('span', 'automlp-fi__label', (i18n.containsTexts || 'Contains %d texts').replace('%d', String(marks.length))));
 		marks.forEach(function (mark) {
@@ -1220,6 +1475,13 @@
 				}
 			}
 		}
+		// Unmarked button: resolve its own label (value of an input, text of a <button>).
+		if (buttonOf(node) === node && !node.getAttribute('data-automlp-fi-text')) {
+			var label = buttonLabel(node);
+			if (label) {
+				node.setAttribute('data-automlp-fi-text', label);
+			}
+		}
 		var matched = matchNode(node);
 		var text = matched.text;
 		var target = matched.node || node;
@@ -1234,6 +1496,7 @@
 			target.classList.add('automlp-fi-selected');
 		}
 
+		clickSeq++;
 		// Listed untranslated: expand that sidebar accordion instead of the detail panel.
 		var listed = findScanEntry(target, text);
 		if (listed) {
@@ -1244,20 +1507,35 @@
 			return;
 		}
 
-		var cacheKey = String(text || '') + '\0' + String((hint && hint.k) || '') + '\0' + String((hint && hint.id) || '');
+		var cacheKey = hintKey(text, hint);
 		if (state.resolveCache[cacheKey]) {
 			renderResult(text, state.resolveCache[cacheKey], info);
 			return;
 		}
 		renderLoading(text);
+		state.clicks++;
+		state.lastClick = Date.now();
+		var seq = ++clickSeq;
 
-		resolveOne(target, text, hint, info)
+		// The background scan already asked for this text: wait for that answer instead of a second request.
+		var pending = state.scanPending[cacheKey] || Promise.resolve(null);
+		pending
+			.then(function (data) {
+				return data ? { text: text, info: info, data: data } : resolveOne(target, text, hint, info);
+			})
 			.then(function (row) {
+				state.clicks--;
+				state.lastClick = Date.now();
 				state.resolveCache[cacheKey] = row.data;
-				renderResult(row.text, row.data, row.info);
+				if (seq === clickSeq) {
+					renderResult(row.text, row.data, row.info);
+				}
 			})
 			.catch(function () {
-				renderResult(text, null);
+				state.clicks--;
+				if (seq === clickSeq) {
+					renderResult(text, null);
+				}
 			});
 	}
 
@@ -1269,7 +1547,7 @@
 		var items = [];
 		var nodes = [];
 		function add(node, text, isMark) {
-			if (!text || seen[text] || !isVisible(node)) {
+			if (!text || seen[text] || !isVisible(node) || isPlaceholderLabel(node, text)) {
 				return;
 			}
 			var matched = matchNode(node, text);
@@ -1280,18 +1558,36 @@
 			var target = matched.node || node;
 			var info = originOf(target, key);
 			var hint = hintFor(target, key, info);
-			// Same rule as a click: only server-known text with a resolvable hint.
-			if (!hint || info.js) {
+			var item = { t: key, h: hint };
+			if (info.js) {
+				// JS-rendered text: resolved against script domains / JSON / POT / ST (bounded).
+				if (jsCount >= JS_CAP || !/[A-Za-z\u00C0-\uFFFF]{2}/.test(key)) {
+					return;
+				}
+				jsCount++;
+				item = { t: key, h: { k: 'js' }, j: 1 };
+			} else if (!hint && info.region && !info.chain.length) {
+				item = { t: key, h: { k: 'region' }, r: { td: info.region.td || '', file: info.region.file || '' } };
+			} else if (!hint) {
 				return;
 			}
 			seen[text] = true;
 			seen[key] = true;
-			items.push({ t: key, h: hint });
+			items.push(item);
 			nodes.push(target);
 		}
+		var jsCount = 0;
+		var JS_CAP = 30;
 		var markNodes = document.querySelectorAll('.automlp-fi-mark');
 		Array.prototype.forEach.call(markNodes, function (node) {
 			add(node, node.getAttribute('data-automlp-fi-text'), true);
+		});
+		// Placeholders of text boxes are translatable strings too (fields stay unmarked).
+		Array.prototype.forEach.call(document.querySelectorAll('input[placeholder], textarea[placeholder]'), function (field) {
+			var ph = normalize(field.getAttribute('placeholder') || '');
+			if (ph.length > 1 && !isInspectorUi(field) && state.byText && state.byText[ph]) {
+				add(field, ph, false);
+			}
 		});
 		// Block-level pattern hits that were marked on the <p>/<li> itself.
 		Array.prototype.forEach.call(document.querySelectorAll('.automlp-fi-mark[data-automlp-fi-hint]'), function (node) {
@@ -1319,14 +1615,31 @@
 				}
 			}
 		}
+		// Text inserted by JavaScript (not in the server HTML): bounded walk.
+		if (texts && document.body) {
+			var jw = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null);
+			var jn;
+			var jwalked = 0;
+			while ((jn = jw.nextNode()) && jwalked < 2500 && jsCount < JS_CAP) {
+				jwalked++;
+				var jp = jn.parentElement;
+				if (!jp || isInspectorUi(jp) || /^(SCRIPT|STYLE|NOSCRIPT|TEMPLATE|OPTION)$/.test(jp.tagName)) {
+					continue;
+				}
+				var jt = normalize(jn.nodeValue);
+				if (jt.length > 2 && jt.length <= 200 && !texts[jt] && !seen[jt] && !(state.byText && state.byText[jt])) {
+					add(jp, jt);
+				}
+			}
+		}
 		// Likely-untranslated (u=1) and DB-owned (container) items first so they fit the cap.
 		var rank = function (h) {
-			return (h.u ? 2 : 0) + (h.k === 'elementor' || h.k === 'post_content' || h.k === 'widget' || h.k === 'nav_menu_item' ? 1 : 0);
+			return (h.u ? 2 : 0) + (h.k === 'elementor' || h.k === 'post_content' || h.k === 'widget' || h.k === 'nav_menu_item' || h.k === 'js' ? 1 : 0);
 		};
 		var order = items.map(function (item, i) {
 			return i;
 		}).sort(function (a, b) {
-			return rank(items[b].h) - rank(items[a].h) || a - b;
+			return rank(items[b].h || {}) - rank(items[a].h || {}) || a - b;
 		});
 		var limit = parseInt(cfg.scanLimit, 10) || 200;
 		// Soft ceiling so huge Elementor pages finish scanning without a stuck loader.
@@ -1566,7 +1879,7 @@
 	}
 
 	function onPagePointerDown(event) {
-		if (!state.open || isInspectorUi(event.target)) {
+		if (!state.open || isInspectorUi(event.target) || isFormField(event.target)) {
 			state.ptrDown = null;
 			return;
 		}
@@ -1657,11 +1970,49 @@
 
 		var results = [];
 		var size = parseInt(cfg.scanBatch, 10) || 40;
+		// Clicks go first: the scan waits while a click is loading and for a short quiet time after it.
+		function whenQuiet(fn) {
+			if (seq !== state.scanSeq || !state.open) {
+				return;
+			}
+			if (state.clicks > 0 || Date.now() - state.lastClick < SCAN_QUIET_MS) {
+				window.setTimeout(function () {
+					whenQuiet(fn);
+				}, 250);
+				return;
+			}
+			fn();
+		}
 		function next(offset) {
 			if (seq !== state.scanSeq || !state.open || offset >= scan.items.length) {
 				return;
 			}
-			post({ action: cfg.scanAction, items: JSON.stringify(scan.items.slice(offset, offset + size)) })
+			var batch = scan.items.slice(offset, offset + size);
+			var request = post({ action: cfg.scanAction, items: JSON.stringify(batch), ctx: JSON.stringify(pageCtx()) });
+			// Let a click on one of these texts reuse this answer (found results only).
+			batch.forEach(function (item, i) {
+				if (!item.h || item.h.alts || item.j || item.r) {
+					return;
+				}
+				var key = hintKey(item.t, item.h);
+				var wait = request.then(function (json) {
+					var res = json && json.success && json.data && Array.isArray(json.data.results) ? json.data.results[i] : null;
+					if (res && res.found !== false) {
+						state.resolveCache[key] = res;
+						return res;
+					}
+					return null;
+				}, function () {
+					return null;
+				});
+				state.scanPending[key] = wait;
+				wait.then(function () {
+					if (state.scanPending[key] === wait) {
+						delete state.scanPending[key];
+					}
+				});
+			});
+			request
 				.then(function (json) {
 					if (seq !== state.scanSeq || !state.open) {
 						return;
@@ -1673,7 +2024,7 @@
 					var finished = offset + size >= scan.items.length;
 					renderScan(scan, results, finished);
 					if (!finished) {
-						scheduleWork(function () {
+						whenQuiet(function () {
 							next(offset + size);
 						});
 					}
@@ -1686,7 +2037,9 @@
 					}
 				});
 		}
-		next(0);
+		whenQuiet(function () {
+			next(0);
+		});
 	}
 
 	function renderScan(scan, results, done) {
@@ -1707,7 +2060,9 @@
 				order.push(label);
 			}
 			groups[label].push({ text: scan.items[i].t, node: scan.nodes[i], res: res });
-			scan.nodes[i].classList.add('automlp-fi-listed');
+			if (!isFormField(scan.nodes[i])) {
+				scan.nodes[i].classList.add('automlp-fi-listed');
+			}
 			count++;
 		});
 
@@ -2020,14 +2375,111 @@
 	 * Nearest resolvable unit under the pointer: marked ancestor of the caret text,
 	 * else a single marked child, else null (caller may show multi-card).
 	 */
+	/**
+	 * Of several marks, the smallest one whose box holds the pointer (a click on a mark's padding).
+	 */
+	function markAtPoint(marks, x, y) {
+		var best = null;
+		var bestArea = Infinity;
+		marks.forEach(function (m) {
+			var r = m.getBoundingClientRect();
+			if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+				var area = r.width * r.height;
+				if (area < bestArea) {
+					best = m;
+					bestArea = area;
+				}
+			}
+		});
+		return best;
+	}
+
+	var BUTTON_SELECTOR = 'button, input[type="submit"], input[type="button"], input[type="reset"]';
+
+	/** The button (or submit/reset input) that contains the node, if any. */
+	function buttonOf(node) {
+		if (node && node.nodeType === 3) {
+			node = node.parentElement;
+		}
+		return node && node.closest ? node.closest(BUTTON_SELECTOR) : null;
+	}
+
+	/** Visible label of a button: the value of an input, the text of a <button>. */
+	function buttonLabel(btn) {
+		return normalize(btn.tagName === 'INPUT' ? (btn.getAttribute('value') || btn.value || '') : (btn.textContent || btn.getAttribute('aria-label') || ''));
+	}
+
+	/**
+	 * Resolve a form control's own text: placeholder (then aria-label, title) for text boxes, the
+	 * selected option for a select. Typed values and editable areas are user content: not resolved.
+	 * Attribute strings are matched against the page map like any other text.
+	 */
+	function resolveControl(node) {
+		if (node && node.nodeType === 3) {
+			node = node.parentElement;
+		}
+		var ctrl = node && node.closest ? node.closest(FIELD_SELECTOR) : null;
+		if (!ctrl || ctrl.isContentEditable) {
+			return;
+		}
+		if (ctrl.tagName === 'SELECT' || ctrl.tagName === 'OPTION') {
+			var sel = ctrl.tagName === 'SELECT' ? ctrl : ctrl.closest('select');
+			var opt = ctrl.tagName === 'OPTION' ? ctrl : (sel && sel.options ? sel.options[sel.selectedIndex] : null);
+			if (!opt) {
+				return;
+			}
+			var otext = normalize(opt.label || opt.text || opt.textContent || '');
+			if (!otext) {
+				return;
+			}
+			opt.setAttribute('data-automlp-fi-text', otext);
+			resolveNode(opt);
+			return;
+		}
+		var texts = [];
+		['placeholder', 'aria-label', 'title'].forEach(function (name) {
+			var v = normalize(ctrl.getAttribute(name) || '');
+			if (v.length > 1 && texts.indexOf(v) === -1) {
+				texts.push(v);
+			}
+		});
+		if (!texts.length) {
+			return;
+		}
+		var pick = texts[0];
+		for (var i = 0; i < texts.length; i++) {
+			if (state.byText && state.byText[texts[i]]) {
+				pick = texts[i];
+				break;
+			}
+		}
+		ctrl.setAttribute('data-automlp-fi-text', pick);
+		resolveNode(ctrl);
+	}
+
+	/** True when the clicked text node sits inside a mark that stands for different text. */
+	function markIsOtherText(mark, tn) {
+		if (!mark || !tn || !mark.contains(tn)) {
+			return false;
+		}
+		var own = normalize(tn.nodeValue || '');
+		var markText = normalize(mark.getAttribute('data-automlp-fi-text') || '');
+		return !!(own && markText && markText.indexOf(own) === -1);
+	}
+
 	function resolveTargetFromEvent(event) {
 		var raw = event.target;
 		if (!raw || isInspectorUi(raw)) {
 			return { kind: 'none' };
 		}
+		// A button always resolves its own label, never the surrounding form area.
+		var btn = buttonOf(raw);
+		if (btn) {
+			return { kind: 'node', node: btn };
+		}
 		// Pierce overlays: deepest leaf mark under the pointer wins.
 		var leafHit = leafMarkFromPoint(event.clientX, event.clientY);
-		if (leafHit) {
+		if (leafHit && !markIsOtherText(leafHit, textNodeFromPoint(event.clientX, event.clientY))) {
 			return { kind: 'node', node: leafHit };
 		}
 		// Prefer caret text under the pointer — always resolve THAT sentence first.
@@ -2036,6 +2488,10 @@
 		var tn = textNodeFromPoint(event.clientX, event.clientY);
 		if (tn && tn.parentElement) {
 			var mark = tn.parentElement.closest ? tn.parentElement.closest('.automlp-fi-mark') : null;
+			// A mark for other text (e.g. "By" around a date): resolve the clicked text itself.
+			if (markIsOtherText(mark, tn)) {
+				mark = null;
+			}
 			// Non-bulk marked ancestor of the caret text.
 			if (mark && !isInspectorUi(mark) && !isBulkContainer(mark)) {
 				return { kind: 'node', node: mark };
@@ -2062,7 +2518,8 @@
 					return !isInspectorUi(n);
 				});
 				if (nested.length >= 2) {
-					return { kind: 'multi', node: direct, marks: nested };
+					var hitNested = markAtPoint(nested, event.clientX, event.clientY);
+					return hitNested ? { kind: 'node', node: hitNested } : { kind: 'multi', node: direct, marks: nested };
 				}
 				if (nested.length === 1) {
 					return { kind: 'node', node: nested[0] };
@@ -2100,7 +2557,8 @@
 			var kids = Array.prototype.slice.call(container.querySelectorAll('.automlp-fi-mark'));
 			kids = kids.filter(function (n) { return !isInspectorUi(n); });
 			if (kids.length >= 2) {
-				return { kind: 'multi', node: container, marks: kids };
+				var hitKid = markAtPoint(kids, event.clientX, event.clientY);
+				return hitKid ? { kind: 'node', node: hitKid } : { kind: 'multi', node: container, marks: kids };
 			}
 			if (kids.length === 1) {
 				return { kind: 'node', node: kids[0] };
@@ -2117,9 +2575,32 @@
 		return { kind: 'none' };
 	}
 
+	/**
+	 * Fields the visitor types in or picks from: clicks and typing there behave normally.
+	 */
+	function isFormField(node) {
+		if (node && node.nodeType === 3) {
+			node = node.parentElement;
+		}
+		if (!node || node.nodeType !== 1) {
+			return false;
+		}
+		if (node.isContentEditable) {
+			return true;
+		}
+		return !!(node.closest && node.closest(FIELD_SELECTOR));
+	}
+
 	function onPageClick(event) {
 		if (!state.open || isInspectorUi(event.target)) {
 			state.ptrDown = null;
+			return;
+		}
+		// Form field: show the field's own text (placeholder, selected option, label attribute)
+		// without preventDefault, so focus and typing keep working.
+		if (isFormField(event.target)) {
+			state.ptrDown = null;
+			resolveControl(event.target);
 			return;
 		}
 		// Drag / text-selection gesture: clear selection and do not resolve.

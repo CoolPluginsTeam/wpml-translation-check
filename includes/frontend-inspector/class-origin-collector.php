@@ -19,9 +19,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Origin_Collector {
 
-	const MAX_ENTRIES  = 2200;
+	const MAX_ENTRIES         = 2200;
 	const MAX_GETTEXT_ENTRIES = 900;
-	const MAX_TEXT_LEN = 500;
+	const MAX_OVERFLOW        = 4000;
+	const MAX_TEXT_LEN        = 500;
 
 	/**
 	 * Map keyed by normalized visible text => list of origin hints.
@@ -30,7 +31,11 @@ class Origin_Collector {
 	 */
 	private static $map = array();
 
-	/** @var int */
+	/**
+	 * Number of gettext entries collected.
+	 *
+	 * @var int
+	 */
 	private static $gettext_entry_count = 0;
 
 	/**
@@ -39,6 +44,49 @@ class Origin_Collector {
 	 * @var array<string, array<int, array<string, mixed>>>
 	 */
 	private static $value_index = array();
+
+	/**
+	 * Subset of indexed values also matched as substrings of rendered HTML (bounded).
+	 *
+	 * @var array<string, bool>
+	 */
+	private static $substring_values = array();
+
+	/**
+	 * Gettext hits that did not fit the map (caps reached). Promoted at buffer time
+	 * when their text is visible in the body, replacing invisible gettext-only keys.
+	 *
+	 * @var array<string, array<string, mixed>>
+	 */
+	private static $overflow = array();
+
+	/**
+	 * Visible body text segments (normalized) => true, built once from the buffer.
+	 *
+	 * @var array<string, bool>
+	 */
+	private static $visible = array();
+
+	/**
+	 * Option names read (get_option) during this render, not yet indexed.
+	 *
+	 * @var array<string, bool>
+	 */
+	private static $read_options = array();
+
+	/**
+	 * Option names already indexed.
+	 *
+	 * @var array<string, bool>
+	 */
+	private static $indexed_options = array();
+
+	/**
+	 * Queried object id of the inspected request.
+	 *
+	 * @var int
+	 */
+	private static $queried_id = 0;
 
 	/**
 	 * Whether collector hooks are active.
@@ -118,6 +166,7 @@ class Origin_Collector {
 		self::$active       = true;
 		self::$current_lang = (string) apply_filters( 'wpml_current_language', null );
 		self::$default_lang = (string) apply_filters( 'wpml_default_language', null );
+		self::$queried_id   = (int) get_queried_object_id();
 
 		self::build_value_index();
 
@@ -126,9 +175,16 @@ class Origin_Collector {
 		self::$phase = did_action( 'template_redirect' ) ? 'r' : 'e';
 		add_action( 'template_redirect', array( __CLASS__, 'enter_render_phase' ), 0 );
 
-		// option_* via 'all' is expensive on Elementor pages; opt-in only.
-		if ( apply_filters( 'automlp_fi_track_option_hooks', false ) ) {
-			add_action( 'all', array( __CLASS__, 'on_all_hooks' ), 1, 2 );
+		/**
+		 * Filters whether options read during the inspected render are tracked (default on).
+		 *
+		 * Uses the cheap generic `pre_option` filter (WP 6.1+) to remember option names;
+		 * their values are indexed once, when the map is printed. No `all` hook.
+		 *
+		 * @param bool $track Default true.
+		 */
+		if ( apply_filters( 'automlp_fi_track_option_hooks', true ) ) {
+			add_filter( 'pre_option', array( __CLASS__, 'on_pre_option' ), 9999, 2 );
 		}
 
 		add_filter( 'gettext', array( __CLASS__, 'on_gettext' ), 9999, 3 );
@@ -138,6 +194,7 @@ class Origin_Collector {
 
 		add_filter( 'the_title', array( __CLASS__, 'on_the_title' ), 9999, 2 );
 		add_filter( 'the_content', array( __CLASS__, 'on_the_content' ), 9999, 1 );
+		add_filter( 'the_excerpt', array( __CLASS__, 'on_the_excerpt' ), 9999, 1 );
 		add_filter( 'nav_menu_item_title', array( __CLASS__, 'on_nav_menu_item_title' ), 9999, 4 );
 		add_action( 'dynamic_sidebar', array( __CLASS__, 'on_dynamic_sidebar' ), 1, 1 );
 		add_filter( 'widget_title', array( __CLASS__, 'on_widget_title' ), 9999, 3 );
@@ -146,6 +203,17 @@ class Origin_Collector {
 		if ( did_action( 'elementor/loaded' ) || class_exists( '\Elementor\Plugin' ) ) {
 			add_action( 'elementor/frontend/before_render', array( __CLASS__, 'on_elementor_before_render' ), 5 );
 			add_filter( 'elementor/widget/render_content', array( __CLASS__, 'on_elementor_render_content' ), 9999, 2 );
+		}
+
+		// ACF field values (skipped when ACF is absent).
+		if ( function_exists( 'acf_get_field' ) ) {
+			add_filter( 'acf/format_value', array( __CLASS__, 'on_acf_format_value' ), 9999, 3 );
+		}
+		// Builder modules (Divi / WPBakery shortcodes, Divi 5 blocks) and form shortcodes/blocks.
+		add_filter( 'do_shortcode_tag', array( __CLASS__, 'on_shortcode_tag' ), 9999, 3 );
+		add_filter( 'render_block', array( __CLASS__, 'on_render_block' ), 9999, 2 );
+		if ( defined( 'BRICKS_VERSION' ) ) {
+			add_filter( 'bricks/frontend/render_element', array( __CLASS__, 'on_bricks_element' ), 9999, 2 );
 		}
 
 		// Taxonomy term names (any taxonomy): cheap core filters only in inspect mode.
@@ -174,9 +242,13 @@ class Origin_Collector {
 			'widget'        => 1,
 			'elementor'     => 1,
 			'term'          => 1,
+			'acf'           => 1,
+			'form'          => 1,
+			'builder'       => 1,
 		);
 
 		$priority = array();
+		$visible  = array();
 		$rest     = array();
 
 		foreach ( self::$map as $text => $origins ) {
@@ -186,20 +258,23 @@ class Origin_Collector {
 					'k' => isset( $origin['k'] ) ? (string) $origin['k'] : 'unknown',
 					'u' => ! empty( $origin['u'] ) ? 1 : 0,
 				);
-				foreach ( array( 'd', 'o', 'c', 'n', 'p', 'id', 'eid', 'did', 'wid', 'ph', 'cd', 'cs', 'sq', 'tax' ) as $key ) {
+				foreach ( array( 'd', 'o', 'c', 'n', 'p', 'id', 'eid', 'did', 'wid', 'ph', 'cd', 'cs', 'sq', 'tax', 'b', 'fk', 'oid', 'f' ) as $key ) {
 					if ( isset( $origin[ $key ] ) && '' !== $origin[ $key ] && null !== $origin[ $key ] ) {
 						$entry[ $key ] = $origin[ $key ];
 					}
 				}
 				if ( isset( $priority_kinds[ $entry['k'] ] ) ) {
 					$priority[] = $entry;
+				} elseif ( isset( self::$visible[ $text ] ) ) {
+					// Text seen in the rendered body first, invisible gettext noise last.
+					$visible[] = $entry;
 				} else {
 					$rest[] = $entry;
 				}
 			}
 		}
 
-		$entries = array_merge( $priority, $rest );
+		$entries = array_merge( $priority, $visible, $rest );
 		if ( count( $entries ) > self::MAX_ENTRIES ) {
 			$entries = array_slice( $entries, 0, self::MAX_ENTRIES );
 		}
@@ -214,6 +289,8 @@ class Origin_Collector {
 			'patterns'    => $patterns,
 			'currentLang' => self::$current_lang,
 			'defaultLang' => self::$default_lang,
+			'qid'         => self::$queried_id,
+			'scripts'     => JS_Strings::page_scripts(),
 		);
 	}
 
@@ -276,13 +353,16 @@ class Origin_Collector {
 		$kind        = isset( $origin['k'] ) ? (string) $origin['k'] : '';
 		$is_priority = in_array(
 			$kind,
-			array( 'option', 'theme_mod', 'post_title', 'post_content', 'nav_menu_item', 'widget', 'elementor', 'term' ),
+			array( 'option', 'theme_mod', 'post_title', 'post_content', 'nav_menu_item', 'widget', 'elementor', 'term', 'acf', 'form', 'builder' ),
 			true
 		);
 
 		if ( ! isset( self::$map[ $text ] ) ) {
 			if ( count( self::$map ) >= self::MAX_ENTRIES ) {
 				if ( ! $is_priority ) {
+					if ( 'gettext' === $kind && ! isset( self::$overflow[ $text ] ) && count( self::$overflow ) < self::MAX_OVERFLOW ) {
+						self::$overflow[ $text ] = $origin;
+					}
 					return;
 				}
 				// Evict a gettext-only key so option/theme_mod/post origins still fit.
@@ -343,69 +423,64 @@ class Origin_Collector {
 	}
 
 	/**
-	 * Index a string option / theme_mod value.
+	 * Index one visible-text key for an option / theme_mod leaf.
 	 *
-	 * @param string               $value  Option value.
-	 * @param array<string, mixed> $origin Origin hint.
+	 * @param string               $key       Normalized visible text.
+	 * @param array<string, mixed> $origin    Origin hint.
+	 * @param bool                 $substring Also match as a substring of rendered HTML.
 	 * @return void
 	 */
-	private static function index_value( $value, array $origin ) {
-		if ( ! is_string( $value ) || is_serialized( $value ) ) {
+	private static function index_value( $key, array $origin, $substring ) {
+		if ( self::is_trivial( $key ) || ! self::is_meaningful_value( $key ) ) {
 			return;
 		}
-		$value = self::normalize( $value );
-		if ( self::is_trivial( $value ) || ! self::is_meaningful_value( $value ) ) {
+		if ( ! isset( self::$value_index[ $key ] ) ) {
+			if ( count( self::$value_index ) >= Option_Index::MAX_LEAVES ) {
+				return;
+			}
+			self::$value_index[ $key ] = array();
+		}
+		if ( count( self::$value_index[ $key ] ) >= 5 ) {
 			return;
 		}
-		if ( ! isset( self::$value_index[ $value ] ) ) {
-			self::$value_index[ $value ] = array();
+		self::$value_index[ $key ][] = $origin;
+		if ( $substring && count( self::$substring_values ) < 600 ) {
+			self::$substring_values[ $key ] = true;
 		}
-		if ( count( self::$value_index[ $value ] ) >= 5 ) {
-			return;
-		}
-		self::$value_index[ $value ][] = $origin;
 	}
 
 	/**
-	 * Walk a nested option array and index string leaves.
+	 * Walk a (possibly nested / serialized) option value and index its string leaves with key paths.
 	 *
-	 * @param mixed  $data  Option data.
-	 * @param string $name  Option name.
-	 * @param string $path  Bracket path.
-	 * @param string $kind  option|theme_mod.
-	 * @param int    $depth Recursion depth.
+	 * @param mixed  $data      Option data.
+	 * @param string $name      Option name.
+	 * @param string $path      Bracket path prefix.
+	 * @param string $kind      option|theme_mod.
+	 * @param bool   $substring Also match as substrings (registered / theme_mods only).
 	 * @return void
 	 */
-	private static function walk_option_value( $data, $name, $path, $kind, $depth = 0 ) {
-		if ( $depth > 4 ) {
-			return;
-		}
-		if ( is_string( $data ) ) {
-			$origin = array(
-				'k' => $kind,
-				'n' => $name,
-			);
-			if ( '' !== $path ) {
-				$origin['p'] = $path;
-			}
-			$origin['u'] = self::is_secondary_lang() ? 1 : 0;
-			self::index_value( $data, $origin );
-			return;
-		}
-		if ( ! is_array( $data ) ) {
-			return;
-		}
-		$count = 0;
-		foreach ( $data as $key => $child ) {
-			if ( $count++ > 80 ) {
-				break;
-			}
-			if ( ! is_string( $key ) && ! is_int( $key ) ) {
-				continue;
-			}
-			$segment = '[' . $key . ']';
-			self::walk_option_value( $child, $name, $path . $segment, $kind, $depth + 1 );
-		}
+	private static function walk_option_value( $data, $name, $path, $kind, $substring = false ) {
+		$untranslated = self::is_secondary_lang() ? 1 : 0;
+		$budget       = 2000;
+		Option_Index::walk(
+			$data,
+			$path,
+			static function ( $leaf, $leaf_path ) use ( $name, $kind, $substring, $untranslated ) {
+				$origin = array(
+					'k' => $kind,
+					'n' => $name,
+					'u' => $untranslated,
+				);
+				if ( '' !== $leaf_path ) {
+					$origin['p'] = $leaf_path;
+				}
+				foreach ( Option_Index::keys_for_leaf( $leaf ) as $key => $partial ) {
+					self::index_value( $key, $origin, $substring && ! $partial );
+				}
+			},
+			0,
+			$budget
+		);
 	}
 
 	/**
@@ -414,19 +489,19 @@ class Origin_Collector {
 	 * @return void
 	 */
 	private static function build_value_index() {
-		// Options are indexed only when read during this render (see on_all_hooks()).
+		// theme_mods + Admin Texts registry now; options read during the render are indexed in index_read_options().
 		$mods = get_theme_mods();
 		if ( is_array( $mods ) ) {
 			foreach ( $mods as $key => $value ) {
 				if ( ! is_string( $key ) ) {
 					continue;
 				}
-				self::walk_option_value( $value, (string) $key, '', 'theme_mod' );
+				self::walk_option_value( $value, (string) $key, '', 'theme_mod', true );
 			}
 		}
 
 		// Warm-index: Admin Texts registry keys + automlp_inspect_tracked_options.
-		// Non-autoload options not listed here are still captured via on_all_hooks().
+		// Other options read during the render are captured via on_pre_option().
 		$tracked  = array();
 		$registry = get_option( '_icl_admin_option_names', array() );
 		if ( is_array( $registry ) ) {
@@ -456,8 +531,55 @@ class Origin_Collector {
 			if ( null === $val ) {
 				continue;
 			}
-			self::walk_option_value( $val, $option_name, '', 'option' );
+			self::walk_option_value( $val, $option_name, '', 'option', true );
+			self::$indexed_options[ $option_name ] = true;
 		}
+	}
+
+	/**
+	 * Remember option names read during the render (generic pre_option filter).
+	 *
+	 * @param mixed  $pre    Short-circuit value (returned untouched).
+	 * @param string $option Option name.
+	 * @return mixed
+	 */
+	public static function on_pre_option( $pre, $option = '' ) {
+		if ( is_string( $option ) && '' !== $option && ! isset( self::$read_options[ $option ] ) && count( self::$read_options ) < 600 ) {
+			self::$read_options[ $option ] = true;
+		}
+		return $pre;
+	}
+
+	/**
+	 * Index values of options read during the render (bounded), once.
+	 *
+	 * @return void
+	 */
+	private static function index_read_options() {
+		if ( ! self::$read_options ) {
+			return;
+		}
+		remove_filter( 'pre_option', array( __CLASS__, 'on_pre_option' ), 9999 );
+		$count = 0;
+		foreach ( array_keys( self::$read_options ) as $name ) {
+			if ( isset( self::$indexed_options[ $name ] ) || Option_Index::is_skipped( $name ) ) {
+				continue;
+			}
+			self::$indexed_options[ $name ] = true;
+			if ( ++$count > 400 ) {
+				break;
+			}
+			$value = get_option( $name, null );
+			if ( null === $value || is_bool( $value ) || is_numeric( $value ) ) {
+				continue;
+			}
+			$kind = ( 0 === strpos( $name, 'theme_mods_' ) ) ? 'theme_mod' : 'option';
+			if ( 'theme_mod' === $kind ) {
+				continue; // Current theme_mods are already indexed by key.
+			}
+			self::walk_option_value( $value, $name, '', 'option', false );
+		}
+		self::$read_options = array();
 	}
 
 	/**
@@ -477,19 +599,148 @@ class Origin_Collector {
 	}
 
 	/**
-	 * Scan HTML for indexed option values.
+	 * Keep a gettext hit that did not fit (bounded); promoted later if visible.
+	 *
+	 * @param string $visible  Normalized translation.
+	 * @param string $original Raw original.
+	 * @param string $domain   Domain.
+	 * @param string $context  Context.
+	 * @param int    $untrans  Likely untranslated flag.
+	 * @return void
+	 */
+	private static function remember_overflow( $visible, $original, $domain, $context, $untrans ) {
+		if ( self::is_trivial( $visible ) || isset( self::$map[ $visible ] ) || isset( self::$overflow[ $visible ] ) || count( self::$overflow ) >= self::MAX_OVERFLOW ) {
+			return;
+		}
+		self::$overflow[ $visible ] = array(
+			'k'  => 'gettext',
+			'd'  => $domain,
+			'o'  => $original,
+			'c'  => $context,
+			'u'  => $untrans ? 1 : 0,
+			'ph' => self::$phase,
+			'sq' => ++self::$gettext_seq,
+		);
+	}
+
+	/**
+	 * Promote overflowed gettext hits whose text is visible in the body, evicting
+	 * gettext-only keys whose text is not visible (bounded, one pass).
+	 *
+	 * @return void
+	 */
+	private static function promote_overflow() {
+		if ( ! self::$overflow || ! self::$visible ) {
+			self::$overflow = array();
+			return;
+		}
+		$wanted = array();
+		foreach ( self::$overflow as $text => $origin ) {
+			if ( isset( self::$visible[ $text ] ) && ! isset( self::$map[ $text ] ) ) {
+				$wanted[ $text ] = $origin;
+			}
+		}
+		self::$overflow = array();
+		if ( ! $wanted ) {
+			return;
+		}
+		$free = self::MAX_ENTRIES - count( self::$map );
+		if ( $free < count( $wanted ) ) {
+			foreach ( self::$map as $text => $origins ) {
+				if ( isset( self::$visible[ $text ] ) ) {
+					continue;
+				}
+				$only_gettext = true;
+				foreach ( $origins as $o ) {
+					if ( ! isset( $o['k'] ) || 'gettext' !== $o['k'] ) {
+						$only_gettext = false;
+						break;
+					}
+				}
+				if ( $only_gettext ) {
+					unset( self::$map[ $text ] );
+					++$free;
+					if ( $free >= count( $wanted ) ) {
+						break;
+					}
+				}
+			}
+		}
+		foreach ( $wanted as $text => $origin ) {
+			if ( $free <= 0 ) {
+				break;
+			}
+			self::$map[ $text ] = array( $origin );
+			--$free;
+		}
+	}
+
+	/**
+	 * Mark texts that contain inline markup (links, bold, ...) as visible as one sentence.
+	 *
+	 * A gettext string such as 'View your <a href="%s">orders</a>.' is split into several
+	 * text nodes on the page; the visible sentence is the text of its block element.
+	 *
+	 * @param string $html Page HTML.
+	 * @return void
+	 */
+	private static function add_inline_visible( $html ) {
+		$html   = (string) preg_replace( '#<(script|style|noscript|template|textarea)\b[^>]*>.*?</\1\s*>|<!--.*?-->#is', ' ', $html );
+		$inline = 'a|abbr|b|bdi|bdo|cite|code|data|dfn|em|i|kbd|mark|q|s|samp|small|span|strong|sub|sup|time|u|var|wbr';
+		$blocks = preg_split( '#<(?!/?(?:' . $inline . ')\b)[^>]*>#i', $html );
+		$count  = 0;
+		foreach ( (array) $blocks as $block ) {
+			if ( false === strpos( (string) $block, '<' ) ) {
+				continue;
+			}
+			$seg = self::normalize( (string) $block );
+			if ( '' === $seg || strlen( $seg ) > self::MAX_TEXT_LEN || isset( self::$visible[ $seg ] ) ) {
+				continue;
+			}
+			self::$visible[ $seg ] = true;
+			if ( ++$count >= self::MAX_OVERFLOW ) {
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Scan HTML for indexed option values: exact text segments (hash lookups) plus
+	 * substring matches for the bounded registered/theme_mod subset.
 	 *
 	 * @param string $html HTML.
 	 * @return void
 	 */
 	private static function attach_value_matches_in_html( $html ) {
+		if ( '' === (string) $html ) {
+			return;
+		}
+		$parts = preg_split( '/<[^>]*>/', (string) $html );
+		foreach ( (array) $parts as $part ) {
+			$seg = self::normalize( (string) $part );
+			if ( '' === $seg ) {
+				continue;
+			}
+			self::$visible[ $seg ] = true;
+			if ( isset( self::$value_index[ $seg ] ) ) {
+				foreach ( self::$value_index[ $seg ] as $origin ) {
+					self::record( $seg, $origin );
+				}
+			}
+		}
+		self::add_inline_visible( (string) $html );
+		self::promote_overflow();
+		if ( ! self::$substring_values ) {
+			return;
+		}
 		$plain = self::normalize( $html );
 		if ( '' === $plain ) {
 			return;
 		}
-		foreach ( self::$value_index as $value => $origins ) {
+		foreach ( array_keys( self::$substring_values ) as $value ) {
+			$value = (string) $value;
 			if ( false !== strpos( $plain, $value ) && preg_match( '/(?<![\p{L}\p{N}])' . preg_quote( $value, '/' ) . '(?![\p{L}\p{N}])/u', $plain ) ) {
-				foreach ( $origins as $origin ) {
+				foreach ( self::$value_index[ $value ] as $origin ) {
 					self::record( $value, $origin );
 				}
 			}
@@ -531,8 +782,8 @@ class Origin_Collector {
 		if ( false !== $pos ) {
 			$html = substr( $html, $pos );
 		}
+		self::index_read_options();
 		$html = preg_replace( '#<(script|style|noscript|template)\b[^>]*>.*?</\1>#is', ' ', $html );
-		$html = preg_replace( '#<[^>]+>#', ' ', (string) $html );
 		self::attach_value_matches_in_html( (string) $html );
 	}
 
@@ -618,10 +869,11 @@ class Origin_Collector {
 
 		// Cap translated gettext noise — keeps Elementor pages interactive under inspect.
 		if ( ! $likely_untranslated && self::$gettext_entry_count >= self::MAX_GETTEXT_ENTRIES ) {
+			self::remember_overflow( $visible, $raw_orig, (string) $domain, (string) $context, 0 );
 			return;
 		}
 
-		$hint                = array(
+		$hint = array(
 			'k'  => 'gettext',
 			'd'  => (string) $domain,
 			'o'  => $raw_orig,
@@ -643,7 +895,7 @@ class Origin_Collector {
 
 		if ( ! self::is_trivial( $visible ) ) {
 			self::record( $visible, $hint );
-			self::$gettext_entry_count++;
+			++self::$gettext_entry_count;
 			self::attach_value_matches( $visible );
 		}
 
@@ -1220,6 +1472,7 @@ class Origin_Collector {
 	 */
 	public static function on_the_content( $content ) {
 		$post_id = (int) get_the_ID();
+		$content = self::mark_inactive_builder_text( (string) $content, $post_id );
 		$plain   = self::normalize( $content );
 		if ( ! self::is_trivial( $plain ) && strlen( $plain ) <= self::MAX_TEXT_LEN ) {
 			self::record(
@@ -1232,6 +1485,133 @@ class Origin_Collector {
 			);
 		}
 		self::attach_value_matches_in_html( $content );
+		return $content;
+	}
+
+	/**
+	 * Excerpts on archive / blog cards: each visible piece belongs to that post.
+	 *
+	 * @param string $excerpt Filtered excerpt HTML.
+	 * @return string
+	 */
+	public static function on_the_excerpt( $excerpt ) {
+		$post_id = (int) get_the_ID();
+		if ( $post_id > 0 && is_string( $excerpt ) && '' !== $excerpt ) {
+			self::record_segments(
+				$excerpt,
+				array(
+					'k'  => 'post_content',
+					'id' => $post_id,
+					'u'  => 0,
+					'x'  => 1,
+				),
+				30
+			);
+		}
+		return $excerpt;
+	}
+
+	/**
+	 * Builder data printed while its builder is NOT active (inspect render only).
+	 *
+	 * Divi / WPBakery shortcodes then show as literal text: the innermost module text is
+	 * wrapped in a span (inspect mode only, visitors never see it) and recorded as a
+	 * builder hint, so a click on it resolves to the module instead of the whole paragraph.
+	 * Bricks page data rendered by anything else is recorded by value with its element id.
+	 *
+	 * @param string $content Filtered post content.
+	 * @param int    $post_id Post ID.
+	 * @return string
+	 */
+	private static function mark_inactive_builder_text( $content, $post_id ) {
+		if ( $post_id <= 0 || '' === $content ) {
+			return $content;
+		}
+		if ( ( false !== strpos( $content, '[et_pb_' ) && ! Integration_Resolvers::builder_active( 'divi' ) )
+			|| ( false !== strpos( $content, '[vc_' ) && ! Integration_Resolvers::builder_active( 'wpbakery' ) ) ) {
+			$count  = 0;
+			$marked = preg_replace_callback(
+				'/\[((?:et_pb|vc)_[a-z0-9_]+)([^\]]*)\]((?:[^\[]|\[(?!\/?(?:et_pb|vc)_))+?)\[\/\1\]/',
+				static function ( $m ) use ( $post_id, &$count ) {
+					$builder = Integration_Resolvers::builder_for_tag( $m[1] );
+					if ( '' === $builder || strlen( $m[3] ) > 2000 || Integration_Resolvers::builder_active( $builder ) || ++$count > 200 ) {
+						return $m[0];
+					}
+					$origin = array(
+						'k'  => 'builder',
+						'b'  => $builder,
+						'id' => $post_id,
+						'u'  => 0,
+					);
+					if ( preg_match( '#<(script|style|textarea)\b#i', $m[3] ) ) {
+						self::record_segments( $m[3], $origin, 20 );
+						return $m[0];
+					}
+					// Wrap every visible text run (wpautop may add <br>/<p> inside the module) in its own span.
+					$runs  = 0;
+					$inner = preg_replace_callback(
+						'/(^|>)([^<]+)(?=<|$)/',
+						static function ( $r ) use ( $origin, $m, &$runs ) {
+							$text = self::normalize( $r[2] );
+							if ( self::is_trivial( $text ) || ++$runs > 20 ) {
+								return $r[0];
+							}
+							self::record( $text, $origin );
+							return $r[1] . '<span class="automlp-fi-builder" data-automlp-fi-builder="' . esc_attr( $m[1] ) . '">' . $r[2] . '</span>';
+						},
+						$m[3]
+					);
+					if ( ! is_string( $inner ) || 0 === $runs ) {
+						return $m[0];
+					}
+					return '[' . $m[1] . $m[2] . ']' . $inner . '[/' . $m[1] . ']';
+				},
+				$content
+			);
+			if ( is_string( $marked ) ) {
+				$content = $marked;
+			}
+		}
+		if ( ! Integration_Resolvers::builder_active( 'bricks' ) ) {
+			$plain = '';
+			foreach ( array( 'content', 'header', 'footer' ) as $area ) {
+				$elements = get_post_meta( $post_id, '_bricks_page_' . $area . '_2', true );
+				if ( ! is_array( $elements ) ) {
+					continue;
+				}
+				if ( '' === $plain ) {
+					$plain = self::normalize( $content );
+				}
+				foreach ( array_slice( $elements, 0, 300 ) as $element ) {
+					if ( ! is_array( $element ) || empty( $element['settings'] ) ) {
+						continue;
+					}
+					$eid    = isset( $element['id'] ) ? (string) $element['id'] : '';
+					$budget = 200;
+					Option_Index::walk(
+						$element['settings'],
+						'',
+						static function ( $leaf ) use ( $plain, $post_id, $eid ) {
+							$text = self::normalize( (string) $leaf );
+							if ( ! self::is_trivial( $text ) && false !== strpos( $plain, $text ) ) {
+								self::record(
+									$text,
+									array(
+										'k'   => 'builder',
+										'b'   => 'bricks',
+										'id'  => $post_id,
+										'eid' => $eid,
+										'u'   => 0,
+									)
+								);
+							}
+						},
+						0,
+						$budget
+					);
+				}
+			}
+		}
 		return $content;
 	}
 
@@ -1386,85 +1766,159 @@ class Origin_Collector {
 		return $content;
 	}
 	/**
-	 * Catch option_{$name} filters during inspect render to index non-autoload options.
+	 * Record each visible text segment of a rendered chunk (bounded).
 	 *
-	 * Bound to the 'all' hook only while inspect mode is active. Ignores everything
-	 * except option_* value filters (not pre_option_* / default_option_*).
-	 *
-	 * @param string $tag   Hook name.
-	 * @param mixed  $value First argument (option value for option_* filters).
+	 * @param string               $html   Rendered HTML.
+	 * @param array<string, mixed> $origin Origin hint.
+	 * @param int                  $max    Max segments.
 	 * @return void
 	 */
-	public static function on_all_hooks( $tag = null, $value = null ) {
-		// do_all_hook passes ( $hook_name, $value, ... ). Be defensive about arg shape.
-		if ( ! is_string( $tag ) || '' === $tag ) {
-			$tag = (string) current_filter();
+	private static function record_segments( $html, array $origin, $max = 60 ) {
+		$parts = preg_split( '/<[^>]*>/', (string) preg_replace( '#<(script|style)\b[^>]*>.*?</\1>#is', ' ', (string) $html ) );
+		$count = 0;
+		foreach ( (array) $parts as $part ) {
+			$seg = self::normalize( (string) $part );
+			if ( self::is_trivial( $seg ) ) {
+				continue;
+			}
+			self::record( $seg, $origin );
+			if ( ++$count >= $max ) {
+				break;
+			}
 		}
-		if ( '' === $tag || 0 !== strpos( $tag, 'option_' ) ) {
-			return;
-		}
-		// Exclude pre_option_* / default_option_* (they do not start with option_).
-		$name = substr( $tag, 7 );
-		if ( '' === $name ) {
-			return;
-		}
-		if ( 0 === strpos( $name, '_' ) ) {
-			return; // Internal / transient options.
-		}
-		$kind = ( 0 === strpos( $name, 'theme_mods_' ) ) ? 'theme_mod' : 'option';
-		// Index for HTML attach, and record string leaves into the map immediately so
-		// values read during shortcode/render appear in the localized payload even if
-		// a later HTML attach misses an encoding variant of the same string.
-		// Index only: a value is recorded when it is actually found in rendered output.
-		self::walk_option_value( $value, $name, '', $kind );
 	}
 
 	/**
-	 * Record string leaves from an option/theme_mod value directly into the map.
+	 * ACF value formatting: remember field key + object for string values.
 	 *
-	 * @param mixed  $data  Value.
-	 * @param string $name  Option name (or theme_mods_* ).
-	 * @param string $path  Bracket path.
-	 * @param string $kind  option|theme_mod.
-	 * @param int    $depth Depth.
-	 * @return void
+	 * @param mixed                $value   Formatted value.
+	 * @param mixed                $post_id ACF object id (123, 'option', 'term_5').
+	 * @param array<string, mixed> $field   Field.
+	 * @return mixed
 	 */
-	private static function record_option_leaves( $data, $name, $path, $kind, $depth = 0 ) {
-		if ( $depth > 4 ) {
-			return;
+	public static function on_acf_format_value( $value, $post_id = 0, $field = array() ) {
+		if ( ! is_string( $value ) || ! is_array( $field ) || empty( $field['key'] ) || ! is_scalar( $post_id ) ) {
+			return $value;
 		}
-		if ( is_string( $data ) ) {
-			$opt_name = $name;
-			$opt_path = $path;
-			if ( 'theme_mod' === $kind && 0 === strpos( $name, 'theme_mods_' ) ) {
-				if ( preg_match( '/^\[([^\]]+)\]/', $path, $m ) ) {
-					$opt_name = $m[1];
-					$opt_path = substr( $path, strlen( $m[0] ) );
-				}
-			}
-			$origin = array(
-				'k' => $kind,
-				'n' => $opt_name,
-				'u' => self::is_secondary_lang() ? 1 : 0,
+		$origin = array(
+			'k'   => 'acf',
+			'fk'  => (string) $field['key'],
+			'oid' => (string) $post_id,
+			'u'   => 0,
+		);
+		if ( false !== strpos( $value, '<' ) ) {
+			self::record_segments( $value, $origin, 30 );
+		} else {
+			self::record( $value, $origin );
+		}
+		return $value;
+	}
+
+	/**
+	 * Shortcode output: builder modules (Divi / WPBakery) and form plugins.
+	 *
+	 * @param string $output Output.
+	 * @param string $tag    Tag.
+	 * @param mixed  $attr   Attributes.
+	 * @return string
+	 */
+	public static function on_shortcode_tag( $output, $tag = '', $attr = array() ) {
+		if ( ! is_string( $output ) || '' === $output ) {
+			return $output;
+		}
+		$form = Integration_Resolvers::form_for_tag( (string) $tag );
+		if ( '' !== $form ) {
+			$id = ( is_array( $attr ) && isset( $attr['id'] ) ) ? absint( $attr['id'] ) : 0;
+			self::record_segments(
+				$output,
+				array(
+					'k'  => 'form',
+					'f'  => $form,
+					'id' => $id,
+					'u'  => 0,
+				)
 			);
-			if ( '' !== $opt_path ) {
-				$origin['p'] = $opt_path;
-			}
-			self::record( $data, $origin );
-			return;
+			return $output;
 		}
-		if ( ! is_array( $data ) ) {
-			return;
+		$builder = Integration_Resolvers::builder_for_tag( (string) $tag );
+		if ( '' !== $builder && 0 !== strpos( (string) $tag, 'et_pb_section' ) && 0 !== strpos( (string) $tag, 'et_pb_row' ) && 'vc_row' !== $tag && 'vc_column' !== $tag ) {
+			self::record_segments(
+				$output,
+				array(
+					'k'  => 'builder',
+					'b'  => $builder,
+					'id' => (int) get_the_ID(),
+					'u'  => 0,
+				),
+				40
+			);
 		}
-		$count = 0;
-		foreach ( $data as $key => $child ) {
-			if ( $count++ > 80 ) {
-				break;
-			}
-			if ( ! is_string( $key ) && ! is_int( $key ) ) {
-				continue;
-			}
-			self::record_option_leaves( $child, $name, $path . '[' . $key . ']', $kind, $depth + 1 );
+		return $output;
+	}
+
+	/**
+	 * Block output: Divi 5 modules and form blocks.
+	 *
+	 * @param string               $html  Block HTML.
+	 * @param array<string, mixed> $block Parsed block.
+	 * @return string
+	 */
+	public static function on_render_block( $html, $block = array() ) {
+		if ( ! is_string( $html ) || '' === $html || ! is_array( $block ) || empty( $block['blockName'] ) ) {
+			return $html;
 		}
+		$name = (string) $block['blockName'];
+		$form = Integration_Resolvers::form_for_tag( $name );
+		if ( '' !== $form ) {
+			$attrs = isset( $block['attrs'] ) && is_array( $block['attrs'] ) ? $block['attrs'] : array();
+			$id    = isset( $attrs['id'] ) ? absint( $attrs['id'] ) : ( isset( $attrs['formId'] ) ? absint( $attrs['formId'] ) : 0 );
+			self::record_segments(
+				$html,
+				array(
+					'k'  => 'form',
+					'f'  => $form,
+					'id' => $id,
+					'u'  => 0,
+				)
+			);
+		} elseif ( 0 === strpos( $name, 'divi/' ) && ! in_array( $name, array( 'divi/section', 'divi/row', 'divi/column', 'divi/placeholder' ), true ) ) {
+			self::record_segments(
+				$html,
+				array(
+					'k'  => 'builder',
+					'b'  => 'divi',
+					'id' => (int) get_the_ID(),
+					'u'  => 0,
+				),
+				40
+			);
+		}
+		return $html;
+	}
+
+	/**
+	 * Bricks element output.
+	 *
+	 * @param string $html    Element HTML.
+	 * @param mixed  $element Bricks element object.
+	 * @return string
+	 */
+	public static function on_bricks_element( $html, $element = null ) {
+		if ( ! is_string( $html ) || '' === $html || ! is_object( $element ) ) {
+			return $html;
+		}
+		$post_id = isset( $element->post_id ) ? (int) $element->post_id : (int) get_the_ID();
+		self::record_segments(
+			$html,
+			array(
+				'k'   => 'builder',
+				'b'   => 'bricks',
+				'id'  => $post_id,
+				'eid' => isset( $element->id ) ? (string) $element->id : '',
+				'u'   => 0,
+			),
+			40
+		);
+		return $html;
 	}
 }

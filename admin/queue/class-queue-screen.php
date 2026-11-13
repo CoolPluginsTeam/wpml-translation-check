@@ -528,7 +528,8 @@ class Queue_Screen {
 			);
 		}
 
-		$wpml_job_id = isset( $row['wpml_job_id'] ) ? (int) $row['wpml_job_id'] : 0;
+		// Older rows may still hold raw provider text: last_error is mapped to a plain line below.
+		$wpml_job_id        = isset( $row['wpml_job_id'] ) ? (int) $row['wpml_job_id'] : 0;
 		$row['result_link'] = '';
 
 		if ( Queue_Table::STATE_DONE === $row['state'] && ( $wpml_job_id || $result_id ) ) {
@@ -544,6 +545,9 @@ class Queue_Screen {
 		$row['queued_ago']  = self::ago( $row['queued_at'] );
 		$row['queued_full'] = self::local_time( $row['queued_at'] );
 		$row['type_label']  = self::type_label( $row['kind'], $source_id );
+		$retrying           = in_array( $row['state'], array( Queue_Table::STATE_WAITING, Queue_Table::STATE_CLAIMED ), true );
+		$provider_key       = isset( $row['provider'] ) ? (string) $row['provider'] : '';
+		$row['last_error']  = ! empty( $row['last_error'] ) ? Queue_Table::friendly_error( (string) $row['last_error'], $provider_key, $retrying ) : '';
 		$row['provider']    = self::provider_label( isset( $row['provider'] ) ? (string) $row['provider'] : '' );
 
 		return $row;

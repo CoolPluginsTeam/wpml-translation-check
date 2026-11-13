@@ -859,7 +859,7 @@ class Queue_Route {
 				true
 			),
 			'attempts'          => (int) $row['attempts'],
-			'error'             => ! empty( $row['last_error'] ) ? (string) $row['last_error'] : '',
+			'error'             => ! empty( $row['last_error'] ) ? Queue_Table::friendly_error( (string) $row['last_error'], isset( $row['provider'] ) ? (string) $row['provider'] : '', in_array( $row['state'], array( Queue_Table::STATE_WAITING, Queue_Table::STATE_CLAIMED ), true ) ) : '',
 			'field_count'       => (int) $row['field_count'],
 			'fields_translated' => isset( $row['fields_translated'] ) ? (int) $row['fields_translated'] : 0,
 			'progress_percent'  => Queue_Table::progress_percent( $row ),

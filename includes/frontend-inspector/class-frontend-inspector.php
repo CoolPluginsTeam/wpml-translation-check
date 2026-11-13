@@ -25,9 +25,11 @@ class Frontend_Inspector {
 	const HANDLE       = 'automlp-frontend-inspector';
 	const AJAX_ACTION  = 'automlp_inspect_resolve';
 	const SCAN_ACTION  = 'automlp_inspect_scan';
+	const REG_ACTION   = 'automlp_inspect_register';
 	const NONCE_ACTION = 'automlp_inspect_resolve';
 	const MAP_ID       = 'automlp-fi-map';
 	const SCAN_LIMIT   = 200;
+	const TEXT_DOMAIN  = 'wpml-translation-check';
 
 	/**
 	 * Register hooks.
@@ -40,6 +42,7 @@ class Frontend_Inspector {
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
 		add_action( 'wp_ajax_' . self::AJAX_ACTION, array( __CLASS__, 'ajax_resolve' ) );
 		add_action( 'wp_ajax_' . self::SCAN_ACTION, array( __CLASS__, 'ajax_scan' ) );
+		add_action( 'wp_ajax_' . self::REG_ACTION, array( __CLASS__, 'ajax_register' ) );
 	}
 
 	/**
@@ -200,13 +203,14 @@ class Frontend_Inspector {
 			'ajaxUrl'      => admin_url( 'admin-ajax.php', 'relative' ),
 			'action'       => self::AJAX_ACTION,
 			'scanAction'   => self::SCAN_ACTION,
+			'regAction'    => self::REG_ACTION,
 			'containersId' => Container_Markers::DATA_ID,
 			'adminUrl'     => admin_url(),
 			'scanLimit'    => self::SCAN_LIMIT,
 			'scanBatch'    => 40,
 			'userId'       => get_current_user_id(),
 			'nonce'        => wp_create_nonce( self::NONCE_ACTION ),
-			'i18n'         => self::strings(),
+			'i18n'         => self::admin_strings( array( __CLASS__, 'strings' ) ),
 		);
 
 		wp_add_inline_script(
@@ -214,6 +218,142 @@ class Frontend_Inspector {
 			'window.automlpFrontendInspector = ' . wp_json_encode( $config ) . ';',
 			'before'
 		);
+	}
+
+	/**
+	 * Admin-language catalog of this plugin's strings (null until loaded).
+	 *
+	 * @var \MO|null
+	 */
+	private static $admin_mo = null;
+
+	/**
+	 * Nesting depth of admin_strings_on().
+	 *
+	 * @var int
+	 */
+	private static $admin_depth = 0;
+
+	/**
+	 * Run a callback with this plugin's strings in the current user's language.
+	 *
+	 * @param callable $callback Callback.
+	 * @return mixed Callback result.
+	 */
+	public static function admin_strings( $callback ) {
+		self::admin_strings_on();
+		try {
+			return call_user_func( $callback );
+		} finally {
+			self::admin_strings_off();
+		}
+	}
+
+	/**
+	 * Panel labels follow the admin's own language, never the page language.
+	 *
+	 * The page language can switch the locale (and WPML String Translation can translate this
+	 * plugin's strings for visitors). These filters run last for this text domain only and answer
+	 * from the admin's locale catalog, or the original English text.
+	 *
+	 * @return void
+	 */
+	public static function admin_strings_on() {
+		if ( 0 === self::$admin_depth++ ) {
+			add_filter( 'gettext_' . self::TEXT_DOMAIN, array( __CLASS__, 'admin_gettext' ), PHP_INT_MAX, 2 );
+			add_filter( 'gettext_with_context_' . self::TEXT_DOMAIN, array( __CLASS__, 'admin_gettext_context' ), PHP_INT_MAX, 3 );
+			add_filter( 'ngettext_' . self::TEXT_DOMAIN, array( __CLASS__, 'admin_ngettext' ), PHP_INT_MAX, 4 );
+		}
+	}
+
+	/**
+	 * Undo admin_strings_on().
+	 *
+	 * @return void
+	 */
+	public static function admin_strings_off() {
+		if ( self::$admin_depth > 0 && 0 === --self::$admin_depth ) {
+			remove_filter( 'gettext_' . self::TEXT_DOMAIN, array( __CLASS__, 'admin_gettext' ), PHP_INT_MAX );
+			remove_filter( 'gettext_with_context_' . self::TEXT_DOMAIN, array( __CLASS__, 'admin_gettext_context' ), PHP_INT_MAX );
+			remove_filter( 'ngettext_' . self::TEXT_DOMAIN, array( __CLASS__, 'admin_ngettext' ), PHP_INT_MAX );
+		}
+	}
+
+	/**
+	 * This plugin's catalog for the current user's locale (empty for English).
+	 *
+	 * @return \MO
+	 */
+	private static function admin_mo() {
+		if ( null === self::$admin_mo ) {
+			self::$admin_mo = new \MO();
+			$locale         = self::admin_locale();
+			if ( '' !== $locale && 'en_US' !== $locale ) {
+				$file  = self::TEXT_DOMAIN . '-' . $locale . '.mo';
+				$paths = array(
+					WP_LANG_DIR . '/plugins/' . $file,
+					WP_LANG_DIR . '/wpml/' . $file,
+					AUTOMLP_AI_PLUGIN_DIR . 'languages/' . $file,
+				);
+				foreach ( $paths as $path ) {
+					if ( is_readable( $path ) && self::$admin_mo->import_from_file( $path ) ) {
+						break;
+					}
+				}
+			}
+		}
+		return self::$admin_mo;
+	}
+
+	/**
+	 * The admin's own locale: profile language, else the site language (not the page language).
+	 *
+	 * Not get_user_locale(): it falls back to get_locale(), which follows the page language on the front end.
+	 *
+	 * @return string
+	 */
+	public static function admin_locale() {
+		$locale = (string) get_user_meta( get_current_user_id(), 'locale', true );
+		if ( '' === $locale ) {
+			$locale = (string) get_option( 'WPLANG' );
+		}
+		return '' === $locale ? 'en_US' : $locale;
+	}
+
+	/**
+	 * Gettext filter: admin-language text.
+	 *
+	 * @param string $translation Translation from other filters.
+	 * @param string $text        Original.
+	 * @return string
+	 */
+	public static function admin_gettext( $translation, $text ) {
+		return self::admin_mo()->translate( $text );
+	}
+
+	/**
+	 * Gettext-with-context filter: admin-language text.
+	 *
+	 * @param string $translation Translation from other filters.
+	 * @param string $text        Original.
+	 * @param string $context     Context.
+	 * @return string
+	 */
+	public static function admin_gettext_context( $translation, $text, $context ) {
+		return self::admin_mo()->translate( $text, $context );
+	}
+
+	/**
+	 * Plural filter: admin-language text.
+	 *
+	 * @param string $translation Translation from other filters.
+	 * @param string $single      Singular.
+	 * @param string $plural      Plural.
+	 * @param int    $number      Count.
+	 * @return string
+	 */
+	public static function admin_ngettext( $translation, $single, $plural, $number ) {
+		return self::admin_mo()->translate_plural( $single, $plural, $number );
 	}
 
 	/**
@@ -260,6 +400,8 @@ class Frontend_Inspector {
 				403
 			);
 		}
+		// The whole response is panel text: keep the plugin's own strings in the admin's language.
+		self::admin_strings_on();
 	}
 
 	/**
@@ -297,10 +439,87 @@ class Frontend_Inspector {
 		}
 
 		$hint = self::read_hint_from_request();
+		$ctx  = self::read_ctx_from_request();
 
 		self::switch_to_page_language();
 
-		wp_send_json_success( Origin_Resolver::resolve( $text, $hint ) );
+		wp_send_json_success( Origin_Resolver::resolve( $text, $hint, $ctx ) );
+	}
+
+	/**
+	 * AJAX: register one string in WPML String Translation (admin only, nonce).
+	 *
+	 * @return void
+	 */
+	public static function ajax_register() {
+		self::verify_ajax();
+
+		// phpcs:disable WordPress.Security.NonceVerification.Missing -- Verified in verify_ajax().
+		$domain   = isset( $_POST['domain'] ) ? sanitize_text_field( wp_unslash( $_POST['domain'] ) ) : '';
+		$original = isset( $_POST['original'] ) ? self::sanitize_gettext_original( wp_unslash( $_POST['original'] ) ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_gettext_original().
+		$context  = isset( $_POST['context'] ) ? sanitize_text_field( wp_unslash( $_POST['context'] ) ) : '';
+		// phpcs:enable WordPress.Security.NonceVerification.Missing
+
+		if ( '' === $domain || '' === trim( $original ) || strlen( $domain ) > 160 || strlen( $context ) > 160 ) {
+			wp_send_json_error(
+				array( 'message' => __( 'Invalid string.', 'wpml-translation-check' ) ),
+				400
+			);
+		}
+
+		$result = Origin_Resolver::register_string( $domain, $original, $context );
+		if ( isset( $result['error'] ) ) {
+			wp_send_json_error( array( 'message' => $result['error'] ), 500 );
+		}
+		wp_send_json_success( $result );
+	}
+
+	/**
+	 * Page context posted with a resolve/scan request.
+	 *
+	 * @param mixed $raw Raw JSON string (unslashed) or null to read $_POST['ctx'].
+	 * @return array<string, mixed>
+	 */
+	private static function read_ctx_from_request( $raw = null ) {
+		if ( null === $raw ) {
+			$raw = isset( $_POST['ctx'] ) ? wp_unslash( $_POST['ctx'] ) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing -- Nonce verified by caller; JSON decoded and sanitized below.
+		}
+		$data = is_string( $raw ) && '' !== $raw ? json_decode( $raw, true ) : $raw;
+		return self::sanitize_ctx( is_array( $data ) ? $data : array() );
+	}
+
+	/**
+	 * Sanitize page context.
+	 *
+	 * @param array<string, mixed> $data Raw.
+	 * @return array<string, mixed>
+	 */
+	private static function sanitize_ctx( array $data ) {
+		$ctx = array(
+			'qid'     => isset( $data['qid'] ) && is_scalar( $data['qid'] ) ? absint( $data['qid'] ) : 0,
+			'js'      => ! empty( $data['js'] ),
+			'scripts' => JS_Strings::sanitize_scripts( isset( $data['scripts'] ) ? $data['scripts'] : array() ),
+			'inline'  => array(),
+			'region'  => array(),
+		);
+		if ( isset( $data['inline'] ) && is_array( $data['inline'] ) ) {
+			foreach ( array_slice( $data['inline'], 0, 5 ) as $handle ) {
+				if ( is_scalar( $handle ) && '' !== (string) $handle ) {
+					$ctx['inline'][] = sanitize_text_field( (string) $handle );
+				}
+			}
+		}
+		if ( isset( $data['region'] ) && is_array( $data['region'] ) ) {
+			foreach ( array( 'td', 'file', 'label' ) as $key ) {
+				if ( isset( $data['region'][ $key ] ) && is_scalar( $data['region'][ $key ] ) ) {
+					$ctx['region'][ $key ] = sanitize_text_field( (string) $data['region'][ $key ] );
+				}
+			}
+			if ( isset( $ctx['region']['file'] ) && false !== strpos( $ctx['region']['file'], '..' ) ) {
+				$ctx['region']['file'] = '';
+			}
+		}
+		return $ctx;
 	}
 
 	/**
@@ -324,7 +543,8 @@ class Frontend_Inspector {
 
 		self::switch_to_page_language();
 
-		$keep    = array( 'found', 'translated', 'same_as_default', 'source_type', 'source_type_label', 'status_label', 'identifiers', 'fix_url', 'fix_label', 'message' );
+		$shared  = self::read_ctx_from_request();
+		$keep    = array( 'found', 'translated', 'same_as_default', 'source_type', 'source_type_label', 'status_label', 'identifiers', 'fix_url', 'fix_label', 'message', 'links', 'actions', 'warning', 'reasons' );
 		$items   = array_slice( array_values( $items ), 0, self::SCAN_LIMIT );
 		$entries = array();
 		foreach ( $items as $item ) {
@@ -335,6 +555,15 @@ class Frontend_Inspector {
 		}
 		// One query per source table for the whole batch.
 		Origin_Resolver::prime( $entries );
+		// One bounded LIKE query for non-autoloaded options of texts without a strong hint.
+		$cold = array();
+		foreach ( $entries as $entry ) {
+			$kind = isset( $entry[1]['k'] ) ? (string) $entry[1]['k'] : '';
+			if ( '' !== $entry[0] && in_array( $kind, array( '', 'option', 'theme_mod', 'js', 'region' ), true ) ) {
+				$cold[] = $entry[0];
+			}
+		}
+		Option_Index::prime_cold( $cold );
 
 		$results = array();
 		foreach ( $items as $index => $item ) {
@@ -347,8 +576,15 @@ class Frontend_Inspector {
 				$results[] = null;
 				continue;
 			}
-			$hint      = ( isset( $item['h'] ) && is_array( $item['h'] ) ) ? self::sanitize_hint( $item['h'] ) : array();
-			$resolved  = Origin_Resolver::resolve( $text, $hint );
+			$hint = ( isset( $item['h'] ) && is_array( $item['h'] ) ) ? self::sanitize_hint( $item['h'] ) : array();
+			$ctx  = $shared;
+			if ( ! empty( $item['j'] ) ) {
+				$ctx['js'] = true;
+			}
+			if ( isset( $item['r'] ) && is_array( $item['r'] ) ) {
+				$ctx['region'] = self::sanitize_ctx( array( 'region' => $item['r'] ) )['region'];
+			}
+			$resolved  = Origin_Resolver::resolve( $text, $hint, $ctx );
 			$results[] = array_intersect_key( $resolved, array_flip( $keep ) ) + array( 'i' => $index );
 		}
 
@@ -389,7 +625,7 @@ class Frontend_Inspector {
 		if ( isset( $_POST['hint_k'] ) ) {
 			$flat['k'] = sanitize_key( wp_unslash( $_POST['hint_k'] ) );
 		}
-		foreach ( array( 'd', 'c', 'n', 'p', 'eid', 'wid', 'tax' ) as $key ) {
+		foreach ( array( 'd', 'c', 'n', 'p', 'eid', 'wid', 'tax', 'b', 'fk', 'oid', 'f' ) as $key ) {
 			$post_key = 'hint_' . $key;
 			if ( isset( $_POST[ $post_key ] ) ) {
 				$flat[ $key ] = sanitize_text_field( wp_unslash( $_POST[ $post_key ] ) );
@@ -399,7 +635,7 @@ class Frontend_Inspector {
 			// Gettext originals may include intentional HTML / placeholders — keep them.
 			$flat['o'] = self::sanitize_gettext_original( wp_unslash( $_POST['hint_o'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitized by sanitize_gettext_original().
 		}
-		foreach ( array( 'id', 'did', 'u' ) as $key ) {
+		foreach ( array( 'id', 'did', 'u', 'x' ) as $key ) {
 			$post_key = 'hint_' . $key;
 			if ( isset( $_POST[ $post_key ] ) ) {
 				$flat[ $key ] = absint( wp_unslash( $_POST[ $post_key ] ) );
@@ -425,7 +661,7 @@ class Frontend_Inspector {
 		if ( isset( $hint['k'] ) && is_scalar( $hint['k'] ) ) {
 			$out['k'] = sanitize_key( (string) $hint['k'] );
 		}
-		foreach ( array( 'd', 'c', 'n', 'p', 'eid', 'wid', 'tax' ) as $key ) {
+		foreach ( array( 'd', 'c', 'n', 'p', 'eid', 'wid', 'tax', 'b', 'fk', 'oid', 'f' ) as $key ) {
 			if ( isset( $hint[ $key ] ) && is_scalar( $hint[ $key ] ) ) {
 				$out[ $key ] = sanitize_text_field( (string) $hint[ $key ] );
 			}
@@ -433,7 +669,7 @@ class Frontend_Inspector {
 		if ( isset( $hint['o'] ) && is_scalar( $hint['o'] ) ) {
 			$out['o'] = self::sanitize_gettext_original( (string) $hint['o'] );
 		}
-		foreach ( array( 'id', 'did', 'u' ) as $key ) {
+		foreach ( array( 'id', 'did', 'u', 'x' ) as $key ) {
 			if ( isset( $hint[ $key ] ) && is_scalar( $hint[ $key ] ) ) {
 				$out[ $key ] = absint( $hint[ $key ] );
 			}
@@ -470,10 +706,10 @@ class Frontend_Inspector {
 			'openLabel'      => __( 'Text Inspector', 'wpml-translation-check' ),
 			'closeLabel'     => __( 'Close Text Inspector', 'wpml-translation-check' ),
 			'hint'           => __( 'Click any text on the page, or an item below, to see where it comes from.', 'wpml-translation-check' ),
-			'loading'        => __( 'Resolving…', 'wpml-translation-check' ),
-			'loadingMap'     => __( 'Collecting text origins for this page…', 'wpml-translation-check' ),
-			'mapError'       => __( 'Could not load the origin map for this page.', 'wpml-translation-check' ),
-			'error'          => __( 'Could not resolve this text.', 'wpml-translation-check' ),
+			'loading'        => __( 'Checking…', 'wpml-translation-check' ),
+			'loadingMap'     => __( 'Reading this page…', 'wpml-translation-check' ),
+			'mapError'       => __( 'Could not read this page. Reload and try again.', 'wpml-translation-check' ),
+			'error'          => __( 'Could not check this text. Try again.', 'wpml-translation-check' ),
 			'source'         => __( 'Source', 'wpml-translation-check' ),
 			'status'         => __( 'Status', 'wpml-translation-check' ),
 			'identifiers'    => __( 'Identifiers', 'wpml-translation-check' ),
@@ -481,8 +717,7 @@ class Frontend_Inspector {
 			'selected'       => __( 'Selected text', 'wpml-translation-check' ),
 			'untranslated'   => __( 'Likely untranslated', 'wpml-translation-check' ),
 			'openFix'        => __( 'Open fix link', 'wpml-translation-check' ),
-			'alsoPossible'   => __( 'Also possible', 'wpml-translation-check' ),
-			'noHint'         => __( 'No collector hint matched; resolver may still find a source.', 'wpml-translation-check' ),
+			'noHint'         => __( 'No direct match found. Other sources are still checked.', 'wpml-translation-check' ),
 			'scanTitle'      => __( 'Untranslated on this page', 'wpml-translation-check' ),
 			'scanning'       => __( 'Checking visible strings…', 'wpml-translation-check' ),
 			/* translators: 1: untranslated count, 2: scanned count */
@@ -491,15 +726,38 @@ class Frontend_Inspector {
 			'scanCapped'     => __( 'Only the first %d visible strings were checked.', 'wpml-translation-check' ),
 			'scanEmpty'      => __( 'No untranslated strings found on this page.', 'wpml-translation-check' ),
 			'scanError'      => __( 'Could not check strings on this page.', 'wpml-translation-check' ),
-			'notFound'       => __( 'Source unknown', 'wpml-translation-check' ),
-			'container'      => __( 'Rendered by', 'wpml-translation-check' ),
-			'region'         => __( 'Theme template', 'wpml-translation-check' ),
+			'notFound'       => __( 'Source not found', 'wpml-translation-check' ),
+			'region'         => __( 'Shown by', 'wpml-translation-check' ),
 			'edit'           => __( 'Edit', 'wpml-translation-check' ),
-			'byJs'           => __( 'Added by JavaScript', 'wpml-translation-check' ),
-			'byJsStatus'     => __( 'Not in the server HTML: inserted in the browser after load.', 'wpml-translation-check' ),
-			'containerOnly'  => __( 'Not registered as a translatable string; edit it in the source above.', 'wpml-translation-check' ),
+			'byJs'           => __( 'Added by a script', 'wpml-translation-check' ),
+			'byJsStatus'     => __( 'Added in the browser after the page loaded.', 'wpml-translation-check' ),
+			'containerOnly'  => __( 'Not a translatable string. Edit it in the source above.', 'wpml-translation-check' ),
 			'controlOptions' => __( 'Options in this control', 'wpml-translation-check' ),
+			'details'        => __( 'Details', 'wpml-translation-check' ),
+			'more'           => __( 'More links', 'wpml-translation-check' ),
+			'reasons'        => __( 'Why it is not shown', 'wpml-translation-check' ),
+			'registering'    => __( 'Adding…', 'wpml-translation-check' ),
+			'registered'     => __( 'Added to String Translation.', 'wpml-translation-check' ),
+			'registerFailed' => __( 'Could not add the text.', 'wpml-translation-check' ),
 			'resizeHandle'   => __( 'Drag to resize panel. Arrow keys adjust width.', 'wpml-translation-check' ),
+			/* translators: %d: number of texts */
+			'containsTexts'  => __( 'This area has %d texts. Click one to see its source.', 'wpml-translation-check' ),
+			'clickToResolve' => __( 'Click to see the source', 'wpml-translation-check' ),
+			/* translators: %s: Elementor widget name, e.g. heading */
+			'elWidget'       => __( 'Elementor %s widget', 'wpml-translation-check' ),
+			'yes'            => __( 'Yes', 'wpml-translation-check' ),
+			'no'             => __( 'No', 'wpml-translation-check' ),
+			'detailLabels'   => array(
+				'component'      => __( 'Comes from', 'wpml-translation-check' ),
+				'plugin'         => __( 'Plugin', 'wpml-translation-check' ),
+				'builder'        => __( 'Page builder', 'wpml-translation-check' ),
+				'builder_active' => __( 'Page builder active', 'wpml-translation-check' ),
+				'menu'           => __( 'Menu', 'wpml-translation-check' ),
+				'field_name'     => __( 'Field', 'wpml-translation-check' ),
+				'form_id'        => __( 'Form ID', 'wpml-translation-check' ),
+				'post_id'        => __( 'Post ID', 'wpml-translation-check' ),
+				'language'       => __( 'Language', 'wpml-translation-check' ),
+			),
 		);
 	}
 }

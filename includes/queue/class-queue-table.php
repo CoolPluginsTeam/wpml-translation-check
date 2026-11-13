@@ -113,7 +113,7 @@ class Queue_Table {
 	 */
 	public static function uninstall() {
 		global $wpdb;
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( $wpdb->prepare( 'DROP TABLE IF EXISTS %i', self::table() ) );
 		delete_option( self::DB_VERSION_OPTION );
 	}
@@ -156,6 +156,127 @@ class Queue_Table {
 			wp_cache_set( 'gen', $gen, self::CACHE_GROUP );
 		}
 		return (string) $gen;
+	}
+
+	/**
+	 * Short, plain message for a provider error (raw details stay in the debug log).
+	 *
+	 * Covers Google Gemini and OpenAI: usage limits, billing, invalid key, missing model,
+	 * network / timeout, plus a generic fallback. Already plain messages pass through.
+	 *
+	 * @param string $raw        Raw error text from the provider or SDK.
+	 * @param string $provider   Stored provider key (google, gemini, openai, ...).
+	 * @param bool   $will_retry Whether the queue retries the job by itself.
+	 * @return string
+	 */
+	public static function friendly_error( $raw, $provider = '', $will_retry = true ) {
+		$raw = trim( wp_strip_all_tags( (string) $raw ) );
+		if ( '' === $raw ) {
+			return '';
+		}
+		$name  = self::provider_name( (string) $provider, $raw );
+		$wait  = self::retry_wait( $raw );
+		$retry = $will_retry
+			? ( '' !== $wait
+				/* translators: %s: time such as "about 3 hours" */
+				? sprintf( __( 'The job will retry automatically in %s.', 'wpml-translation-check' ), $wait )
+				: __( 'The job will retry automatically.', 'wpml-translation-check' ) )
+			: ( '' !== $wait
+				/* translators: %s: time such as "about 3 hours" */
+				? sprintf( __( 'Try again in %s.', 'wpml-translation-check' ), $wait )
+				: __( 'Please try again later.', 'wpml-translation-check' ) );
+
+		if ( preg_match( '/insufficient_quota|billing (?:hard )?limit|exceeded your current quota.*billing/i', $raw ) && preg_match( '/openai|insufficient_quota/i', $raw . ' ' . $provider ) ) {
+			/* translators: %s: AI provider name */
+			return sprintf( __( 'Your %s account has no credit left. Check your plan and billing.', 'wpml-translation-check' ), $name );
+		}
+		if ( preg_match( '/\b429\b|too many requests|rate[ _-]?limit|quota|resource_exhausted/i', $raw ) ) {
+			if ( preg_match( '/per ?day|daily|requestsperday/i', $raw ) ) {
+				/* translators: %s: AI provider name */
+				return sprintf( __( 'Daily limit reached for %s.', 'wpml-translation-check' ), $name ) . ' ' . $retry;
+			}
+			/* translators: %s: AI provider name */
+			return sprintf( __( 'Too many requests to %s right now.', 'wpml-translation-check' ), $name ) . ' ' . $retry;
+		}
+		if ( preg_match( '/\b40[13]\b|invalid[ _]api[ _]key|api key not valid|incorrect api key|api_key_invalid|permission_denied|unauthori[sz]ed|no api key/i', $raw ) ) {
+			if ( '' === $provider ) {
+				return __( 'The AI service API key is not valid. Update it in the plugin settings.', 'wpml-translation-check' );
+			}
+			/* translators: %s: AI provider name */
+			return sprintf( __( 'The %s API key is not valid. Update it in the plugin settings.', 'wpml-translation-check' ), $name );
+		}
+		if ( preg_match( '/model.{0,40}(?:not found|does not exist|not supported)|\b404\b.{0,80}model/i', $raw ) ) {
+			/* translators: %s: AI provider name */
+			return sprintf( __( 'The selected %s model is not available. Choose another model in the plugin settings.', 'wpml-translation-check' ), $name );
+		}
+		if ( preg_match( '/curl error|timed out|timeout|could not resolve host|connection (?:refused|reset)|\b50[0234]\b|service unavailable|overloaded|unavailable|internal server error|bad gateway/i', $raw ) ) {
+			/* translators: %s: AI provider name */
+			return sprintf( __( 'Could not reach %s.', 'wpml-translation-check' ), $name ) . ' ' . $retry;
+		}
+		// Plain plugin messages are already readable; anything technical gets a generic line.
+		if ( strlen( $raw ) <= 180 && ! preg_match( '#https?://|[{}\[\]]|\(\d{3}\)|\b[a-z]+_[a-z_]+\b#i', $raw ) ) {
+			return $raw;
+		}
+		/* translators: %s: AI provider name */
+		return sprintf( __( '%s could not translate this job.', 'wpml-translation-check' ), $name ) . ' ' . $retry;
+	}
+
+	/**
+	 * Display name of the provider, from its key or the error text.
+	 *
+	 * @param string $provider Provider key.
+	 * @param string $raw      Raw error.
+	 * @return string
+	 */
+	private static function provider_name( $provider, $raw ) {
+		$key = strtolower( $provider . ' ' . $raw );
+		if ( false !== strpos( $key, 'gemini' ) || false !== strpos( $key, 'google' ) ) {
+			return 'Google Gemini';
+		}
+		if ( false !== strpos( $key, 'openai' ) || 0 === strpos( strtolower( $provider ), 'gpt' ) ) {
+			return 'OpenAI';
+		}
+		if ( 'chrome' === strtolower( $provider ) ) {
+			return __( 'Chrome built-in AI', 'wpml-translation-check' );
+		}
+		return '' !== $provider ? ucfirst( $provider ) : __( 'the AI service', 'wpml-translation-check' );
+	}
+
+	/**
+	 * "about 3 hours" from "retry in 3h5m31s" / "try again in 20s" / "retryDelay": "52s".
+	 *
+	 * @param string $raw Raw error.
+	 * @return string Empty when no wait time is given.
+	 */
+	private static function retry_wait( $raw ) {
+		if ( ! preg_match( '/(?:retry|try again)\D{0,20}((?:\d+(?:\.\d+)?\s*(?:h|ms|m|s)\s*)+)/i', $raw, $m )
+			&& ! preg_match( '/retryDelay\W+((?:\d+(?:\.\d+)?\s*(?:h|ms|m|s)\s*)+)/i', $raw, $m ) ) {
+			return '';
+		}
+		$seconds = 0;
+		if ( preg_match_all( '/(\d+(?:\.\d+)?)\s*(h|ms|m|s)/i', $m[1], $parts, PREG_SET_ORDER ) ) {
+			foreach ( $parts as $part ) {
+				$unit     = strtolower( $part[2] );
+				$factor   = array(
+					'h'  => 3600,
+					'm'  => 60,
+					's'  => 1,
+					'ms' => 0.001,
+				);
+				$seconds += (float) $part[1] * $factor[ $unit ];
+			}
+		}
+		if ( $seconds >= 5400 ) {
+			$hours = (int) round( $seconds / 3600 );
+			/* translators: %d: number of hours */
+			return sprintf( _n( 'about %d hour', 'about %d hours', $hours, 'wpml-translation-check' ), $hours );
+		}
+		if ( $seconds >= 90 ) {
+			$minutes = (int) round( $seconds / 60 );
+			/* translators: %d: number of minutes */
+			return sprintf( _n( 'about %d minute', 'about %d minutes', $minutes, 'wpml-translation-check' ), $minutes );
+		}
+		return $seconds > 0 ? __( 'about a minute', 'wpml-translation-check' ) : '';
 	}
 
 	/**
@@ -207,7 +328,7 @@ class Queue_Table {
 			$row['source_map'] = wp_json_encode( $row['source_map'] );
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$ok = $wpdb->insert( self::table(), $row );
 
 		if ( ! $ok ) {
@@ -236,7 +357,7 @@ class Queue_Table {
 			}
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$done = $wpdb->update( self::table(), $args, array( 'job_id' => (int) $job_id ), null, array( '%d' ) );
 
 		self::bump_cache();
@@ -265,7 +386,7 @@ class Queue_Table {
 			}
 		}
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$done = $wpdb->update(
 			self::table(),
 			$args,
@@ -293,7 +414,7 @@ class Queue_Table {
 
 		$args['touched_at'] = current_time( 'mysql', true );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$done = $wpdb->update( self::table(), $args, array( 'wpml_job_id' => (int) $wpml_job_id ), null, array( '%d' ) );
 
 		self::bump_cache();
@@ -365,7 +486,7 @@ class Queue_Table {
 	public static function claim( $job_id ) {
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				'UPDATE %i SET state = %s, touched_at = %s WHERE job_id = %d AND state = %s',
@@ -426,6 +547,8 @@ class Queue_Table {
 		}
 
 		$attempts = (int) $row['attempts'] + 1;
+		// Raw provider text goes to the debug log (Dispatcher::log); the queue shows a plain line.
+		$message = self::friendly_error( (string) $message, isset( $row['provider'] ) ? (string) $row['provider'] : '', $attempts <= (int) $max_retries );
 
 		if ( $attempts <= (int) $max_retries ) {
 			self::edit(
@@ -532,7 +655,7 @@ class Queue_Table {
 
 		$cutoff = gmdate( 'Y-m-d H:i:s', time() - ( absint( $minutes ) * MINUTE_IN_SECONDS ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				'UPDATE %i SET state = %s, touched_at = %s, fields_translated = 0
@@ -674,7 +797,7 @@ class Queue_Table {
 
 		global $wpdb;
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			$wpdb->prepare( 'SELECT state, COUNT(*) AS total FROM %i GROUP BY state', self::table() ),
 			ARRAY_A
@@ -882,7 +1005,9 @@ class Queue_Table {
 			array( self::STATE_WAITING, self::STATE_CLAIMED, self::STATE_SENT, self::STATE_WRITING )
 		);
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching
+		// One %d placeholder per id is built above; the replacements come from $params.
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$rows = $wpdb->get_results(
 			// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 			$wpdb->prepare(
@@ -892,6 +1017,7 @@ class Queue_Table {
 			),
 			ARRAY_A
 		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber
 
 		$out = array();
 
@@ -920,7 +1046,7 @@ class Queue_Table {
 
 		$slim_cutoff = gmdate( 'Y-m-d H:i:s', time() - ( absint( $slim_after_days ) * DAY_IN_SECONDS ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				'UPDATE %i SET source_map = NULL, request_payload = NULL, response_payload = NULL
@@ -935,7 +1061,7 @@ class Queue_Table {
 
 		$purge_cutoff = gmdate( 'Y-m-d H:i:s', time() - ( absint( $purge_after_days ) * DAY_IN_SECONDS ) );
 
-		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query(
 			$wpdb->prepare(
 				'DELETE FROM %i WHERE state IN (%s, %s, %s) AND closed_at IS NOT NULL AND closed_at < %s',
