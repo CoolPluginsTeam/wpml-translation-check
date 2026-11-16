@@ -583,7 +583,12 @@
 		}
 		// Attribute text (button value, option label) is never in the text index: not script text.
 		var attrText = /^(INPUT|OPTION|OPTGROUP|SELECT|TEXTAREA)$/.test(node.tagName || '');
-		info.js = isAdded(node) || (!attrText && !!texts && !info.inServer && !(state.byText && state.byText[text]));
+		// Server-rendered post / block / Elementor / widget content is not script text,
+		// even when a length-capped index missed a long (e.g. multibyte) paragraph.
+		var serverChain = info.inServer || info.chain.some(function (c) {
+			return c.type === 'post_content' || c.type === 'block' || c.type === 'elementor' || c.type === 'widget';
+		});
+		info.js = isAdded(node) || (!attrText && !serverChain && !!texts && !(state.byText && state.byText[text]));
 		return info;
 	}
 

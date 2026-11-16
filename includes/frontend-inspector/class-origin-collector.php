@@ -23,6 +23,7 @@ class Origin_Collector {
 	const MAX_GETTEXT_ENTRIES = 900;
 	const MAX_OVERFLOW        = 4000;
 	const MAX_TEXT_LEN        = 500;
+	const MAX_TEXT_CHARS      = 2000;
 
 	/**
 	 * Map keyed by normalized visible text => list of origin hints.
@@ -319,6 +320,17 @@ class Origin_Collector {
 	}
 
 	/**
+	 * Character-aware length so multibyte text (e.g. Hindi) is treated the same as
+	 * Latin text, not dropped early by a byte-based cap.
+	 *
+	 * @param string $text Text.
+	 * @return int
+	 */
+	private static function text_len( $text ) {
+		return function_exists( 'mb_strlen' ) ? (int) mb_strlen( (string) $text, 'UTF-8' ) : strlen( (string) $text );
+	}
+
+	/**
 	 * Whether text is too short / numeric to be useful.
 	 *
 	 * @param string $text Normalized text.
@@ -328,7 +340,7 @@ class Origin_Collector {
 		if ( '' === $text || strlen( $text ) < 2 ) {
 			return true;
 		}
-		if ( strlen( $text ) > self::MAX_TEXT_LEN ) {
+		if ( self::text_len( $text ) > self::MAX_TEXT_CHARS ) {
 			return true;
 		}
 		if ( preg_match( '/^[\d\s\.\,\%\$â‚¬Â£â‚¹\/\-\+:]+$/u', $text ) ) {
@@ -694,7 +706,7 @@ class Origin_Collector {
 				continue;
 			}
 			$seg = self::normalize( (string) $block );
-			if ( '' === $seg || strlen( $seg ) > self::MAX_TEXT_LEN || isset( self::$visible[ $seg ] ) ) {
+			if ( '' === $seg || self::text_len( $seg ) > self::MAX_TEXT_CHARS || isset( self::$visible[ $seg ] ) ) {
 				continue;
 			}
 			self::$visible[ $seg ] = true;

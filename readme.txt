@@ -86,6 +86,8 @@ You can continue using the tools already installed on your WordPress website whi
 
  * **Chrome built-in AI Integration:** Instantly translate content directly inside browser using Chrome’s built-in AI translator without any API key or external cost.
 
+ * **MCP Integration:** Connect AutoMLP with supported AI apps such as Claude Code, Claude Desktop, Codex, and Cursor through MCP to translate content, manage strings, terms, URLs, supported Elementor translation tasks, and more.
+
 [Upgrade to Pro!](https://coolplugins.net/product/automlp-ai-translation-for-wpml/?utm_source=automlp_plugin&utm_medium=readme&utm_campaign=get_pro&utm_content=upgrade_to_pro)
 
 ### Check Out Our Other Automatic Translation Addons

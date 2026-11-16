@@ -28,8 +28,19 @@ class Container_Markers {
 	const MAX_CONTAINERS = 4000;
 	const MAX_TEXTS      = 6000;
 	const MAX_TEXT_LEN   = 400;
-	const MAX_REPEATS    = 20;
+	const MAX_TEXT_CHARS = 2000;
 	const MARKER_REGEX   = '/<!--afi:[ser]:\d+-->/';
+
+	/**
+	 * Character-aware length so multibyte body text (e.g. Hindi) is indexed on the
+	 * same footing as Latin text, not dropped early by a byte-based cap.
+	 *
+	 * @param string $text Text.
+	 * @return int
+	 */
+	private static function text_len( $text ) {
+		return function_exists( 'mb_strlen' ) ? (int) mb_strlen( (string) $text, 'UTF-8' ) : strlen( (string) $text );
+	}
 
 	/**
 	 * Container meta keyed by marker id.
@@ -57,7 +68,6 @@ class Container_Markers {
 		$late = PHP_INT_MAX;
 
 		add_filter( 'the_content', array( __CLASS__, 'wrap_content' ), $late );
-		add_filter( 'the_excerpt', array( __CLASS__, 'wrap_excerpt' ), $late );
 		add_filter( 'render_block', array( __CLASS__, 'wrap_block' ), $late, 2 );
 		add_filter( 'do_shortcode_tag', array( __CLASS__, 'wrap_shortcode' ), $late, 2 );
 		add_filter( 'wp_nav_menu', array( __CLASS__, 'wrap_menu' ), $late, 2 );
@@ -119,23 +129,6 @@ class Container_Markers {
 			array(
 				'type' => 'post_content',
 				'id'   => $post_id,
-			)
-		);
-	}
-
-	/**
-	 * Post excerpt (archive and blog listings).
-	 *
-	 * @param string $excerpt Excerpt HTML.
-	 * @return string
-	 */
-	public static function wrap_excerpt( $excerpt ) {
-		return self::wrap(
-			$excerpt,
-			array(
-				'type'    => 'post_content',
-				'id'      => (int) get_the_ID(),
-				'excerpt' => 1,
 			)
 		);
 	}
@@ -460,11 +453,7 @@ class Container_Markers {
 		if ( ! is_string( $html ) || false === strpos( $html, '<!--afi:' ) ) {
 			return $html;
 		}
-		$index = Frontend_Inspector::admin_strings(
-			static function () use ( $html ) {
-				return self::build_index( $html );
-			}
-		);
+		$index = self::build_index( $html );
 		$html  = (string) preg_replace( self::MARKER_REGEX, '', $html );
 		$json  = wp_json_encode( $index, JSON_HEX_TAG | JSON_HEX_AMP | JSON_UNESCAPED_UNICODE );
 		if ( ! is_string( $json ) ) {
@@ -501,7 +490,6 @@ class Container_Markers {
 		$stack  = array();
 		$parent = array();
 		$texts  = array();
-		$occ    = array();
 		$used   = array();
 		$skip   = false;
 
@@ -536,32 +524,16 @@ class Container_Markers {
 				continue;
 			}
 			$text = trim( (string) preg_replace( '/\s+/u', ' ', html_entity_decode( $token, ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) );
-			if ( '' === $text || strlen( $text ) < 2 || strlen( $text ) > self::MAX_TEXT_LEN ) {
+			if ( '' === $text || strlen( $text ) < 2 || self::text_len( $text ) > self::MAX_TEXT_CHARS || isset( $texts[ $text ] ) ) {
 				continue;
 			}
-			$cid = $stack ? (int) end( $stack ) : 0;
-			if ( isset( $texts[ $text ] ) ) {
-				// Same text again (e.g. a title repeated in a paragraph): keep every place in page order.
-				if ( count( $occ[ $text ] ) < self::MAX_REPEATS ) {
-					$occ[ $text ][] = array( $cid, $region );
-				}
-			} else {
-				$texts[ $text ] = array( $cid, $region );
-				$occ[ $text ]   = array( $texts[ $text ] );
-			}
+			$cid            = $stack ? (int) end( $stack ) : 0;
+			$texts[ $text ] = array( $cid, $region );
 			for ( $c = $cid; $c > 0 && ! isset( $used[ $c ] ); $c = isset( $parent[ $c ] ) ? $parent[ $c ] : 0 ) {
 				$used[ $c ] = true;
 			}
 			if ( $region ) {
 				$used[ $region ] = true;
-			}
-		}
-
-		// Only texts whose repeats sit in different places are sent to the browser.
-		$dups = array();
-		foreach ( $occ as $text => $places ) {
-			if ( count( $places ) > 1 && count( array_unique( array_map( 'wp_json_encode', $places ) ) ) > 1 ) {
-				$dups[ $text ] = $places;
 			}
 		}
 
@@ -574,56 +546,8 @@ class Container_Markers {
 
 		return array(
 			'texts'      => $texts,
-			'dups'       => (object) $dups,
 			'containers' => (object) $containers,
 		);
-	}
-
-	/**
-	 * Readable block title from the block name: "core/media-text" -> "Media text".
-	 *
-	 * @param string $name Block name.
-	 * @return string
-	 */
-	private static function block_title( $name ) {
-		// Built from the block name, not the registered title: that title is translated into the
-		// page language and would mix languages in the panel (e.g. a Hindi word + "block").
-		$slug = false !== strpos( $name, '/' ) ? substr( $name, strpos( $name, '/' ) + 1 ) : $name;
-		return ucfirst( str_replace( array( '-', '_' ), ' ', $slug ) );
-	}
-
-	/**
-	 * Plain shortcode label: "My account shortcode (WooCommerce)".
-	 *
-	 * @param string $tag  Shortcode tag, e.g. woocommerce_my_account.
-	 * @param string $file Callback file (relative path:line) or ''.
-	 * @return string
-	 */
-	private static function shortcode_label( $tag, $file ) {
-		$owner = '' !== $file ? Component_Registry::for_path( (string) preg_replace( '/:\d+$/', '', $file ) ) : array();
-		$words = preg_split( '/[_\-\s]+/', strtolower( $tag ), -1, PREG_SPLIT_NO_EMPTY );
-		if ( $owner && count( (array) $words ) > 1 ) {
-			$keys = array_filter(
-				array(
-					isset( $owner['slug'] ) ? strtolower( (string) $owner['slug'] ) : '',
-					isset( $owner['domain'] ) ? strtolower( (string) $owner['domain'] ) : '',
-					strtolower( (string) preg_replace( '/[^A-Za-z0-9]/', '', Component_Registry::name( $owner ) ) ),
-				)
-			);
-			foreach ( $keys as $key ) {
-				if ( 0 === strpos( $key, $words[0] ) ) {
-					array_shift( $words );
-					break;
-				}
-			}
-		}
-		$name = ucfirst( implode( ' ', (array) $words ) );
-		if ( $owner ) {
-			/* translators: 1: shortcode name in words, e.g. My account; 2: plugin or theme name */
-			return sprintf( __( '%1$s shortcode (%2$s)', 'wpml-translation-check' ), $name, Component_Registry::name( $owner ) );
-		}
-		/* translators: %s: shortcode name in words, e.g. My account */
-		return sprintf( __( '%s shortcode', 'wpml-translation-check' ), $name );
 	}
 
 	/**
@@ -640,15 +564,12 @@ class Container_Markers {
 
 		switch ( $type ) {
 			case 'post_content':
-				$out['label'] = empty( $meta['excerpt'] ) ? __( 'Post content', 'wpml-translation-check' ) : __( 'Post excerpt', 'wpml-translation-check' );
+				$out['label'] = __( 'Post content', 'wpml-translation-check' );
 				$out['id']    = $id;
 				$edit         = $id ? (string) get_edit_post_link( $id, 'raw' ) : '';
-				if ( ! empty( $meta['excerpt'] ) ) {
-					$out['excerpt'] = 1;
-				}
 				break;
 			case 'block':
-				$out['label'] = sprintf( /* translators: %s: block name, e.g. Paragraph */ __( '%s block', 'wpml-translation-check' ), self::block_title( (string) $meta['block'] ) );
+				$out['label'] = sprintf( /* translators: %s: block name */ __( 'Block: %s', 'wpml-translation-check' ), $meta['block'] );
 				$out['block'] = $meta['block'];
 				$out['id']    = $id;
 				if ( ! empty( $meta['ref'] ) ) {
@@ -668,9 +589,9 @@ class Container_Markers {
 				}
 				break;
 			case 'shortcode':
+				$out['label'] = '[' . $meta['tag'] . ']';
 				$out['tag']   = $meta['tag'];
 				$out['file']  = self::callback_location( $meta['tag'] );
-				$out['label'] = self::shortcode_label( (string) $meta['tag'], (string) $out['file'] );
 				break;
 			case 'nav_menu':
 				$out['label']    = sprintf( /* translators: %s: menu name */ __( 'Menu: %s', 'wpml-translation-check' ), $meta['name'] );
@@ -701,8 +622,7 @@ class Container_Markers {
 				$edit          = $meta['did'] ? admin_url( 'post.php?post=' . (int) $meta['did'] . '&action=elementor' ) : '';
 				break;
 			case 'template':
-				$owner        = ! empty( $meta['file'] ) ? Component_Registry::label( Component_Registry::for_path( (string) $meta['file'] ) ) : '';
-				$out['label'] = '' !== $owner ? $owner : __( 'Your theme', 'wpml-translation-check' );
+				$out['label'] = sprintf( /* translators: %s: template region */ __( 'Theme template (%s)', 'wpml-translation-check' ), $meta['label'] );
 				$out['file']  = $meta['file'];
 				break;
 		}

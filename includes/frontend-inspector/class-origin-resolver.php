@@ -691,6 +691,102 @@ class Origin_Resolver {
 	}
 
 	/**
+	 * Match a WPML builder package context that belongs to the current document.
+	 *
+	 * Only `gutenberg-{id}` and `elementor-{id}` are recognized; `{id}` must be a
+	 * positive post ID equal to the current queried post, its original-language
+	 * source, or its current-language copy. The returned post_id is mapped to the
+	 * current-language copy so sibling body paragraphs of the same document resolve
+	 * consistently to the post being viewed. Portable: uses the queried post ID and
+	 * the public `wpml_object_id` filter, with no hardcoded IDs, hosts, or a generic
+	 * "-{number}" rule.
+	 *
+	 * @param string $context String Translation context.
+	 * @return array{builder:string, post_id:int}|null
+	 */
+	private static function match_builder_package( $context ) {
+		if ( ! preg_match( '/^(gutenberg|elementor)-(\d+)$/', (string) $context, $m ) ) {
+			return null;
+		}
+		$builder = $m[1];
+		$ctx_id  = (int) $m[2];
+		if ( $ctx_id <= 0 ) {
+			return null;
+		}
+
+		$page = isset( self::$cache['page'] ) ? (array) self::$cache['page'] : array();
+		$qid  = isset( $page['qid'] ) ? (int) $page['qid'] : 0;
+		if ( $qid <= 0 ) {
+			$qid = (int) get_queried_object_id();
+		}
+		if ( $qid <= 0 ) {
+			return null;
+		}
+
+		$ids       = array( $qid => true );
+		$post_type = get_post_type( $qid );
+		$post_type = $post_type ? $post_type : 'any';
+		$default   = (string) apply_filters( 'wpml_default_language', null );
+		$current   = (string) apply_filters( 'wpml_current_language', null );
+		// Original-language source of the current document.
+		$source = (int) apply_filters( 'wpml_object_id', $qid, $post_type, true, $default );
+		if ( $source > 0 ) {
+			$ids[ $source ] = true;
+		}
+		// Current-language copy (a click inside the post body may carry either ID).
+		$translation = 0;
+		if ( '' !== $current ) {
+			$translation = (int) apply_filters( 'wpml_object_id', $qid, $post_type, true, $current );
+			if ( $translation > 0 ) {
+				$ids[ $translation ] = true;
+			}
+		}
+
+		if ( ! isset( $ids[ $ctx_id ] ) ) {
+			return null;
+		}
+
+		// Resolve to the current-language copy actually being viewed so every body
+		// paragraph of the same document points to one post (e.g. the Hindi post on a
+		// Hindi page), instead of the English source for packages keyed by source ID.
+		$target = $ctx_id;
+		if ( '' !== $current ) {
+			$current_copy = (int) apply_filters( 'wpml_object_id', $ctx_id, $post_type, true, $current );
+			if ( $current_copy > 0 ) {
+				$target = $current_copy;
+			} elseif ( $translation > 0 ) {
+				$target = $translation;
+			}
+		}
+
+		return array(
+			'builder' => $builder,
+			'post_id' => $target,
+		);
+	}
+
+	/**
+	 * Route a matched builder package to the post-content or Elementor result.
+	 *
+	 * Gutenberg packages resolve as Post content with the Edit post / translation
+	 * fix; Elementor packages resolve as the Elementor origin with Edit in
+	 * Elementor. String Translation and Theme and plugins localization are never
+	 * offered for these contexts.
+	 *
+	 * @param string                            $text         Visible text.
+	 * @param array{builder:string,post_id:int} $package      Matched package.
+	 * @param string                            $current      Current language.
+	 * @param string                            $default_lang Default language.
+	 * @return array<string, mixed>
+	 */
+	private static function resolve_builder_package( $text, array $package, $current, $default_lang ) {
+		if ( 'elementor' === $package['builder'] ) {
+			return self::resolve_elementor( $text, array( 'did' => $package['post_id'] ), $current, $default_lang );
+		}
+		return self::resolve_post( $text, array( 'id' => $package['post_id'] ), $current, $default_lang, 'post_content', true );
+	}
+
+	/**
 	 * Route an icl_strings row to the matching resolver by its context.
 	 *
 	 * @param string                $text         Visible text.
@@ -701,6 +797,10 @@ class Origin_Resolver {
 	 */
 	private static function resolve_st_row( $text, array $row, $current, $default_lang ) {
 		$context = (string) $row['context'];
+		$package = self::match_builder_package( $context );
+		if ( $package ) {
+			return self::resolve_builder_package( $text, $package, $current, $default_lang );
+		}
 		if ( 0 === strpos( $context, 'admin_texts_' ) ) {
 			$option = substr( $context, 12 );
 			$name   = (string) $row['name'];
@@ -1543,9 +1643,10 @@ class Origin_Resolver {
 	 * @param string               $current Current lang.
 	 * @param string               $default_lang Default lang.
 	 * @param string               $kind    post_title|post_content.
+	 * @param bool                 $from_package Whether the text came from a WPML builder package.
 	 * @return array<string, mixed>
 	 */
-	private static function resolve_post( $text, array $hint, $current, $default_lang, $kind ) {
+	private static function resolve_post( $text, array $hint, $current, $default_lang, $kind, $from_package = false ) {
 		$post_id = isset( $hint['id'] ) ? absint( $hint['id'] ) : 0;
 		if ( $post_id <= 0 ) {
 			return self::not_found( __( 'The post for this text could not be found.', 'wpml-translation-check' ) );
@@ -1575,7 +1676,7 @@ class Origin_Resolver {
 		$status_label = sprintf( /* translators: %s: language name, e.g. English */ __( 'Language: %s', 'wpml-translation-check' ), self::language_name( $lang ) );
 		// Text printed by a shortcode/block/widget inside the content (e.g. WooCommerce My Account):
 		// when it is not written in the post, a matching theme/plugin string wins.
-		if ( 'post_content' === $kind && empty( $hint['x'] ) ) {
+		if ( 'post_content' === $kind && empty( $hint['x'] ) && ! $from_package ) {
 			$gettext = self::gettext_for_rendered_text( $text, $post, $source_id, $current, $default_lang );
 			if ( $gettext ) {
 				return $gettext;
@@ -1607,13 +1708,19 @@ class Origin_Resolver {
 				$src_n   = Origin_Collector::normalize( $src_val );
 				$cur_n   = Origin_Collector::normalize( $cur_val );
 				$text_n  = Origin_Collector::normalize( $text );
-				if ( 'post_content' === $kind && ! $excerpt && '' !== $text_n && false === strpos( $src_n, $text_n ) && false === strpos( $cur_n, $text_n ) ) {
+				if ( ! $from_package && 'post_content' === $kind && ! $excerpt && '' !== $text_n && false === strpos( $src_n, $text_n ) && false === strpos( $cur_n, $text_n ) ) {
 					// Text is not authored in the source post: it is rendered by a shortcode/block (e.g. gettext).
 					return self::resolve_dynamic_post_text( $text, $post_id, $current, $default_lang );
 				}
 				if ( '' !== $src_n && $src_n === $cur_n ) {
 					$translated   = false;
 					$status_label = __( 'Same as the original (probably not translated)', 'wpml-translation-check' );
+				} elseif ( self::is_untranslated_source_text( $text_n, $src_n, $lang, $default_lang ) ) {
+					// Source-language leftover on a secondary-language page (left untranslated or
+					// pasted back). translated=false so Untranslated on this page lists it; Status
+					// stays Original language. Short proper nouns stay out via is_untranslated_source_text.
+					$translated   = false;
+					$status_label = __( 'Original language', 'wpml-translation-check' );
 				} else {
 					$translated   = true;
 					$status_label = __( 'Translated', 'wpml-translation-check' );
@@ -1658,6 +1765,38 @@ class Origin_Resolver {
 			'message'           => '',
 			'text'              => $text,
 		);
+	}
+
+	/**
+	 * True when the clicked text is the source/original-language content shown on a
+	 * secondary-language page (a source paragraph left untranslated, or pasted back into
+	 * the translation) rather than a real translation. The text must appear verbatim in the
+	 * source-language field. A cross-script language pair is confirmed when the text is in
+	 * the source language's own script, which the page language does not use; for a
+	 * same-script pair the script test cannot decide, so a substantial verbatim run is
+	 * required to avoid flagging short shared tokens (names, numbers) that legitimately repeat.
+	 *
+	 * @param string $text_n  Normalized clicked text.
+	 * @param string $src_n   Normalized source-language field.
+	 * @param string $lang         Page (translation) language code.
+	 * @param string $default_lang Default (source) language code.
+	 * @return bool
+	 */
+	private static function is_untranslated_source_text( $text_n, $src_n, $lang, $default_lang ) {
+		if ( '' === $text_n || '' === $src_n || false === strpos( $src_n, $text_n ) ) {
+			return false;
+		}
+		$langs       = apply_filters( 'wpml_active_languages', null, array( 'skip_missing' => 0 ) );
+		$langs       = is_array( $langs ) ? $langs : array();
+		$page_script = isset( $langs[ $lang ]['native_name'] ) ? self::script_of( (string) $langs[ $lang ]['native_name'] ) : '';
+		$def_script  = isset( $langs[ $default_lang ]['native_name'] ) ? self::script_of( (string) $langs[ $default_lang ]['native_name'] ) : '';
+		$text_script = self::script_of( $text_n );
+		// Cross-script pair: the clicked text is written in the source script, not the page script.
+		if ( '' !== $def_script && $def_script !== $page_script && '' !== $text_script && $text_script === $def_script ) {
+			return true;
+		}
+		// Same-script or undetermined pair: require a substantial verbatim run of letters.
+		return (int) preg_match_all( '/\p{L}/u', $text_n ) >= 40;
 	}
 
 	/**
@@ -1836,8 +1975,12 @@ class Origin_Resolver {
 	 * @return array<string, mixed>
 	 */
 	private static function resolve_matched_strings( $text, array $matches, $current, $default_lang ) {
-		$best = self::pick_best_row( $matches );
-		$res  = self::resolve_gettext(
+		$best    = self::pick_best_row( $matches );
+		$package = $best ? self::match_builder_package( (string) $best['context'] ) : null;
+		if ( $package ) {
+			return self::resolve_builder_package( $text, $package, $current, $default_lang );
+		}
+		$res = self::resolve_gettext(
 			$text,
 			array(
 				'd' => $best['context'],
@@ -1872,6 +2015,10 @@ class Origin_Resolver {
 			ARRAY_A
 		);
 		if ( is_array( $row ) ) {
+			$package = self::match_builder_package( (string) $row['context'] );
+			if ( $package ) {
+				return self::resolve_builder_package( $text, $package, $current, $default_lang );
+			}
 			return self::resolve_gettext(
 				$text,
 				array(
@@ -1884,6 +2031,10 @@ class Origin_Resolver {
 		}
 		$orig = self::lookup_icl_string_by_value( $value );
 		if ( $orig ) {
+			$package = self::match_builder_package( (string) $orig['context'] );
+			if ( $package ) {
+				return self::resolve_builder_package( $text, $package, $current, $default_lang );
+			}
 			return self::resolve_gettext( $text, array( 'd' => (string) $orig['context'] ), $current, $default_lang );
 		}
 		$matches = self::match_strings_by_visible( $value, $current, $default_lang );
@@ -2652,6 +2803,15 @@ class Origin_Resolver {
 			if ( $s > $score ) {
 				$best  = $row;
 				$score = $s;
+			}
+		}
+
+		// A Gutenberg/Elementor package for the current document is post/page
+		// content, not script text: route it to the correct origin and Fix.
+		if ( $best ) {
+			$package = self::match_builder_package( (string) $best['context'] );
+			if ( $package ) {
+				return self::resolve_builder_package( $text, $package, $current, $default_lang );
 			}
 		}
 
