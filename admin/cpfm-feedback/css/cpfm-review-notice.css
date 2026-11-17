@@ -1,0 +1,55 @@
+/**
+ * CPFM_Review_Notice — the admin-notice review-ask surface.
+ * See admin/cpfm-feedback/review/class-cpfm-review-notice.php.
+ */
+.cpfm-rv { position: relative; padding: 6px 34px 6px 12px; }
+/* An explicit `display` beats the UA rule for [hidden], so a hidden
+   step must be re-hidden here or BOTH steps show at once. */
+.cpfm-rv .cpfm-rv__step[hidden] { display: none; }
+.cpfm-rv .cpfm-rv__line {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	margin: 8px 0 4px;
+	font-size: 13px;
+	line-height: 1.5;
+}
+.cpfm-rv .cpfm-rv__icon { flex: 0 0 auto; width: 16px; height: 16px; font-size: 16px; color: #dba617; }
+.cpfm-rv .cpfm-rv__icon--heart { color: #d63638; }
+.cpfm-rv .button-small { text-decoration: none; }
+.cpfm-rv .cpfm-rv__inline-dismiss { font-size: 12px; color: #646970; text-decoration: none; }
+.cpfm-rv .cpfm-rv__inline-dismiss:hover { color: #d63638; }
+.cpfm-rv .cpfm-rv__links { margin: 0 0 8px; padding-inline-start: 26px; font-size: 12px; }
+.cpfm-rv .cpfm-rv__links a { color: #646970; text-decoration: none; }
+.cpfm-rv .cpfm-rv__links a:hover { color: #d63638; }
+.cpfm-rv .cpfm-rv__sep { color: #c3c4c7; margin: 0 4px; }
+.cpfm-rv .cpfm-rv__x {
+	position: absolute; top: 6px; inset-inline-end: 6px;
+	width: 24px; height: 24px;
+	display: inline-flex; align-items: center; justify-content: center;
+	border: 0; border-radius: 4px; background: transparent;
+	color: #a7aaad; font-size: 18px; line-height: 1; cursor: pointer; padding: 0;
+}
+.cpfm-rv .cpfm-rv__x:hover { background: #f0f0f1; color: #1d2327; }
+
+/* The CTA appears only after the user says they like the plugin, so
+   a brief pulse points at what they just opted into. Three pulses,
+   then it settles - an endless animation in wp-admin is a
+   distraction, not a nudge. Drawn with box-shadow so nothing
+   reflows. */
+@keyframes cpfm-rv-pulse {
+	0%   { box-shadow: 0 0 0 0 rgba(34, 113, 177, 0.55); }
+	70%  { box-shadow: 0 0 0 8px rgba(34, 113, 177, 0); }
+	100% { box-shadow: 0 0 0 0 rgba(34, 113, 177, 0); }
+}
+.cpfm-rv [data-cpfm-rv-step="2"] .cpfm-rv__cta {
+	animation: cpfm-rv-pulse 1.4s ease-out 3;
+	border-radius: 3px;
+}
+.cpfm-rv .cpfm-rv__cta:hover,
+.cpfm-rv .cpfm-rv__cta:focus { animation: none; }
+
+@media ( prefers-reduced-motion: reduce ) {
+	.cpfm-rv .cpfm-rv__cta { animation: none; }
+}

@@ -1,0 +1,25 @@
+/**
+ * CPFM_Welcome_Notice — the one-time "major update is here" announcement.
+ * See admin/cpfm-feedback/class-cpfm-welcome-notice.php.
+ */
+.cpfm-welcome { position: relative; padding: 4px 34px 4px 12px; }
+/* Text and both actions sit together on the LEFT - the button
+   follows the sentence rather than being pushed to the far edge. */
+.cpfm-welcome .cpfm-welcome__row {
+	display: flex; flex-wrap: wrap; align-items: center;
+	justify-content: flex-start; gap: 10px;
+	margin: 9px 0; font-size: 13px; line-height: 1.5;
+}
+.cpfm-welcome .cpfm-welcome__icon { flex: 0 0 auto; width: 18px; height: 18px; font-size: 18px; color: #2271b1; }
+.cpfm-welcome .cpfm-welcome__text { flex: 0 1 auto; }
+.cpfm-welcome .button-small { text-decoration: none; }
+.cpfm-welcome .cpfm-welcome__dismiss { font-size: 12px; color: #646970; text-decoration: none; }
+.cpfm-welcome .cpfm-welcome__dismiss:hover { color: #d63638; }
+.cpfm-welcome .cpfm-welcome__x {
+	position: absolute; top: 6px; inset-inline-end: 6px;
+	width: 24px; height: 24px;
+	display: inline-flex; align-items: center; justify-content: center;
+	border: 0; border-radius: 4px; background: transparent;
+	color: #a7aaad; font-size: 18px; line-height: 1; cursor: pointer; padding: 0;
+}
+.cpfm-welcome .cpfm-welcome__x:hover { background: #f0f0f1; color: #1d2327; }

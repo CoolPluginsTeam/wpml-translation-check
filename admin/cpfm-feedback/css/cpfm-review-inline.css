@@ -1,0 +1,20 @@
+/**
+ * CPFM_Review_Inline — the embeddable inline review-ask surface.
+ * See admin/cpfm-feedback/review/class-cpfm-review-inline.php.
+ */
+.cpfm-rv-inline{position:relative;margin:16px 0 0;padding:14px 34px 14px 16px;border:1px solid #f0d9a0;border-inline-start:4px solid #dba617;border-radius:6px;background:#fdf8ec;box-shadow:0 1px 1px rgba(0,0,0,.04);display:flex;flex-direction:column;gap:6px}
+/* An explicit display beats the UA rule for [hidden], so the
+   server-rendered hidden state must be restated here. */
+.cpfm-rv-inline[hidden]{display:none}
+.cpfm-rv-inline--bar{flex-direction:row;align-items:center;flex-wrap:wrap;gap:12px}
+.cpfm-rv-inline--minimal{background:transparent;border:0;border-inline-start:0;box-shadow:none;padding:8px 34px 8px 0}
+.cpfm-rv-inline__stars{display:inline-flex;color:#dba617}
+.cpfm-rv-inline__stars .dashicons{width:15px;height:15px;font-size:15px}
+.cpfm-rv-inline__title{margin:0;font-size:13px;font-weight:600;color:#1d2327}
+.cpfm-rv-inline__text{margin:0;font-size:12.5px;line-height:1.5;color:#50575e}
+.cpfm-rv-inline__actions{display:flex;align-items:center;gap:12px;margin:2px 0 0}
+.cpfm-rv-inline__actions .button-small{text-decoration:none}
+.cpfm-rv-inline__later{background:none;border:0;padding:0;font-size:12px;color:#646970;text-decoration:underline;cursor:pointer}
+.cpfm-rv-inline__later:hover{color:#1d2327}
+.cpfm-rv-inline__x{position:absolute;top:6px;inset-inline-end:6px;inline-size:24px;block-size:24px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:4px;background:transparent;color:#a7aaad;font-size:18px;line-height:1;cursor:pointer;padding:0}
+.cpfm-rv-inline__x:hover{background:#f0f0f1;color:#1d2327}

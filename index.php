@@ -34,6 +34,13 @@ if( !defined( 'AUTOMLP_AI_FEEDBACK_API' ) ) {
 	define( 'AUTOMLP_AI_FEEDBACK_API', 'https://feedback.coolplugins.net/' );
 }
 
+if ( ! defined( 'AUTOMLP_AI_PLUGIN_FILE' ) ) {
+	define( 'AUTOMLP_AI_PLUGIN_FILE', __FILE__ );
+}
+if ( ! defined( 'AUTOMLP_AI_PLUGIN_NAME' ) ) {
+	define( 'AUTOMLP_AI_PLUGIN_NAME', 'AutoMLP – AI Translation for WPML' );
+}
+
 use AUTOMLP_WPML\Includes\Routes\Bulk_Translation_Route;
 
 
@@ -66,20 +73,15 @@ final class AUTOMLP_Ai_Translate_Addon {
 	 */
 	public function __construct() {
 		$this->init();
-		$this->init_feedback_notice();
-		$this->init_cron();
-	}
 
-	/**
-		 * Initialize the cron job for the plugin.
-		 */
-		public function init_cron(){
-			// if (is_admin()) {
-			require_once AUTOMLP_AI_PLUGIN_DIR . '/admin/cpfm-feedback/cron/automlp-cron.php';
-			$cron = new AUTOMLP_cronjob();
-			$cron->automlp_cron_init_hooks();
-			// }
-			}
+		// Shared CPFM feedback framework: review ask, deactivation survey and usage opt-in.
+		add_action( 'init', array( $this, 'register_cpfm_notices' ), 999 );
+		$this->init_cpfm_cron();
+
+		if ( is_admin() ) {
+			add_action( 'admin_enqueue_scripts', array( $this, 'automlp_ai_load_scripts' ) );
+		}
+	}
 
 	public function register_ai_client() {
 		if ( version_compare( get_option( 'AUTOMLP_AI_VERSION', '0' ), '1.3.0', '<' ) ) {
@@ -144,42 +146,251 @@ final class AUTOMLP_Ai_Translate_Addon {
 		}
 	}
 
-	public function init_feedback_notice() {
+	/**
+	 * Register the CPFM review ask, deactivation survey and usage opt-in notice.
+	 *
+	 * Runs on `init` (priority 999) so every string is translated after the text
+	 * domain is loaded. The review ask and the deactivation survey are only for
+	 * the free plugin; the Pro plugin has its own.
+	 *
+	 * @return void
+	 */
+	public function register_cpfm_notices() {
+		if ( ! is_admin() ) {
+			return;
+		}
 
-		if (is_admin()) {
-			add_action('admin_enqueue_scripts', array($this, 'automlp_ai_load_scripts'));
-			if(!class_exists('CPFM_Feedback_Notice')){
-				require_once AUTOMLP_AI_PLUGIN_DIR . '/admin/cpfm-feedback/cpfm-common-notice.php';
+		static $registered = false;
+		if ( $registered ) {
+			return;
+		}
+		$registered = true;
 
+		$loader = AUTOMLP_AI_PLUGIN_DIR . 'admin/cpfm-feedback/class-cpfm-loader.php';
+		if ( ! file_exists( $loader ) ) {
+			return;
+		}
+
+		require_once $loader;
+		if ( class_exists( 'CPFM_Loader' ) ) {
+			CPFM_Loader::load();
+		}
+
+		$name = AUTOMLP_AI_PLUGIN_NAME;
+		$page = 'automlp_ai_dashboard';
+
+		$dashboard_screens = array(
+			'wpml_page_' . $page,
+			'toplevel_page_' . $page,
+		);
+
+		if ( ! defined( 'AUTOMLP_AI_PRO_VERSION' ) ) {
+			if ( class_exists( 'CPFM_Review' ) ) {
+				CPFM_Review::cpfm_register(
+					array(
+						'id'          => 'automlp',
+						'plugin_file' => AUTOMLP_AI_PLUGIN_FILE,
+						'plugin_name' => $name,
+						'review_url'  => 'https://wordpress.org/support/plugin/wpml-translation-check/reviews/#new-post',
+						'capability'  => 'activate_plugins',
+						'quiet_days'  => 0,
+						'own_screens' => $dashboard_screens,
+						'trigger'     => array(
+							'type'  => 'install_age',
+							'hours' => 24,
+						),
+						'notice'      => array(
+							'enabled'        => true,
+							'template'       => 'two_step',
+							'screens'        => array( 'plugins' ),
+							'inline_screens' => array(),
+							'defer_screens'  => array(),
+						),
+						'row'         => array( 'enabled' => true ),
+						'legacy'      => array(
+							'done_options'  => array(
+								'cpt_review_notice_dismissed' => array( 'in_key' => 'automlp_ai' ),
+							),
+							'install_dates' => array( 'automlp_ai_install_date' ),
+						),
+						'i18n'        => array(
+							'like_question' => sprintf(
+								/* translators: %s: plugin name. */
+								__( 'Do you like the %s plugin?', 'wpml-translation-check' ),
+								$name
+							),
+							'yes_button'    => __( 'Yes, I like it', 'wpml-translation-check' ),
+							'dismiss_link'  => __( 'Not good, dismiss', 'wpml-translation-check' ),
+							'later_link'    => __( 'Ask me later', 'wpml-translation-check' ),
+							'thanks_line'   => __( 'That is great to hear! A quick review on WordPress.org would really help us.', 'wpml-translation-check' ),
+							'submit_button' => __( 'Submit review', 'wpml-translation-check' ),
+							'no_link'       => __( 'I do not like it, dismiss', 'wpml-translation-check' ),
+							'row_question'  => __( 'Do you like this plugin?', 'wpml-translation-check' ),
+							'inline_title'  => sprintf(
+								/* translators: %s: plugin name. */
+								__( 'Enjoying %s?', 'wpml-translation-check' ),
+								$name
+							),
+							'inline_text'   => __( 'A short review helps other site owners find it.', 'wpml-translation-check' ),
+							'close_label'   => __( 'Close', 'wpml-translation-check' ),
+						),
+					)
+				);
 			}
 
-		add_action('cpfm_register_notice', function () {
-			if (!class_exists('CPFM_Feedback_Notice') || !current_user_can('manage_options')) {
-				return;
+			if ( class_exists( 'CPFM_Deactivation_Feedback' ) ) {
+				CPFM_Deactivation_Feedback::cpfm_register(
+					array(
+						'id'                     => 'automlp',
+						'slug'                   => 'wpml-translation-check',
+						'plugin_name'            => $name,
+						'version'                => AUTOMLP_AI_VERSION,
+						'api'                    => AUTOMLP_AI_FEEDBACK_API,
+						'site_key'               => '61',
+						'install_date_option'    => 'automlp_ai_install_date',
+						'initial_version_option' => 'automlp_ai_initial_save_version',
+						'reasons'                => array(
+							'not_working'  => array(
+								'title'       => __( "The plugin isn't working", 'wpml-translation-check' ),
+								'placeholder' => __( 'Which problem did you run into? We read every reply.', 'wpml-translation-check' ),
+							),
+							'not_expected' => array(
+								'title'       => __( "It didn't do what I expected", 'wpml-translation-check' ),
+								'placeholder' => __( 'What were you hoping it would do?', 'wpml-translation-check' ),
+							),
+							'found_better' => array(
+								'title'       => __( 'I found a better plugin', 'wpml-translation-check' ),
+								'placeholder' => __( 'Mind sharing which one?', 'wpml-translation-check' ),
+							),
+							'temporary'    => array(
+								'title'       => __( "It's a temporary deactivation", 'wpml-translation-check' ),
+								'placeholder' => '',
+							),
+							'other'        => array(
+								'title'       => __( 'Another reason', 'wpml-translation-check' ),
+								'placeholder' => __( 'Please tell us more', 'wpml-translation-check' ),
+							),
+						),
+						'i18n'                   => array(
+							'title'        => __( 'Before you go…', 'wpml-translation-check' ),
+							/* translators: %s: plugin name (bold). */
+							'intro'        => __( 'What made you deactivate %s? Your answer helps us fix it.', 'wpml-translation-check' ),
+							'submit'       => __( 'Submit & Deactivate', 'wpml-translation-check' ),
+							'skip'         => __( 'Skip & Deactivate', 'wpml-translation-check' ),
+							'deactivating' => __( 'Deactivating…', 'wpml-translation-check' ),
+							'pick_reason'  => __( 'Please choose a reason.', 'wpml-translation-check' ),
+							'close_label'  => __( 'Close', 'wpml-translation-check' ),
+							/* translators: %s: company name. */
+							'byline'       => __( 'A plugin by %s', 'wpml-translation-check' ),
+							'consent'      => __( 'Submitting shares your reason plus your site URL, admin email and basic environment details (PHP, WordPress, active plugins). Skip & Deactivate sends nothing.', 'wpml-translation-check' ),
+						),
+					)
+				);
 			}
-			
-			$notice = [
-				'title' => __('AutoMLP – AI Translation for WPML', 'wpml-translation-check'),
-				'message' => __('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'wpml-translation-check'),
-				'pages' => ['automlp_ai_dashboard'],
-				'always_show_on' => ['automlp_ai_dashboard'], // This enables auto-show
-				'plugin_name'=>'wpml-translation-check'
-			];
-			CPFM_Feedback_Notice::cpfm_register_notice('cool_automlp_translations', $notice);
-				if (!isset($GLOBALS['cool_plugins_feedback'])) {
-					$GLOBALS['cool_plugins_feedback'] = [];
+		}
+
+		// Register the "Help Improve Plugins" opt-in popup via CPFM_Feedback_Notice.
+		if ( class_exists( 'CPFM_Feedback_Notice' ) ) {
+			CPFM_Feedback_Notice::cpfm_register_notice(
+				'cool_automlp_translations',
+				array(
+					'title'          => $name,
+					'message'        => __( 'Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'wpml-translation-check' ),
+					'plugin_name'    => 'automlp',
+					'pages'          => array( $page ),
+					'always_show_on' => array( $page ),
+					'i18n'           => array(
+						'panel_title' => __( 'Help Improve Plugins', 'wpml-translation-check' ),
+						'yes_label'   => __( "Yes, it's OK", 'wpml-translation-check' ),
+						'no_label'    => __( 'No, Thanks', 'wpml-translation-check' ),
+						'more_info'   => __( 'More info', 'wpml-translation-check' ),
+					),
+				)
+			);
+
+			// Schedule the usage cron when the user opts in.
+			add_action(
+				'cpfm_after_opt_in_automlp',
+				function () {
+					update_option( 'automlp_feedback_opt_in', 'yes' );
+					if ( class_exists( 'CPFM_Usage_Cron' ) ) {
+						CPFM_Usage_Cron::cpfm_schedule_event( 'automlp_extra_data_update' );
+					}
 				}
-				$GLOBALS['cool_plugins_feedback']['cool_automlp_translations'][] = $notice;
-		});
+			);
 
-		add_action('cpfm_after_opt_in_wpml-translation-check', function($category) {
-			if ($category === 'cool_automlp_translations') {
-				AUTOMLP_cronjob::automlp_send_data();
-				$options = get_option('automlp_feedback_opt_in');
-				$options = 'yes';
-				update_option('automlp_feedback_opt_in', $options);	
-			}
-			});
+			// Clear the usage cron when the user opts out.
+			add_action(
+				'cpfm_after_opt_out_automlp',
+				function () {
+					update_option( 'automlp_feedback_opt_in', 'no' );
+					wp_clear_scheduled_hook( 'automlp_extra_data_update' );
+				}
+			);
+		}
+
+		// The plugin's own dashboard shows no review notice (it has the opt-in panel).
+		add_action(
+			'admin_notices',
+			static function () {
+				$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+				if ( ! $screen || empty( $screen->id ) ) {
+					return;
+				}
+				if ( false === strpos( (string) $screen->id, 'automlp_ai_dashboard' ) ) {
+					return;
+				}
+				if ( class_exists( 'CPFM_Review_Notice' ) ) {
+					remove_action( 'admin_notices', array( 'CPFM_Review_Notice', 'cpfm_maybe_render' ), 10 );
+				}
+			},
+			0
+		);
+	}
+
+	/**
+	 * Boot and register the CPFM usage cron.
+	 *
+	 * Not admin-only on purpose: wp-cron.php is not an admin request, and the
+	 * scheduled event needs its handler attached there.
+	 *
+	 * @return void
+	 */
+	public function init_cpfm_cron() {
+		$cron_file = AUTOMLP_AI_PLUGIN_DIR . 'admin/cpfm-feedback/cron/class-cron.php';
+		if ( file_exists( $cron_file ) ) {
+			require_once $cron_file;
+		}
+		$env_file = AUTOMLP_AI_PLUGIN_DIR . 'admin/cpfm-feedback/class-cpfm-environment.php';
+		if ( file_exists( $env_file ) ) {
+			require_once $env_file;
+		}
+
+		if ( ! class_exists( 'CPFM_Usage_Cron' ) ) {
+			return;
+		}
+
+		CPFM_Usage_Cron::cpfm_register(
+			array(
+				'id'                      => 'automlp',
+				'plugin_name'             => AUTOMLP_AI_PLUGIN_NAME,
+				'version'                 => AUTOMLP_AI_VERSION,
+				'api'                     => AUTOMLP_AI_FEEDBACK_API,
+				'cron_hook'               => 'automlp_extra_data_update',
+				'consent_override_option' => 'automlp_feedback_opt_in',
+				'consent_master_option'   => 'cpfm_opt_in_choice_cool_automlp_translations',
+				'install_date_option'     => 'automlp_ai_install_date',
+				'initial_version_option'  => 'automlp_ai_initial_save_version',
+				'site_key'                => '61',
+			)
+		);
+
+		// Family consent may already exist (a sibling was installed first): inherit it.
+		// The cron is scheduled only on activation or on an explicit opt-in.
+		$automlp_opt_in = get_option( 'automlp_feedback_opt_in' );
+		if ( ! in_array( $automlp_opt_in, array( 'yes', 'no' ), true )
+			&& 'yes' === get_option( 'cpfm_opt_in_choice_cool_automlp_translations' ) ) {
+			update_option( 'automlp_feedback_opt_in', 'yes' );
 		}
 	}
 
@@ -431,7 +642,6 @@ final class AUTOMLP_Ai_Translate_Addon {
 		add_action( 'admin_init', array( $this, 'register_ai_model_setting' ) );
 		add_action( 'admin_menu', array( $this, 'register_automlp_ai_dashboard_menu' ), 20 );
 		add_action( 'admin_menu', array( $this, 'hide_wp_ai_client_menu' ), 99 );
-		add_action( 'admin_init', array( $this, 'automlp_feedback_form' ) );
 
 		// Initialize AJAX handlers.
 		if ( class_exists( 'AUTOMLP_AI_Update_Translate_Data_Ajax' ) ) {
@@ -461,12 +671,15 @@ final class AUTOMLP_Ai_Translate_Addon {
 		if ( ! get_option( 'automlp_ai_install_date' ) ) {
 			add_option( 'automlp_ai_install_date', gmdate( 'Y-m-d h:i:s' ) );
 		}
-		$get_opt_in = get_option('automlp_feedback_opt_in');
+		$get_opt_in = get_option( 'automlp_feedback_opt_in' );
 
-			if ($get_opt_in =='yes' && !wp_next_scheduled('automlp_extra_data_update')) {
-
-				wp_schedule_event(time(), 'every_30_days', 'automlp_extra_data_update');
+		if ( 'yes' === $get_opt_in ) {
+			if ( class_exists( 'CPFM_Usage_Cron' ) ) {
+				CPFM_Usage_Cron::cpfm_schedule_event( 'automlp_extra_data_update' );
+			} elseif ( ! wp_next_scheduled( 'automlp_extra_data_update' ) ) {
+				wp_schedule_event( time(), 'every_30_days', 'automlp_extra_data_update' );
 			}
+		}
 	}
 
 	/**
@@ -504,21 +717,6 @@ private function is_wpml_setup_complete() {
 	// Fallback if WPML libs aren't available.
 	$settings = get_option( 'icl_sitepress_settings', [] );
 	return is_array( $settings ) && ! empty( $settings['setup_complete'] );
-}
-
-public function automlp_feedback_form() {
-	if(is_admin()){
-		require_once __DIR__ . '/admin/feedback/admin-feedback-form.php';
-		AUTOMLP_Ai_Cpt_Dashboard::review_notice(
-			'automlp_ai',
-			'AutoMLP – AI Translation for WPML',
-			'https://wordpress.org/support/plugin/wpml-translation-check/reviews/#new-post'
-		);
-	}
-
-	if(class_exists('automlp_admin_notices')){
-		new automlp_admin_notices();
-	}
 }
 
 	/**

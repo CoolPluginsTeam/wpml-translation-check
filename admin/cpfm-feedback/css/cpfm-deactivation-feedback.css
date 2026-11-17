@@ -1,0 +1,363 @@
+/**
+ * CPFM Deactivation Feedback — compact, self-contained modal.
+ *
+ * Everything is scoped under .cpfm-df AND hard-reset, so wp-admin, the active
+ * theme, and other plugins can neither leak INTO the modal nor be touched by it.
+ * The submit button is fully styled here (no core .button dependency), so it
+ * looks identical regardless of admin colour scheme or plugin overrides.
+ */
+
+/* --- containment + reset ------------------------------------------------- */
+.cpfm-df,
+.cpfm-df * {
+	box-sizing: border-box;
+}
+.cpfm-df button,
+.cpfm-df input,
+.cpfm-df textarea,
+.cpfm-df a {
+	font-family: inherit;
+}
+/* Neutralise wp-admin/native chrome, but leave background + colour to each
+   component (setting them here would out-specific the component rules below). */
+.cpfm-df button {
+	-webkit-appearance: none;
+	appearance: none;
+	margin: 0;
+	border: 0;
+	box-shadow: none;
+	text-transform: none;
+	letter-spacing: normal;
+	line-height: 1.2;
+	cursor: pointer;
+}
+
+/* --- overlay ------------------------------------------------------------- */
+.cpfm-df {
+	display: none;
+	position: fixed;
+	inset: 0;
+	z-index: 100000;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+}
+.cpfm-df.is-open {
+	display: flex;
+}
+.cpfm-df__backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.5);
+	backdrop-filter: saturate(120%) blur(1px);
+}
+
+/* --- dialog -------------------------------------------------------------- */
+.cpfm-df__dialog {
+	position: relative;
+	width: 100%;
+	max-width: 500px;
+	max-height: calc(100vh - 40px);
+	overflow-y: auto;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 20px 48px -14px rgba(15, 23, 42, 0.45);
+	padding: 20px 20px 14px;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+	color: #334155;
+	line-height: 1.45;
+	animation: cpfm-df-in 0.16s ease-out;
+}
+@keyframes cpfm-df-in {
+	from { opacity: 0; transform: translateY(6px) scale(0.985); }
+	to   { opacity: 1; transform: none; }
+}
+
+.cpfm-df__x {
+	position: absolute;
+	top: 9px;
+	inset-inline-end: 9px;
+	width: 26px;
+	height: 26px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 6px;
+	background: transparent;
+	color: #94a3b8;
+	font-size: 20px;
+	padding: 0;
+	transition: background 0.15s, color 0.15s;
+}
+.cpfm-df__x:hover {
+	background: #f1f5f9;
+	color: #475569;
+}
+
+/* --- header -------------------------------------------------------------- */
+.cpfm-df__head {
+	margin: 0 22px 14px 0;
+}
+.cpfm-df__title {
+	margin: 0 0 3px;
+	padding: 0;
+	font-size: 16px;
+	font-weight: 700;
+	color: #0f172a;
+	line-height: 1.3;
+}
+.cpfm-df__sub {
+	margin: 0;
+	padding: 0;
+	font-size: 12.5px;
+	color: #64748b;
+}
+
+/* --- reasons ------------------------------------------------------------- */
+.cpfm-df__form {
+	margin: 0;
+}
+.cpfm-df__option {
+	display: block;
+	margin: 0 0 6px;
+	/* NO padding here. The wrapper is a plain div (the textarea must not be
+	   nested in the label), so any padding it owned would be dead space that
+	   looks clickable but selects nothing. The inner label carries it instead,
+	   which makes the whole padded area a real click target. */
+	padding: 0;
+	border: 1px solid #e5e9f0;
+	border-radius: 8px;
+	/* Declared (not left to default) so a stray `label { background: … }` from
+	   another admin plugin can't tint the rows. */
+	background: #fff;
+	cursor: pointer;
+	transition: border-color 0.12s, background 0.12s;
+}
+.cpfm-df__option:hover {
+	border-color: #cbd5e1;
+	background: #f8fafc;
+}
+/* Keyboard focus is shown on the whole ROW (never a ring on the radio itself).
+   Selected + focused rows share ONE accent with the radio and the textarea. */
+.cpfm-df__option:focus-within {
+	border-color: #9fb0bc;
+	box-shadow: 0 0 0 1.5px #dfedf7;
+}
+.cpfm-df__option:has(.cpfm-df__radio:checked) {
+	border-color: #9fb0bc;
+	background: #f6fafd;
+}
+
+/* Custom radio: one clean ring that gains a dark centre dot when selected.
+   NOTE the .cpfm-df prefix on every rule — wp-admin styles `input[type=radio]`
+   AND paints its own dot with `input[type=radio]:checked::before` (higher
+   specificity than a lone class), which otherwise stacks on top of ours and
+   renders a "bullseye", at a different size from the unchecked ones. These
+   rules out-specify core and switch its pseudo-element off. */
+.cpfm-df .cpfm-df__radio,
+.cpfm-df .cpfm-df__radio:checked {
+	-webkit-appearance: none;
+	appearance: none;
+	position: relative;
+	display: inline-block;
+	inline-size: 16px;
+	block-size: 16px;
+	min-inline-size: 16px;
+	min-block-size: 16px;
+	inset-block-start: 0;
+	margin: 0 4px 0 0;
+	padding: 0;
+	border: 1.5px solid #c3cad3;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: none;
+	vertical-align: middle;
+	cursor: pointer;
+	transition: border-color 0.15s;
+}
+
+/* Core's dot — off. Ours is the ::after below. */
+.cpfm-df .cpfm-df__radio::before,
+.cpfm-df .cpfm-df__radio:checked::before {
+	content: none;
+	display: none;
+}
+
+.cpfm-df .cpfm-df__radio:hover {
+	border-color: #94a3b8;
+}
+
+.cpfm-df .cpfm-df__radio:checked {
+	border-color: #1d3f5c;
+}
+
+.cpfm-df .cpfm-df__radio:checked::after {
+	content: "";
+	position: absolute;
+	inset: 3px;
+	border-radius: 50%;
+	background: #2271b1;
+}
+
+/* No ring on the control itself — the row carries the focus state. (No
+   border-color here on purpose: darkening an UNCHECKED radio on focus makes it
+   read as already selected.) */
+.cpfm-df .cpfm-df__radio:focus,
+.cpfm-df .cpfm-df__radio:focus-visible {
+	outline: none;
+	box-shadow: none;
+}
+/* Block-level so the whole reason line stays a click target now that the row
+   wrapper is a plain div. */
+.cpfm-df__row {
+	display: block;
+	/* Owns the row's padding so the ENTIRE padded area selects the radio. */
+	padding: 8px 11px;
+	cursor: pointer;
+}
+.cpfm-df__reason {
+	font-size: 13px;
+	font-weight: 500;
+	color: #334155;
+	vertical-align: middle;
+}
+.cpfm-df__note {
+	display: none;
+	/* The row's padding now lives on the label, so the textarea supplies its
+	   own inset to stay aligned with the reason text above it (11px matches
+	   .cpfm-df__row) and to keep a gap at the bottom of the card.
+	   An explicit calc width, NOT `auto`: a textarea has an intrinsic `cols`
+	   width and does not stretch to fill like a normal block, so `auto` leaves
+	   it stranded at ~155px. box-sizing is border-box from the reset above. */
+	width: calc(100% - 22px);
+	margin: 0 11px 10px;
+	padding: 7px 9px;
+	border: 1px solid #cbd5e1;
+	border-radius: 6px;
+	/* Declared so a bare `textarea { background: … }` elsewhere can't repaint it. */
+	background: #fff;
+	font-size: 12.5px;
+	line-height: 1.45;
+	color: #1e293b;
+	resize: vertical;
+}
+/* The textarea is no longer a sibling of the radio (it sits outside the inner
+   label, so the label can't swallow it), so this reads the state off the row.
+   Same :has() the selected-row rule above already relies on. */
+.cpfm-df__option:has(.cpfm-df__radio:checked) .cpfm-df__note {
+	display: block;
+}
+
+/* Focus uses the modal's own accent (same dark navy as the selected radio it
+   sits under) instead of wp-admin's default blue. Prefixed with .cpfm-df to
+   out-specify core's `textarea:focus`. */
+.cpfm-df .cpfm-df__note:focus {
+    outline: none;
+    border: 1px solid #2271b1;
+    box-shadow: none;
+}
+
+.cpfm-df__error {
+	margin: 4px 0 0;
+	padding: 0;
+	color: #dc2626;
+	font-size: 12px;
+}
+
+/* --- actions ------------------------------------------------------------- */
+/* Primary on the start edge, skip on the end edge — flush to the card's inner
+   corners with a guaranteed gap between them. */
+.cpfm-df__actions {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin: 16px 0 0;
+}
+/* The CTA's fill/label are the one thing a broad `button { background: X
+   !important }` from another admin plugin can still repaint, so these two
+   declarations are !important — everything else here wins on specificity alone. */
+.cpfm-df__submit {
+	display: inline-flex;
+	align-items: center;
+	gap: 7px;
+	padding: 8px 16px;
+	min-height: 34px;
+	border-radius: 8px;
+	background: #2271b1 !important;
+	color: #fff !important;
+	font-size: 13px;
+	font-weight: 600;
+	line-height: 1;
+	transition: background 0.15s;
+}
+.cpfm-df__submit:hover {
+	background: #1b5a8f !important;
+}
+.cpfm-df__submit:focus-visible {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+}
+.cpfm-df__submit[disabled] {
+	opacity: 0.7;
+	cursor: default;
+}
+.cpfm-df__spinner {
+	display: none;
+	width: 13px;
+	height: 13px;
+	border: 2px solid rgba(255, 255, 255, 0.5);
+	border-top-color: #fff;
+	border-radius: 50%;
+	animation: cpfm-df-spin 0.7s linear infinite;
+}
+.cpfm-df.is-sending .cpfm-df__spinner {
+	display: inline-block;
+}
+@keyframes cpfm-df-spin {
+	to { transform: rotate(360deg); }
+}
+.cpfm-df__skip {
+	font-size: 11px;
+	color: #9aa5b4;
+	text-decoration: none;
+}
+.cpfm-df__skip:hover {
+	color: #334155;
+	text-decoration: underline;
+}
+
+/* --- footer (consent + credit on one tight strip) ------------------------ */
+.cpfm-df__consent {
+	margin: 14px 0 0;
+	padding-top: 10px;
+	border-top: 1px solid #eef1f6;
+	font-size: 11px;
+	color: #9aa5b4;
+	line-height: 1.45;
+}
+.cpfm-df__by {
+	margin: 6px 0 0;
+	font-size: 11px;
+	color: #9aa5b4;
+}
+.cpfm-df__by a {
+	color: #64748b;
+	text-decoration: none;
+}
+.cpfm-df__by a:hover {
+	text-decoration: underline;
+}
+
+/* NOTE: no `prefers-color-scheme: dark` block on purpose. wp-admin has no dark
+   mode (it ships user-selected Admin Color Schemes, which are classes, not that
+   media query), so honouring the OS preference here would paint a dark modal on
+   top of a light admin — a mismatch, not a feature. */
+
+/* --- small screens ------------------------------------------------------- */
+@media (max-width: 520px) {
+	.cpfm-df__dialog { padding: 18px 16px 12px; }
+	.cpfm-df__actions { flex-direction: column; align-items: stretch; gap: 8px; }
+	.cpfm-df__submit { justify-content: center; }
+	.cpfm-df__skip { text-align: center; }
+}

@@ -1,0 +1,27 @@
+/**
+ * CPFM_Review_Row — the plugins.php row surface.
+ * See admin/cpfm-feedback/review/class-cpfm-review-row.php.
+ *
+ * Every selector here is anchored on #the-list for id-level specificity:
+ * it cannot leak onto another plugin's row, and another plugin's generic
+ * `.plugin-update p {}` cannot reshape it, no specificity hack required.
+ */
+/* Core's own .row-actions values (#646970, 13px) so this reads as
+   list-table furniture rather than a message. */
+#the-list .plugin-version-author-uri .cpfm-rv-row {
+	display: block;
+	margin: 6px 0 0;
+	font-size: 13px;
+	color: #646970;
+}
+#the-list .cpfm-rv-row__line {
+	display: inline-flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+#the-list .cpfm-rv-row__stars { display: inline-flex; color: #dba617; }
+#the-list .cpfm-rv-row__stars .dashicons { width: 15px; height: 15px; font-size: 15px; }
+#the-list .cpfm-rv-row__go { text-decoration: none; }
+#the-list .cpfm-rv-row__no { color: #646970; text-decoration: none; font-size: 12px; }
+#the-list .cpfm-rv-row__no:hover { color: #d63638; }

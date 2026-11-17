@@ -17,6 +17,14 @@ delete_option( 'automlp_ai_install_date' );
 delete_option( 'automlp_ai_initial_save_version' );
 delete_option( 'AUTOMLP_AI_VERSION' );
 
+// CPFM feedback framework: the review-ask state of this plugin. Shared flags that other
+// Cool Plugins products also read (the usage consent choice) are left alone.
+delete_option( 'cpfm_review_state_automlp' );
+$automlp_review_quiet = get_option( 'cpfm_review_last_shown' );
+if ( is_array( $automlp_review_quiet ) && isset( $automlp_review_quiet['id'] ) && 'automlp' === sanitize_key( $automlp_review_quiet['id'] ) ) {
+	delete_option( 'cpfm_review_last_shown' );
+}
+
 // Pro shares this queue, bot user and options. Keep them while Pro is still
 // installed so switching to Pro does not lose queued jobs.
 if ( file_exists( WP_PLUGIN_DIR . '/automlp-pro/automlp-pro.php' ) ) {
