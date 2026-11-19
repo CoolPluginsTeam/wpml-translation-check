@@ -1,0 +1,3511 @@
+# Copyright (C) 2026 Cool Plugins
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: AutoMLP – AI Translation for WPML 2.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/wpml-translation-"
+"check\n"
+"Last-Translator: \n"
+"Language-Team: Français\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-19T05:57:30+00:00\n"
+"PO-Revision-Date: 2026-11-19 06:44+0000\n"
+"X-Generator: Loco https://localise.biz/\n"
+"X-Domain: wpml-translation-check\n"
+"Language: fr_FR\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Loco-Version: 2.8.10; wp-7.1.5; php-8.2.29"
+
+#. Plugin Name of the plugin
+#: index.php includes/wizard/html-wizard-notice.php:29
+#: admin/assets/frontend/setup/setup.js:1
+msgid "AutoMLP – AI Translation for WPML"
+msgstr "AutoMLP – Traduction IA pour WPML"
+
+#. Description of the plugin
+#: index.php
+msgid ""
+"AutoMLP – AI translation addon for WPML that helps translate WordPress pages "
+"and posts content faster and more accurately."
+msgstr ""
+"AutoMLP – Module de traduction IA pour WPML qui aide à traduire plus "
+"rapidement et avec plus de précision le contenu des pages et des articles "
+"WordPress."
+
+#. Author of the plugin
+#: index.php
+msgid "Cool Plugins"
+msgstr "Cool Plugins"
+
+#. Author URI of the plugin
+#: index.php
+msgid ""
+"https://coolplugins.net/?"
+"utm_source=automlp_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=plugins_list"
+msgstr ""
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:13
+msgid "Automate the Translation Process"
+msgstr "Automatiser le processus de traduction"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:15
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:25
+#: admin/automlp-ai-dashboard/views/license.php:11
+msgid "Free"
+msgstr "Gratuit"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:17
+#: admin/automlp-ai-dashboard/views/dashboard.php:18
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:13
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:14
+#: admin/automlp-ai-dashboard/views/license.php:13
+#: admin/automlp-ai-dashboard/views/license.php:14
+msgid "Upgrade Now"
+msgstr "Passer à la version supérieure"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:24
+msgid "Translate Pages/Posts"
+msgstr "Traduire les pages/articles"
+
+#. translators: %1$s: strong tag, %2$s: strong tag.
+#: admin/automlp-ai-dashboard/views/dashboard.php:29
+#, php-format
+msgid ""
+"Go to Pages or Posts, select items, click %1$sAI Translate%2$s, choose "
+"language and provider (Gemini/OpenAI), then click %1$sTranslate%2$s."
+msgstr ""
+"Accédez aux pages ou aux articles, sélectionnez les éléments, cliquez sur "
+"%1$sAI Translate%2$s, choisissez la langue et le fournisseur (Gemini/OpenAI),"
+" puis cliquez sur %1$sTranslate%2$s."
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:39
+#: admin/automlp-ai-dashboard/views/dashboard.php:55
+msgid "String Translation"
+msgstr "Traduction des chaînes"
+
+#. translators: %1$s: strong tag, %2$s: strong tag, %3$s: strong tag, %4$s: strong tag.
+#: admin/automlp-ai-dashboard/views/dashboard.php:44
+#, php-format
+msgid ""
+"Go to %1$sWPML → String Translation%2$s, select strings, click %1$sAI "
+"Translate%2$s, choose language and provider, then click %1$sTranslate%2$s."
+msgstr ""
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:58
+msgid "Page Translation"
+msgstr "Traduction des pages"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:61
+msgid "Read Plugin Docs"
+msgstr "Lire la documentation de l’extension"
+
+#. translators: %s: plugin name (brand name, not translated)
+#: admin/automlp-ai-dashboard/views/dashboard.php:65
+#, php-format
+msgid "Automate the Translation Process with %s Addon"
+msgstr "Automatisez le processus de traduction avec le module %s"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:77
+msgid "AI Translation Providers"
+msgstr "Fournisseurs de traduction IA"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:84
+msgid "OpenAI"
+msgstr "OpenAI"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:94
+#: admin/automlp-ai-dashboard/views/dashboard.php:118
+#: admin/automlp-ai-dashboard/views/dashboard.php:143
+msgid "Unlimited Free Translations"
+msgstr "Traductions gratuites illimitées"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:95
+#: admin/automlp-ai-dashboard/views/dashboard.php:119
+msgid "Use Translation Modals"
+msgstr "Utiliser les fenêtres modales de traduction"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:96
+#: admin/automlp-ai-dashboard/views/dashboard.php:120
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:51
+msgid "Bulk Translation"
+msgstr "Traduction en masse"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:99
+#: admin/automlp-ai-dashboard/views/dashboard.php:123
+#: admin/automlp-ai-dashboard/views/dashboard.php:147
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Docs"
+msgstr "Documentation"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:100
+#: admin/automlp-ai-dashboard/views/dashboard.php:124
+#: admin/automlp-ai-dashboard/views/settings.php:16
+#: admin/class-automlp_ai_dashboard.php:235 index.php:519
+msgid "Settings"
+msgstr "Réglages"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:108
+msgid "Gemini"
+msgstr "Gemini"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:132
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Chrome Built-in AI"
+msgstr "IA intégrée à Chrome"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:142
+msgid "Fast AI Translations in Browser"
+msgstr "Traductions IA rapides dans le navigateur"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:144
+msgid "Bulk Translation (Pro)"
+msgstr "Traduction en masse (Pro)"
+
+#: admin/automlp-ai-dashboard/views/dashboard.php:148
+msgid "Configure"
+msgstr "Configurer"
+
+#: admin/automlp-ai-dashboard/views/footer.php:8
+msgid "Made with ❤️ by"
+msgstr ""
+
+#: admin/automlp-ai-dashboard/views/footer.php:12
+msgid "Cool Plugins Logo"
+msgstr "Logo de Cool Plugins"
+
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:9
+msgid "Free VS Pro"
+msgstr "Gratuit ou Pro"
+
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:11
+msgid "Inactive"
+msgstr "Inactif"
+
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:19
+msgid ""
+"Compare the Free and Pro versions to choose the best option for your "
+"translation needs."
+msgstr ""
+"Comparez les versions gratuite et Pro pour choisir celle qui répond le mieux "
+"à vos besoins de traduction."
+
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:24
+msgid "Dynamic Content"
+msgstr "Contenu dynamique"
+
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:26
+msgid "Pro"
+msgstr "Pro"
+
+#. translators: 1: Chrome (brand name, not translated), 2: AI (not translated)
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:34
+#, php-format
+msgid "%1$s Built-in %2$s Support"
+msgstr "Prise en charge intégrée de %1$s%2$s"
+
+#. translators: %s: API Key (not translated)
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:40
+#, php-format
+msgid "No %s Required"
+msgstr "Aucun %s requis"
+
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:43
+msgid "Unlimited Translations"
+msgstr "Traductions illimitées"
+
+#. translators: 1: AI (not translated), 2: Gemini/OpenAI (brand names, not translated)
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:46
+#, php-format
+msgid "%1$s Translator (%2$s) Support"
+msgstr "Prise en charge du traducteur %1$s (%2$s)"
+
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:50
+msgid "Custom Post Type Translation"
+msgstr "Traduction des types de publication personnalisés"
+
+#. translators: %s: Divi (brand name, not translated)
+#. translators: %s: Elementor Template (brand name, not translated)
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:54
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:59
+#, php-format
+msgid "%s Translation"
+msgstr "Traduction %s"
+
+#: admin/automlp-ai-dashboard/views/free-vs-pro.php:62
+msgid "Premium Support"
+msgstr "Assistance premium"
+
+#: admin/automlp-ai-dashboard/views/license.php:9
+msgid "License Key"
+msgstr "Clé de licence"
+
+#: admin/automlp-ai-dashboard/views/license.php:18
+msgid "Your license key provides access to pro version updates and support."
+msgstr ""
+"Votre clé de licence vous donne accès aux mises à jour et à l’assistance de "
+"la version Pro."
+
+#. translators: 1: AutoPoly - AI Translation For Polylang (free) plugin name in strong tag
+#: admin/automlp-ai-dashboard/views/license.php:23
+#, php-format
+msgid "You're using %s - no license needed. Enjoy! 😊"
+msgstr ""
+
+#. translators: 1: AutoPoly - AI Translation For Polylang (free) plugin name in strong tag
+#: admin/automlp-ai-dashboard/views/license.php:23
+msgid "AutoMLP AI Translation For WPML (free)"
+msgstr "Traduction IA AutoMLP pour WPML (gratuite)"
+
+#: admin/automlp-ai-dashboard/views/license.php:28
+msgid "To unlock more features, consider"
+msgstr "Pour profiter de fonctionnalités supplémentaires, pensez à"
+
+#: admin/automlp-ai-dashboard/views/license.php:29
+msgid "upgrading to Pro"
+msgstr "passer à la version Pro"
+
+#: admin/automlp-ai-dashboard/views/license.php:31
+msgid ""
+"As a valued user, you automatically receive an exclusive discount on the "
+"Annual License and an even greater discount on the POPULAR Lifetime License "
+"at checkout!"
+msgstr ""
+"En tant qu’utilisateur privilégié, vous bénéficiez automatiquement d’une "
+"remise exclusive sur la licence annuelle et d’une remise encore plus "
+"importante sur la licence à vie POPULAIRE lors du paiement !"
+
+#: admin/automlp-ai-dashboard/views/settings.php:7
+msgid "You do not have sufficient permissions to access this page."
+msgstr ""
+"Vous ne disposez pas des autorisations nécessaires pour accéder à cette page."
+
+#: admin/automlp-ai-dashboard/views/settings.php:18
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Start Translation"
+msgstr "Lancer la traduction"
+
+#: admin/automlp-ai-dashboard/views/settings.php:32
+msgid "AI API Keys & Models"
+msgstr "Clés API et modèles IA"
+
+#: admin/automlp-ai-dashboard/views/settings.php:36
+msgid "Configure your API keys and models for the AI translation providers."
+msgstr ""
+"Configurez vos clés API et vos modèles pour les fournisseurs de traduction "
+"IA."
+
+#: admin/automlp-ai-dashboard/views/settings.php:55
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Please select a translation language first."
+msgstr "Veuillez d’abord sélectionner une langue de traduction."
+
+#: admin/automlp-ai-dashboard/views/settings.php:57
+msgid ""
+"Complete the Setup Wizard and choose a language in the Languages step. Until "
+"then, API key settings are disabled."
+msgstr ""
+"Terminez l’assistant de configuration et choisissez une langue à l’étape "
+"Langues. D’ici là, les paramètres de la clé API sont désactivés."
+
+#: admin/automlp-ai-dashboard/views/settings.php:61
+msgid "Open Setup Wizard"
+msgstr "Ouvrir l’assistant de configuration"
+
+#. translators: %s: API name.
+#: admin/automlp-ai-dashboard/views/settings.php:239
+#, php-format
+msgid "Add %s API key"
+msgstr "Ajouter une clé API %s"
+
+#: admin/automlp-ai-dashboard/views/settings.php:266
+msgid "Test Connection"
+msgstr "Tester la connexion"
+
+#: admin/automlp-ai-dashboard/views/settings.php:280
+msgid "Reset API key"
+msgstr "Réinitialiser la clé API"
+
+#: admin/automlp-ai-dashboard/views/settings.php:283
+#: admin/automlp-ai-dashboard/views/settings.php:618
+#: admin/automlp-ai-dashboard/views/settings.php:631
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Reset"
+msgstr "Réinitialiser"
+
+#: admin/automlp-ai-dashboard/views/settings.php:298
+msgid "Select OpenAI Model"
+msgstr "Sélectionner un modèle OpenAI"
+
+#: admin/automlp-ai-dashboard/views/settings.php:308
+msgid "gpt-6.1-sol (Best Quality)"
+msgstr "gpt-6.1-sol (meilleure qualité)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:309
+msgid "gpt-6-sol (High Quality)"
+msgstr "gpt-6-sol (haute qualité)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:310
+msgid "gpt-6-astra (Highest Accuracy)"
+msgstr "gpt-6-astra (précision maximale)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:311
+msgid "gpt-6-luna (Recommended, Fast & Cheap)"
+msgstr "gpt-6-luna (recommandé, rapide et économique)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:312
+msgid "gpt-5.6-sol (High Quality)"
+msgstr "gpt-5.6-sol (haute qualité)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:313
+msgid "gpt-5.6-terra (Very Good)"
+msgstr "gpt-5.6-terra (très bon)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:314
+msgid "gpt-5.6-luna (Fast & Cheap)"
+msgstr "gpt-5.6-luna (rapide et économique)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:315
+msgid "gpt-5.5 (High Quality)"
+msgstr "gpt-5.5 (haute qualité)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:316
+msgid "gpt-5.4 (Good Quality)"
+msgstr "gpt-5.4 (Bonne qualité)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:317
+msgid "gpt-5.4-pro (Highest Accuracy)"
+msgstr "gpt-5.4-pro (Précision maximale)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:318
+msgid "gpt-5.4-mini (Fast)"
+msgstr "gpt-5.4-mini (Rapide)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:319
+msgid "gpt-5.4-nano (Cheapest)"
+msgstr "gpt-5.4-nano (Le moins cher)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:320
+msgid "gpt-5.3-chat-latest (Balanced)"
+msgstr "gpt-5.3-chat-latest (Équilibré)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:321
+msgid "gpt-5.2 (Balanced)"
+msgstr "gpt-5.2 (Équilibré)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:322
+msgid "gpt-5-mini (Fast)"
+msgstr "gpt-5-mini (Rapide)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:323
+msgid "gpt-5-nano (Cheapest)"
+msgstr "gpt-5-nano (Le moins cher)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:324
+msgid "gpt-4o-mini (Legacy)"
+msgstr "gpt-4o-mini (Ancien)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:350
+msgid "Select Gemini Model"
+msgstr "Sélectionner le modèle Gemini"
+
+#: admin/automlp-ai-dashboard/views/settings.php:360
+msgid "gemini-4-argon (Best Quality)"
+msgstr "gemini-4-argon (Meilleure qualité)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:361
+msgid "gemini-3.8-flash (High Quality)"
+msgstr "gemini-3.8-flash (Haute qualité)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:362
+msgid "gemini-3.7-flash (Very Good)"
+msgstr "gemini-3.7-flash (Très bonne qualité)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:363
+msgid "gemini-3.6-flash (Fast & Reliable)"
+msgstr "gemini-3.6-flash (Rapide et fiable)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:364
+msgid "gemini-3.5-flash (High Accuracy)"
+msgstr "gemini-3.5-flash (Haute précision)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:365
+msgid "gemini-3.5-flash-lite (Recommended, Fast & Cheap)"
+msgstr "gemini-3.5-flash-lite (Recommandé, rapide et économique)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:366
+msgid "gemini-3.1-pro-preview (Pro Preview)"
+msgstr "gemini-3.1-pro-preview (Aperçu Pro)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:367
+msgid "gemini-3.1-flash-lite (Fast & Cheap)"
+msgstr "gemini-3.1-flash-lite (Rapide et économique)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:368
+msgid "gemini-3.1-flash-lite-preview (Fast & Cheap)"
+msgstr "gemini-3.1-flash-lite-preview (Rapide et économique)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:369
+msgid "gemini-3-flash-preview (Fast)"
+msgstr "gemini-3-flash-preview (Rapide)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:370
+msgid "gemini-2.5-pro (Legacy)"
+msgstr "gemini-2.5-pro (Ancien)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:371
+msgid "gemini-2.5-flash (Legacy)"
+msgstr "gemini-2.5-flash (Ancien)"
+
+#: admin/automlp-ai-dashboard/views/settings.php:372
+msgid "gemini-2.5-flash-lite (Legacy)"
+msgstr "gemini-2.5-flash-lite (Ancien)"
+
+#. translators: 1: Click here link, 2: API name.
+#: admin/automlp-ai-dashboard/views/settings.php:395
+#, php-format
+msgid "%1$s to see how to configure %2$s in the AI SDK."
+msgstr "%1$s pour découvrir comment configurer %2$s dans le SDK d’IA."
+
+#: admin/automlp-ai-dashboard/views/settings.php:396
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Click here"
+msgstr "Cliquez ici"
+
+#: admin/automlp-ai-dashboard/views/settings.php:405
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Note: API keys configured here are linked with the"
+msgstr "Remarque : les clés API configurées ici sont associées aux"
+
+#: admin/automlp-ai-dashboard/views/settings.php:411
+#: admin/assets/frontend/setup/setup.js:1
+msgid "AI → Connectors"
+msgstr ""
+
+#: admin/automlp-ai-dashboard/views/settings.php:414
+#: admin/assets/frontend/setup/setup.js:1
+msgid "settings in WordPress."
+msgstr "paramètres de WordPress."
+
+#: admin/automlp-ai-dashboard/views/settings.php:445 index.php:299
+msgid ""
+"Help us make this plugin more compatible with your site by sharing non-"
+"sensitive site data."
+msgstr ""
+"Aidez-nous à rendre cette extension plus compatible avec votre site en "
+"partageant des données non sensibles à son sujet."
+
+#: admin/automlp-ai-dashboard/views/settings.php:446
+msgid "See terms"
+msgstr "Consulter les conditions"
+
+#: admin/automlp-ai-dashboard/views/settings.php:449
+msgid ""
+"Opt in to receive email updates about security improvements, new features, "
+"helpful tutorials, and occasional special offers. We'll collect:"
+msgstr ""
+"Acceptez de recevoir par e-mail des informations sur les améliorations de "
+"sécurité, les nouvelles fonctionnalités, des tutoriels utiles et des offres "
+"spéciales occasionnelles. Nous recueillerons :"
+
+#: admin/automlp-ai-dashboard/views/settings.php:449
+msgid "Click Here"
+msgstr "Cliquez ici"
+
+#: admin/automlp-ai-dashboard/views/settings.php:451
+msgid "Your website home URL and WordPress admin email."
+msgstr ""
+"L’URL de la page d’accueil de votre site et l’adresse e-mail "
+"d’administration WordPress."
+
+#: admin/automlp-ai-dashboard/views/settings.php:452
+msgid ""
+"To check plugin compatibility, we will collect the following: list of active "
+"plugins and themes, server type, MySQL version, WordPress version, memory "
+"limit, site language and database prefix."
+msgstr ""
+"Pour vérifier la compatibilité de l’extension, nous recueillerons les "
+"éléments suivants : liste des extensions et des thèmes actifs, type de "
+"serveur, version de MySQL, version de WordPress, limite de mémoire, langue "
+"du site et préfixe de la base de données."
+
+#: admin/automlp-ai-dashboard/views/settings.php:458
+msgid "Save"
+msgstr "Enregistrer"
+
+#: admin/automlp-ai-dashboard/views/settings.php:553
+msgid "Enter new key to update"
+msgstr "Saisissez une nouvelle clé pour la mettre à jour"
+
+#: admin/automlp-ai-dashboard/views/settings.php:583
+msgid "Deleting..."
+msgstr "Suppression en cours..."
+
+#: admin/automlp-ai-dashboard/views/settings.php:603
+msgid "API key removed successfully."
+msgstr "La clé API a été supprimée."
+
+#: admin/automlp-ai-dashboard/views/settings.php:608
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Failed to delete API key. Please try again."
+msgstr "Impossible de supprimer la clé API. Veuillez réessayer."
+
+#: admin/automlp-ai-dashboard/views/settings.php:625
+#: admin/automlp-ai-dashboard/views/settings.php:804
+msgid "Network error. Please try again."
+msgstr "Erreur réseau. Veuillez réessayer."
+
+#: admin/automlp-ai-dashboard/views/settings.php:699
+msgid "Settings saved successfully."
+msgstr "Les paramètres ont été enregistrés."
+
+#: admin/automlp-ai-dashboard/views/settings.php:719
+msgid "Request failed. Please try again."
+msgstr "La requête a échoué. Veuillez réessayer."
+
+#: admin/automlp-ai-dashboard/views/settings.php:752
+msgid "Testing..."
+msgstr "Test en cours..."
+
+#: admin/automlp-ai-dashboard/views/settings.php:779
+msgid "✓ Valid Key!"
+msgstr ""
+
+#: admin/automlp-ai-dashboard/views/settings.php:779
+msgid "✗ Invalid Key!"
+msgstr ""
+
+#: admin/automlp-ai-dashboard/views/settings.php:783
+msgid "Connection failed."
+msgstr "Échec de la connexion."
+
+#: admin/automlp-ai-dashboard/views/settings.php:802
+msgid "✗ Error!"
+msgstr ""
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:19
+msgid "0"
+msgstr "0"
+
+#. translators: %d: seconds.
+#: admin/automlp-ai-dashboard/views/sidebar.php:26
+#, php-format
+msgid "%d sec"
+msgstr "%d s"
+
+#. translators: 1: minutes, 2: seconds.
+#: admin/automlp-ai-dashboard/views/sidebar.php:33
+#, php-format
+msgid "%1$d min %2$d sec"
+msgstr "%1$d min %2$d s"
+
+#. translators: 1: hours, 2: minutes.
+#: admin/automlp-ai-dashboard/views/sidebar.php:40
+#, php-format
+msgid "%1$d hours %2$d min"
+msgstr "%1$d h %2$d min"
+
+#. translators: 1: days, 2: hours, 3: minutes.
+#: admin/automlp-ai-dashboard/views/sidebar.php:47
+#, php-format
+msgid "%1$d days %2$d hours %3$d min"
+msgstr "%1$d j %2$d h %3$d min"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:88
+msgid "LocoAI – Auto Translate For Loco Translate"
+msgstr "LocoAI – Traduction automatique pour Loco Translate"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:89
+msgid "LocoAI – Auto Translate for Loco Translate (Pro)"
+msgstr "LocoAI – Traduction automatique pour Loco Translate (Pro)"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:121
+msgid "B"
+msgstr "B"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:123
+msgid "M"
+msgstr "M"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:125
+msgid "K"
+msgstr "K"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:136
+msgid "Auto Translation Status"
+msgstr "État de la traduction automatique"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:184
+msgid "Total Characters Translated!"
+msgstr "Nombre total de caractères traduits !"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:188
+msgid "Total Strings"
+msgstr "Nombre total de chaînes"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:200
+msgid "Total Translation Jobs"
+msgstr "Nombre total de tâches de traduction"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:204
+#: assets/bulk-translate/index.js:1
+msgid "Time Taken"
+msgstr "Temps écoulé"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:211
+msgid "Need Help?"
+msgstr "Besoin d’aide ?"
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:212
+msgid ""
+"Facing any issue with AI translation? Create a support thread and our team "
+"will assist you."
+msgstr ""
+"Vous rencontrez un problème avec la traduction par IA ? Créez un fil de "
+"discussion d’assistance et notre équipe vous aidera."
+
+#: admin/automlp-ai-dashboard/views/sidebar.php:213
+msgid "Get Support"
+msgstr "Obtenir de l’aide"
+
+#. translators: %s: plugin name (brand name, not translated)
+#: admin/automlp-ai-dashboard/views/sidebar.php:217
+#, php-format
+msgid "Happy with %s?"
+msgstr "Vous aimez %s ?"
+
+#. translators: %s: plugin name (brand name, not translated)
+#: admin/automlp-ai-dashboard/views/sidebar.php:218
+#, php-format
+msgid ""
+"If %s helped you translate your site faster and save translation costs, "
+"please take a minute to leave a review."
+msgstr ""
+"Si %s vous a aidé à traduire votre site plus rapidement et à réduire vos "
+"coûts de traduction, prenez un instant pour laisser un avis."
+
+#. translators: %s: plugin name (brand name, not translated)
+#: admin/automlp-ai-dashboard/views/sidebar.php:219
+msgid "Leave a Review"
+msgstr "Laisser un avis"
+
+#: admin/class-automlp_ai_dashboard.php:139
+#: admin/cpt_dashboard/cpt_dashboard.php:311
+msgid "Unauthorized"
+msgstr "Non autorisé"
+
+#: admin/class-automlp_ai_dashboard.php:143
+msgid "Invalid security token sent."
+msgstr "Jeton de sécurité envoyé invalide."
+
+#: admin/class-automlp_ai_dashboard.php:150
+msgid "Invalid JSON."
+msgstr "JSON invalide."
+
+#: admin/class-automlp_ai_dashboard.php:156
+msgid "Invalid enabled providers."
+msgstr "Fournisseurs activés invalides."
+
+#: admin/class-automlp_ai_dashboard.php:172
+msgid "Enabled providers updated successfully."
+msgstr "Fournisseurs activés mis à jour avec succès."
+
+#: admin/class-automlp_ai_dashboard.php:234
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#: admin/class-automlp_ai_dashboard.php:236
+msgid "License"
+msgstr "Licence"
+
+#: admin/class-automlp_ai_dashboard.php:237
+msgid "Free vs Pro"
+msgstr "Gratuit ou Pro"
+
+#: admin/class-automlp_ai_dashboard.php:249
+msgid "WPML Auto Logo"
+msgstr "Logo automatique WPML"
+
+#: admin/class-automlp_ai_dashboard.php:258
+msgid "Premium"
+msgstr "Premium"
+
+#: admin/class-automlp_ai_dashboard.php:259
+msgid "Premium Icon"
+msgstr "Icône Premium"
+
+#: admin/class-automlp_ai_dashboard.php:260
+msgid "Unlock More Features"
+msgstr "Débloquer davantage de fonctionnalités"
+
+#: admin/class-automlp_ai_dashboard.php:265
+msgid "Dashboard navigation"
+msgstr "Navigation du tableau de bord"
+
+#: admin/class-automlp_ai_dashboard.php:286
+msgid "View file not found."
+msgstr "Fichier d’affichage introuvable."
+
+#. translators: %1$s: plugin name, %2$s: total character count, %3$s: Cool Plugins URL
+#: admin/cpt_dashboard/cpt_dashboard.php:273
+#, php-format
+msgid ""
+"Thanks for using <b>%1$s</b>! You have translated <b>%2$s</b> characters so "
+"far using our plugin!<br>Please give us a quick rating, it works as a boost "
+"for us to keep working on more <a style=\"text-decoration: none;\" "
+"href=\"%3$s\" target=\"_blank\" rel=\"noopener noreferrer\"><b>Cool "
+"Plugins</b></a>!"
+msgstr ""
+
+#: admin/cpt_dashboard/cpt_dashboard.php:298
+msgid "Rate Now!"
+msgstr "Évaluer maintenant !"
+
+#: admin/cpt_dashboard/cpt_dashboard.php:298
+msgid "Not Interested"
+msgstr "Pas intéressé"
+
+#: admin/cpt_dashboard/cpt_dashboard.php:322
+msgid "Invalid nonce"
+msgstr "Nonce invalide"
+
+#: admin/queue/class-queue-screen.php:55
+msgid "Translation Queue"
+msgstr "File d’attente des traductions"
+
+#. translators: %d: number of jobs still running
+#: admin/queue/class-queue-screen.php:62
+#, php-format
+msgid "Translation Queue (%d)"
+msgstr "File d’attente des traductions (%d)"
+
+#: admin/queue/class-queue-screen.php:107
+msgid "Loading jobs…"
+msgstr "Chargement des tâches…"
+
+#: admin/queue/class-queue-screen.php:108
+msgid "Jobs updated."
+msgstr "Tâches mises à jour."
+
+#: admin/queue/class-queue-screen.php:109
+msgid "Delete the selected jobs from the queue? They will not be translated."
+msgstr ""
+"Supprimer les tâches sélectionnées de la file d’attente ? Elles ne seront "
+"pas traduites."
+
+#: admin/queue/class-queue-screen.php:110
+msgid "Delete this job from the queue? It will not be translated."
+msgstr ""
+"Supprimer cette tâche de la file d’attente ? Elle ne sera pas traduite."
+
+#: admin/queue/class-queue-screen.php:111
+msgid "Remove all finished jobs from the history?"
+msgstr "Supprimer toutes les tâches terminées de l’historique ?"
+
+#: admin/queue/class-queue-screen.php:133
+#: admin/queue/class-queue-screen.php:179
+#: includes/routes/class-queue-route.php:172
+#: includes/routes/class-queue-route.php:189
+#: includes/routes/class-queue-route.php:428
+msgid "You are not allowed to do this."
+msgstr "Vous n’êtes pas autorisé à effectuer cette action."
+
+#: admin/queue/class-queue-screen.php:449
+#: admin/queue/class-queue-screen.php:565
+#: assets/bulk-string-translate/index.js:1
+msgid "Strings"
+msgstr "Chaînes"
+
+#. translators: %d: post id
+#: admin/queue/class-queue-screen.php:518
+#, php-format
+msgid "Post #%d"
+msgstr ""
+
+#. translators: %d: number of strings
+#: admin/queue/class-queue-screen.php:526
+#, php-format
+msgid "%d string"
+msgid_plural "%d strings"
+msgstr[0] "%d chaîne"
+msgstr[1] "%d chaînes"
+
+#: admin/queue/class-queue-screen.php:583
+#: includes/queue/class-queue-table.php:240
+msgid "Chrome built-in AI"
+msgstr "IA intégrée de Chrome"
+
+#: admin/queue/class-queue-screen.php:617 admin/queue/view-queue.php:284
+#: includes/routes/class-queue-route.php:975
+msgid "Queued"
+msgstr "En attente"
+
+#: admin/queue/class-queue-screen.php:618
+#: includes/routes/class-queue-route.php:976
+msgid "Starting"
+msgstr "Démarrage"
+
+#: admin/queue/class-queue-screen.php:619
+#: includes/routes/class-queue-route.php:977
+msgid "Translating"
+msgstr "Traduction en cours"
+
+#: admin/queue/class-queue-screen.php:620
+#: includes/routes/class-queue-route.php:978
+msgid "Saving"
+msgstr "Enregistrement"
+
+#: admin/queue/class-queue-screen.php:621 admin/queue/view-queue.php:69
+#: includes/routes/class-queue-route.php:979
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Completed"
+msgstr "Terminé"
+
+#: admin/queue/class-queue-screen.php:622 admin/queue/view-queue.php:70
+#: includes/routes/class-queue-route.php:980 assets/bulk-translate/index.js:1
+msgid "Failed"
+msgstr "Échec"
+
+#: admin/queue/class-queue-screen.php:623 admin/queue/view-queue.php:71
+#: includes/routes/class-queue-route.php:981
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. translators: %s: human readable time difference
+#: admin/queue/class-queue-screen.php:685
+#, php-format
+msgid "%s ago"
+msgstr "il y a %s"
+
+#. translators: %d: number of jobs
+#: admin/queue/class-queue-screen.php:712
+#, php-format
+msgid "%d job was sent back to the queue."
+msgid_plural "%d jobs were sent back to the queue."
+msgstr[0] "%d tâche a été remise dans la file d’attente."
+msgstr[1] "%d tâches ont été remises dans la file d’attente."
+
+#: admin/queue/class-queue-screen.php:716
+msgid ""
+"None of the selected jobs could be retried. Only failed jobs whose source "
+"content is still stored can be retried."
+msgstr ""
+"Aucune des tâches sélectionnées n’a pu être relancée. Seules les tâches "
+"ayant échoué et dont le contenu source est toujours stocké peuvent être "
+"relancées."
+
+#. translators: %d: number of jobs
+#: admin/queue/class-queue-screen.php:722
+#, php-format
+msgid "%d job was deleted from the queue and will not be translated."
+msgid_plural "%d jobs were deleted from the queue and will not be translated."
+msgstr[0] ""
+"%d tâche a été supprimée de la file d’attente et ne sera pas traduite."
+msgstr[1] ""
+"%d tâches ont été supprimées de la file d’attente et ne seront pas traduites."
+
+#: admin/queue/class-queue-screen.php:726
+msgid ""
+"None of the selected jobs could be deleted. They may have finished or be "
+"saving right now."
+msgstr ""
+"Aucune des tâches sélectionnées n’a pu être supprimée. Elles sont peut-être "
+"terminées ou en cours d’enregistrement."
+
+#: admin/queue/class-queue-screen.php:727
+msgid "Select at least one job and choose an action."
+msgstr "Sélectionnez au moins une tâche et choisissez une action."
+
+#: admin/queue/class-queue-screen.php:728
+msgid "The queue was processed."
+msgstr "La file d’attente a été traitée."
+
+#: admin/queue/class-queue-screen.php:729
+msgid "That job was sent back to the queue."
+msgstr "Cette tâche a été remise dans la file d’attente."
+
+#: admin/queue/class-queue-screen.php:730
+msgid "Failed jobs were sent back to the queue."
+msgstr "Les tâches ayant échoué ont été remises dans la file d’attente."
+
+#: admin/queue/class-queue-screen.php:731
+msgid "Finished jobs were removed from the history."
+msgstr "Les tâches terminées ont été supprimées de l’historique."
+
+#: admin/queue/class-queue-screen.php:732
+msgid ""
+"There was nothing to retry. Jobs can only be retried while their source "
+"content is still stored."
+msgstr ""
+"Aucune tâche à relancer. Les tâches ne peuvent être relancées que tant que "
+"leur contenu source est toujours stocké."
+
+#: admin/queue/class-queue-screen.php:733
+msgid "The job was deleted from the queue and will not be translated."
+msgstr "La tâche a été supprimée de la file d’attente et ne sera pas traduite."
+
+#: admin/queue/class-queue-screen.php:734
+msgid ""
+"That job could not be deleted. It may have finished or be saving right now."
+msgstr ""
+"Cette tâche n’a pas pu être supprimée. Elle est peut-être terminée ou en "
+"cours d’enregistrement."
+
+#: admin/queue/view-queue.php:67
+msgid "All"
+msgstr "Tout"
+
+#: admin/queue/view-queue.php:68
+msgid "In progress"
+msgstr "En cours"
+
+#: admin/queue/view-queue.php:121
+msgid "The queue is not running normally."
+msgstr "La file d’attente ne fonctionne pas normalement."
+
+#: admin/queue/view-queue.php:123
+msgid ""
+"WP-Cron is disabled on this site. Set up a real cron job that calls wp-cron."
+"php, or use Process now below."
+msgstr ""
+"WP-Cron est désactivé sur ce site. Configurez une véritable tâche cron qui "
+"appelle wp-cron.php, ou utilisez « Traiter maintenant » ci-dessous."
+
+#: admin/queue/view-queue.php:125
+msgid ""
+"No scheduled run was found. Deactivating and reactivating the plugin will "
+"restore it."
+msgstr ""
+"Aucune exécution planifiée n’a été trouvée. Désactivez puis réactivez "
+"l’extension pour la rétablir."
+
+#: admin/queue/view-queue.php:127
+msgid "The queue has not run recently, so translations may be delayed."
+msgstr ""
+"La file d’attente n’a pas été exécutée récemment ; les traductions peuvent "
+"donc être retardées."
+
+#: admin/queue/view-queue.php:137
+msgid ""
+"Track every translation AutoMLP has run: its status, who translated it and "
+"when. Use this page to monitor progress, retry failures or remove jobs you "
+"no longer need."
+msgstr ""
+"Suivez chaque traduction effectuée par AutoMLP : son statut, la personne qui "
+"l’a traduite et la date. Utilisez cette page pour suivre la progression, "
+"réessayer les échecs ou supprimer les tâches dont vous n’avez plus besoin."
+
+#: admin/queue/view-queue.php:146
+msgid "Process now"
+msgstr "Traiter maintenant"
+
+#: admin/queue/view-queue.php:156
+msgid "Retry failed"
+msgstr "Réessayer les échecs"
+
+#: admin/queue/view-queue.php:166
+msgid "Clear history"
+msgstr "Effacer l’historique"
+
+#: admin/queue/view-queue.php:172
+msgid "Filter by status"
+msgstr "Filtrer par statut"
+
+#: admin/queue/view-queue.php:196
+msgid "Search jobs"
+msgstr "Rechercher des tâches"
+
+#: admin/queue/view-queue.php:199
+msgid "Search by title, job ID or error"
+msgstr "Rechercher par titre, ID de tâche ou erreur"
+
+#: admin/queue/view-queue.php:202
+msgid "Filter by type"
+msgstr "Filtrer par type"
+
+#: admin/queue/view-queue.php:204
+msgid "All types"
+msgstr "Tous les types"
+
+#: admin/queue/view-queue.php:214
+msgid "Filter by language"
+msgstr "Filtrer par langue"
+
+#: admin/queue/view-queue.php:216
+msgid "All languages"
+msgstr "Toutes les langues"
+
+#: admin/queue/view-queue.php:225
+msgid "Filter"
+msgstr "Filtrer"
+
+#: admin/queue/view-queue.php:228
+msgid "Reset filters"
+msgstr "Réinitialiser les filtres"
+
+#: admin/queue/view-queue.php:236
+msgid "No jobs match these filters."
+msgstr "Aucune tâche ne correspond à ces filtres."
+
+#: admin/queue/view-queue.php:237
+msgid "Show all jobs"
+msgstr "Afficher toutes les tâches"
+
+#: admin/queue/view-queue.php:239
+msgid "Nothing here yet."
+msgstr "Rien pour le moment."
+
+#: admin/queue/view-queue.php:241
+msgid ""
+"Translations you start from the Posts or Pages list will appear here, along "
+"with anything still running."
+msgstr ""
+"Les traductions lancées depuis la liste des articles ou des pages "
+"apparaîtront ici, ainsi que celles qui sont encore en cours."
+
+#: admin/queue/view-queue.php:254 admin/queue/view-queue.php:256
+msgid "Bulk actions"
+msgstr "Actions groupées"
+
+#: admin/queue/view-queue.php:257 admin/queue/view-queue.php:375
+msgid "Retry"
+msgstr "Réessayer"
+
+#. translators: %s: content title
+#: admin/queue/view-queue.php:258 admin/queue/view-queue.php:382
+msgid "Delete"
+msgstr "Supprimer"
+
+#: admin/queue/view-queue.php:260
+msgid "Apply"
+msgstr "Appliquer"
+
+#. translators: %s: number of jobs
+#: admin/queue/view-queue.php:265
+#, php-format
+msgid "%s job"
+msgid_plural "%s jobs"
+msgstr[0] "Tâche %s"
+msgstr[1] "Tâches %s"
+
+#: admin/queue/view-queue.php:277
+msgid ""
+"Nothing to select: only failed or running jobs can be retried or deleted."
+msgstr ""
+"Aucun élément à sélectionner : seules les tâches échouées ou en cours "
+"peuvent être réessayées ou supprimées."
+
+#: admin/queue/view-queue.php:278
+msgid "Select all jobs"
+msgstr "Sélectionner toutes les tâches"
+
+#: admin/queue/view-queue.php:281
+msgid "Job ID"
+msgstr "ID de tâche"
+
+#: admin/queue/view-queue.php:282
+msgid "Content"
+msgstr "Contenu"
+
+#: admin/queue/view-queue.php:283 admin/assets/frontend/setup/setup.js:1
+msgid "Languages"
+msgstr "Langues"
+
+#: admin/queue/view-queue.php:285
+#: includes/frontend-inspector/class-frontend-inspector.php:714
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Status"
+msgstr "Statut"
+
+#: admin/queue/view-queue.php:286 assets/bulk-translate/index.js:1
+msgid "Actions"
+msgstr "Actions"
+
+#. translators: %s: content title
+#: admin/queue/view-queue.php:298
+#, php-format
+msgid "Select %s"
+msgstr "Sélectionner %s"
+
+#. translators: %d: number of attempts
+#: admin/queue/view-queue.php:358
+#, php-format
+msgid "Attempt %d"
+msgstr "Tentative %d"
+
+#: admin/queue/view-queue.php:369 assets/bulk-translate/index.js:1
+msgid "Review"
+msgstr "Vérifier"
+
+#. translators: %s: content title
+#: admin/queue/view-queue.php:381
+#, php-format
+msgid "Delete queue job for %s"
+msgstr "Supprimer la tâche de la file d’attente pour %s"
+
+#. translators: 1: first job shown, 2: last job shown, 3: total jobs
+#: admin/queue/view-queue.php:399
+#, php-format
+msgid "Showing %1$s–%2$s of %3$s"
+msgstr "Affichage de %1$s–%2$s sur %3$s"
+
+#: admin/queue/view-queue.php:408
+msgid "Pagination"
+msgstr "Pagination"
+
+#: admin/queue/view-queue.php:455
+msgid ""
+"This page refreshes automatically while translations are running. You can "
+"safely close it — translation continues in the background."
+msgstr ""
+"Cette page s’actualise automatiquement pendant l’exécution des traductions. "
+"Vous pouvez la fermer sans risque : la traduction continue en arrière-plan."
+
+#: includes/bulk-translation/bulk-translation.php:54
+#: includes/string-translation/string-translation.php:71
+msgid "AI Translate"
+msgstr "Traduction par IA"
+
+#: includes/bulk-translation/register-assets.php:59
+msgid "Pages"
+msgstr "Pages"
+
+#: includes/class-automlp-ai-helper.php:390 assets/bulk-translate/index.js:1
+msgid "The current editor is not supported."
+msgstr "L’éditeur actuel n’est pas pris en charge."
+
+#: includes/class-automlp-ai-helper.php:399 assets/bulk-translate/index.js:1
+msgid "Already translated. Re-translation is available in the Pro version."
+msgstr "Déjà traduit. La retraduction est disponible dans la version Pro."
+
+#: includes/class-automlp-ai-helper.php:408 assets/bulk-translate/index.js:1
+msgid ""
+"Skipped: this page already has an open WPML translation job for this "
+"language. Finish or cancel it in WPML first."
+msgstr ""
+"Ignoré : cette page possède déjà une tâche de traduction WPML en cours pour "
+"cette langue. Terminez-la ou annulez-la d’abord dans WPML."
+
+#. translators: %s: plugin name
+#: includes/frontend-inspector/class-component-registry.php:156
+#, php-format
+msgid "Plugin: %s"
+msgstr "Extension : %s"
+
+#. translators: %s: theme name
+#: includes/frontend-inspector/class-component-registry.php:160
+#, php-format
+msgid "Theme: %s"
+msgstr "Thème : %s"
+
+#: includes/frontend-inspector/class-container-markers.php:567
+#: includes/frontend-inspector/class-origin-resolver.php:1745
+#: includes/frontend-inspector/class-origin-resolver.php:2048
+msgid "Post content"
+msgstr "Contenu de l’article"
+
+#. translators: %s: block name
+#: includes/frontend-inspector/class-container-markers.php:572
+#, php-format
+msgid "Block: %s"
+msgstr "Bloc : %s"
+
+#. translators: %s: menu name
+#: includes/frontend-inspector/class-container-markers.php:597
+#, php-format
+msgid "Menu: %s"
+msgstr "Menu : %s"
+
+#: includes/frontend-inspector/class-container-markers.php:603
+#: includes/frontend-inspector/class-origin-resolver.php:2098
+#: includes/frontend-inspector/class-origin-resolver.php:2191
+msgid "Menu item"
+msgstr "Élément de menu"
+
+#. translators: %s: sidebar id
+#: includes/frontend-inspector/class-container-markers.php:607
+#, php-format
+msgid "Widget area: %s"
+msgstr "Zone de widgets : %s"
+
+#. translators: %s: widget id
+#: includes/frontend-inspector/class-container-markers.php:612
+#, php-format
+msgid "Widget: %s"
+msgstr "Widget : %s"
+
+#. translators: %s: Elementor widget name
+#: includes/frontend-inspector/class-container-markers.php:618
+#, php-format
+msgid "Elementor widget: %s"
+msgstr "Widget Elementor : %s"
+
+#. translators: %s: template region
+#: includes/frontend-inspector/class-container-markers.php:625
+#, php-format
+msgid "Theme template (%s)"
+msgstr "Modèle du thème (%s)"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:129
+#: includes/frontend-inspector/class-frontend-inspector.php:707
+msgid "Close Text Inspector"
+msgstr "Fermer l’inspecteur de texte"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:130
+#: includes/frontend-inspector/class-frontend-inspector.php:706
+msgid "Text Inspector"
+msgstr "Inspecteur de texte"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:135
+msgid "Find where visible text on this page comes from"
+msgstr "Trouver l’origine du texte visible sur cette page"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:392
+msgid "Invalid security token."
+msgstr "Jeton de sécurité invalide."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:399
+msgid "Forbidden."
+msgstr "Accès interdit."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:436
+msgid "Empty text."
+msgstr "Texte vide."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:465
+msgid "Invalid string."
+msgstr "Chaîne invalide."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:539
+msgid "Invalid scan request."
+msgstr "Requête d’analyse invalide."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:704
+msgid "Text Origin Inspector"
+msgstr "Inspecteur de l’origine du texte"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:705 index.php:236
+#: index.php:283 assets/bulk-string-translate/index.js:1
+#: assets/bulk-translate/index.js:1
+msgid "Close"
+msgstr "Fermer"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:708
+msgid ""
+"Click any text on the page, or an item below, to see where it comes from."
+msgstr ""
+"Cliquez sur n’importe quel texte de la page ou sur un élément ci-dessous "
+"pour voir d’où il provient."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:709
+msgid "Checking…"
+msgstr "Vérification…"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:710
+msgid "Reading this page…"
+msgstr "Lecture de cette page…"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:711
+msgid "Could not read this page. Reload and try again."
+msgstr "Impossible de lire cette page. Rechargez-la et réessayez."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:712
+msgid "Could not check this text. Try again."
+msgstr "Impossible de vérifier ce texte. Réessayez."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:713
+msgid "Source"
+msgstr "Source"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:715
+msgid "Identifiers"
+msgstr "Identifiants"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:716
+msgid "Fix"
+msgstr "Corriger"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:717
+msgid "Selected text"
+msgstr "Texte sélectionné"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:718
+msgid "Likely untranslated"
+msgstr "Probablement non traduit"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:719
+msgid "Open fix link"
+msgstr "Ouvrir le lien de correction"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:720
+msgid "No direct match found. Other sources are still checked."
+msgstr ""
+"Aucune correspondance directe trouvée. Les autres sources sont toujours "
+"vérifiées."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:721
+msgid "Untranslated on this page"
+msgstr "Non traduit sur cette page"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:722
+msgid "Checking visible strings…"
+msgstr "Vérification des chaînes visibles…"
+
+#. translators: 1: untranslated count, 2: scanned count
+#: includes/frontend-inspector/class-frontend-inspector.php:724
+#, php-format
+msgid "%1$d untranslated of %2$d checked"
+msgstr "%1$d non traduites sur %2$d vérifiées"
+
+#. translators: %d: maximum number of strings checked
+#: includes/frontend-inspector/class-frontend-inspector.php:726
+#, php-format
+msgid "Only the first %d visible strings were checked."
+msgstr "Seules les %d premières chaînes visibles ont été vérifiées."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:727
+msgid "No untranslated strings found on this page."
+msgstr "Aucune chaîne non traduite trouvée sur cette page."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:728
+msgid "Could not check strings on this page."
+msgstr "Impossible de vérifier les chaînes sur cette page."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:729
+#: includes/frontend-inspector/class-origin-resolver.php:605
+msgid "Source not found"
+msgstr "Source introuvable"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:730
+msgid "Shown by"
+msgstr "Affiché par"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:731
+msgid "Edit"
+msgstr "Modifier"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:732
+#: includes/frontend-inspector/class-origin-resolver.php:2838
+msgid "Added by a script"
+msgstr "Ajouté par un script"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:733
+msgid "Added in the browser after the page loaded."
+msgstr "Ajouté dans le navigateur après le chargement de la page."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:734
+msgid "Not a translatable string. Edit it in the source above."
+msgstr "Chaîne non traduisible. Modifiez-la dans la source ci-dessus."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:735
+msgid "Options in this control"
+msgstr "Options de ce contrôle"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:736
+msgid "Details"
+msgstr "Détails"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:737
+msgid "More links"
+msgstr "Autres liens"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:738
+msgid "Why it is not shown"
+msgstr "Pourquoi elle n’est pas affichée"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:739
+msgid "Adding…"
+msgstr "Ajout…"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:740
+msgid "Added to String Translation."
+msgstr "Ajouté à String Translation."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:741
+msgid "Could not add the text."
+msgstr "Impossible d’ajouter le texte."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:742
+msgid "Drag to resize panel. Arrow keys adjust width."
+msgstr ""
+"Faites glisser pour redimensionner le panneau. Utilisez les touches fléchées "
+"pour ajuster la largeur."
+
+#. translators: %d: number of texts
+#: includes/frontend-inspector/class-frontend-inspector.php:744
+#, php-format
+msgid "This area has %d texts. Click one to see its source."
+msgstr ""
+"Cette zone contient %d textes. Cliquez sur l’un d’eux pour voir sa source."
+
+#: includes/frontend-inspector/class-frontend-inspector.php:745
+msgid "Click to see the source"
+msgstr "Cliquez pour voir la source"
+
+#. translators: %s: Elementor widget name, e.g. heading
+#: includes/frontend-inspector/class-frontend-inspector.php:747
+#, php-format
+msgid "Elementor %s widget"
+msgstr "Widget Elementor %s"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:748
+msgid "Yes"
+msgstr "Oui"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:749
+msgid "No"
+msgstr "Non"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:751
+msgid "Comes from"
+msgstr "Provient de"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:752
+msgid "Plugin"
+msgstr "Extension"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:753
+msgid "Page builder"
+msgstr "Constructeur de pages"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:754
+msgid "Page builder active"
+msgstr "Constructeur de pages actif"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:755
+msgid "Menu"
+msgstr "Menu"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:756
+msgid "Field"
+msgstr "Champ"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:757
+msgid "Form ID"
+msgstr "ID du formulaire"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:758
+msgid "Post ID"
+msgstr "ID de l’article"
+
+#: includes/frontend-inspector/class-frontend-inspector.php:759
+#: assets/bulk-translate/index.js:1
+msgid "Language"
+msgstr "Langue"
+
+#. translators: %s: builder name
+#: includes/frontend-inspector/class-integration-resolvers.php:303
+#, php-format
+msgid "%s module text"
+msgstr "Texte du module %s"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:307
+msgid "Original-language page shown on a translated page"
+msgstr "Page dans la langue d’origine affichée sur une page traduite"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:314
+#: includes/frontend-inspector/class-integration-resolvers.php:446
+#: includes/frontend-inspector/class-origin-resolver.php:2339
+msgid "Same as the original"
+msgstr "Identique à l’original"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:315
+#: includes/frontend-inspector/class-integration-resolvers.php:449
+#: includes/frontend-inspector/class-origin-resolver.php:1591
+#: includes/frontend-inspector/class-origin-resolver.php:1595
+#: includes/frontend-inspector/class-origin-resolver.php:1726
+#: includes/frontend-inspector/class-origin-resolver.php:2343
+msgid "Translated"
+msgstr "Traduit"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:323
+msgid "Translate this page (WPML)"
+msgstr "Traduire cette page (WPML)"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:328
+msgid "WPML Translation Management"
+msgstr "Gestion de la traduction WPML"
+
+#. translators: %s: builder name
+#: includes/frontend-inspector/class-integration-resolvers.php:334
+#, php-format
+msgid "%s module"
+msgstr "Module %s"
+
+#. translators: %s: builder name
+#: includes/frontend-inspector/class-integration-resolvers.php:349
+#, php-format
+msgid "Edit in %s"
+msgstr "Modifier dans %s"
+
+#. translators: %s: builder name
+#: includes/frontend-inspector/class-integration-resolvers.php:350
+msgid "Edit post"
+msgstr "Modifier l’article"
+
+#. translators: %s: builder name
+#: includes/frontend-inspector/class-integration-resolvers.php:351
+#, php-format
+msgid "%s is not active on this site. The saved content is shown."
+msgstr "%s n’est pas actif sur ce site. Le contenu enregistré est affiché."
+
+#: includes/frontend-inspector/class-integration-resolvers.php:380
+msgid "Don't translate"
+msgstr "Ne pas traduire"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:381
+msgid "Copy"
+msgstr "Copier"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:382
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Translate"
+msgstr "Traduire"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:383
+msgid "Copy once"
+msgstr "Copier une fois"
+
+#. translators: %s: ACFML translation preference
+#: includes/frontend-inspector/class-integration-resolvers.php:428
+#, php-format
+msgid "ACF field (set to: %s)"
+msgstr "Champ ACF (défini sur : %s)"
+
+#. translators: %s: ACFML translation preference
+#: includes/frontend-inspector/class-integration-resolvers.php:429
+msgid "ACF field value"
+msgstr "Valeur du champ ACF"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:445
+msgid "Copied from the original language"
+msgstr "Copié depuis la langue d’origine"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:454
+#: includes/frontend-inspector/class-integration-resolvers.php:544
+#: includes/frontend-inspector/class-origin-resolver.php:1764
+#: includes/frontend-inspector/class-origin-resolver.php:2053
+msgid "Edit post / translation"
+msgstr "Modifier l’article / la traduction"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:457
+#: includes/frontend-inspector/class-origin-resolver.php:1632
+msgid "Edit category or tag"
+msgstr "Modifier la catégorie ou l’étiquette"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:460
+msgid "Open ACF options page"
+msgstr "Ouvrir la page des options ACF"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:462
+msgid "Translate the ACF options page"
+msgstr "Traduire la page des options ACF"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:468
+msgid "Edit field group"
+msgstr "Modifier le groupe de champs"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:473
+#: includes/frontend-inspector/class-integration-resolvers.php:547
+msgid "WPML custom field settings"
+msgstr "Réglages des champs personnalisés WPML"
+
+#. translators: %s: ACF field label
+#: includes/frontend-inspector/class-integration-resolvers.php:479
+#, php-format
+msgid "ACF field: %s"
+msgstr "Champ ACF : %s"
+
+#. translators: %s: meta key
+#: includes/frontend-inspector/class-integration-resolvers.php:536
+#, php-format
+msgid "Custom field: %s"
+msgstr "Champ personnalisé : %s"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:542
+msgid "Custom field value"
+msgstr "Valeur du champ personnalisé"
+
+#. translators: %s: form plugin
+#: includes/frontend-inspector/class-integration-resolvers.php:721
+#, php-format
+msgid "%s form text"
+msgstr "Texte du formulaire %s"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:732
+msgid "Form translated"
+msgstr "Formulaire traduit"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:732
+msgid "Form not translated in this language"
+msgstr "Formulaire non traduit dans cette langue"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:739
+msgid "Translate form (WPML)"
+msgstr "Traduire le formulaire (WPML)"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:747
+msgid "Contact forms are not set as translatable in WPML"
+msgstr ""
+"Les formulaires de contact ne sont pas définis comme traduisibles dans WPML"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:749
+msgid "WPML translation settings"
+msgstr "Réglages de traduction WPML"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:766
+#: includes/frontend-inspector/class-origin-resolver.php:2242
+msgid "Translate in String Translation"
+msgstr "Traduire dans String Translation"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:773
+msgid "Form text is not registered in WPML yet"
+msgstr "Le texte du formulaire n’est pas encore enregistré dans WPML"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:776
+msgid "Translate the form in WPML"
+msgstr "Traduire le formulaire dans WPML"
+
+#. translators: 1: form plugin, 2: form id
+#: includes/frontend-inspector/class-integration-resolvers.php:784
+#, php-format
+msgid "%1$s form #%2$d"
+msgstr ""
+
+#: includes/frontend-inspector/class-integration-resolvers.php:795
+msgid "Edit form"
+msgstr "Modifier le formulaire"
+
+#: includes/frontend-inspector/class-integration-resolvers.php:818
+msgid "WooCommerce email template setting"
+msgstr "Réglage du modèle d’e-mail WooCommerce"
+
+#. translators: %s: email title
+#: includes/frontend-inspector/class-integration-resolvers.php:831
+#, php-format
+msgid "WooCommerce email: %s"
+msgstr "E-mail WooCommerce : %s"
+
+#: includes/frontend-inspector/class-origin-resolver.php:192
+msgid "Language name"
+msgstr "Nom de la langue"
+
+#: includes/frontend-inspector/class-origin-resolver.php:194
+msgid "Language names are shown in their own language"
+msgstr "Les noms des langues sont affichés dans leur propre langue"
+
+#. translators: %s: language name, e.g. Hindi
+#: includes/frontend-inspector/class-origin-resolver.php:232
+#, php-format
+msgid "Shown in %s"
+msgstr "Affiché dans %s"
+
+#: includes/frontend-inspector/class-origin-resolver.php:250
+msgid "WordPress text"
+msgstr "Texte WordPress"
+
+#. translators: %s: plugin or theme name
+#. translators: %s: plugin or theme name, e.g. WooCommerce
+#: includes/frontend-inspector/class-origin-resolver.php:252
+#: includes/frontend-inspector/class-origin-resolver.php:933
+#, php-format
+msgid "%s text"
+msgstr "Texte %s"
+
+#: includes/frontend-inspector/class-origin-resolver.php:258
+#: includes/frontend-inspector/class-origin-resolver.php:915
+#: includes/frontend-inspector/class-origin-resolver.php:2895
+msgid "Translated by a language file"
+msgstr "Traduit par un fichier de langue"
+
+#: includes/frontend-inspector/class-origin-resolver.php:258
+#: includes/frontend-inspector/class-origin-resolver.php:1568
+#: includes/frontend-inspector/class-origin-resolver.php:1700
+#: includes/frontend-inspector/class-origin-resolver.php:1723
+#: includes/frontend-inspector/class-origin-resolver.php:2226
+#: includes/frontend-inspector/class-origin-resolver.php:2618
+msgid "Original language"
+msgstr "Langue d’origine"
+
+#: includes/frontend-inspector/class-origin-resolver.php:266
+#: includes/frontend-inspector/class-origin-resolver.php:962
+#: includes/frontend-inspector/class-origin-resolver.php:2841
+#: includes/frontend-inspector/class-origin-resolver.php:2870
+msgid "Theme and plugins localization"
+msgstr "Localisation du thème et des extensions"
+
+#: includes/frontend-inspector/class-origin-resolver.php:550
+msgid ""
+"Try clicking a smaller part of the text. If it is still not found, edit it "
+"where it was created."
+msgstr ""
+"Essayez de cliquer sur une partie plus petite du texte. Si elle reste "
+"introuvable, modifiez-la à l’endroit où elle a été créée."
+
+#: includes/frontend-inspector/class-origin-resolver.php:608
+#: includes/frontend-inspector/class-origin-resolver.php:2609
+msgid "Could not be identified"
+msgstr "Impossible à identifier"
+
+#: includes/frontend-inspector/class-origin-resolver.php:903
+msgid "Not added to String Translation"
+msgstr "Non ajouté à String Translation"
+
+#: includes/frontend-inspector/class-origin-resolver.php:918
+msgid "Not translated (same as the original)"
+msgstr "Non traduit (identique à l’original)"
+
+#: includes/frontend-inspector/class-origin-resolver.php:934
+msgid "Theme or plugin text"
+msgstr "Texte du thème ou de l’extension"
+
+#: includes/frontend-inspector/class-origin-resolver.php:949
+#: includes/frontend-inspector/class-origin-resolver.php:1111
+#: includes/frontend-inspector/class-origin-resolver.php:1382
+#: includes/frontend-inspector/class-origin-resolver.php:2882
+msgid "Open in String Translation"
+msgstr "Ouvrir dans String Translation"
+
+#: includes/frontend-inspector/class-origin-resolver.php:949
+#: includes/frontend-inspector/class-origin-resolver.php:2913
+msgid "Scan in Theme and plugins localization"
+msgstr "Analyser dans Localisation du thème et des extensions"
+
+#: includes/frontend-inspector/class-origin-resolver.php:955
+msgid ""
+"This text is not in String Translation yet. Add it here, or scan the theme "
+"or plugin in Theme and plugins localization."
+msgstr ""
+"Ce texte ne figure pas encore dans String Translation. Ajoutez-le ici ou "
+"analysez le thème ou l’extension dans la section de localisation des thèmes "
+"et extensions."
+
+#: includes/frontend-inspector/class-origin-resolver.php:985
+msgid "Add to String Translation"
+msgstr "Ajouter à String Translation"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1007
+msgid "WPML String Translation is not active."
+msgstr "WPML String Translation n’est pas actif."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1025
+msgid "WPML could not add this text."
+msgstr "WPML n’a pas pu ajouter ce texte."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1030
+msgid "Translate it in String Translation"
+msgstr "Traduisez-le dans String Translation"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1184
+msgid ""
+"The translation is not marked as complete, so WPML does not show it yet."
+msgstr ""
+"La traduction n’est pas marquée comme terminée, WPML ne l’affiche donc pas "
+"encore."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1187
+msgid ""
+"The translation was added to a different entry than the one this page uses. "
+"Translate the row marked ✓ below."
+msgstr ""
+
+#: includes/frontend-inspector/class-origin-resolver.php:1190
+msgid ""
+"The translation was added to a different entry than the one this page uses."
+msgstr ""
+"La traduction a été ajoutée à une entrée différente de celle utilisée par "
+"cette page."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1198
+msgid ""
+"A language file overrides this translation. Re-save the translation in "
+"String Translation."
+msgstr ""
+"Un fichier de langue remplace cette traduction. Enregistrez à nouveau la "
+"traduction dans String Translation."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1200
+msgid "Another plugin or language file changes this text after WPML."
+msgstr ""
+"Une autre extension ou un fichier de langue modifie ce texte après WPML."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1208
+msgid "The theme or plugin reads this setting before WPML can translate it."
+msgstr ""
+"Le thème ou l’extension lit ce réglage avant que WPML puisse le traduire."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1211
+msgid "A cache may be showing an old copy. Clear the cache for this page."
+msgstr ""
+"Le cache affiche peut-être une ancienne version. Videz le cache de cette "
+"page."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1214
+msgid "WPML did not apply the translation on this page."
+msgstr "WPML n’a pas appliqué la traduction sur cette page."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1219
+msgid "Translated, but not shown on the page"
+msgstr "Traduit, mais non affiché sur la page"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1223
+msgid "WPML Troubleshooting (clear cache)"
+msgstr "Dépannage de WPML (vider le cache)"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1285
+msgid ""
+"WPML has not updated its language file yet. Re-save the translation in "
+"String Translation."
+msgstr ""
+"WPML n’a pas encore mis à jour son fichier de langue. Enregistrez à nouveau "
+"la traduction dans String Translation."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1289
+msgid ""
+"WPML's language file is out of date. Re-save the translation in String "
+"Translation."
+msgstr ""
+"Le fichier de langue de WPML n’est pas à jour. Enregistrez à nouveau la "
+"traduction dans String Translation."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1319
+msgid "The setting for this text could not be found."
+msgstr "Le réglage correspondant à ce texte est introuvable."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1364
+msgid "In Admin Texts, but not found in String Translation"
+msgstr "Dans Admin Texts, mais introuvable dans String Translation"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1366
+msgid "Original language (not in Admin Texts)"
+msgstr "Langue d’origine (absent d’Admin Texts)"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1369
+msgid "Not in Admin Texts"
+msgstr "Absent d’Admin Texts"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1376
+msgid "WPML Admin Texts"
+msgstr "Textes d’administration WPML"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1385
+msgid "Open Admin Texts"
+msgstr "Ouvrir Admin Texts"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1390
+msgid "Theme setting"
+msgstr "Réglage du thème"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1391
+msgid "Site setting"
+msgstr "Réglage du site"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1395
+msgid "Theme setting (Admin Texts)"
+msgstr "Réglage du thème (Admin Texts)"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1396
+msgid "Site setting (Admin Texts)"
+msgstr "Réglage du site (Admin Texts)"
+
+#. translators: 1: option name, 2: key path
+#: includes/frontend-inspector/class-origin-resolver.php:1403
+#, php-format
+msgid ""
+"This setting is not in Admin Texts. Open Admin Texts, select \"%1$s\", then "
+"translate it in String Translation."
+msgstr ""
+"Ce réglage ne figure pas dans Admin Texts. Ouvrez Admin Texts, sélectionnez "
+"«%1$s», puis traduisez-le dans String Translation."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1405
+msgid "(whole value)"
+msgstr "(valeur entière)"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1441
+msgid "Edit email in WooCommerce settings"
+msgstr "Modifier l’e-mail dans les réglages de WooCommerce"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1445
+msgid ""
+"Translate this email text in String Translation, or switch the language on "
+"the WooCommerce email settings screen."
+msgstr ""
+"Traduisez le texte de cet e-mail dans String Translation ou changez la "
+"langue dans l’écran des réglages des e-mails de WooCommerce."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1469
+msgid "Shown translated, but missing in String Translation"
+msgstr "Affiché traduit, mais absent de String Translation"
+
+#. translators: 1: ST context, 2: locale
+#: includes/frontend-inspector/class-origin-resolver.php:1473
+msgid ""
+"The page uses an old WPML language file. Re-save the translation in String "
+"Translation so both match."
+msgstr ""
+"La page utilise un ancien fichier de langue WPML. Enregistrez à nouveau la "
+"traduction dans String Translation pour synchroniser les deux."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1528
+msgid "The category or tag for this text could not be found."
+msgstr "La catégorie ou l’étiquette correspondant à ce texte est introuvable."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1533
+msgid "The category or tag could not be loaded."
+msgstr "Impossible de charger la catégorie ou l’étiquette."
+
+#. translators: %s: language name, e.g. English
+#: includes/frontend-inspector/class-origin-resolver.php:1559
+#: includes/frontend-inspector/class-origin-resolver.php:1599
+#: includes/frontend-inspector/class-origin-resolver.php:1676
+#: includes/frontend-inspector/class-origin-resolver.php:2095
+#: includes/frontend-inspector/class-origin-resolver.php:2325
+#, php-format
+msgid "Language: %s"
+msgstr "Langue : %s"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1564
+msgid "This taxonomy is not set as translatable in WPML"
+msgstr "Cette taxonomie n’est pas définie comme traduisible dans WPML"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1572
+#: includes/frontend-inspector/class-origin-resolver.php:1577
+#: includes/frontend-inspector/class-origin-resolver.php:2907
+msgid "Not translated in this language"
+msgstr "Non traduit dans cette langue"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1588
+#: includes/frontend-inspector/class-origin-resolver.php:1717
+msgid "Same as the original (probably not translated)"
+msgstr "Identique à l’original (probablement non traduit)"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1617
+msgid "Category or tag"
+msgstr "Catégorie ou étiquette"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1652
+msgid "The post for this text could not be found."
+msgstr "L’article correspondant à ce texte est introuvable."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1657
+msgid "Post could not be loaded."
+msgstr "Impossible de charger l’article."
+
+#: includes/frontend-inspector/class-origin-resolver.php:1741
+msgid "Post title"
+msgstr "Titre de l’article"
+
+#: includes/frontend-inspector/class-origin-resolver.php:1743
+msgid "Post excerpt"
+msgstr "Extrait de l’article"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2051
+msgid "Added automatically (not written in the original post)"
+msgstr "Ajouté automatiquement (ne figure pas dans l’article d’origine)"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2071
+msgid "The menu item could not be found."
+msgstr "L’élément de menu est introuvable."
+
+#: includes/frontend-inspector/class-origin-resolver.php:2076
+msgid "Menu item could not be loaded."
+msgstr "Impossible de charger l’élément de menu."
+
+#: includes/frontend-inspector/class-origin-resolver.php:2102
+msgid "Original-language menu item shown on translated page"
+msgstr "Élément de menu dans la langue d’origine affiché sur la page traduite"
+
+#. translators: %s: menu name
+#: includes/frontend-inspector/class-origin-resolver.php:2115
+#, php-format
+msgid "Edit menu \"%s\""
+msgstr "Modifier le menu « %s »"
+
+#. translators: %s: menu name
+#: includes/frontend-inspector/class-origin-resolver.php:2116
+msgid "Open Menus screen"
+msgstr "Ouvrir l’écran des menus"
+
+#. translators: %s: language name, e.g. Hindi
+#: includes/frontend-inspector/class-origin-resolver.php:2124
+#, php-format
+msgid "Edit the %s menu"
+msgstr "Modifier le menu %s"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2126
+msgid "Edit the original menu"
+msgstr "Modifier le menu d’origine"
+
+#. translators: %s: language name, e.g. English
+#: includes/frontend-inspector/class-origin-resolver.php:2134
+#, php-format
+msgid "Edit the original (%s) menu"
+msgstr "Modifier le menu d’origine (%s)"
+
+#. translators: %s: language name, e.g. English
+#: includes/frontend-inspector/class-origin-resolver.php:2151
+#, php-format
+msgid "Label not translated: same as the %s menu item"
+msgstr "Libellé non traduit : identique à l’élément de menu %s"
+
+#. translators: %s: language name, e.g. English
+#: includes/frontend-inspector/class-origin-resolver.php:2152
+msgid "Translated menu item"
+msgstr "Élément de menu traduit"
+
+#. translators: %s: language name, e.g. Hindi
+#: includes/frontend-inspector/class-origin-resolver.php:2157
+#, php-format
+msgid "This menu has no %s translation: the original menu is shown"
+msgstr "Ce menu n’a pas de traduction en %s : le menu d’origine est affiché"
+
+#. translators: %s: language name, e.g. Hindi
+#: includes/frontend-inspector/class-origin-resolver.php:2160
+#, php-format
+msgid "Create the %s translation of this menu"
+msgstr "Créer la traduction de ce menu en %s"
+
+#. translators: %s: language name, e.g. Hindi
+#: includes/frontend-inspector/class-origin-resolver.php:2177
+#, php-format
+msgid "Edit the %s translation of this menu"
+msgstr "Modifier la traduction de ce menu en %s"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2184
+msgid "WPML Menus Sync"
+msgstr "Synchronisation des menus WPML"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2228
+msgid "Open Widgets screen"
+msgstr "Ouvrir l’écran des widgets"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2247
+msgid "Widget text is not in String Translation"
+msgstr "Le texte du widget ne figure pas dans String Translation"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2253
+msgid "Widget"
+msgstr "Widget"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2306
+msgid "Elementor widget text"
+msgstr "Texte du widget Elementor"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2333
+msgid "Original-language Elementor page shown on a translated page"
+msgstr "Page Elementor dans la langue d’origine affichée sur une page traduite"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2353
+msgid "Elementor widget"
+msgstr "Widget Elementor"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2366
+msgid "Edit in Elementor"
+msgstr "Modifier dans Elementor"
+
+#. translators: %s: language name, e.g. Hindi
+#: includes/frontend-inspector/class-origin-resolver.php:2644
+#: includes/frontend-inspector/class-origin-resolver.php:2670
+#, php-format
+msgid "Not translated in %s"
+msgstr "Non traduit en %s"
+
+#. translators: %s: language name, e.g. Hindi
+#: includes/frontend-inspector/class-origin-resolver.php:2663
+#, php-format
+msgid "Translated in %s"
+msgstr "Traduit en %s"
+
+#. translators: %s: language name, e.g. Hindi
+#: includes/frontend-inspector/class-origin-resolver.php:2676
+#, php-format
+msgid "Translation in %s is not complete"
+msgstr "La traduction en %s est incomplète"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2834
+msgid ""
+"Added by a script after the page loaded. It was not found in String "
+"Translation, so it may come from an outside service."
+msgstr ""
+"Ajouté par un script après le chargement de la page. Ce texte n’a pas été "
+"trouvé dans String Translation et peut donc provenir d’un service externe."
+
+#: includes/frontend-inspector/class-origin-resolver.php:2835
+msgid ""
+"Added by a script after the page loaded. It was not found in String "
+"Translation."
+msgstr ""
+"Ajouté par un script après le chargement de la page. Ce texte n’a pas été "
+"trouvé dans String Translation."
+
+#: includes/frontend-inspector/class-origin-resolver.php:2848
+msgid "Script text"
+msgstr "Texte du script"
+
+#. translators: %s: component
+#: includes/frontend-inspector/class-origin-resolver.php:2852
+#, php-format
+msgid "Script text — %s"
+msgstr "Texte du script — %s"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2897
+msgid "A translation exists, but the page shows the original"
+msgstr "Une traduction existe, mais la page affiche le texte d’origine"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2900
+msgid ""
+"The script did not load its translations on this page. A cache or "
+"optimization plugin may be serving an old copy."
+msgstr ""
+"Le script n’a pas chargé ses traductions sur cette page. Un cache ou un "
+"plugin d’optimisation utilise peut-être une ancienne version."
+
+#: includes/frontend-inspector/class-origin-resolver.php:2903
+msgid "The language file has no translation for this text"
+msgstr "Le fichier de langue ne contient aucune traduction pour ce texte"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2908
+msgid "Not in String Translation"
+msgstr "Absent de String Translation"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2917
+msgid "Written directly in a script, so WPML cannot translate it"
+msgstr "Écrit directement dans un script : WPML ne peut donc pas le traduire"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2919
+msgid ""
+"Ask your developer to make this text translatable, then translate it in "
+"String Translation."
+msgstr ""
+"Demandez à votre développeur de rendre ce texte traduisible, puis traduisez-"
+"le dans String Translation."
+
+#. translators: 1: JSON file, 2: ST context
+#: includes/frontend-inspector/class-origin-resolver.php:2927
+#, php-format
+msgid "Translated by %1$s. To manage it in WPML, add it to String Translation."
+msgstr ""
+"Traduit par %1$s. Pour le gérer dans WPML, ajoutez-le à String Translation."
+
+#: includes/frontend-inspector/class-origin-resolver.php:2928
+msgid "a language file"
+msgstr "un fichier de langue"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2931
+msgid "Add it to String Translation to translate it."
+msgstr "Ajoutez-le à String Translation pour le traduire."
+
+#: includes/frontend-inspector/class-origin-resolver.php:2955
+msgid "the theme"
+msgstr "le thème"
+
+#. translators: %s: component
+#: includes/frontend-inspector/class-origin-resolver.php:2959
+#, php-format
+msgid "Built into %s"
+msgstr "Intégré à %s"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2969
+msgid "Not translatable with WPML as written"
+msgstr "Non traduisible avec WPML tel qu’il est rédigé"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2971
+msgid "Scan theme in Theme and plugins localization"
+msgstr "Analyser le thème dans « Localisation des thèmes et extensions »"
+
+#: includes/frontend-inspector/class-origin-resolver.php:2972
+msgid ""
+"This text is written directly in the theme or plugin files. Ask your "
+"developer to make it translatable, then scan it in Theme and plugins "
+"localization."
+msgstr ""
+"Ce texte est écrit directement dans les fichiers du thème ou de l’extension. "
+"Demandez à votre développeur de le rendre traduisible, puis analysez-le dans "
+"« Localisation des thèmes et extensions »."
+
+#: includes/providers/class-ai-gateway.php:247
+#: includes/providers/class-ai-gateway.php:274
+#: includes/queue/class-dispatcher.php:940
+msgid "The AI provider skipped part of the translation response."
+msgstr "Le fournisseur d’IA a ignoré une partie de la réponse de traduction."
+
+#: includes/providers/class-ai-gateway.php:639
+#: includes/routes/bulk-translation-route.php:424
+msgid "AI client is not available."
+msgstr "Le client d’IA n’est pas disponible."
+
+#: includes/providers/class-ai-gateway.php:660
+msgid "The AI provider returned an empty response."
+msgstr "Le fournisseur d’IA a renvoyé une réponse vide."
+
+#: includes/providers/class-ai-gateway.php:694
+msgid "The AI provider returned a response that could not be parsed as JSON."
+msgstr ""
+"Le fournisseur d’IA a renvoyé une réponse qui n’a pas pu être analysée en "
+"tant que JSON."
+
+#: includes/providers/class-ai-gateway.php:708
+msgid "The AI SDK is not available."
+msgstr "Le SDK d’IA n’est pas disponible."
+
+#: includes/providers/class-ai-gateway.php:712
+msgid "No AI provider is configured. Add an API key in the plugin settings."
+msgstr ""
+"Aucun fournisseur d’IA n’est configuré. Ajoutez une clé API dans les "
+"paramètres de l’extension."
+
+#: includes/providers/class-ai-gateway.php:716
+msgid "No AI model is selected for this provider."
+msgstr "Aucun modèle d’IA n’est sélectionné pour ce fournisseur."
+
+#. translators: %s: provider slug, e.g. openai
+#: includes/providers/class-ai-gateway.php:726
+#, php-format
+msgid "The API key for %s is missing or invalid."
+msgstr "La clé API pour %s est manquante ou invalide."
+
+#. translators: 1: source language name, 2: target language name
+#: includes/providers/class-prompt-builder.php:37
+#, php-format
+msgid ""
+"Translate each value from %1$s into %2$s. Produce a natural, meaning-based "
+"translation rather than a literal one."
+msgstr ""
+"Traduisez chaque valeur de %1$s vers %2$s. Produisez une traduction "
+"naturelle qui respecte le sens, plutôt qu’une traduction littérale."
+
+#: includes/providers/class-prompt-builder.php:41
+msgid ""
+"Leave anything inside square brackets exactly as it is. Those are shortcodes "
+"or dynamic placeholders."
+msgstr ""
+"Laissez tout ce qui se trouve entre crochets exactement tel quel. Il s’agit "
+"de codes courts ou d’espaces réservés dynamiques."
+
+#: includes/providers/class-prompt-builder.php:42
+msgid ""
+"Keep every HTML tag and attribute intact, including class, id and data-* "
+"attributes. Do not add, remove or reorder markup."
+msgstr ""
+"Conservez intactes toutes les balises HTML et leurs attributs, y compris les "
+"attributs class, id et data-*. N’ajoutez, ne supprimez et ne réorganisez "
+"aucun élément de balisage."
+
+#: includes/providers/class-prompt-builder.php:43
+msgid ""
+"Preserve leading and trailing whitespace, and keep line breaks where they "
+"appear in the source."
+msgstr ""
+"Conservez les espaces de début et de fin, ainsi que les sauts de ligne "
+"présents dans le texte source."
+
+#: includes/providers/class-prompt-builder.php:44
+msgid ""
+"Leave URLs, email addresses, file paths and code identifiers untranslated."
+msgstr ""
+"Ne traduisez pas les URL, les adresses e-mail, les chemins de fichiers ni "
+"les identifiants de code."
+
+#: includes/providers/class-prompt-builder.php:45
+msgid ""
+"Return a JSON object whose keys are the same numeric keys as the input and "
+"whose values are the translated strings."
+msgstr ""
+"Renvoyez un objet JSON dont les clés sont les mêmes clés numériques que "
+"celles de l’entrée et dont les valeurs sont les chaînes traduites."
+
+#: includes/providers/class-prompt-builder.php:46
+msgid ""
+"Return raw JSON only. No markdown fences, no commentary, no surrounding "
+"prose."
+msgstr ""
+"Renvoyez uniquement du JSON brut. Pas de blocs de code Markdown, pas de "
+"commentaires ni de texte supplémentaire."
+
+#: includes/providers/class-prompt-builder.php:47
+msgid ""
+"Do not escape double quotes with extra backslashes. The output must parse as "
+"valid JSON on the first attempt."
+msgstr ""
+"N’échappez pas les guillemets doubles en ajoutant des barres obliques "
+"inverses. La sortie doit être du JSON valide dès la première tentative."
+
+#. translators: %s: short description of the website
+#: includes/providers/class-prompt-builder.php:55
+#, php-format
+msgid "Use this site context to guide tone and terminology: %s"
+msgstr ""
+"Utilisez le contexte de ce site pour orienter le ton et la terminologie : %s"
+
+#: includes/providers/class-prompt-builder.php:68
+msgid "You are a translation engine. Follow every rule below exactly."
+msgstr ""
+"Vous êtes un moteur de traduction. Suivez exactement toutes les règles ci-"
+"dessous."
+
+#: includes/providers/class-prompt-builder.php:70
+msgid "Input JSON:"
+msgstr "JSON d’entrée :"
+
+#: includes/providers/class-prompt-builder.php:101
+msgid "Topic"
+msgstr "Sujet"
+
+#: includes/providers/class-prompt-builder.php:102
+msgid "Purpose"
+msgstr "Objectif"
+
+#: includes/providers/class-prompt-builder.php:103
+msgid "Audience"
+msgstr "Public"
+
+#: includes/queue/class-dispatcher.php:183
+msgid "Every minute (AutoMLP queue)"
+msgstr "Toutes les minutes (file d’attente AutoMLP)"
+
+#: includes/queue/class-dispatcher.php:825
+msgid "This job has no source strings."
+msgstr "Ce travail ne contient aucune chaîne source."
+
+#: includes/queue/class-dispatcher.php:842
+msgid "Every field in this job was empty."
+msgstr "Tous les champs de ce travail étaient vides."
+
+#: includes/queue/class-dispatcher.php:848
+msgid "No translation units could be prepared for this job."
+msgstr "Aucune unité de traduction n’a pu être préparée pour ce travail."
+
+#: includes/queue/class-dispatcher.php:897
+msgid "The next translation batch could not be prepared."
+msgstr "Le lot de traduction suivant n’a pas pu être préparé."
+
+#: includes/queue/class-dispatcher.php:954
+msgid "The AI provider returned no usable translations."
+msgstr "Le fournisseur d’IA n’a renvoyé aucune traduction exploitable."
+
+#: includes/queue/class-dispatcher.php:958
+msgid "The AI provider did not return every required translation chunk."
+msgstr ""
+"Le fournisseur d’IA n’a pas renvoyé tous les blocs de traduction requis."
+
+#: includes/queue/class-dispatcher.php:1000
+msgid "No writer is registered to save this translation."
+msgstr "Aucun rédacteur n’est enregistré pour enregistrer cette traduction."
+
+#. translators: %s: time such as "about 3 hours"
+#: includes/queue/class-queue-table.php:182
+#, php-format
+msgid "The job will retry automatically in %s."
+msgstr "Le travail sera automatiquement réessayé dans %s."
+
+#: includes/queue/class-queue-table.php:183
+msgid "The job will retry automatically."
+msgstr "Le travail sera automatiquement réessayé."
+
+#. translators: %s: time such as "about 3 hours"
+#: includes/queue/class-queue-table.php:186
+#, php-format
+msgid "Try again in %s."
+msgstr "Réessayez dans %s."
+
+#: includes/queue/class-queue-table.php:187
+msgid "Please try again later."
+msgstr "Veuillez réessayer plus tard."
+
+#. translators: %s: AI provider name
+#: includes/queue/class-queue-table.php:191
+#, php-format
+msgid "Your %s account has no credit left. Check your plan and billing."
+msgstr ""
+"Votre compte %s n’a plus de crédit. Vérifiez votre forfait et votre "
+"facturation."
+
+#. translators: %s: AI provider name
+#: includes/queue/class-queue-table.php:196
+#, php-format
+msgid "Daily limit reached for %s."
+msgstr "Limite quotidienne atteinte pour %s."
+
+#. translators: %s: AI provider name
+#: includes/queue/class-queue-table.php:199
+#, php-format
+msgid "Too many requests to %s right now."
+msgstr "Trop de requêtes vers %s pour le moment."
+
+#: includes/queue/class-queue-table.php:203
+msgid "The AI service API key is not valid. Update it in the plugin settings."
+msgstr ""
+"La clé API du service d’IA n’est pas valide. Mettez-la à jour dans les "
+"paramètres de l’extension."
+
+#. translators: %s: AI provider name
+#: includes/queue/class-queue-table.php:206
+#, php-format
+msgid "The %s API key is not valid. Update it in the plugin settings."
+msgstr ""
+"La clé API %s n’est pas valide. Mettez-la à jour dans les réglages de "
+"l’extension."
+
+#. translators: %s: AI provider name
+#: includes/queue/class-queue-table.php:210
+#, php-format
+msgid ""
+"The selected %s model is not available. Choose another model in the plugin "
+"settings."
+msgstr ""
+"Le modèle %s sélectionné n’est pas disponible. Choisissez un autre modèle "
+"dans les réglages de l’extension."
+
+#. translators: %s: AI provider name
+#: includes/queue/class-queue-table.php:214
+#, php-format
+msgid "Could not reach %s."
+msgstr "Impossible de joindre %s."
+
+#. translators: %s: AI provider name
+#: includes/queue/class-queue-table.php:221
+#, php-format
+msgid "%s could not translate this job."
+msgstr "%s n’a pas pu traduire cette tâche."
+
+#: includes/queue/class-queue-table.php:242
+msgid "the AI service"
+msgstr "le service d’IA"
+
+#. translators: %d: number of hours
+#: includes/queue/class-queue-table.php:272
+#, php-format
+msgid "about %d hour"
+msgid_plural "about %d hours"
+msgstr[0] "environ %d heure"
+msgstr[1] "environ %d heures"
+
+#. translators: %d: number of minutes
+#: includes/queue/class-queue-table.php:277
+#, php-format
+msgid "about %d minute"
+msgid_plural "about %d minutes"
+msgstr[0] "environ %d minute"
+msgstr[1] "environ %d minutes"
+
+#: includes/queue/class-queue-table.php:279
+msgid "about a minute"
+msgstr "environ une minute"
+
+#: includes/routes/bulk-translation-route.php:135
+msgid "Missing provider or API key."
+msgstr "Fournisseur ou clé API manquant."
+
+#: includes/routes/bulk-translation-route.php:150
+msgid "Connection successful!"
+msgstr "Connexion réussie !"
+
+#: includes/routes/bulk-translation-route.php:173
+msgid "Invalid nonce."
+msgstr "Nonce invalide."
+
+#: includes/routes/bulk-translation-route.php:177
+#: includes/routes/bulk-translation-route.php:181
+msgid "You are not authorized to perform this action."
+msgstr "Vous n’êtes pas autorisé à effectuer cette action."
+
+#: includes/routes/bulk-translation-route.php:195
+#: includes/routes/bulk-translation-route.php:499
+msgid "Unauthorized."
+msgstr "Non autorisé."
+
+#: includes/routes/bulk-translation-route.php:208
+msgid "Invalid OpenAI API key."
+msgstr "Clé API OpenAI invalide."
+
+#: includes/routes/bulk-translation-route.php:215
+msgid "Invalid OpenAI API key format. Please check your credentials."
+msgstr "Format de clé API OpenAI invalide. Veuillez vérifier vos identifiants."
+
+#: includes/routes/bulk-translation-route.php:222
+msgid "Invalid OpenAI API key format."
+msgstr "Format de clé API OpenAI invalide."
+
+#: includes/routes/bulk-translation-route.php:232
+msgid "Invalid Google API key."
+msgstr "Clé API Google invalide."
+
+#: includes/routes/bulk-translation-route.php:239
+msgid "Invalid Google API key format. Please check your credentials."
+msgstr "Format de clé API Google invalide. Veuillez vérifier vos identifiants."
+
+#: includes/routes/bulk-translation-route.php:271
+#: includes/routes/bulk-translation-route.php:316
+msgid "Please enter at least one API key (OpenAI or Google)."
+msgstr "Veuillez saisir au moins une clé API (OpenAI ou Google)."
+
+#: includes/routes/bulk-translation-route.php:376
+msgid "One of the API keys is invalid."
+msgstr "L’une des clés API est invalide."
+
+#: includes/routes/bulk-translation-route.php:407
+msgid "Provider and API key are required."
+msgstr "Le fournisseur et la clé API sont requis."
+
+#: includes/routes/bulk-translation-route.php:412
+msgid "API key appears to be invalid or too short."
+msgstr "La clé API semble invalide ou trop courte."
+
+#: includes/routes/bulk-translation-route.php:416
+msgid "Invalid API key format. Please check your credentials."
+msgstr "Format de clé API invalide. Veuillez vérifier vos identifiants."
+
+#: includes/routes/bulk-translation-route.php:420
+msgid "OpenAI API keys must start with sk- and be in the correct format."
+msgstr ""
+"Les clés API OpenAI doivent commencer par sk- et respecter le format requis."
+
+#: includes/routes/bulk-translation-route.php:429
+msgid "Invalid AI provider."
+msgstr "Fournisseur d’IA invalide."
+
+#: includes/routes/bulk-translation-route.php:439
+msgid "Gemini rate limit reached. Please wait a minute and try again."
+msgstr ""
+"Limite de requêtes Gemini atteinte. Veuillez patienter une minute, puis "
+"réessayer."
+
+#: includes/routes/bulk-translation-route.php:440
+msgid "Please wait a few seconds before testing again."
+msgstr "Veuillez patienter quelques secondes avant de réessayer."
+
+#: includes/routes/bulk-translation-route.php:458
+msgid "API key is not configured for this provider."
+msgstr "La clé API n’est pas configurée pour ce fournisseur."
+
+#: includes/routes/bulk-translation-route.php:469
+msgid "Gemini free tier rate limit exceeded. Please wait and try again."
+msgstr ""
+"Limite de requêtes de l’offre gratuite Gemini dépassée. Veuillez patienter, "
+"puis réessayer."
+
+#: includes/routes/bulk-translation-route.php:470
+msgid "Rate limit exceeded. Please try again later."
+msgstr "Limite de requêtes dépassée. Veuillez réessayer plus tard."
+
+#: includes/routes/bulk-translation-route.php:473
+msgid "Invalid API key. Please check your credentials."
+msgstr "Clé API invalide. Veuillez vérifier vos identifiants."
+
+#: includes/routes/class-queue-route.php:210
+msgid "Select at least one item to translate."
+msgstr "Sélectionnez au moins un élément à traduire."
+
+#: includes/routes/class-queue-route.php:220
+msgid "Select at least one target language."
+msgstr "Sélectionnez au moins une langue cible."
+
+#: includes/routes/class-queue-route.php:255
+msgid ""
+"Nothing was queued. You do not have permission to translate the selected "
+"items."
+msgstr ""
+"Aucun élément n’a été mis en file d’attente. Vous n’êtes pas autorisé à "
+"traduire les éléments sélectionnés."
+
+#: includes/routes/class-queue-route.php:257
+msgid ""
+"Nothing was queued. Some items are already translated or have an active WPML "
+"Advanced Translation Editor job; you do not have permission to translate the "
+"others."
+msgstr ""
+"Aucun élément n’a été mis en file d’attente. Certains éléments sont déjà "
+"traduits ou font l’objet d’une tâche active dans l’éditeur de traduction "
+"avancé WPML ; vous n’êtes pas autorisé à traduire les autres."
+
+#: includes/routes/class-queue-route.php:259
+msgid ""
+"Skipped: WPML Advanced Translation Editor already has an active job for the "
+"selected page(s) and language(s). Finish or cancel those ATE jobs first."
+msgstr ""
+"Ignoré : l’éditeur de traduction avancé WPML a déjà une tâche active pour "
+"les pages et les langues sélectionnées. Terminez ou annulez d’abord ces "
+"tâches ATE."
+
+#: includes/routes/class-queue-route.php:261
+msgid ""
+"Nothing was queued. Some items are already translated; others already have "
+"an active WPML Advanced Translation Editor job."
+msgstr ""
+"Aucun élément n’a été mis en file d’attente. Certains éléments sont déjà "
+"traduits ; d’autres font déjà l’objet d’une tâche active dans l’éditeur de "
+"traduction avancé WPML."
+
+#: includes/routes/class-queue-route.php:263
+msgid ""
+"Nothing was queued. The selected items are already translated or use an "
+"editor that is not supported. Re-translation is available in the Pro version."
+msgstr ""
+"Aucun élément n’a été mis en file d’attente. Les éléments sélectionnés sont "
+"déjà traduits ou utilisent un éditeur qui n’est pas pris en charge. La "
+"retraduction est disponible dans la version Pro."
+
+#: includes/routes/class-queue-route.php:265
+msgid ""
+"Everything selected is already translated into the chosen language. Re-"
+"translation is available in the Pro version."
+msgstr ""
+"Tous les éléments sélectionnés sont déjà traduits dans la langue choisie. La "
+"retraduction est disponible dans la version Pro."
+
+#: includes/routes/class-queue-route.php:298
+msgid ""
+"Translation jobs were created in WPML but none reached the queue. Check that "
+"the AutoMLP translator is registered under WPML, Translation Management, "
+"Translators."
+msgstr ""
+"Des tâches de traduction ont été créées dans WPML, mais aucune n’a été "
+"ajoutée à la file d’attente. Vérifiez que le traducteur AutoMLP est "
+"enregistré dans WPML, sous Gestion de la traduction > Traducteurs."
+
+#: includes/routes/class-queue-route.php:339
+msgid "Select at least one string to translate."
+msgstr "Sélectionnez au moins une chaîne à traduire."
+
+#: includes/routes/class-queue-route.php:349
+msgid "That target language is not available on your plan."
+msgstr "Cette langue cible n’est pas disponible avec votre forfait."
+
+#: includes/routes/class-queue-route.php:373
+msgid "The string batch was created in WPML but did not reach the queue."
+msgstr ""
+"Le lot de chaînes a été créé dans WPML, mais n’a pas été ajouté à la file "
+"d’attente."
+
+#: includes/routes/class-queue-route.php:487
+msgid "That job no longer exists."
+msgstr "Cette tâche n’existe plus."
+
+#: includes/routes/class-queue-route.php:495
+#: includes/routes/class-queue-route.php:687
+msgid "You are not allowed to translate that content."
+msgstr "Vous n’êtes pas autorisé à traduire ce contenu."
+
+#: includes/routes/class-queue-route.php:512
+msgid "Only failed jobs can be retried."
+msgstr "Seules les tâches ayant échoué peuvent être relancées."
+
+#: includes/routes/class-queue-route.php:542
+msgid ""
+"This job can no longer be retried because its source content is no longer "
+"stored. Start the translation again from the content list."
+msgstr ""
+"Cette tâche ne peut plus être relancée, car son contenu source n’est plus "
+"enregistré. Relancez la traduction depuis la liste de contenus."
+
+#: includes/routes/class-queue-route.php:564
+msgid "That job could not be added back to the queue."
+msgstr "Cette tâche n’a pas pu être ajoutée à nouveau à la file d’attente."
+
+#: includes/routes/class-queue-route.php:707
+msgid "WPML did not create a new job for this item."
+msgstr "WPML n’a pas créé de nouvelle tâche pour cet élément."
+
+#. translators: %d: new queue job id
+#: includes/routes/class-queue-route.php:719
+#, php-format
+msgid "Retried as job #%d with a fresh WPML job."
+msgstr ""
+
+#. translators: %s: plugin name
+#: includes/wizard/html-wizard-notice.php:28
+#, php-format
+msgid "Welcome to %s"
+msgstr "Bienvenue sur %s"
+
+#: includes/wizard/html-wizard-notice.php:34
+msgid "You're almost ready to translate your content with AI."
+msgstr "Vous êtes presque prêt à traduire votre contenu avec l’IA."
+
+#: includes/wizard/html-wizard-notice.php:38
+msgid "Run the Setup Wizard"
+msgstr "Lancer l’assistant de configuration"
+
+#: includes/wizard/html-wizard-notice.php:41
+msgid "Skip setup"
+msgstr "Ignorer la configuration"
+
+#: includes/wizard/wizard.php:49
+msgid "AutoMLP Setup Wizard"
+msgstr "Assistant de configuration d’AutoMLP"
+
+#: includes/wizard/wizard.php:50
+msgid "AutoMLP Setup"
+msgstr "Configuration d’AutoMLP"
+
+#: includes/wizard/wizard.php:161
+msgid "Sorry, you are not allowed to manage options for this site."
+msgstr "Désolé, vous n’êtes pas autorisé à gérer les options de ce site."
+
+#: includes/wpml/class-background-flow.php:112
+msgid ""
+"WP-Cron is disabled on this site, so queued translations will not run "
+"automatically. Add a real cron job that calls wp-cron.php, or use the "
+"Process now button."
+msgstr ""
+"WP-Cron est désactivé sur ce site. Les traductions en file d’attente ne "
+"seront donc pas exécutées automatiquement. Ajoutez une véritable tâche cron "
+"qui appelle wp-cron.php ou utilisez le bouton Traiter maintenant."
+
+#: includes/wpml/class-background-flow.php:114
+msgid ""
+"The translation queue is not scheduled. Deactivate and reactivate AutoMLP to "
+"restore it."
+msgstr ""
+"La file d’attente des traductions n’est pas planifiée. Désactivez puis "
+"réactivez AutoMLP pour la rétablir."
+
+#: includes/wpml/class-background-flow.php:116
+msgid ""
+"The translation queue has not run recently. Queued translations may be "
+"delayed."
+msgstr ""
+"La file d’attente des traductions n’a pas été traitée récemment. Les "
+"traductions en attente peuvent être retardées."
+
+#. translators: %d: number of waiting jobs
+#: includes/wpml/class-background-flow.php:122
+#, php-format
+msgid "%d job is waiting."
+msgid_plural "%d jobs are waiting."
+msgstr[0] "%d tâche est en attente."
+msgstr[1] "%d tâches sont en attente."
+
+#: includes/wpml/class-background-flow.php:129
+msgid "AutoMLP:"
+msgstr "AutoMLP :"
+
+#: includes/wpml/class-bot-translator.php:98
+msgid ""
+"WPML and Polylang cannot work together. Please deactivate Polylang to use "
+"WPML with AutoMLP."
+msgstr ""
+"WPML et Polylang ne peuvent pas fonctionner ensemble. Veuillez désactiver "
+"Polylang pour utiliser WPML avec AutoMLP."
+
+#: includes/wpml/class-bot-translator.php:147
+#: includes/wpml/class-bot-translator.php:148
+msgid "AutoMLP AI Translator"
+msgstr "Traducteur IA AutoMLP"
+
+#: includes/wpml/class-bot-translator.php:150
+msgid ""
+"Automated translator used by AutoMLP. Do not delete while translations are "
+"queued."
+msgstr ""
+"Traducteur automatique utilisé par AutoMLP. Ne le supprimez pas tant que des "
+"traductions sont en file d’attente."
+
+#: includes/wpml/class-job-listener.php:189
+msgid "This language is not available on your plan."
+msgstr "Cette langue n’est pas disponible avec votre forfait."
+
+#: includes/wpml/class-job-listener.php:199
+msgid "WPML did not return any translatable content for this item."
+msgstr "WPML n’a renvoyé aucun contenu traduisible pour cet élément."
+
+#: includes/wpml/class-job-listener.php:561
+msgid "Deleted from the queue by an administrator."
+msgstr "Supprimé de la file d’attente par un administrateur."
+
+#: includes/wpml/class-job-sender.php:82
+msgid "A post and a target language are required."
+msgstr "Un article et une langue cible sont requis."
+
+#: includes/wpml/class-job-sender.php:86 includes/wpml/class-job-sender.php:276
+#: assets/bulk-translate/index.js:1
+msgid "You are not allowed to translate this post."
+msgstr "Vous n’êtes pas autorisé à traduire cet article."
+
+#: includes/wpml/class-job-sender.php:92
+msgid "That post no longer exists."
+msgstr "Cet article n’existe plus."
+
+#: includes/wpml/class-job-sender.php:107
+#: includes/wpml/class-job-sender.php:175
+#: includes/wpml/class-job-sender.php:357
+msgid "The translator account could not be created."
+msgstr "Le compte du traducteur n’a pas pu être créé."
+
+#: includes/wpml/class-job-sender.php:115
+#: includes/wpml/class-job-sender.php:282
+msgid "Source and target languages are the same."
+msgstr "Les langues source et cible sont identiques."
+
+#: includes/wpml/class-job-sender.php:121
+msgid ""
+"WPML Advanced Translation Editor already has an active job for this page and "
+"language. Finish or cancel that job first."
+msgstr ""
+"L’éditeur de traduction avancé WPML a déjà une tâche active pour cette page "
+"et cette langue. Terminez ou annulez d’abord cette tâche."
+
+#: includes/wpml/class-job-sender.php:126
+#: includes/wpml/class-job-sender.php:169
+#: includes/wpml/class-job-sender.php:361
+msgid "WPML Translation Management is not available."
+msgstr "WPML Translation Management n’est pas disponible."
+
+#: includes/wpml/class-job-sender.php:316
+msgid "WPML did not create a translation job for this item."
+msgstr "WPML n’a pas créé de tâche de traduction pour cet élément."
+
+#: includes/wpml/class-job-sender.php:347
+msgid "Strings and a target language are required."
+msgstr "Des chaînes et une langue cible sont requises."
+
+#: includes/wpml/class-job-sender.php:351
+msgid "You are not allowed to translate strings."
+msgstr "Vous n’êtes pas autorisé à traduire des chaînes."
+
+#. translators: 1: language code, 2: date and time
+#: includes/wpml/class-job-sender.php:461
+#, php-format
+msgid "AutoMLP AI (%1$s) %2$s"
+msgstr "AutoMLP AI (%1$s) %2$s"
+
+#: includes/wpml/class-legacy-bridge.php:76
+msgid "This translation method has been replaced. Please reload the page."
+msgstr ""
+"Cette méthode de traduction a été remplacée. Veuillez recharger la page."
+
+#: includes/wpml/class-writer.php:135
+msgid "This queue row is not linked to a WPML job."
+msgstr "Cette ligne de la file d’attente n’est liée à aucune tâche WPML."
+
+#: includes/wpml/class-writer.php:162
+msgid "None of the translated fields matched a WPML field id."
+msgstr ""
+"Aucun des champs traduits ne correspondait à un identifiant de champ WPML."
+
+#: includes/wpml/class-writer.php:179
+msgid "Submitted data is not valid."
+msgstr "Les données envoyées ne sont pas valides."
+
+#: includes/wpml/class-writer.php:208
+msgid "WPML did not accept the submitted translation."
+msgstr "WPML n’a pas accepté la traduction envoyée."
+
+#. translators: 1: WPML job id, 2: reason reported by WPML
+#: includes/wpml/class-writer.php:227
+#, php-format
+msgid "WPML rejected the translation for job #%1$d: %2$s"
+msgstr ""
+
+#: includes/wpml/class-writer.php:264
+msgid "WPML accepted the translation but no translated post was found."
+msgstr ""
+"WPML a accepté la traduction, mais aucun article traduit n’a été trouvé."
+
+#: includes/wpml/class-writer.php:305
+msgid "the job no longer exists."
+msgstr "la tâche n’existe plus."
+
+#: includes/wpml/class-writer.php:310
+msgid "the job was left open, so WPML did not apply the translation."
+msgstr "la tâche est restée ouverte, WPML n’a donc pas appliqué la traduction."
+
+#. translators: %s: WPML field name
+#: includes/wpml/class-writer.php:342
+#, php-format
+msgid "The translation for field \"%s\" is missing or empty."
+msgstr "La traduction du champ « %s » est manquante ou vide."
+
+#. translators: %s: plugin name.
+#: index.php:220
+#, php-format
+msgid "Do you like the %s plugin?"
+msgstr "Le plugin %s vous plaît-il ?"
+
+#: index.php:223
+msgid "Yes, I like it"
+msgstr "Oui, il me plaît"
+
+#: index.php:224
+msgid "Not good, dismiss"
+msgstr "Non, merci"
+
+#: index.php:225
+msgid "Ask me later"
+msgstr "Me le rappeler plus tard"
+
+#: index.php:226
+msgid ""
+"That is great to hear! A quick review on WordPress.org would really help us."
+msgstr ""
+"Ravi de l’apprendre ! Un rapide avis sur WordPress.org nous aiderait "
+"beaucoup."
+
+#: index.php:227
+msgid "Submit review"
+msgstr "Envoyer un avis"
+
+#: index.php:228
+msgid "I do not like it, dismiss"
+msgstr "Non, il ne me plaît pas"
+
+#: index.php:229
+msgid "Do you like this plugin?"
+msgstr "Ce plugin vous plaît-il ?"
+
+#. translators: %s: plugin name.
+#: index.php:232
+#, php-format
+msgid "Enjoying %s?"
+msgstr "Vous appréciez %s ?"
+
+#: index.php:235
+msgid "A short review helps other site owners find it."
+msgstr "Un court avis aide les autres propriétaires de sites à le découvrir."
+
+#: index.php:255
+msgid "The plugin isn't working"
+msgstr "Le plugin ne fonctionne pas"
+
+#: index.php:256
+msgid "Which problem did you run into? We read every reply."
+msgstr "Quel problème avez-vous rencontré ? Nous lisons toutes les réponses."
+
+#: index.php:259
+msgid "It didn't do what I expected"
+msgstr "Il n’a pas fait ce que j’attendais"
+
+#: index.php:260
+msgid "What were you hoping it would do?"
+msgstr "Qu’espériez-vous qu’il fasse ?"
+
+#: index.php:263
+msgid "I found a better plugin"
+msgstr "J’ai trouvé un meilleur plugin"
+
+#: index.php:264
+msgid "Mind sharing which one?"
+msgstr "Pourriez-vous nous dire lequel ?"
+
+#: index.php:267
+msgid "It's a temporary deactivation"
+msgstr "Il s’agit d’une désactivation temporaire"
+
+#: index.php:271
+msgid "Another reason"
+msgstr "Autre raison"
+
+#: index.php:272
+msgid "Please tell us more"
+msgstr "Veuillez nous en dire plus"
+
+#: index.php:276
+msgid "Before you go…"
+msgstr "Avant de partir…"
+
+#. translators: %s: plugin name (bold).
+#: index.php:278
+#, php-format
+msgid "What made you deactivate %s? Your answer helps us fix it."
+msgstr ""
+"Pourquoi avez-vous désactivé %s ? Votre réponse nous aidera à l’améliorer."
+
+#: index.php:279
+msgid "Submit & Deactivate"
+msgstr "Envoyer et désactiver"
+
+#: index.php:280
+msgid "Skip & Deactivate"
+msgstr "Ignorer et désactiver"
+
+#: index.php:281
+msgid "Deactivating…"
+msgstr "Désactivation en cours…"
+
+#: index.php:282
+msgid "Please choose a reason."
+msgstr "Veuillez choisir une raison."
+
+#. translators: %s: company name.
+#: index.php:285
+#, php-format
+msgid "A plugin by %s"
+msgstr "Un plugin de %s"
+
+#: index.php:286
+msgid ""
+"Submitting shares your reason plus your site URL, admin email and basic "
+"environment details (PHP, WordPress, active plugins). Skip & Deactivate "
+"sends nothing."
+msgstr ""
+"En envoyant votre réponse, vous partagez votre raison ainsi que l’URL de "
+"votre site, l’adresse e-mail de l’administrateur et des informations de base "
+"sur l’environnement (PHP, WordPress, plugins actifs). L’option « Ignorer et "
+"désactiver » n’envoie rien."
+
+#: index.php:304
+msgid "Help Improve Plugins"
+msgstr "Aidez-nous à améliorer les plugins"
+
+#: index.php:305
+msgid "Yes, it's OK"
+msgstr "Oui, d’accord"
+
+#: index.php:306
+msgid "No, Thanks"
+msgstr "Non, merci"
+
+#: index.php:307
+msgid "More info"
+msgstr "Plus d’infos"
+
+#: index.php:502
+msgid "Setup"
+msgstr "Configuration"
+
+#: index.php:548
+msgid "AUTOMLP AI Translate"
+msgstr "Traduction par AUTOMLP AI"
+
+#: index.php:549
+msgid "AutoMLP AI"
+msgstr "AutoMLP AI"
+
+#. translators: 1: WPML setup link
+#: index.php:746
+#, php-format
+msgid ""
+"WPML is active but setup is not complete. Please %1$s to finish configuring "
+"WPML before using this plugin."
+msgstr ""
+"WPML est actif, mais sa configuration n’est pas terminée. Veuillez %1$s pour "
+"terminer la configuration de WPML avant d’utiliser ce plugin."
+
+#: index.php:747
+msgid "complete the WPML setup"
+msgstr "terminer la configuration de WPML"
+
+#: index.php:762
+msgid "WPML Multilingual CMS"
+msgstr "WPML Multilingual CMS"
+
+#: index.php:770
+msgid "WPML String Translation"
+msgstr "WPML String Translation"
+
+#: index.php:777
+msgid "AutoMLP – AI Translation for WPML:"
+msgstr "AutoMLP – Traduction IA pour WPML :"
+
+#. translators: 1: WPML Multilingual CMS link, 2: WPML String Translation link
+#: index.php:782
+#, php-format
+msgid "This plugin requires both %1$s and %2$s to be installed and activated."
+msgstr ""
+"Cette extension nécessite l’installation et l’activation de %1$s et de %2$s."
+
+#. translators: %s: Missing plugin link
+#: index.php:789
+#, php-format
+msgid "This plugin requires %s to be installed and activated."
+msgstr "Cette extension nécessite l’installation et l’activation de %s."
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Connect AI Provider"
+msgstr "Connecter un fournisseur d’IA"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid ""
+"To start using AI translation, connect at least one AI provider below. Add "
+"your AI provider API key to start translating your website with AutoML."
+msgstr ""
+"Pour commencer à utiliser la traduction par IA, connectez au moins un "
+"fournisseur d’IA ci-dessous. Ajoutez la clé API de votre fournisseur d’IA "
+"pour commencer à traduire votre site web avec AutoML."
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "OpenAI API key"
+msgstr "Clé API OpenAI"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Enter OpenAI API key"
+msgstr "Saisissez la clé API OpenAI"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid " to see how to configure OpenAI in the AI SDK."
+msgstr ""
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Google / Gemini API key"
+msgstr "Clé API Google / Gemini"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Enter Google API key"
+msgstr "Saisissez la clé API Google"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid " to see how to configure Google Gemini in the AI SDK."
+msgstr ""
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid ""
+"Translate on your device using local AI, no API key required, unlimited "
+"translations, save 100% on API usage costs."
+msgstr ""
+"Traduisez sur votre appareil à l’aide d’une IA locale, sans clé API, avec un "
+"nombre illimité de traductions et économisez 100  %d es frais d’utilisation "
+"de l’API."
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Upgrade to Pro →"
+msgstr ""
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid ""
+"API keys are saved securely and can be updated anytime in WPML → AutoMLP AI "
+"→ Settings."
+msgstr ""
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "API keys saved."
+msgstr "Clés API enregistrées."
+
+#: admin/assets/frontend/setup/setup.js:1
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Continue"
+msgstr "Continuer"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Select an option"
+msgstr "Sélectionner une option"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Select Language for AI Translation"
+msgstr "Sélectionner la langue pour la traduction par IA"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid ""
+"Choose your website language you want to translate using AI. The free "
+"version of AutoMLP allows AI translation for one language only."
+msgstr ""
+"Choisissez la langue de votre site web vers laquelle vous souhaitez traduire "
+"à l’aide de l’IA. La version gratuite d’AutoMLP permet de traduire par IA "
+"vers une seule langue."
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Choose a language"
+msgstr "Choisir une langue"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Translate all languages using AI"
+msgstr "Traduire toutes les langues à l’aide de l’IA"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid ""
+" - Have a website in multiple languages and want to translate them all using "
+"AI?"
+msgstr ""
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Finish setup"
+msgstr "Terminer la configuration"
+
+#: admin/assets/frontend/setup/setup.js:1
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Back"
+msgstr "Retour"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Intro"
+msgstr "Introduction"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "AI Translation"
+msgstr "Traduction par IA"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Watch Setup Guide Video"
+msgstr "Regarder la vidéo du guide de configuration"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Learn how to set up AutoMLP and start translating your pages"
+msgstr "Découvrez comment configurer AutoMLP et commencer à traduire vos pages"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "automatically using AI."
+msgstr "automatiquement à l’aide de l’IA."
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "AutoMLP Setup Guide"
+msgstr "Guide de configuration d’AutoMLP"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Get Started"
+msgstr "Commencer"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Need help? Visit our"
+msgstr "Besoin d’aide ? Consultez notre"
+
+#: admin/assets/frontend/setup/setup.js:1
+msgid "Documentation"
+msgstr "Documentation"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Request failed."
+msgstr "Échec de la requête."
+
+#: assets/bulk-string-translate/index.js:1
+msgid "No strings found to translate."
+msgstr "Aucune chaîne à traduire trouvée."
+
+#: assets/bulk-string-translate/index.js:1
+msgid "Translation failed"
+msgstr "Échec de la traduction"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+#, js-format
+msgid ""
+"Translations already exist for all selected %s in the chosen languages. "
+"There are no new %s to translate."
+msgstr ""
+"Des traductions existent déjà pour tous les éléments %s sélectionnés dans "
+"les langues choisies. Il n’y a aucun nouvel élément %s à traduire."
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Bulk Translation Error"
+msgstr "Erreur de traduction groupée"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "STEP 3 OF 3"
+msgstr "ÉTAPE 3 SUR 3"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+#, js-format
+msgid "Bulk Translation %s"
+msgstr "Traduction groupée %s"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "In Progress"
+msgstr "En cours"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Pending"
+msgstr "En attente"
+
+#: assets/bulk-string-translate/index.js:1
+msgid "Your content is being translated. Please wait for a moment."
+msgstr ""
+"Votre contenu est en cours de traduction. Veuillez patienter un instant."
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Your content has been translated successfully."
+msgstr "Votre contenu a été traduit avec succès."
+
+#: assets/bulk-string-translate/index.js:1
+msgid "STRINGS"
+msgstr "CHAÎNES"
+
+#: assets/bulk-string-translate/index.js:1
+msgid "CHARACTERS"
+msgstr "CARACTÈRES"
+
+#: assets/bulk-string-translate/index.js:1
+msgid "TIME TAKEN"
+msgstr "DURÉE"
+
+#: assets/bulk-string-translate/index.js:1
+msgid "ms"
+msgstr "ms"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "seconds"
+msgstr "secondes"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Untitled"
+msgstr "Sans titre"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Error Details"
+msgstr "Détails de l’erreur"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "STEP 2 OF 3"
+msgstr "ÉTAPE 2 SUR 3"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Select Translation Engine"
+msgstr "Sélectionner le moteur de traduction"
+
+#: assets/bulk-string-translate/index.js:1
+msgid "Choose the Ai provider you want to use for your this translation batch."
+msgstr ""
+"Choisissez le fournisseur d’IA que vous souhaitez utiliser pour ce lot de "
+"traductions."
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+#, js-format
+msgid "%1$s Built-in %2$s"
+msgstr "%1$s intégré %2$s"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+#, js-format
+msgid "Translate Using %s"
+msgstr "Traduire avec %s"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Buy Pro"
+msgstr "Acheter la version Pro"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+#, js-format
+msgid "%s Model"
+msgstr "Modèle %s"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+#, js-format
+msgid "Translate Using %s Model"
+msgstr "Traduire avec le modèle %s"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Add API Key"
+msgstr "Ajouter une clé API"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+#, js-format
+msgid "Please select at least one %s for translation."
+msgstr "Veuillez sélectionner au moins un élément %s à traduire."
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Please select at least one language"
+msgstr "Veuillez sélectionner au moins une langue"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "STEP 1 OF 3"
+msgstr "ÉTAPE 1 SUR 3"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Select Languages"
+msgstr "Sélectionner les langues"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Multiple language translation available in Pro."
+msgstr ""
+"La traduction vers plusieurs langues est disponible dans la version Pro."
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Buy Pro Version to Unlock All Languages"
+msgstr "Achetez la version Pro pour débloquer toutes les langues"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Upgrade now"
+msgstr "Mettre à niveau maintenant"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Select language in Setup Wizard (Languages step)"
+msgstr ""
+"Sélectionnez une langue dans l’assistant de configuration (étape Langues)"
+
+#: assets/bulk-string-translate/index.js:1 assets/bulk-translate/index.js:1
+msgid "Next"
+msgstr "Suivant"
+
+#: assets/bulk-translate/index.js:1
+msgid "N/A"
+msgstr "S.O."
+
+#: assets/bulk-translate/index.js:1
+msgid "Translation failed."
+msgstr "Échec de la traduction."
+
+#: assets/bulk-translate/index.js:1
+#, js-format
+msgid "#%s"
+msgstr ""
+
+#: assets/bulk-translate/index.js:1
+msgid "Could not be queued."
+msgstr "Impossible de mettre en file d’attente."
+
+#: assets/bulk-translate/index.js:1
+#, js-format
+msgid ""
+"Translations already exist for all selected %s in the chosen language. Re-"
+"translation is available in the Pro version."
+msgstr ""
+"Des traductions existent déjà pour tous les %s sélectionnés dans la langue "
+"choisie. La retraduction est disponible dans la version Pro."
+
+#: assets/bulk-translate/index.js:1
+msgid "Translation could not be started."
+msgstr "La traduction n’a pas pu être lancée."
+
+#: assets/bulk-translate/index.js:1
+msgid "In Queue"
+msgstr "En file d’attente"
+
+#: assets/bulk-translate/index.js:1
+msgid "Preparing"
+msgstr "Préparation"
+
+#: assets/bulk-translate/index.js:1
+msgid "Skipped"
+msgstr "Ignoré"
+
+#: assets/bulk-translate/index.js:1
+msgid "Retrying"
+msgstr "Nouvelle tentative"
+
+#: assets/bulk-translate/index.js:1
+msgid "Completed with errors"
+msgstr "Terminé avec des erreurs"
+
+#: assets/bulk-translate/index.js:1
+msgid "Completed – some items were skipped"
+msgstr "Terminé – certains éléments ont été ignorés"
+
+#: assets/bulk-translate/index.js:1
+msgid "Posts"
+msgstr "Articles"
+
+#: assets/bulk-translate/index.js:1
+msgid "Characters"
+msgstr "Caractères"
+
+#: assets/bulk-translate/index.js:1
+msgid "Preview"
+msgstr "Aperçu"
+
+#: assets/bulk-translate/index.js:1
+#, js-format
+msgid "Open the translated %s for review"
+msgstr "Ouvrir le %s traduit pour le vérifier"
+
+#: assets/bulk-translate/index.js:1
+#, js-format
+msgid ""
+"Please wait until all translations for this %s are complete before reviewing."
+msgstr ""
+"Veuillez attendre que toutes les traductions de ce %s soient terminées avant "
+"de procéder à la vérification."
+
+#: assets/bulk-translate/index.js:1
+#, js-format
+msgid "Check Translated %s"
+msgstr "Vérifier le %s traduit"
+
+#: assets/bulk-translate/index.js:1
+msgid "Select an AI provider to automatically translate your content."
+msgstr ""
+"Sélectionnez un fournisseur d’IA pour traduire automatiquement votre contenu."
+
+#: assets/bulk-translate/index.js:1
+msgid "Best for creative and localized content."
+msgstr "Idéal pour les contenus créatifs et adaptés au contexte local."
+
+#: assets/bulk-translate/index.js:1
+msgid "Reliable, fast translation across 130+ languages."
+msgstr "Traduction fiable et rapide dans plus de 130 langues."
