@@ -88,6 +88,8 @@ class Register_Assets {
 					true
 				);
 
+				wp_set_script_translations( 'automlp-ai-bulk-translate', 'wpml-translation-check', AUTOMLP_AI_PLUGIN_DIR . 'languages' );
+
 				wp_enqueue_style(
 					'automlp-ai-bulk-translate',
 					AUTOMLP_AI_PLUGIN_URL . 'assets/bulk-string-translate/index.css',

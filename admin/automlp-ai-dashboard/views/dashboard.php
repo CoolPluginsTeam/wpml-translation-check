@@ -62,7 +62,7 @@ $automlp_active_providers = get_option('automlp_enabled_providers', array('googl
 </div>
 <div class="automlp_ai_dashboard-get-started-grid-content">
 					<iframe
-						title="Automate the Translation Process with AUTOMLP Ai Translate Addon"
+						title="<?php echo esc_attr( sprintf( /* translators: %s: plugin name (brand name, not translated) */ __( 'Automate the Translation Process with %s Addon', 'wpml-translation-check' ), 'AutoMLP AI Translate' ) ); ?>"
 						src="https://www.youtube.com/embed/ZcSbNup4efw"
 						frameborder="0"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"

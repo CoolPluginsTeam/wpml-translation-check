@@ -94,6 +94,7 @@ class Register_Assets {
 		$css_file = $rtl ? 'index-rtl.css' : 'index.css';
 
 		wp_enqueue_script( 'automlp-wpml-bulk-translate', AUTOMLP_AI_PLUGIN_URL . 'assets/bulk-translate/index.js', $editor_script_asset['dependencies'], $editor_script_asset['version'], true );
+		wp_set_script_translations( 'automlp-wpml-bulk-translate', 'wpml-translation-check', AUTOMLP_AI_PLUGIN_DIR . 'languages' );
 		wp_enqueue_style( 'automlp-wpml-bulk-translate', AUTOMLP_AI_PLUGIN_URL . 'assets/bulk-translate/' . $css_file, array(), $editor_script_asset['version'] );
 
 		$languages            = WPML_AT_Helper::get_wpml_languages();

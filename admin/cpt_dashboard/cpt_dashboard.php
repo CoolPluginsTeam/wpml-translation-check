@@ -295,7 +295,7 @@ if(!defined('ABSPATH')){
 
             add_action('automlp_ai_admin_notices', function() use ($message, $prefix, $url, $allowed){
                 $html= '<div class="notice notice-info is-dismissible cpt-review-notice" data-prefix="'.$prefix.'" data-nonce="'.wp_create_nonce('automlp_wpml_hide_review_notice').'">';
-                $html .= '<div class="cpt-review-notice-content"><p>'.$message.'</p><div class="automlp-wpml-review-notice-dismiss"><a href="'. $url .'" target="_blank" class="button button-primary">Rate Now! ★★★★★</a></div></div><button class="cpt-not-interested">'.__('Not Interested', 'wpml-translation-check').'</button></div>';
+				$html .= '<div class="cpt-review-notice-content"><p>' . $message . '</p><div class="automlp-wpml-review-notice-dismiss"><a href="' . $url . '" target="_blank" class="button button-primary">' . esc_html__( 'Rate Now!', 'wpml-translation-check' ) . ' ★★★★★</a></div></div><button class="cpt-not-interested">' . __( 'Not Interested', 'wpml-translation-check' ) . '</button></div>';
                 
                 echo wp_kses($html, $allowed);
             });

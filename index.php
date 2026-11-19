@@ -5,6 +5,7 @@
  * Version: 2.0.0
  * Author: Cool Plugins
  * Author URI: https://coolplugins.net/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=author_page&utm_content=plugins_list
+ * Domain Path: /languages
  * Text Domain: wpml-translation-check
  * License: GPL v2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -738,12 +739,12 @@ public function wpml_missing_notice() {
         ?>
         <div class="notice notice-error">
             <p>
-                <strong><?php esc_html_e( 'AutoMLP – AI Translation for WPML Pro:', 'wpml-translation-check-pro' ); ?></strong>
+				<strong><?php echo esc_html( 'AutoMLP – AI Translation for WPML Pro:' ); ?></strong>
                 <?php
                 printf(
                     /* translators: 1: WPML setup link */
-                    esc_html__( 'WPML is active but setup is not complete. Please %1$s to finish configuring WPML before using this plugin.', 'wpml-translation-check-pro' ),
-                    '<a href="' . esc_url( admin_url( 'admin.php?page=' . rawurlencode( 'sitepress-multilingual-cms/menu/setup.php' ) ) ) . '">' . esc_html__( 'complete the WPML setup', 'wpml-translation-check-pro' ) . '</a>'
+					esc_html__( 'WPML is active but setup is not complete. Please %1$s to finish configuring WPML before using this plugin.', 'wpml-translation-check' ),
+					'<a href="' . esc_url( admin_url( 'admin.php?page=' . rawurlencode( 'sitepress-multilingual-cms/menu/setup.php' ) ) ) . '">' . esc_html__( 'complete the WPML setup', 'wpml-translation-check' ) . '</a>'
                 );
                 ?>
             </p>

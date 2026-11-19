@@ -443,7 +443,7 @@ $automlp_wpml_wizard_language_set = is_array( $automlp_wpml_wizard_lang ) && ! e
                                         name="automlp_ai_dashboard_feedback_checkbox"
                                         <?php checked(get_option('automlp_feedback_opt_in'), 'yes'); ?>>
                                     <p><?php echo esc_html__('Help us make this plugin more compatible with your site by sharing non-sensitive site data.', 'wpml-translation-check'); ?></p>
-                                    <a href="#" class="cpfm-see-terms">[See terms]</a>
+									<a href="#" class="cpfm-see-terms">[<?php esc_html_e( 'See terms', 'wpml-translation-check' ); ?>]</a>
                                 </div>
                                 <div id="termsBox" style="display: none;padding-left: 20px; margin-top: 10px; font-size: 12px; color: #999;">
                                         <p><?php echo esc_html__("Opt in to receive email updates about security improvements, new features, helpful tutorials, and occasional special offers. We'll collect:", 'wpml-translation-check'); ?> <a href="https://my.coolplugins.net/terms/usage-tracking/?utm_source=automlp_plugin&utm_medium=inside&utm_campaign=terms&utm_content=dashboard" target="_blank" rel="noopener noreferrer"><?php echo esc_html__('Click Here', 'wpml-translation-check'); ?></a></p>

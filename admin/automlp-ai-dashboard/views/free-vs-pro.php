@@ -28,17 +28,39 @@ if(!defined('ABSPATH')){
         </thead>
         <tbody>
             <?php
-                $automlp_features = [
-                    'Chrome Built-in AI Support' => [false, true],
-                    'No API Key Required' => [false, true],
-                    'Unlimited Translations' => [true, true],
-                    'AI Translator (Gemini/OpenAI) Support' => [true, true],
-                    'Custom Post Type Translation' => [false, true],
-                    'Bulk Translation' => [true, true],
-                    'Divi Translation' => [false, true],
-                    'Elementor Template Translation' => [false, true],
-                    'Premium Support' => [false, true],
-                ];
+				$automlp_features = array(
+					sprintf(
+						/* translators: 1: Chrome (brand name, not translated), 2: AI (not translated) */
+						__( '%1$s Built-in %2$s Support', 'wpml-translation-check' ),
+						'Chrome',
+						'AI'
+					) => array( false, true ),
+					sprintf(
+						/* translators: %s: API Key (not translated) */
+						__( 'No %s Required', 'wpml-translation-check' ),
+						'API Key'
+					) => array( false, true ),
+					__( 'Unlimited Translations', 'wpml-translation-check' ) => array( true, true ),
+					sprintf(
+						/* translators: 1: AI (not translated), 2: Gemini/OpenAI (brand names, not translated) */
+						__( '%1$s Translator (%2$s) Support', 'wpml-translation-check' ),
+						'AI',
+						'Gemini/OpenAI'
+					) => array( true, true ),
+					__( 'Custom Post Type Translation', 'wpml-translation-check' ) => array( false, true ),
+					__( 'Bulk Translation', 'wpml-translation-check' ) => array( true, true ),
+					sprintf(
+						/* translators: %s: Divi (brand name, not translated) */
+						__( '%s Translation', 'wpml-translation-check' ),
+						'Divi'
+					) => array( false, true ),
+					sprintf(
+						/* translators: %s: Elementor Template (brand name, not translated) */
+						__( '%s Translation', 'wpml-translation-check' ),
+						'Elementor Template'
+					) => array( false, true ),
+					__( 'Premium Support', 'wpml-translation-check' ) => array( false, true ),
+				);
              foreach ($automlp_features as $automlp_feature => $automlp_availability): ?>
                 <tr>
                     <td><?php echo esc_html($automlp_feature); ?></td>

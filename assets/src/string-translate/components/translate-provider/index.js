@@ -12,7 +12,7 @@ export default (props) => {
 
     const Services = {
         localAiTranslator: {
-            title: "Chrome Built-in AI",
+            title: sprintf(__("%1$s Built-in %2$s", "wpml-translation-check"), "Chrome", "AI"),
             SettingBtnText: "Translate",
             serviceLabel: "Chrome AI Translator",
             heading: sprintf(__("Translate Using %s", "wpml-translation-check"), "Chrome built-in API"),
@@ -24,7 +24,7 @@ export default (props) => {
             filterHtmlContent: true
         },
         openai_ai: {
-            title: "OpenAI Model",
+            title: sprintf(__("%s Model", "wpml-translation-check"), "OpenAI"),
             SettingBtnText: "Translate",
             serviceLabel: "OpenAI",
             heading: sprintf(__("Translate Using %s Model", "wpml-translation-check"), "OpenAI"),
@@ -36,7 +36,7 @@ export default (props) => {
             filterHtmlContent: true
         },
         google_ai: {
-            title: "Gemini Model",
+            title: sprintf(__("%s Model", "wpml-translation-check"), "Gemini"),
             SettingBtnText: "Translate",
             serviceLabel: "Gemini",
             heading: sprintf(__("Translate Using %s Model", "wpml-translation-check"), "Gemini"),

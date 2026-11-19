@@ -30,7 +30,7 @@ export default (props) => {
 	const Services = {
 		openai_ai: {
 			slug: 'openai',
-			title: 'OpenAI Model',
+			title: sprintf(__('%s Model', 'wpml-translation-check'), 'OpenAI'),
 			SettingBtnText: 'Translate',
 			serviceLabel: 'OpenAI',
 			heading: sprintf(
@@ -45,7 +45,7 @@ export default (props) => {
 		},
 		google_ai: {
 			slug: 'google',
-			title: 'Gemini Model',
+			title: sprintf(__('%s Model', 'wpml-translation-check'), 'Gemini'),
 			SettingBtnText: 'Translate',
 			serviceLabel: 'Gemini',
 			heading: sprintf(
@@ -60,7 +60,7 @@ export default (props) => {
 		},
 		localAiTranslator: {
 			slug: '',
-			title: 'Chrome Built-in AI',
+			title: sprintf(__('%1$s Built-in %2$s', 'wpml-translation-check'), 'Chrome', 'AI'),
 			SettingBtnText: 'Translate',
 			serviceLabel: 'Chrome AI Translator',
 			heading: sprintf(

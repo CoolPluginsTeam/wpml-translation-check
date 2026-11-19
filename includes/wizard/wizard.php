@@ -187,6 +187,7 @@ class AUTOMLP_Ai_Wizard {
 			$asset['version'],
 			true
 		);
+		wp_set_script_translations( 'automlp_ai_setup', 'wpml-translation-check', AUTOMLP_AI_PLUGIN_DIR . 'languages' );
 		wp_enqueue_style(
 			'automlp-ai-wizard',
 			$style,

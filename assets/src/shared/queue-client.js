@@ -7,6 +7,8 @@
  * progress.
  */
 
+import { __ } from '@wordpress/i18n';
+
 const cfg = () => window.automlp_wpml_bulk_translate_object || {};
 
 const REST_ROOT = () => (cfg().queueRouteUrl || '').replace(/\/$/, '');
@@ -45,7 +47,7 @@ const request = async (path, body = null, method = 'POST') => {
 
 	if (!response.ok) {
 		const message =
-			data && data.message ? data.message : 'Request failed.';
+			data && data.message ? data.message : __( 'Request failed.', 'wpml-translation-check' );
 		throw new Error(message);
 	}
 
