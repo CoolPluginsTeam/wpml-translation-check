@@ -388,6 +388,9 @@ if ( ! class_exists( 'CPFM_Deactivation_Feedback' ) ) {
 				$extra_details['onboarding_data'] = array();
 			}
 
+			// Registration key this plugin used in cpfm_register() (e.g. 'twae').
+			$extra_details['plugin_id'] = sanitize_key( $id );
+
 			$body = array(
 				'plugin_name'    => sanitize_text_field( $cfg['plugin_name'] ),
 				'plugin_version' => sanitize_text_field( (string) $cfg['version'] ),

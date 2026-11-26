@@ -254,6 +254,9 @@ if ( ! class_exists( 'CPFM_Usage_Cron' ) ) {
 				$extra_details['onboarding_data'] = array();
 			}
 
+			// Registration key this plugin used in cpfm_register() (e.g. 'twae').
+			$extra_details['plugin_id'] = sanitize_key( $id );
+
 			$site_url      = get_site_url();
 
 			$install_date = $config['install_date_option'] ? get_option( $config['install_date_option'] ) : '';
